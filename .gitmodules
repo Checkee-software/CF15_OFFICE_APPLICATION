@@ -1,0 +1,3 @@
+[submodule "src/shared-types"]
+	path = src/shared-types
+	url = https://github.com/Checkee-software/CF15_SHAREDTYPES.git
