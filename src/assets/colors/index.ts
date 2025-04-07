@@ -1,0 +1,27 @@
+const colors = {
+    white: '#F5F5F5',
+    black: '#212121',
+    background: '#FFFFFF',
+    primary: '#4CAF50',
+    primary_oppacity_15: 'rgba()',
+    primary_oppacity_30: 'rgba()',
+    light_gray: '#D3D3D3',
+    gray: '#808080',
+    gray_oppacity_15: 'rgba()',
+    gray_oppacity_30: 'rgba()',
+    dark_gray: '#A9A9A9',
+    orange: '#FF9800',
+    orange_oppacity_15: 'rgba()',
+    orange_oppacity_30: 'rgba()',
+    tomato: '#FF4E45',
+    tomato_oppacity_15: 'rgba()',
+    blue: '#2196F3',
+    blue_oppacity_15: 'rgba()',
+    blue_oppacity_30: 'rgba()',
+    yellow: '#EBD233',
+    yellow_oppacity_15: 'rgba()',
+    yellow_oppacity_30: 'rgba()',
+    brown: '#421F19',
+};
+
+export default colors;

@@ -1,5 +1,20 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
+# Before Getting Started
+```sh
+# checkout new branch (switch to home), if your current branch is "main"
+git checkout home
+
+# init submodule 
+git submodule init
+
+# update submodule
+git submodule update
+
+# install whole packages
+npm install
+```
+
 # Getting Started
 
 > **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
