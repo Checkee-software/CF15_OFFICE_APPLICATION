@@ -9,8 +9,14 @@ const USER_SCREENS = {
     } as ScreenInformation,
     UPDATE_PASSWORD: {
         key: 'UPDATE_PASSWORD',
-        headerTitle: 'ĐỔI MẬT KHẢU',
+        headerTitle: 'ĐỔI MẬT KHẨU',
         buttonLabel: 'ĐỔI MẬT KHẨU',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    NOTIFICATION: {
+        key: 'NOTIFICATION',
+        headerTitle: 'QUẢN LÝ THÔNG BÁO',
+        buttonLabel: 'QUẢN LÝ THÔNG BÁO',
         isOpenQRCamera: false,
     } as ScreenInformation,
 }

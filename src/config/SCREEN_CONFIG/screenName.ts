@@ -18,6 +18,7 @@ export type ScreenName =
     /* USER */
     | 'PROFILE'
     | 'UPDATE_PASSWORD'
+    | 'NOTIFICATION'
     /* GLOBAL */
     | 'CAMERA_SCANNER'
     | 'MANUAL_SEARCHING'

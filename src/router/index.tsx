@@ -11,7 +11,7 @@ import colors from '../assets/colors';
 const Stack = createNativeStackNavigator();
 
 export default function Router() {
-    const isLoggedIn: unknown = false;
+    const isLoggedIn: unknown = true;
 
     const renderStackScreenGroup = () => {
         switch (isLoggedIn) {
@@ -69,7 +69,7 @@ export default function Router() {
                         backgroundColor: colors.white,
                     },
                     headerTitleAlign: 'center',
-                    headerTintColor: 'white',
+                    headerTintColor: 'black',
                     headerShadowVisible: false,
                 }}>
                 {renderStackScreenGroup()}
