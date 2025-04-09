@@ -15,8 +15,11 @@ import moment from 'moment';
 import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useNavigation} from '@react-navigation/native';
+import useAuthStore from '../../../stores/authStore';
 
 export default function Main() {
+    const {userInfo} = useAuthStore();
+
     const isRollCall = false;
     const navigation = useNavigation();
 
@@ -35,7 +38,7 @@ export default function Main() {
                             Chào buổi sáng
                         </Text>
                         <Text style={MainStyles.helloUserText}>
-                            Robert Amber
+                            {userInfo.fullName}
                         </Text>
                     </View>
 

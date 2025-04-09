@@ -4,15 +4,17 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Loading from '../screens/subscreen/Loading';
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 import {UNAUTHENTICATION_SCREENS} from '../config/SCREEN_CONFIG/unauthentication';
-import {AUTHENTICATION_SCREENS} from '../config/SCREEN_CONFIG/authentication';
 import colors from '../assets/colors';
 import BottomTabsNavigator from './BottomTabsNavigator';
-import {useAuth} from '../contexts/AuthContext';
+//import {useAuth} from '../contexts/AuthContext';
+import useAuthStore from '../stores/authStore';
 
 const Stack = createNativeStackNavigator();
 
 export default function Router() {
-    const {isLogin, userInfo} = useAuth();
+    //const {isLogin, userInfo} = useAuth();
+
+    const {isLogin} = useAuthStore();
 
     const isLoggedIn: unknown = isLogin;
 

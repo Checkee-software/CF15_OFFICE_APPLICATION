@@ -13,12 +13,10 @@ import images from '../../../assets/images';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
-import {useAuth} from '../../../contexts/AuthContext';
-//api
-import {signIn} from '../../../service/UserService';
+import useAuthStore from '../../../stores/authStore';
 
 export default function Login() {
-    const {login} = useAuth();
+    const {login, isLoading} = useAuthStore();
 
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -52,23 +50,7 @@ export default function Login() {
             password: userAccount.password,
         };
 
-        try {
-            const responseSignIn = await signIn(_userAccount);
-            console.log(responseSignIn);
-            if (responseSignIn.status !== 200) {
-                Alert.alert(responseSignIn.data);
-            } else {
-                const userInfo = {
-                    fullName: responseSignIn.data.data.fullName,
-                    userType: responseSignIn.data.data.userType,
-                };
-
-                login(userInfo);
-            }
-        } catch (error) {
-            //Alert.alert(res)
-            console.log(error);
-        }
+        login(_userAccount);
     };
 
     return (
@@ -79,8 +61,8 @@ export default function Login() {
                 <Image
                     source={images.backgroundLogin}
                     style={LoginStyles.welcomeSceenBackground}
-                    blurRadius={2}
-                    resizeMode='contain'
+                    blurRadius={1}
+                    resizeMode='cover'
                 />
                 <View style={LoginStyles.welcomeSceen}>
                     <Image
