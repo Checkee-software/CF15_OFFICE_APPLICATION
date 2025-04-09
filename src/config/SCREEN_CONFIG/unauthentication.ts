@@ -1,5 +1,5 @@
 import SCREEN_INFO from './screenInfo';
-import { ScreenRegistry } from './types';
+import {ScreenRegistry} from './types';
 
 /* screens */
 import Login from '../../screens/onboarding/Login';
@@ -14,15 +14,15 @@ import AutomaticTracing from '../../screens/onboarding/AutomaticTracing';
 
 export const UNAUTHENTICATION_SCREENS: ScreenRegistry[] = [
     {
-        name: SCREEN_INFO.INDEX.key,
-        component: Splash,
+        name: SCREEN_INFO.LOGIN.key,
+        component: Login,
         options: {
             headerShown: false,
         },
     },
     {
-        name: SCREEN_INFO.LOGIN.key,
-        component: Login,
+        name: SCREEN_INFO.INDEX.key,
+        component: Splash,
         options: {
             headerShown: false,
         },

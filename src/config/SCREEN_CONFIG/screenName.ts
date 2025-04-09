@@ -5,6 +5,7 @@ export type ScreenName =
     | 'AUTOMATIC_TRACING'
     /* HOME */
     | 'MAIN'
+    | 'LISTNOTIFICATION'
     | 'DIRECT_EXPORT_FILLED_GAS_TANK'
     | 'WAREHOUSE_EXPORT_FILLED_GAS_TANK'
     | 'DIRECT_EXPORT_GAS_TANK'
@@ -28,4 +29,4 @@ export type ScreenName =
     | 'SCANNED_GAS_TANK'
     /* SUB-SCREENS */
     | 'LOADING'
-    | 'ERROR'
+    | 'ERROR';

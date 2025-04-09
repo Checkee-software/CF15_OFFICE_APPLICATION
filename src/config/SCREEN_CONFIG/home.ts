@@ -1,9 +1,19 @@
-import { ScreenInformation } from './types';
+import {ScreenInformation} from './types';
 
 const HOME_SCREENS = {
     MAIN: {
         key: 'MAIN',
-        headerTitle: 'Trang chủ',
+        headerTitle: 'CF15 OFFICE',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    NOTIFICATION: {
+        key: 'NOTIFICATION',
+        headerTitle: 'THÔNG BÁO',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    LISTNOTIFICATION: {
+        key: 'LISTNOTIFICATION',
+        headerTitle: 'THÔNG BÁO',
         isOpenQRCamera: false,
     } as ScreenInformation,
     DIRECT_EXPORT_FILLED_GAS_TANK: {
@@ -66,6 +76,6 @@ const HOME_SCREENS = {
         buttonLabel: 'Báo cáo thống kê',
         isOpenQRCamera: false,
     } as ScreenInformation,
-}
+};
 
 export default HOME_SCREENS;
