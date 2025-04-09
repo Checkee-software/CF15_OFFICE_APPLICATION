@@ -20,6 +20,8 @@ import DirectExportFilledGasTank from '../../screens/home/DirectExportFilledGasT
 import WarehouseExportFilledGasTank from '../../screens/home/WarehouseExportFilledGasTank';
 import Selling from '../../screens/Selling';
 import Notification from '../../screens/user/Notification';
+import Feedback from '../../screens/onboarding/Feedback';
+import Feedback1 from '../../screens/onboarding/Feedback/index2';
 
 /**
  * Declare user's screens before signing in
@@ -28,10 +30,18 @@ import Notification from '../../screens/user/Notification';
 
 export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
     {
-        name: SCREEN_INFO.PROFILE.key,
-        component: Profile,
+        name: SCREEN_INFO.FEEDBACK.key,
+        component: Feedback,
         options: {
-            title: SCREEN_INFO.PROFILE.headerTitle,
+            title: SCREEN_INFO.FEEDBACK.headerTitle,
+        },
+    },
+
+    {
+        name: SCREEN_INFO.FEEDBACK1.key,
+        component: Feedback1,
+        options: {
+            title: SCREEN_INFO.FEEDBACK1.headerTitle,
         },
     },
     /* HOME */
@@ -142,13 +152,13 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         },
     },
     /* USER */
-    // {
-    //     name: SCREEN_INFO.PROFILE.key,
-    //     component: Profile,
-    //     options: {
-    //         title: SCREEN_INFO.PROFILE.headerTitle,
-    //     },
-    // },
+    {
+        name: SCREEN_INFO.PROFILE.key,
+        component: Profile,
+        options: {
+            title: SCREEN_INFO.PROFILE.headerTitle,
+        },
+    },
     {
         name: SCREEN_INFO.UPDATE_PASSWORD.key,
         component: UpdatePassword,

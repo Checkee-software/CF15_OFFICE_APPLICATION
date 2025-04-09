@@ -19,6 +19,18 @@ const USER_SCREENS = {
         buttonLabel: 'QUẢN LÝ THÔNG BÁO',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    FEEDBACK: {
+        key: 'FEEDBACK',
+        headerTitle: 'GÓP Ý',
+        buttonLabel: 'GÓP Ý',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    FEEDBACK1: {
+        key: 'FEEDBACK1',
+        headerTitle: 'GÓP Ý',
+        buttonLabel: 'GÓP Ý',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
 }
 
 export default USER_SCREENS;

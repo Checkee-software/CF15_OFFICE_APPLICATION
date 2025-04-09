@@ -19,6 +19,8 @@ export type ScreenName =
     | 'PROFILE'
     | 'UPDATE_PASSWORD'
     | 'NOTIFICATION'
+    | 'FEEDBACK'
+    | 'FEEDBACK1'
     /* GLOBAL */
     | 'CAMERA_SCANNER'
     | 'MANUAL_SEARCHING'
