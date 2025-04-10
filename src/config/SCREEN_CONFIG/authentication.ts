@@ -1,5 +1,5 @@
 import SCREEN_INFO from './screenInfo';
-import { ScreenRegistry } from './types';
+import {ScreenRegistry} from './types';
 
 /* screens */
 import Main from '../../screens/home/Main';
@@ -20,6 +20,7 @@ import DirectExportFilledGasTank from '../../screens/home/DirectExportFilledGasT
 import WarehouseExportFilledGasTank from '../../screens/home/WarehouseExportFilledGasTank';
 import Selling from '../../screens/Selling';
 import Notification from '../../screens/user/Notification';
+import ListNotification from '../../screens/home/ListNotification/ListNotification';
 import Feedback from '../../screens/onboarding/Feedback';
 import Feedback1 from '../../screens/onboarding/Feedback/index2';
 import News from '../../screens/user/News';
@@ -48,6 +49,13 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
     },
 
     {
+        name: SCREEN_INFO.MAIN.key,
+        component: Main,
+        options: {
+            title: SCREEN_INFO.MAIN.headerTitle,
+        },
+    },
+    {
         name: SCREEN_INFO.FEEDBACK.key,
         component: Feedback,
         options: {
@@ -63,13 +71,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         },
     },
     /* HOME */
-    {
-        name: SCREEN_INFO.MAIN.key,
-        component: Main,
-        options: {
-            title: SCREEN_INFO.MAIN.headerTitle,
-        },
-    },
     {
         name: SCREEN_INFO.DIRECT_EXPORT_FILLED_GAS_TANK.key,
         component: DirectExportFilledGasTank,
@@ -187,6 +188,13 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
     {
         name: SCREEN_INFO.NOTIFICATION.key,
         component: Notification,
+        options: {
+            title: SCREEN_INFO.NOTIFICATION.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.LISTNOTIFICATION.key,
+        component: ListNotification,
         options: {
             title: SCREEN_INFO.NOTIFICATION.headerTitle,
         },
