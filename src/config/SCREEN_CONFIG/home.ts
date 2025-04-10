@@ -16,6 +16,16 @@ const HOME_SCREENS = {
         headerTitle: 'THÔNG BÁO',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    DOCUMENT: {
+        key: 'DOCUMENT',
+        headerTitle: 'TÀI LIỆU',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    DETAILDOCUMENTS: {
+        key: 'DETAILDOCUMENTS',
+        headerTitle: 'CHI TIẾT TÀI LIỆU',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     DIRECT_EXPORT_FILLED_GAS_TANK: {
         key: 'DIRECT_EXPORT_FILLED_GAS_TANK',
         headerTitle: 'Xuất bình (thẳng)',

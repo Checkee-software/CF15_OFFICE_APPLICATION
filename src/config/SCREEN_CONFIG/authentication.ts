@@ -4,6 +4,8 @@ import {ScreenRegistry} from './types';
 /* screens */
 import Main from '../../screens/home/Main';
 import Profile from '../../screens/user/Profile';
+import Document from '../../screens/home/Document';
+import DetailDocuments from '../../screens/home/Document/DetailDocuments';
 import Statistic from '../../screens/home/Statistic';
 import ImportTank from '../../screens/home/ImportTank';
 import ExportProduct from '../../screens/home/ExportProduct';
@@ -20,7 +22,7 @@ import DirectExportFilledGasTank from '../../screens/home/DirectExportFilledGasT
 import WarehouseExportFilledGasTank from '../../screens/home/WarehouseExportFilledGasTank';
 import Selling from '../../screens/Selling';
 import Notification from '../../screens/user/Notification';
-import ListNotification from '../../screens/home/ListNotification/ListNotification';
+import ListNotification from '../../screens/home/ListNotification';
 import Feedback from '../../screens/onboarding/Feedback';
 import Feedback1 from '../../screens/onboarding/Feedback/index2';
 
@@ -179,6 +181,21 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: ListNotification,
         options: {
             title: SCREEN_INFO.NOTIFICATION.headerTitle,
+        },
+    },
+    /* DOCUMENT */
+    {
+        name: SCREEN_INFO.DOCUMENT.key,
+        component: Document,
+        options: {
+            title: SCREEN_INFO.DOCUMENT.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.DETAILDOCUMENTS.key,
+        component: DetailDocuments,
+        options: {
+            title: SCREEN_INFO.DETAILDOCUMENTS.headerTitle,
         },
     },
 ];

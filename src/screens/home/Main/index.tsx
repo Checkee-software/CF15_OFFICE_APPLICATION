@@ -26,7 +26,7 @@ export default function Main() {
     const formatDateWithWeekdayNumber = () => {
         const mDate = moment();
         const weekday = mDate.isoWeekday(); // Thứ 2 = 1, Chủ nhật = 7
-        return `Thứ ${weekday}, ${mDate.format('DD.MM.YYYY')}`;
+        return `Thứ ${weekday + 1}, ${mDate.format('DD.MM.YYYY')}`;
     };
 
     return (
@@ -189,13 +189,7 @@ export default function Main() {
                 <View style={MainStyles.mainMenu}>
                     <Text style={MainStyles.mainMenuTitle}>Chức năng</Text>
                     <View style={MainStyles.warpMenuButton}>
-                        <TouchableOpacity
-                            style={MainStyles.menuButton}
-                            onPress={() =>
-                                navigation.navigate(
-                                    SCREEN_INFO.CAMERA_SCANNER.key,
-                                )
-                            }>
+                        <TouchableOpacity style={MainStyles.menuButton}>
                             <Image
                                 source={images.gardener}
                                 style={MainStyles.menuButtonImage}
@@ -253,7 +247,11 @@ export default function Main() {
                             </Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={MainStyles.menuButton}>
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.DOCUMENT.key)
+                            }>
                             <Image
                                 source={images.document}
                                 style={MainStyles.menuButtonImage}

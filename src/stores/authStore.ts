@@ -12,15 +12,15 @@ const useAuthStore = create(set => ({
         try {
             const response = await signIn(userAccount); // gọi API đăng nhập
             //const token = response.data?.tokenDTO?.token;
-            const userData = {
-                fullName: response.data.data.fullName,
-                address: response.data.data.address,
-                phoneNumber: response.data.data.phoneNumber,
-                userType: response.data.data.userType,
-                userName: response.data.data.username,
-            };
 
             if (response) {
+                const userData = {
+                    fullName: response.data.data.fullName,
+                    address: response.data.data.address,
+                    phoneNumber: response.data.data.phoneNumber,
+                    userType: response.data.data.userType,
+                    userName: response.data.data.username,
+                };
                 set({userInfo: userData, isLogin: true});
             }
         } catch (error) {

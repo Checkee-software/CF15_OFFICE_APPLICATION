@@ -1,16 +1,10 @@
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-} from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
-const ListNotification = () => {
+const index = () => {
     return (
         <View style={NotificationStyle.container}>
             <ScrollView>
@@ -197,7 +191,7 @@ const ListNotification = () => {
     );
 };
 
-export default ListNotification;
+export default index;
 
 const NotificationStyle = StyleSheet.create({
     container: {

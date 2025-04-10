@@ -5,12 +5,14 @@ import Work from '../screens/home/Work';
 import CameraScanner from '../screens/global/CameraScanner';
 import History from '../screens/home/History';
 import Profile from '../screens/user/Profile';
+import Main from '../screens/home/Main';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 import HomeStack from './HomeStack';
 
-const BottomTabsNavigator = () => {
+const BottomTabsNavigator = ({navigation}) => {
     const Tab = createBottomTabNavigator();
 
     return (
@@ -27,11 +29,29 @@ const BottomTabsNavigator = () => {
                 tabBarInactiveTintColor: 'gray',
             }}>
             <Tab.Screen
-                component={HomeStack}
+                component={Main}
                 name='Trang chủ'
                 options={{
+                    headerTitle: 'CF15 OFFICE',
+                    headerShown: true,
                     tabBarIcon: ({size, color}) => (
                         <MaterialIcons name='home' size={size} color={color} />
+                    ),
+                    headerRight: () => (
+                        <TouchableOpacity
+                            style={style.alertView}
+                            onPress={() =>
+                                navigation.navigate(
+                                    SCREEN_INFO.LISTNOTIFICATION.key,
+                                )
+                            }>
+                            <View style={style.alertDot} />
+                            <FontAwesome
+                                name='bell'
+                                size={24}
+                                color={'rgba(76, 175, 80, 1)'}
+                            />
+                        </TouchableOpacity>
                     ),
                 }}
             />
@@ -49,7 +69,7 @@ const BottomTabsNavigator = () => {
 
             <Tab.Screen
                 component={CameraScanner}
-                name='Quét'
+                name='ScanScreen'
                 options={{
                     headerShown: true,
                     tabBarButton: props => (

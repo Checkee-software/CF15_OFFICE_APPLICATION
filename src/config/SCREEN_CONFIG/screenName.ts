@@ -6,6 +6,8 @@ export type ScreenName =
     /* HOME */
     | 'MAIN'
     | 'LISTNOTIFICATION'
+    | 'DOCUMENT'
+    | 'DETAILDOCUMENTS'
     | 'DIRECT_EXPORT_FILLED_GAS_TANK'
     | 'WAREHOUSE_EXPORT_FILLED_GAS_TANK'
     | 'DIRECT_EXPORT_GAS_TANK'

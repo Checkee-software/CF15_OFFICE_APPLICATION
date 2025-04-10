@@ -12,9 +12,9 @@ import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 
-export default function Profile() {
+export default function Profile({navigation}) {
     const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const navigation = useNavigation();
+    //const navigation = useNavigation();
     const [showAccountInfo, setShowAccountInfo] = useState(false);
     return (
         <View style={styles.wrapper}>

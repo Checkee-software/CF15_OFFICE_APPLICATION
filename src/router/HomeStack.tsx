@@ -19,7 +19,7 @@ const HomeStack = () => {
                     backgroundColor: '#fff',
                 },
                 headerTitleStyle: {
-                    fontSize: 16,
+                    fontSize: 18,
                 },
                 headerTitleAlign: 'center',
                 headerTintColor: 'black',

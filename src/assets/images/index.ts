@@ -7,6 +7,7 @@ import backgroundLogin from './background_login.png';
 import megaphone from './megaphone.png';
 import document from './document.png';
 import gardener from './gardener.png';
+import fileTypeDocument from './file-type-document.png';
 
 const images = {
     feedBack: feedBack,
@@ -18,6 +19,7 @@ const images = {
     megaphone: megaphone,
     document: document,
     gardener: gardener,
+    fileTypeDocument: fileTypeDocument,
 };
 
 export default images;
