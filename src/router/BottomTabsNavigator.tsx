@@ -10,9 +10,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
-import HomeStack from './HomeStack';
 
-const BottomTabsNavigator = ({navigation}) => {
+const BottomTabsNavigator = () => {
     const Tab = createBottomTabNavigator();
 
     return (

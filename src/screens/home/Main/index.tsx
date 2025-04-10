@@ -20,7 +20,7 @@ import useAuthStore from '../../../stores/authStore';
 export default function Main() {
     const {userInfo} = useAuthStore();
 
-    const isRollCall = false;
+    const isRollCall = true;
     const navigation = useNavigation();
 
     const formatDateWithWeekdayNumber = () => {
@@ -44,14 +44,14 @@ export default function Main() {
 
                     <View style={MainStyles.avatarUser}>
                         <Image
-                            source={images.logoCF15}
+                            source={images.avatar}
                             style={MainStyles.avatar}
                             resizeMode='contain'
                         />
                     </View>
                 </View>
 
-                <View
+                {/* <View
                     style={[
                         MainStyles.rollCall,
                         isRollCall
@@ -144,7 +144,7 @@ export default function Main() {
                             </TouchableOpacity>
                         )}
                     </View>
-                </View>
+                </View> */}
 
                 <View style={MainStyles.syntheticJob}>
                     <View style={MainStyles.sideJob}>
@@ -278,6 +278,7 @@ const MainStyles = StyleSheet.create({
         alignItems: 'center',
         color: 'rgba(76, 175, 80, 1)',
         justifyContent: 'space-between',
+        marginBottom: 15,
     },
     helloTime: {
         flexDirection: 'column',
@@ -292,18 +293,18 @@ const MainStyles = StyleSheet.create({
     avatarUser: {
         borderRadius: '50%',
         backgroundColor: 'rgba(128, 128, 128, 0.15)',
-        width: 52,
-        height: 52,
+        width: 60,
+        height: 60,
     },
     avatar: {
         margin: 'auto',
-        width: 45,
-        height: 45,
+        width: 50,
+        height: 50,
         aspectRatio: 1,
         borderRadius: 25,
     },
     rollCall: {
-        marginVertical: 14,
+        //marginVertical: 20,
         borderRadius: 15,
         padding: 12,
         flexDirection: 'row',
@@ -377,7 +378,7 @@ const MainStyles = StyleSheet.create({
         fontWeight: '500',
     },
     syntheticJob: {
-        marginTop: 20,
+        marginTop: 15,
     },
     sideJob: {
         flexDirection: 'row',

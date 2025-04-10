@@ -37,6 +37,7 @@ const index = ({navigation}) => {
                         }>
                         <View style={DocumentStyles.iconDocument}>
                             <Image
+                                style={DocumentStyles.iconDocumentImage}
                                 source={images.fileTypeDocument}
                                 resizeMode='contain'
                             />
@@ -47,9 +48,11 @@ const index = ({navigation}) => {
                                 Lorem ipsum dolor sit amet consectetur. Morbi
                                 velit mauris ut ac elit
                             </Text>
+
                             <Text style={DocumentStyles.documentAuthor}>
                                 Victoria Secret
                             </Text>
+
                             <Text style={DocumentStyles.documentTimeSent}>
                                 08:34 24/02/2025
                             </Text>
@@ -57,9 +60,13 @@ const index = ({navigation}) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={DocumentStyles.warpDocumentContentAndIcon}>
+                        style={DocumentStyles.warpDocumentContentAndIcon}
+                        onPress={() =>
+                            navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key)
+                        }>
                         <View style={DocumentStyles.iconDocument}>
                             <Image
+                                style={DocumentStyles.iconDocumentImage}
                                 source={images.fileTypeDocument}
                                 resizeMode='contain'
                             />
@@ -70,9 +77,11 @@ const index = ({navigation}) => {
                                 Lorem ipsum dolor sit amet consectetur. Morbi
                                 velit mauris ut ac elit
                             </Text>
+
                             <Text style={DocumentStyles.documentAuthor}>
                                 Victoria Secret
                             </Text>
+
                             <Text style={DocumentStyles.documentTimeSent}>
                                 08:34 24/02/2025
                             </Text>
@@ -80,9 +89,13 @@ const index = ({navigation}) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={DocumentStyles.warpDocumentContentAndIcon}>
+                        style={DocumentStyles.warpDocumentContentAndIcon}
+                        onPress={() =>
+                            navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key)
+                        }>
                         <View style={DocumentStyles.iconDocument}>
                             <Image
+                                style={DocumentStyles.iconDocumentImage}
                                 source={images.fileTypeDocument}
                                 resizeMode='contain'
                             />
@@ -93,9 +106,11 @@ const index = ({navigation}) => {
                                 Lorem ipsum dolor sit amet consectetur. Morbi
                                 velit mauris ut ac elit
                             </Text>
+
                             <Text style={DocumentStyles.documentAuthor}>
                                 Victoria Secret
                             </Text>
+
                             <Text style={DocumentStyles.documentTimeSent}>
                                 08:34 24/02/2025
                             </Text>
@@ -112,10 +127,8 @@ export default index;
 const DocumentStyles = StyleSheet.create({
     container: {
         flex: 1,
-        //alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 10,
-        paddingHorizontal: 15,
+        paddingHorizontal: 12,
         backgroundColor: '#fff',
     },
     warpSearchInputAndIcon: {
@@ -127,19 +140,18 @@ const DocumentStyles = StyleSheet.create({
         paddingHorizontal: 14,
     },
     searchInput: {
-        paddingVertical: 14,
+        paddingVertical: 12,
         color: 'black',
         width: '100%',
     },
     listDocument: {
-        //flexDirection: 'column'
-        gap: 10,
-        marginTop: 10,
+        backgroundColor: '#fff',
+        gap: 20,
+        marginTop: 14,
     },
     warpDocumentContentAndIcon: {
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flex: 1,
         gap: 8,
     },
     iconDocument: {
@@ -150,26 +162,28 @@ const DocumentStyles = StyleSheet.create({
         height: 72,
         width: 72,
     },
+    iconDocumentImage: {
+        height: 60,
+        width: 60,
+        aspectRatio: 1,
+    },
     documentContent: {
-        //paddingHorizontal: 10,
-        //flex: 1,
-        //flexDirection: 'column',
-        //flexWrap: 'nowrap',
+        flex: 1,
     },
     documentContentText: {
-        fontSize: 13,
-        textAlign: 'left',
-        flexShrink: 0,
+        fontSize: 12,
+        flexShrink: 1,
     },
     documentAuthor: {
         color: 'rgba(76, 175, 80, 1)',
         fontSize: 12,
         fontWeight: 300,
+        flexShrink: 1,
     },
     documentTimeSent: {
         fontSize: 11,
         color: 'rgba(128, 128, 128, 1)',
-        textAlign: 'right',
-        //alignSelf: 'flex-end',
+        alignSelf: 'flex-end',
+        flexShrink: 1,
     },
 });

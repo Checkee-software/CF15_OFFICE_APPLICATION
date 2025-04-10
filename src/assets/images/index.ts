@@ -8,6 +8,7 @@ import megaphone from './megaphone.png';
 import document from './document.png';
 import gardener from './gardener.png';
 import fileTypeDocument from './file-type-document.png';
+import avatar from './Avatar.png';
 
 const images = {
     feedBack: feedBack,
@@ -19,8 +20,8 @@ const images = {
     megaphone: megaphone,
     document: document,
     gardener: gardener,
-
     fileTypeDocument: fileTypeDocument,
+    avatar: avatar,
 
     plant1: require('./plant1.jpg'),
     plant2: require('./plant2.jpg'),
