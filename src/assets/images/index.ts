@@ -19,7 +19,11 @@ const images = {
     megaphone: megaphone,
     document: document,
     gardener: gardener,
+
     fileTypeDocument: fileTypeDocument,
+
+    plant1: require('./plant1.jpg'),
+    plant2: require('./plant2.jpg'),
 };
 
 export default images;
