@@ -27,8 +27,20 @@ const USER_SCREENS = {
     } as ScreenInformation,
     FEEDBACK1: {
         key: 'FEEDBACK1',
-        headerTitle: 'GÓP Ý',
-        buttonLabel: 'GÓP Ý',
+        headerTitle: 'TẠO GÓP Ý',
+        buttonLabel: 'TẠO GÓP Ý',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    NEWS: {
+        key: 'NEWS',
+        headerTitle: 'TIN TỨC',
+        buttonLabel: 'TIN TỨC',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    NEWS1: {
+        key: 'NEWS1',
+        headerTitle: 'CHI TIẾT',
+        buttonLabel: 'TIN TỨC',
         isOpenQRCamera: false,
     } as ScreenInformation,
 }

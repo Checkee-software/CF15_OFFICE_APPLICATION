@@ -22,13 +22,31 @@ import Selling from '../../screens/Selling';
 import Notification from '../../screens/user/Notification';
 import Feedback from '../../screens/onboarding/Feedback';
 import Feedback1 from '../../screens/onboarding/Feedback/index2';
-
+import News from '../../screens/user/News';
+import News1 from '../../screens/user/News/index1';
 /**
  * Declare user's screens before signing in
  * For handling route only
  */
 
 export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
+    
+    {
+        name: SCREEN_INFO.NEWS.key,
+        component: News,
+        options: {
+            title: SCREEN_INFO.NEWS.headerTitle,
+        },
+    },
+
+    {
+        name: SCREEN_INFO.NEWS1.key,
+        component: News1,
+        options: {
+            title: SCREEN_INFO.NEWS1.headerTitle,
+        },
+    },
+
     {
         name: SCREEN_INFO.FEEDBACK.key,
         component: Feedback,

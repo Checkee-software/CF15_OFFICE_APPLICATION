@@ -64,6 +64,7 @@ export default function FeedbackScreen() {
                     <Text style={styles.role}>{item.role}</Text>
                 </View>
             </View>
+            <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.feedback}>{item.content}</Text>
             <Text style={styles.time}>{item.time}</Text>
         </View>
@@ -134,6 +135,13 @@ const styles = StyleSheet.create({
         color: '#3182CE',
         fontSize: 14,
     },
+    title: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 8,
+        marginBottom: 4,
+    },
+    
     feedback: {
         fontSize: 14,
         marginTop: 4,

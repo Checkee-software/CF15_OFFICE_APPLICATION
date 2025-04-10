@@ -21,6 +21,8 @@ export type ScreenName =
     | 'NOTIFICATION'
     | 'FEEDBACK'
     | 'FEEDBACK1'
+    | 'NEWS'
+    | 'NEWS1'
     /* GLOBAL */
     | 'CAMERA_SCANNER'
     | 'MANUAL_SEARCHING'
