@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
 /* configurations */
 import asyncStorageHelper from './src/utils/localStorageHelper/index';
+import useAuthStore from './src/stores/authStore';
 
 /* packages */
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -10,14 +11,47 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import Router from './src/router';
 import Loading from './src/screens/subscreen/Loading';
 
-export default function App() {
-    if (asyncStorageHelper.isLoad) {
+const InitApp = () => {
+    const {autoLogin} = useAuthStore();
+
+    const [isReady, setIsReady] = useState(false);
+
+    useEffect(() => {
+        const init = async () => {
+            await asyncStorageHelper.awaitLoaded();
+            const token = asyncStorageHelper.token;
+            const userAccount = asyncStorageHelper.userAccount;
+            if (token !== '' && userAccount?.userName) {
+                autoLogin(userAccount);
+            }
+            setIsReady(true);
+        };
+
+        init();
+    }, []);
+
+    if (!isReady) {
         return <Loading />;
-    } else {
-        return (
-            <SafeAreaProvider>
-                <Router />
-            </SafeAreaProvider>
-        );
     }
+
+    return <Router />;
+};
+
+export default function App() {
+    // if (asyncStorageHelper.isLoad) {
+    //     return <Loading />;
+    // } else {
+    //     return (
+    //         <AuthProvider>
+    //             <SafeAreaProvider>
+    //                 <Router />
+    //             </SafeAreaProvider>
+    //         </AuthProvider>
+    //     );
+    // }
+    return (
+        <SafeAreaProvider>
+            <InitApp />
+        </SafeAreaProvider>
+    );
 }

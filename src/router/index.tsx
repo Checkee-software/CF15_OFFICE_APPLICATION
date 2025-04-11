@@ -1,13 +1,13 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Loading from '../screens/subscreen/Loading';
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 import {UNAUTHENTICATION_SCREENS} from '../config/SCREEN_CONFIG/unauthentication';
 import {AUTHENTICATION_SCREENS} from '../config/SCREEN_CONFIG/authentication';
-import colors from '../assets/colors';
 import BottomTabsNavigator from './BottomTabsNavigator';
 import useAuthStore from '../stores/authStore';
+import asyncStorageHelper from '../utils/localStorageHelper/index';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +15,9 @@ export default function Router() {
     const {isLogin} = useAuthStore();
 
     const isLoggedIn: unknown = isLogin;
+
+    console.log('Token hiện tại:', asyncStorageHelper.token);
+    console.log('User', asyncStorageHelper.userAccount);
 
     const renderStackScreenGroup = () => {
         switch (isLoggedIn) {

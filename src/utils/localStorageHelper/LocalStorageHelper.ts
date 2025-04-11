@@ -2,6 +2,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface IClientStorage {
     token?: string;
+    userAccount?: {
+        fullName: string;
+        address: {};
+        phoneNumber: string;
+        userType: {};
+        userName: string;
+    };
 }
 
 const STORAGE_KEY = 'checkee';
@@ -21,6 +28,13 @@ export default class LocalStorageHelper {
     // ☣️ Khai báo field cần lưu ở đây
     private data: IClientStorage = {
         token: '',
+        userAccount: {
+            fullName: '',
+            address: {},
+            phoneNumber: '',
+            userType: {},
+            userName: '',
+        },
     };
 
     protected constructor() {
@@ -30,7 +44,7 @@ export default class LocalStorageHelper {
     private save = async () => {
         try {
             const data = JSON.stringify(this.data);
-            console.log("token-data: ", data);
+            console.log('token-data: ', data);
             await AsyncStorage.setItem(STORAGE_KEY, data);
             console.log('💾 LocalStorageHelper saved');
         } catch (e) {
@@ -95,5 +109,36 @@ export default class LocalStorageHelper {
     public set token(v: string | undefined) {
         this.data.token = v;
         this.save();
+    }
+
+    public async clearToken() {
+        this.data.token = '';
+        await this.save();
+    }
+
+    public get userAccount() {
+        return this.data.userAccount;
+    }
+
+    public set userAccount(
+        v:
+            | {
+                  userAccount: {
+                      fullName: string;
+                      address: {};
+                      phoneNumber: number;
+                      userType: {};
+                      userName: string;
+                  };
+              }
+            | undefined,
+    ) {
+        this.data.userAccount = v;
+        this.save();
+    }
+
+    public async clearUserAccount() {
+        this.data.userAccount = undefined;
+        await this.save();
     }
 }

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     View,
     Text,
@@ -16,9 +16,13 @@ import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useNavigation} from '@react-navigation/native';
 import useAuthStore from '../../../stores/authStore';
+import asyncStorageHelper from '../../../utils/localStorageHelper/index';
 
 export default function Main() {
     const {userInfo} = useAuthStore();
+
+    // console.log('Token hiện tại:', asyncStorageHelper.token);
+    // console.log('User', asyncStorageHelper.userAccount);
 
     const isRollCall = true;
     const navigation = useNavigation();
@@ -31,7 +35,7 @@ export default function Main() {
 
     return (
         <View style={MainStyles.container}>
-            <ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={MainStyles.welcomeUser}>
                     <View style={MainStyles.helloTime}>
                         <Text style={MainStyles.helloTimeText}>
@@ -51,7 +55,7 @@ export default function Main() {
                     </View>
                 </View>
 
-                {/* <View
+                <View
                     style={[
                         MainStyles.rollCall,
                         isRollCall
@@ -123,12 +127,11 @@ export default function Main() {
                                 style={
                                     MainStyles.warpButtonRollCalledAndEndWorking
                                 }>
-                                <TouchableOpacity
-                                    style={MainStyles.btnRollCalled}>
+                                <View style={MainStyles.btnRollCalled}>
                                     <Text style={MainStyles.btnRollCallText}>
                                         Đã điểm danh
                                     </Text>
-                                </TouchableOpacity>
+                                </View>
                                 <TouchableOpacity
                                     style={MainStyles.btnEndWorking}>
                                     <Text style={MainStyles.btnRollCallText}>
@@ -144,7 +147,7 @@ export default function Main() {
                             </TouchableOpacity>
                         )}
                     </View>
-                </View> */}
+                </View>
 
                 <View style={MainStyles.syntheticJob}>
                     <View style={MainStyles.sideJob}>
@@ -415,7 +418,7 @@ const MainStyles = StyleSheet.create({
         fontSize: 12,
     },
     mainMenu: {
-        marginTop: 15,
+        marginVertical: 15,
     },
     mainMenuTitle: {
         color: 'rgba(128, 128, 128, 1)',
@@ -424,7 +427,8 @@ const MainStyles = StyleSheet.create({
     warpMenuButton: {
         marginTop: 10,
         flexDirection: 'row',
-        alignItems: 'flex-start',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: 10,
     },

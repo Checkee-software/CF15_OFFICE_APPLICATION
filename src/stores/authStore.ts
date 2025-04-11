@@ -1,8 +1,8 @@
 import {create} from 'zustand';
-import {signIn} from '../service/UserService';
-import {Alert} from 'react-native';
-import axios from 'axios';
+//import axios from 'axios';
+import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
+import asyncStorageHelper from '../utils/localStorageHelper/index';
 
 const backendURL = 'http://cf15officeservice.checkee.vn';
 
@@ -14,7 +14,7 @@ const useAuthStore = create(set => ({
     login: async userAccount => {
         set({isLoading: true});
         try {
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 `${backendURL}/login/sign-in`,
                 userAccount,
             );
@@ -28,13 +28,15 @@ const useAuthStore = create(set => ({
                     userType: response.data.data.userType,
                     userName: response.data.data.username,
                 };
+
+                asyncStorageHelper.userAccount = userData;
                 set({userInfo: userData, isLogin: true});
             }
         } catch (error) {
             if (error.response.status === 401) {
                 Snackbar.show({
                     text: 'Tài khoản hoặc mật khẩu không chính xác',
-                    duration: Snackbar.LENGTH_SHORT,
+                    duration: Snackbar.LENGTH_LONG,
                 });
             }
 
@@ -48,7 +50,7 @@ const useAuthStore = create(set => ({
             if (error.response.status === 500) {
                 Snackbar.show({
                     text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
-                    duration: Snackbar.LENGTH_SHORT,
+                    duration: Snackbar.LENGTH_LONG,
                 });
             }
         } finally {
@@ -56,7 +58,15 @@ const useAuthStore = create(set => ({
         }
     },
 
-    logout: () => {
+    autoLogin: userAccount => {
+        set({isLoading: true});
+        set({userInfo: userAccount, isLogin: true});
+        set({isLoading: false});
+    },
+
+    logout: async () => {
+        await asyncStorageHelper.clearUserAccount();
+        await asyncStorageHelper.clearToken();
         set({userInfo: null, isLogin: false});
     },
 }));

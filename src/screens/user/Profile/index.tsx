@@ -11,8 +11,11 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
+import useAuthStore from '../../../stores/authStore';
 
 export default function Profile({navigation}) {
+    const {userInfo, logout} = useAuthStore();
+
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     //const navigation = useNavigation();
     const [showAccountInfo, setShowAccountInfo] = useState(false);
@@ -31,7 +34,7 @@ export default function Profile({navigation}) {
                         />
                     </View>
 
-                    <Text style={styles.name}>NGUYỄN VĂN AN KHANG</Text>
+                    <Text style={styles.name}>{userInfo.fullName}</Text>
                     <Text style={styles.email}>robertambercf15.com</Text>
 
                     <View style={styles.card}>
@@ -79,13 +82,13 @@ export default function Profile({navigation}) {
                                     {renderInfoRow('Dân tộc', 'Kinh')}
                                     {renderInfoRow(
                                         'Phòng ban',
-                                        'Phòng sản xuất',
+                                        `${userInfo.userType.department}`,
                                     )}
                                     {renderInfoRow('Đơn vị', 'Đơn vị 1')}
                                     {renderInfoRow('Ngày sinh', '01/01/1995')}
                                     {renderInfoRow(
                                         'Số điện thoại',
-                                        '0900123456',
+                                        `${userInfo.phoneNumber}`,
                                     )}
                                     {renderInfoRow('CCCD', '001100022531')}
                                     {renderInfoRow(
@@ -132,7 +135,8 @@ export default function Profile({navigation}) {
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.modalButton}
-                                onPress={() => {
+                                onPress={async () => {
+                                    await logout();
                                     setShowLogoutModal(false);
                                     // TODO: Handle logout logic here
                                 }}>
