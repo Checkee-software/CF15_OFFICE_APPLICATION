@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
+import useFeedbackStore from '../../../stores/feedbackStore';
+
 export default function Feedback1() {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -17,9 +19,10 @@ export default function Feedback1() {
     const [errorContent, setErrorContent] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const {submitFeedback} = useFeedbackStore();
     const navigation = useNavigation();
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         let hasError = false;
 
         if (title.trim() === '') {
@@ -39,20 +42,9 @@ export default function Feedback1() {
         if (hasError) return;
 
         setLoading(true);
-
-        setTimeout(() => {
-            const newFeedback = {
-                id: Date.now().toString(),
-                name: 'Kim Ngân',
-                role: 'Nhân viên',
-                content,
-                title,
-                avatar: 'https://i.pravatar.cc/150?img=2',
-                time: new Date().toLocaleString('vi-VN'),
-            };
-
-            navigation.navigate(SCREEN_INFO.FEEDBACK.key, {newFeedback});
-        }, 1500);
+        await submitFeedback(title, content);
+        setLoading(false);
+        navigation.navigate(SCREEN_INFO.FEEDBACK.key);
     };
 
     return (

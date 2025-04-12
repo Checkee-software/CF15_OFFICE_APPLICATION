@@ -232,7 +232,11 @@ export default function Main() {
                             </Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={MainStyles.menuButton}>
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.FEEDBACK.key)
+                            }>
                             <Image
                                 source={images.feedBack}
                                 style={MainStyles.menuButtonImage}
@@ -240,7 +244,11 @@ export default function Main() {
                             <Text style={MainStyles.menuButtonText}>Góp ý</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={MainStyles.menuButton}>
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.NEWS.key)
+                            }>
                             <Image
                                 source={images.megaphone}
                                 style={MainStyles.menuButtonImage}

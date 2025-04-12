@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {
     View,
     Text,
@@ -8,78 +8,28 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import images from '../../../assets/images';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import Loading from '../../subscreen/Loading'; // Import Loading component
-
-type NewsItem = {
-    id: string;
-    title: string;
-    description: string;
-    author: string;
-    image: any;
-    bookmarked: boolean;
-};
-
-const DATA: NewsItem[] = [
-    {
-        id: '1',
-        title: 'Cây trồng',
-        description: 'Lorem ipsum dolor sit amet consectetur. Pretium odio proin...',
-        author: 'CF15 Office',
-        image: images.plant2,
-        bookmarked: false,
-    },
-    {
-        id: '2',
-        title: 'Nông nghiệp',
-        description: 'Lorem ipsum dolor sit amet consectetur. Pretium odio proin...',
-        author: 'CF15 Office',
-        image: images.plant1,
-        bookmarked: true,
-    },
-    {
-        id: '3',
-        title: 'Nông nghiệp',
-        description: 'Lorem ipsum dolor sit amet consectetur. Pretium odio proin...',
-        author: 'CF15 Office',
-        image: images.plant2,
-        bookmarked: false,
-    },
-];
+import Loading from '../../subscreen/Loading';
+import useNewsStore from '../../../stores/newsStore';
 
 export default function News({navigation}: {navigation: any}) {
-    const [newsList, setNewsList] = useState<NewsItem[]>([]);
-    const [loading, setLoading] = useState(true);
+    const {news, fetchNews, isLoading} = useNewsStore();
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            setNewsList(DATA); 
-            setLoading(false); 
-        }, 2000); 
-
-        return () => clearTimeout(timeout);
+        fetchNews();
     }, []);
 
-    const toggleBookmark = (id: string) => {
-        setNewsList(prev =>
-            prev.map(item =>
-                item.id === id ? {...item, bookmarked: !item.bookmarked} : item,
-            ),
-        );
+    const handleItemPress = (item: any) => {
+        navigation.navigate(SCREEN_INFO.NEWS1.key, {id: item.id});
     };
 
-    const handleItemPress = (item: NewsItem) => {
-        navigation.navigate(SCREEN_INFO.NEWS1.key, {newsItem: item});
-    };
-
-    const renderItem = ({item}: {item: NewsItem}) => (
+    const renderItem = ({item}: {item: any}) => (
         <TouchableOpacity 
             style={styles.itemContainer} 
             onPress={() => handleItemPress(item)}
             activeOpacity={0.7}
         >
-            <Image source={item.image} style={styles.image} />
+            <Image source={{uri: item.image}} style={styles.image} />
             <View style={styles.textContainer}>
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.description}>{item.description}</Text>
@@ -90,27 +40,26 @@ export default function News({navigation}: {navigation: any}) {
             <TouchableOpacity 
                 onPress={(e) => {
                     e.stopPropagation(); 
-                    toggleBookmark(item.id);
-                }}
+                  }}
                 style={styles.bookmarkButton}
             >
                 <Icon
-                    name={item.bookmarked ? 'bookmark' : 'bookmark-outline'}
+                    name={'bookmark-outline'}
                     size={20}
-                    color={item.bookmarked ? '#FF9B0D' : 'gray'}
+                    color={'gray'}
                 />
             </TouchableOpacity>
         </TouchableOpacity>
     );
 
-    if (loading) {
+    if (isLoading) {
         return <Loading />;
     }
 
     return (
         <View style={styles.container}>
             <FlatList
-                data={newsList}
+                data={news}
                 keyExtractor={item => item.id}
                 renderItem={renderItem}
                 contentContainerStyle={{padding: 10, flexGrow: 1}}
