@@ -1,4 +1,10 @@
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    TouchableOpacity,
+} from 'react-native';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -94,11 +100,13 @@ const DetailDocuments = () => {
                                 </View>
                             </View>
 
-                            <Feather
-                                name='download'
-                                color={'rgba(33, 150, 243, 1)'}
-                                size={22}
-                            />
+                            <TouchableOpacity>
+                                <Feather
+                                    name='download'
+                                    color={'rgba(33, 150, 243, 1)'}
+                                    size={22}
+                                />
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>

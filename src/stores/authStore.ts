@@ -7,7 +7,7 @@ import asyncStorageHelper from '../utils/localStorageHelper/index';
 const backendURL = 'http://cf15officeservice.checkee.vn';
 
 const useAuthStore = create(set => ({
-    useInfo: null,
+    userInfo: null,
     isLoading: false,
     isLogin: false,
 
@@ -18,10 +18,10 @@ const useAuthStore = create(set => ({
                 `${backendURL}/login/sign-in`,
                 userAccount,
             );
-            //const token = response.data?.tokenDTO?.token;
 
             if (response) {
                 const userData = {
+                    userId: response.data.data._id,
                     fullName: response.data.data.fullName,
                     address: response.data.data.address,
                     phoneNumber: response.data.data.phoneNumber,
@@ -32,7 +32,7 @@ const useAuthStore = create(set => ({
                 asyncStorageHelper.userAccount = userData;
                 set({userInfo: userData, isLogin: true});
             }
-        } catch (error) {
+        } catch (error: any) {
             if (error.response.status === 401) {
                 Snackbar.show({
                     text: 'Tài khoản hoặc mật khẩu không chính xác',

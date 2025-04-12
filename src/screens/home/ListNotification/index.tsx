@@ -1,4 +1,10 @@
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    TouchableOpacity,
+} from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -20,7 +26,7 @@ const index = () => {
                 </View> */}
 
                 <View style={NotificationStyle.warpNotifi}>
-                    <View style={NotificationStyle.cardNotifi}>
+                    <TouchableOpacity style={NotificationStyle.cardNotifi}>
                         <View style={NotificationStyle.headerNotifi}>
                             <View style={NotificationStyle.warpLeftHeader}>
                                 <MaterialIcons
@@ -42,9 +48,9 @@ const index = () => {
                                 Nhấn để xem.
                             </Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
-                    <View style={NotificationStyle.cardNotifi}>
+                    <TouchableOpacity style={NotificationStyle.cardNotifi}>
                         <View style={NotificationStyle.headerNotifi}>
                             <View style={NotificationStyle.warpLeftHeader}>
                                 <MaterialIcons
@@ -66,9 +72,9 @@ const index = () => {
                                 Nhấn để xem.
                             </Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
-                    <View style={NotificationStyle.cardNotifi}>
+                    <TouchableOpacity style={NotificationStyle.cardNotifi}>
                         <View style={NotificationStyle.headerNotifi}>
                             <View style={NotificationStyle.warpLeftHeader}>
                                 <MaterialCommunityIcons
@@ -90,9 +96,9 @@ const index = () => {
                                 duyệt.
                             </Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
-                    <View style={NotificationStyle.cardNotifi}>
+                    <TouchableOpacity style={NotificationStyle.cardNotifi}>
                         <View style={NotificationStyle.headerNotifi}>
                             <View style={NotificationStyle.warpLeftHeader}>
                                 <AntDesign
@@ -114,9 +120,9 @@ const index = () => {
                                 bạn. Nhấn để xem lý do.
                             </Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
-                    <View style={NotificationStyle.cardNotifi}>
+                    <TouchableOpacity style={NotificationStyle.cardNotifi}>
                         <View style={NotificationStyle.headerNotifi}>
                             <View style={NotificationStyle.warpLeftHeader}>
                                 <MaterialIcons
@@ -138,9 +144,9 @@ const index = () => {
                                 việc của bạn. Nhấn để xem.
                             </Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
-                    <View style={NotificationStyle.cardNotifi}>
+                    <TouchableOpacity style={NotificationStyle.cardNotifi}>
                         <View style={NotificationStyle.headerNotifi}>
                             <View style={NotificationStyle.warpLeftHeader}>
                                 <MaterialCommunityIcons
@@ -161,9 +167,9 @@ const index = () => {
                                 Bạn có công việc mới được giao. Nhấn để xem.
                             </Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
 
-                    <View style={NotificationStyle.cardNotifi}>
+                    <TouchableOpacity style={NotificationStyle.cardNotifi}>
                         <View style={NotificationStyle.headerNotifi}>
                             <View style={NotificationStyle.warpLeftHeader}>
                                 <MaterialCommunityIcons
@@ -184,7 +190,7 @@ const index = () => {
                                 Công việc đã hoàn thành. Nhấn để xem.
                             </Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
         </View>
@@ -242,6 +248,6 @@ const NotificationStyle = StyleSheet.create({
         marginLeft: 34,
     },
     notifiContentText: {
-        fontSize: 13,
+        fontSize: 14,
     },
 });

@@ -17,6 +17,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
 import useAuthStore from '../../../stores/authStore';
 import {Dimensions} from 'react-native';
+import Loading from '../../subscreen/Loading';
 
 const {width} = Dimensions.get('window');
 
@@ -57,6 +58,10 @@ export default function Login() {
 
         await login(_userAccount);
     };
+
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <ScrollView

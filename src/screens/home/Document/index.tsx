@@ -147,7 +147,7 @@ const DocumentStyles = StyleSheet.create({
     listDocument: {
         backgroundColor: '#fff',
         gap: 20,
-        marginTop: 14,
+        marginTop: 16,
     },
     warpDocumentContentAndIcon: {
         flexDirection: 'row',

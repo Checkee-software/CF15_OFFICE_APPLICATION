@@ -8,6 +8,8 @@ import {AUTHENTICATION_SCREENS} from '../config/SCREEN_CONFIG/authentication';
 import BottomTabsNavigator from './BottomTabsNavigator';
 import useAuthStore from '../stores/authStore';
 import asyncStorageHelper from '../utils/localStorageHelper/index';
+import Feather from 'react-native-vector-icons/Feather';
+import {TouchableOpacity} from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -63,7 +65,20 @@ export default function Router() {
                                     key={index}
                                     name={screen.name}
                                     component={screen.component}
-                                    options={screen.options}
+                                    options={navigation => ({
+                                        ...screen.options,
+                                        headerLeft: () => (
+                                            <TouchableOpacity
+                                                onPress={() =>
+                                                    navigation.navigation.goBack()
+                                                }>
+                                                <Feather
+                                                    name='chevron-left'
+                                                    size={26}
+                                                />
+                                            </TouchableOpacity>
+                                        ),
+                                    })}
                                 />
                             ))}
                         </Stack.Group>

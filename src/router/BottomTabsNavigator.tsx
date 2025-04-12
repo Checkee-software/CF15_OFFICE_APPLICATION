@@ -11,7 +11,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 
-const BottomTabsNavigator = () => {
+const BottomTabsNavigator = ({navigation}) => {
     const Tab = createBottomTabNavigator();
 
     return (
@@ -20,12 +20,18 @@ const BottomTabsNavigator = () => {
                 headerStyle: {
                     backgroundColor: 'white',
                 },
+                tabBarStyle: {
+                    height: 55,
+                },
                 headerShown: false,
                 animation: 'shift',
                 headerTitleAlign: 'center',
                 headerShadowVisible: false,
                 tabBarActiveTintColor: 'rgba(76, 175, 80, 1)',
                 tabBarInactiveTintColor: 'gray',
+                tabBarLabelStyle: {
+                    fontSize: 10,
+                },
             }}>
             <Tab.Screen
                 component={Main}
@@ -34,7 +40,7 @@ const BottomTabsNavigator = () => {
                     headerTitle: 'CF15 OFFICE',
                     headerShown: true,
                     tabBarIcon: ({size, color}) => (
-                        <MaterialIcons name='home' size={size} color={color} />
+                        <MaterialIcons name='home' size={28} color={color} />
                     ),
                     headerRight: () => (
                         <TouchableOpacity
@@ -47,7 +53,7 @@ const BottomTabsNavigator = () => {
                             <View style={style.alertDot} />
                             <FontAwesome
                                 name='bell'
-                                size={24}
+                                size={26}
                                 color={'rgba(76, 175, 80, 1)'}
                             />
                         </TouchableOpacity>
@@ -61,7 +67,7 @@ const BottomTabsNavigator = () => {
                 options={{
                     headerShown: true,
                     tabBarIcon: ({size, color}) => (
-                        <MaterialIcons name='work' size={size} color={color} />
+                        <MaterialIcons name='work' size={26} color={color} />
                     ),
                 }}
             />
@@ -92,11 +98,7 @@ const BottomTabsNavigator = () => {
                 options={{
                     headerShown: true,
                     tabBarIcon: ({size, color}) => (
-                        <MaterialIcons
-                            name='history'
-                            size={size}
-                            color={color}
-                        />
+                        <MaterialIcons name='history' size={26} color={color} />
                     ),
                 }}
             />
@@ -107,7 +109,7 @@ const BottomTabsNavigator = () => {
                 options={{
                     headerShown: true,
                     tabBarIcon: ({size, color}) => (
-                        <FontAwesome name='user' size={size} color={color} />
+                        <FontAwesome name='user' size={26} color={color} />
                     ),
                 }}
             />

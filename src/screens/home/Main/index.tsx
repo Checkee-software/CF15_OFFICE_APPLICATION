@@ -9,23 +9,36 @@ import {
 } from 'react-native';
 import images from '../../../assets/images';
 import * as Progress from 'react-native-progress';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
 import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import {useNavigation} from '@react-navigation/native';
 import useAuthStore from '../../../stores/authStore';
 import asyncStorageHelper from '../../../utils/localStorageHelper/index';
 
-export default function Main() {
+export default function Main({navigation}) {
     const {userInfo} = useAuthStore();
 
     // console.log('Token hiện tại:', asyncStorageHelper.token);
     // console.log('User', asyncStorageHelper.userAccount);
 
     const isRollCall = true;
-    const navigation = useNavigation();
+
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+
+        if (hour >= 5 && hour < 11) {
+            return 'Chào buổi sáng';
+        } else if (hour >= 11 && hour < 13) {
+            return 'Chào buổi trưa';
+        } else if (hour >= 13 && hour < 18) {
+            return 'Chào buổi chiều';
+        } else if (hour >= 18 && hour < 22) {
+            return 'Chào buổi tối';
+        } else {
+            return 'Chúc ngủ ngon';
+        }
+    };
 
     const formatDateWithWeekdayNumber = () => {
         const mDate = moment();
@@ -39,7 +52,7 @@ export default function Main() {
                 <View style={MainStyles.welcomeUser}>
                     <View style={MainStyles.helloTime}>
                         <Text style={MainStyles.helloTimeText}>
-                            Chào buổi sáng
+                            {getGreeting()}
                         </Text>
                         <Text style={MainStyles.helloUserText}>
                             {userInfo.fullName}
@@ -77,43 +90,43 @@ export default function Main() {
                         )}
 
                         <View style={MainStyles.rollCallStreak}>
-                            <MaterialIcons
+                            <MaterialCommunityIcons
                                 name='check-circle-outline'
                                 size={20}
                                 color='green'
                             />
 
-                            <AntDesign
-                                name='closecircle'
+                            <MaterialCommunityIcons
+                                name='close-circle'
                                 size={20}
                                 color='rgba(255, 78, 69, 1)'
                             />
 
-                            <MaterialIcons
+                            <MaterialCommunityIcons
                                 name='check-circle-outline'
                                 size={20}
                                 color='green'
                             />
 
-                            <MaterialIcons
+                            <MaterialCommunityIcons
                                 name='check-circle-outline'
                                 size={20}
                                 color='rgba(255, 152, 0, 1)'
                             />
 
-                            <MaterialIcons
+                            <MaterialCommunityIcons
                                 name='check-circle-outline'
                                 size={20}
                                 color='gray'
                             />
 
-                            <MaterialIcons
+                            <MaterialCommunityIcons
                                 name='check-circle-outline'
                                 size={20}
                                 color='gray'
                             />
 
-                            <MaterialIcons
+                            <MaterialCommunityIcons
                                 name='check-circle-outline'
                                 size={20}
                                 color='gray'
@@ -232,7 +245,11 @@ export default function Main() {
                             </Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={MainStyles.menuButton}>
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.FEEDBACK.key)
+                            }>
                             <Image
                                 source={images.feedBack}
                                 style={MainStyles.menuButtonImage}
@@ -240,7 +257,11 @@ export default function Main() {
                             <Text style={MainStyles.menuButtonText}>Góp ý</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={MainStyles.menuButton}>
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.NEWS.key)
+                            }>
                             <Image
                                 source={images.megaphone}
                                 style={MainStyles.menuButtonImage}
@@ -309,7 +330,7 @@ const MainStyles = StyleSheet.create({
     rollCall: {
         //marginVertical: 20,
         borderRadius: 15,
-        padding: 12,
+        padding: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -333,7 +354,8 @@ const MainStyles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         marginTop: 6,
-        gap: 10,
+        gap: 6,
+        alignItems: 'center',
     },
     warpButtonRollCalledAndEndWorking: {
         flexDirection: 'row',
