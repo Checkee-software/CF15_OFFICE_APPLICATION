@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useCallback} from 'react';
 import {
     View,
     Text,
@@ -14,75 +14,60 @@ import {
 } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
+import useFeedbackStore from '../../../stores/feedbackStore';
 
 export default function FeedbackScreen() {
     const navigation = useNavigation();
     const route = useRoute();
-    const [feedbackList, setFeedbackList] = useState<any[]>([]);
-    const [error, setError] = useState(false);
-    const [refreshing, setRefreshing] = useState(false);
+
+    const {
+        feedbacks,
+        fetchFeedbacks,
+        isLoading,
+    } = useFeedbackStore();
 
     const fetchData = async () => {
         try {
-            setError(false);
-            setRefreshing(true);
-            const simulateError = false;
-            if (simulateError) {
-                throw new Error('Lỗi giả lập');
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            if (route.params?.newFeedback) {
-                setFeedbackList(prev => [route.params.newFeedback, ...prev]);
-                navigation.setParams({newFeedback: undefined});
-            }
+            await fetchFeedbacks();
         } catch (err) {
-            console.error(err);
-            setError(true);
-        } finally {
-            setRefreshing(false);
+            console.error('Lỗi khi fetch:', err);
         }
     };
 
     useFocusEffect(
         useCallback(() => {
             fetchData();
-        }, [route.params?.newFeedback]),
+        }, []),
     );
 
-    const handleRefresh = () => {
-        fetchData();
-    };
-
-    const renderItem = ({item}: any) => (
+    const renderItem = ({item}) => (
         <View style={styles.itemContainer}>
             <View style={styles.row}>
                 <Image source={{uri: item.avatar}} style={styles.avatar} />
                 <View style={styles.nameContainer}>
                     <Text style={styles.name}>{item.name}</Text>
-                    <Text style={styles.role}>{item.role}</Text>
+                    <Text style={styles.role}>{item.departmentCode}</Text>
                 </View>
             </View>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.feedback}>{item.content}</Text>
-            <Text style={styles.time}>{item.time}</Text>
+            <Text style={styles.time}>{item.createdAt}</Text>
         </View>
     );
 
     return (
         <View style={styles.container}>
             <FlatList
-                data={error ? [] : feedbackList}
+                data={feedbacks}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
                 contentContainerStyle={styles.list}
-                refreshing={refreshing}
-                onRefresh={handleRefresh}
+                refreshing={isLoading}
+                onRefresh={fetchData}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>
-                            {error ? 'Có lỗi xảy ra' : 'Chưa có góp ý nào'}
+                            {isLoading ? 'Đang tải...' : 'Chưa có góp ý nào'}
                         </Text>
                     </View>
                 }
@@ -141,11 +126,9 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 4,
     },
-    
     feedback: {
         fontSize: 14,
         marginTop: 4,
-        marginLeft: 0,
     },
     time: {
         fontSize: 12,
