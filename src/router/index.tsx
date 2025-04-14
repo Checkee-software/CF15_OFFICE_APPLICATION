@@ -18,8 +18,8 @@ export default function Router() {
 
     const isLoggedIn: unknown = isLogin;
 
-    console.log('Token hiện tại:', asyncStorageHelper.token);
-    console.log('User', asyncStorageHelper.userAccount);
+    //console.log('Token hiện tại:', asyncStorageHelper.token);
+    //console.log('User', asyncStorageHelper.userAccount);
 
     const renderStackScreenGroup = () => {
         switch (isLoggedIn) {

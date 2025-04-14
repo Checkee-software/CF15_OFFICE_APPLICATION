@@ -7,6 +7,7 @@ import Profile from '../../screens/user/Profile';
 import Document from '../../screens/home/Document';
 import DetailDocuments from '../../screens/home/Document/DetailDocuments';
 import Statistic from '../../screens/home/Statistic';
+import BrowseJobs from '../../screens/home/BrowseJobs';
 import ImportTank from '../../screens/home/ImportTank';
 import ExportProduct from '../../screens/home/ExportProduct';
 import GasTankDetail from '../../screens/global/GasTankDetail';
@@ -33,7 +34,6 @@ import News1 from '../../screens/user/News/index1';
  */
 
 export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
-    
     {
         name: SCREEN_INFO.NEWS.key,
         component: News,
@@ -57,6 +57,7 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.MAIN.headerTitle,
         },
     },
+
     {
         name: SCREEN_INFO.FEEDBACK.key,
         component: Feedback,
@@ -70,6 +71,14 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: Feedback1,
         options: {
             title: SCREEN_INFO.FEEDBACK1.headerTitle,
+        },
+    },
+
+    {
+        name: SCREEN_INFO.BROWSEJOBS.key,
+        component: BrowseJobs,
+        options: {
+            title: SCREEN_INFO.BROWSEJOBS.headerTitle,
         },
     },
     /* HOME */

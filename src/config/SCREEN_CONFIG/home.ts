@@ -26,6 +26,11 @@ const HOME_SCREENS = {
         headerTitle: 'CHI TIẾT TÀI LIỆU',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    BROWSEJOBS: {
+        key: 'BROWSEJOBS',
+        headerTitle: 'DUYỆT CÔNG VIỆC',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     DIRECT_EXPORT_FILLED_GAS_TANK: {
         key: 'DIRECT_EXPORT_FILLED_GAS_TANK',
         headerTitle: 'Xuất bình (thẳng)',

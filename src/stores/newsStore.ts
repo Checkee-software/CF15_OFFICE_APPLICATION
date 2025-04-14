@@ -7,7 +7,7 @@ type NewsItem = {
     title: string;
     description: string;
     author: string;
-    image: string; 
+    image: string;
     content?: string;
     category?: string;
 };
@@ -34,7 +34,10 @@ const useNewsStore = create<NewsState>(set => ({
             const newsData = res.data?.data || [];
             set({news: newsData});
         } catch (error: any) {
-            console.log('FETCH_NEWS_ERROR:', error?.response?.data || error.message);
+            console.log(
+                'FETCH_NEWS_ERROR:',
+                error?.response?.data || error.message,
+            );
             Snackbar.show({
                 text: 'Không thể tải danh sách tin tức',
                 duration: Snackbar.LENGTH_SHORT,
@@ -47,10 +50,15 @@ const useNewsStore = create<NewsState>(set => ({
     fetchNewsDetail: async (id: string) => {
         set({isLoading: true});
         try {
-            const res = await axiosClient.get(`${backendURL}/resources/news/${id}`);
+            const res = await axiosClient.get(
+                `${backendURL}/resources/news/${id}`,
+            );
             set({selectedNews: res.data?.data || null});
         } catch (error: any) {
-            console.log('FETCH_NEWS_DETAIL_ERROR:', error?.response?.data || error.message);
+            console.log(
+                'FETCH_NEWS_DETAIL_ERROR:',
+                error?.response?.data || error.message,
+            );
             Snackbar.show({
                 text: 'Không thể tải chi tiết tin tức',
                 duration: Snackbar.LENGTH_SHORT,

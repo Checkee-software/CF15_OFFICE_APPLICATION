@@ -69,6 +69,22 @@ const BottomTabsNavigator = ({navigation}) => {
                     tabBarIcon: ({size, color}) => (
                         <MaterialIcons name='work' size={26} color={color} />
                     ),
+                    headerRight: () => (
+                        <TouchableOpacity
+                            style={style.alertView}
+                            onPress={() =>
+                                navigation.navigate(
+                                    SCREEN_INFO.LISTNOTIFICATION.key,
+                                )
+                            }>
+                            <View style={style.alertDot} />
+                            <FontAwesome
+                                name='bell'
+                                size={26}
+                                color={'rgba(76, 175, 80, 1)'}
+                            />
+                        </TouchableOpacity>
+                    ),
                 }}
             />
 
@@ -100,6 +116,22 @@ const BottomTabsNavigator = ({navigation}) => {
                     tabBarIcon: ({size, color}) => (
                         <MaterialIcons name='history' size={26} color={color} />
                     ),
+                    headerRight: () => (
+                        <TouchableOpacity
+                            style={style.alertView}
+                            onPress={() =>
+                                navigation.navigate(
+                                    SCREEN_INFO.LISTNOTIFICATION.key,
+                                )
+                            }>
+                            <View style={style.alertDot} />
+                            <FontAwesome
+                                name='bell'
+                                size={26}
+                                color={'rgba(76, 175, 80, 1)'}
+                            />
+                        </TouchableOpacity>
+                    ),
                 }}
             />
 
@@ -110,6 +142,22 @@ const BottomTabsNavigator = ({navigation}) => {
                     headerShown: true,
                     tabBarIcon: ({size, color}) => (
                         <FontAwesome name='user' size={26} color={color} />
+                    ),
+                    headerRight: () => (
+                        <TouchableOpacity
+                            style={style.alertView}
+                            onPress={() =>
+                                navigation.navigate(
+                                    SCREEN_INFO.LISTNOTIFICATION.key,
+                                )
+                            }>
+                            <View style={style.alertDot} />
+                            <FontAwesome
+                                name='bell'
+                                size={26}
+                                color={'rgba(76, 175, 80, 1)'}
+                            />
+                        </TouchableOpacity>
                     ),
                 }}
             />

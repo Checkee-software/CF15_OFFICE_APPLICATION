@@ -3,11 +3,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 interface IClientStorage {
     token?: string;
     userAccount?: {
-        fullName: string;
-        address: {};
-        phoneNumber: string;
-        userType: {};
+        userId: string;
+        status: boolean;
+        nation: string;
+        contract: string;
         userName: string;
+        fullName: string;
+        dateOfBirth: string;
+        recruimentDate: string;
+        phoneNumber: string;
+        ID: string;
+        userType: {
+            level: string;
+            role: string;
+            department: string;
+            departmentName: string;
+            unit: string;
+        };
+        address: string;
+        avatar: string;
     };
 }
 
@@ -29,11 +43,25 @@ export default class LocalStorageHelper {
     private data: IClientStorage = {
         token: '',
         userAccount: {
-            fullName: '',
-            address: {},
-            phoneNumber: '',
-            userType: {},
+            userId: '',
+            status: false,
+            nation: '',
+            contract: '',
             userName: '',
+            fullName: '',
+            dateOfBirth: '',
+            recruimentDate: '',
+            phoneNumber: '',
+            ID: '',
+            userType: {
+                level: '',
+                role: '',
+                department: '',
+                departmentName: '',
+                unit: '',
+            },
+            address: '',
+            avatar: '',
         },
     };
 

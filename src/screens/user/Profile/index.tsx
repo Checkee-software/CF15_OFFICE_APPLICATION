@@ -12,6 +12,8 @@ import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useAuthStore from '../../../stores/authStore';
+import moment from 'moment';
+import asyncStorageHelper from '../../../utils/localStorageHelper/index';
 
 export default function Profile({navigation}) {
     const {userInfo, logout} = useAuthStore();
@@ -29,7 +31,12 @@ export default function Profile({navigation}) {
                 <View style={styles.container}>
                     <View style={styles.avatarWrapper}>
                         <Image
-                            source={{uri: 'https://i.pravatar.cc/150?img=12'}}
+                            source={{
+                                uri: `${userInfo.avatar}`,
+                                headers: {
+                                    Authorization: `${asyncStorageHelper.token}`,
+                                },
+                            }}
                             style={styles.avatar}
                         />
                     </View>
@@ -39,7 +46,9 @@ export default function Profile({navigation}) {
 
                     <View style={styles.card}>
                         <Text style={styles.dateLabel}>Ngày làm việc</Text>
-                        <Text style={styles.dateValue}>17/03/2022</Text>
+                        <Text style={styles.dateValue}>
+                            {moment(userInfo.recruimentDate).format('L')}
+                        </Text>
 
                         <View style={styles.divider} />
 
@@ -79,21 +88,32 @@ export default function Profile({navigation}) {
 
                             {showAccountInfo && (
                                 <View style={styles.accountInfoCard}>
-                                    {renderInfoRow('Dân tộc', 'Kinh')}
+                                    {renderInfoRow(
+                                        'Dân tộc',
+                                        `${userInfo.nation}`,
+                                    )}
                                     {renderInfoRow(
                                         'Phòng ban',
                                         `${userInfo.userType.department}`,
                                     )}
-                                    {renderInfoRow('Đơn vị', 'Đơn vị 1')}
-                                    {renderInfoRow('Ngày sinh', '01/01/1995')}
+                                    {renderInfoRow(
+                                        'Đơn vị',
+                                        `${userInfo.userType.unit}`,
+                                    )}
+                                    {renderInfoRow(
+                                        'Ngày sinh',
+                                        `${moment(userInfo.dateOfBirth).format(
+                                            'L',
+                                        )}`,
+                                    )}
                                     {renderInfoRow(
                                         'Số điện thoại',
                                         `${userInfo.phoneNumber}`,
                                     )}
-                                    {renderInfoRow('CCCD', '001100022531')}
+                                    {renderInfoRow('CCCD', `${userInfo.ID}`)}
                                     {renderInfoRow(
                                         'Loại hợp đồng',
-                                        'Hợp đồng lao động',
+                                        `${userInfo.contract}`,
                                         true,
                                     )}
                                 </View>

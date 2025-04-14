@@ -19,8 +19,8 @@ import asyncStorageHelper from '../../../utils/localStorageHelper/index';
 export default function Main({navigation}) {
     const {userInfo} = useAuthStore();
 
-    // console.log('Token hiện tại:', asyncStorageHelper.token);
-    // console.log('User', asyncStorageHelper.userAccount);
+    console.log('Token hiện tại:', asyncStorageHelper.token);
+    console.log('User', asyncStorageHelper.userAccount);
 
     const isRollCall = true;
 
@@ -43,7 +43,9 @@ export default function Main({navigation}) {
     const formatDateWithWeekdayNumber = () => {
         const mDate = moment();
         const weekday = mDate.isoWeekday(); // Thứ 2 = 1, Chủ nhật = 7
-        return `Thứ ${weekday + 1}, ${mDate.format('DD.MM.YYYY')}`;
+        return `${
+            weekday === 7 ? 'Chủ Nhật' : `Thứ ${weekday + 1}`
+        }, ${mDate.format('DD.MM.YYYY')}`;
     };
 
     return (
@@ -235,7 +237,11 @@ export default function Main({navigation}) {
                             </Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={MainStyles.menuButton}>
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.BROWSEJOBS.key)
+                            }>
                             <Image
                                 source={images.toDoList}
                                 style={MainStyles.menuButtonImage}

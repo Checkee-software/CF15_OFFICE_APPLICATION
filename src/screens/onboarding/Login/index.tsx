@@ -17,7 +17,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
 import useAuthStore from '../../../stores/authStore';
 import {Dimensions} from 'react-native';
-import Loading from '../../subscreen/Loading';
+import Backdrop from '../../subscreen/Loading/index2';
 
 const {width} = Dimensions.get('window');
 
@@ -28,9 +28,9 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
 
     const [userAccount, setUserAccount] = useState({
-        username: 'cf15office', //cf15office
+        username: 'lamphucf15', //cf15office
         phoneNumber: '',
-        password: 'CF15@FFICE2025', //CF15@FFICE2025
+        password: '00000000', //CF15@FFICE2025
     });
 
     const onChangeUserName = value => {
@@ -56,18 +56,14 @@ export default function Login() {
             password: userAccount.password,
         };
 
-        await login(_userAccount);
+        login(_userAccount);
     };
 
-    if (isLoading) {
-        return <Loading />;
-    }
-
     return (
-        <ScrollView
-            keyboardShouldPersistTaps='handled'
-            contentContainerStyle={{flex: 1}}>
-            <View style={LoginStyles.container}>
+        <View style={LoginStyles.container}>
+            <ScrollView
+                keyboardShouldPersistTaps='handled'
+                contentContainerStyle={{flex: 1}}>
                 <ImageBackground
                     source={images.backgroundLogin}
                     style={LoginStyles.welcomeSceenBackground}>
@@ -230,8 +226,10 @@ export default function Login() {
                 <View style={LoginStyles.version}>
                     <Text style={LoginStyles.textVersion}>Version 1.0.0</Text>
                 </View>
-            </View>
-        </ScrollView>
+            </ScrollView>
+
+            <Backdrop open={isLoading} />
+        </View>
     );
 }
 
