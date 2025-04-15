@@ -33,9 +33,9 @@ export default function Profile({navigation}) {
                         <Image
                             source={{
                                 uri: `${userInfo.avatar}`,
-                                headers: {
-                                    Authorization: `${asyncStorageHelper.token}`,
-                                },
+                                // headers: {
+                                //     Authorization: `${asyncStorageHelper.token}`,
+                                // },
                             }}
                             style={styles.avatar}
                         />

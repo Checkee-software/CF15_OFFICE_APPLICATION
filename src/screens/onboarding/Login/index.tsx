@@ -56,7 +56,7 @@ export default function Login() {
             password: userAccount.password,
         };
 
-        login(_userAccount);
+        await login(_userAccount);
     };
 
     return (

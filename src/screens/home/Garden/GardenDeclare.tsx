@@ -1,12 +1,12 @@
 import {View, Text} from 'react-native';
 import React from 'react';
 
-const History = () => {
+const GardenDeclare = () => {
     return (
         <View>
-            <Text>index</Text>
+            <Text>GardenDeclare</Text>
         </View>
     );
 };
 
-export default History;
+export default GardenDeclare;

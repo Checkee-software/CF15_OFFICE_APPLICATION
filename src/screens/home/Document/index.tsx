@@ -12,7 +12,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import images from '../../../assets/images';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 
-const index = ({navigation}) => {
+const Document = ({navigation}) => {
     return (
         <View style={DocumentStyles.container}>
             <ScrollView keyboardShouldPersistTaps='handled'>
@@ -122,7 +122,7 @@ const index = ({navigation}) => {
     );
 };
 
-export default index;
+export default Document;
 
 const DocumentStyles = StyleSheet.create({
     container: {

@@ -18,8 +18,6 @@ const useAuthStore = create(set => ({
                 userAccount,
             );
 
-            //console.log(response);
-
             if (response) {
                 const userData = {
                     ...response.data.data,

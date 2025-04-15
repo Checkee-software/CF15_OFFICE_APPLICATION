@@ -21,7 +21,7 @@ const InitApp = () => {
             await asyncStorageHelper.awaitLoaded();
             const token = asyncStorageHelper.token;
             const userAccount = asyncStorageHelper.userAccount;
-            if (token !== '' && userAccount?.userName) {
+            if (token !== '' && !userAccount.userName) {
                 autoLogin(userAccount);
             }
             setIsReady(true);

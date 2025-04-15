@@ -22,6 +22,7 @@ export default function Main({navigation}) {
     console.log('Token hiện tại:', asyncStorageHelper.token);
     console.log('User', asyncStorageHelper.userAccount);
 
+    const a = 'https://reactjs.org/logo-og.png';
     const isRollCall = true;
 
     const getGreeting = () => {
@@ -63,7 +64,9 @@ export default function Main({navigation}) {
 
                     <View style={MainStyles.avatarUser}>
                         <Image
-                            source={images.avatar}
+                            source={{
+                                uri: userInfo.avatar,
+                            }}
                             style={MainStyles.avatar}
                             resizeMode='contain'
                         />

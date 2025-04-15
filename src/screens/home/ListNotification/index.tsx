@@ -10,7 +10,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
-const index = () => {
+const ListNotification = () => {
     return (
         <View style={NotificationStyle.container}>
             <ScrollView>
@@ -197,7 +197,7 @@ const index = () => {
     );
 };
 
-export default index;
+export default ListNotification;
 
 const NotificationStyle = StyleSheet.create({
     container: {
