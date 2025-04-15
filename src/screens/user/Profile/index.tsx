@@ -238,7 +238,6 @@ const styles = StyleSheet.create({
     },
     container: {
         width: 372,
-        height: 653,
         backgroundColor: '#4CAF50',
         alignItems: 'center',
         marginTop: 112,

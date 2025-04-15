@@ -28,6 +28,8 @@ import Feedback from '../../screens/onboarding/Feedback';
 import Feedback1 from '../../screens/onboarding/Feedback/index2';
 import News from '../../screens/user/News';
 import News1 from '../../screens/user/News/index1';
+import GardenInfo from '../../screens/home/Garden/GardenInfo';
+import GardenInfo1 from '../../screens/home/Garden/GardenInfo1';
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -79,6 +81,20 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: BrowseJobs,
         options: {
             title: SCREEN_INFO.BROWSEJOBS.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.GARDENINFO.key,
+        component: GardenInfo,
+        options: {
+            title: SCREEN_INFO.GARDENINFO.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.GARDENINFO1.key,
+        component: GardenInfo1,
+        options: {
+            title: SCREEN_INFO.GARDENINFO1.headerTitle,
         },
     },
     /* HOME */

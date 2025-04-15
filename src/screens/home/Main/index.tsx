@@ -220,7 +220,11 @@ export default function Main({navigation}) {
                             </Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={MainStyles.menuButton}>
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.GARDENINFO.key)
+                            }>
                             <Image
                                 source={images.garden}
                                 style={MainStyles.menuButtonImage}
