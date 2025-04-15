@@ -1,5 +1,13 @@
-import React, {useEffect} from 'react';
-import {View, Text, Image, StyleSheet, ScrollView, ActivityIndicator} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+    View,
+    Text,
+    Image,
+    StyleSheet,
+    ScrollView,
+    ActivityIndicator,
+    TouchableOpacity
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import useNewsStore from '../../../stores/newsStore';
@@ -7,8 +15,11 @@ import useNewsStore from '../../../stores/newsStore';
 export default function NewsDetail() {
     const route = useRoute<RouteProp<{params: {id: string}}, 'params'>>();
     const {id} = route.params;
-
+    const [bookmarked, setBookmarked] = useState(false);
     const {selectedNews, fetchNewsDetail, isLoading} = useNewsStore();
+    const toggleBookmark = () => {
+        setBookmarked(prev => !prev);
+    };
 
     useEffect(() => {
         if (id) {
@@ -19,26 +30,46 @@ export default function NewsDetail() {
     if (isLoading || !selectedNews) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#339CFF" />
-                <Text style={{marginTop: 12}}>Đang tải chi tiết tin tức...</Text>
+                <ActivityIndicator size='large' color='#339CFF' />
+                <Text style={{marginTop: 12}}>
+                    Đang tải chi tiết tin tức...
+                </Text>
             </View>
         );
     }
 
     return (
         <ScrollView style={styles.container}>
-            <Image source={{uri: selectedNews.image}} style={styles.image} />
+            <Image
+                source={{
+                    uri:
+                        selectedNews.image ||
+                        'https://vov2.vov.vn/sites/default/files/2021-02/z2346000241203_2c20d4b68755b5f540ee91114347778a.jpg',
+                }}
+                style={styles.image}
+            />
+
             <View style={styles.desc}>
                 <View style={styles.categoryRow}>
-                    <Text style={styles.category}>{selectedNews.category || 'Tin tức'}</Text>
-                    <Icon name="bookmark" size={18} color="#FFA500" />
+                    <Text style={styles.category}>
+                        {selectedNews.newsType || 'Tin tức'}
+                    </Text>
+                    <TouchableOpacity onPress={toggleBookmark}>
+                        <Icon
+                            name={bookmarked ? 'bookmark' : 'bookmark-o'}
+                            size={18}
+                            color={bookmarked ? '#FFA500' : 'gray'}
+                        />
+                    </TouchableOpacity>
                 </View>
 
                 <Text style={styles.author}>
-                    Tác giả: <Text style={styles.authorName}>{selectedNews.author}</Text>
+                    Tác giả: <Text style={styles.authorName}>CF15 Office</Text>
                 </Text>
                 <Text style={styles.title}>{selectedNews.title}</Text>
-                <Text style={styles.content}>{selectedNews.content || 'Không có nội dung'}</Text>
+                <Text style={styles.content}>
+                    {selectedNews.content || 'Không có nội dung'}
+                </Text>
             </View>
         </ScrollView>
     );
