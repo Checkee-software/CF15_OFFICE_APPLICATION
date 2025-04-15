@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -14,39 +14,62 @@ import useNewsStore from '../../../stores/newsStore';
 
 export default function News({navigation}: {navigation: any}) {
     const {news, fetchNews, isLoading} = useNewsStore();
+    const [bookmarkedItems, setBookmarkedItems] = useState<{
+        [key: string]: boolean;
+    }>({});
 
     useEffect(() => {
         fetchNews();
     }, []);
 
     const handleItemPress = (item: any) => {
-        navigation.navigate(SCREEN_INFO.NEWS1.key, {id: item.id});
+        navigation.navigate(SCREEN_INFO.NEWS1.key, {id: item._id});
+    };
+    const toggleBookmark = (id: string) => {
+        setBookmarkedItems(prev => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
     };
 
     const renderItem = ({item}: {item: any}) => (
-        <TouchableOpacity 
-            style={styles.itemContainer} 
+        <TouchableOpacity
+            style={styles.itemContainer}
             onPress={() => handleItemPress(item)}
-            activeOpacity={0.7}
-        >
-            <Image source={{uri: item.image}} style={styles.image} />
+            activeOpacity={0.7}>
+            <Image
+                source={{
+                    uri:
+                        item.image ||
+                        'https://vov2.vov.vn/sites/default/files/2021-02/z2346000241203_2c20d4b68755b5f540ee91114347778a.jpg',
+                }}
+                style={styles.image}
+            />
+
             <View style={styles.textContainer}>
+                <Text style={styles.title}>{item.newsType}</Text>
                 <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.description}>{item.description}</Text>
+                <Text style={styles.description}>
+                    {item.content?.slice(0, 100)}...
+                </Text>
                 <Text style={styles.author}>
-                    Tác giả: <Text style={{color: '#339CFF'}}>{item.author}</Text>
+                    Tác giả: <Text style={{color: '#339CFF'}}>CF15 Office</Text>
                 </Text>
             </View>
-            <TouchableOpacity 
-                onPress={(e) => {
-                    e.stopPropagation(); 
-                  }}
-                style={styles.bookmarkButton}
-            >
+            <TouchableOpacity
+                onPress={e => {
+                    e.stopPropagation();
+                    toggleBookmark(item._id);
+                }}
+                style={styles.bookmarkButton}>
                 <Icon
-                    name={'bookmark-outline'}
+                    name={
+                        bookmarkedItems[item._id]
+                            ? 'bookmark'
+                            : 'bookmark-outline'
+                    }
                     size={20}
-                    color={'gray'}
+                    color={bookmarkedItems[item._id] ? '#FFA500' : 'gray'}
                 />
             </TouchableOpacity>
         </TouchableOpacity>
@@ -60,12 +83,14 @@ export default function News({navigation}: {navigation: any}) {
         <View style={styles.container}>
             <FlatList
                 data={news}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item._id}
                 renderItem={renderItem}
                 contentContainerStyle={{padding: 10, flexGrow: 1}}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>Không có tin tức nào</Text>
+                        <Text style={styles.emptyText}>
+                            Không có tin tức nào
+                        </Text>
                     </View>
                 }
             />

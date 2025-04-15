@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
     View,
     Text,
@@ -15,6 +15,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useFeedbackStore from '../../../stores/feedbackStore';
+import dayjs from 'dayjs';
 
 export default function FeedbackScreen() {
     const navigation = useNavigation();
@@ -37,21 +38,30 @@ export default function FeedbackScreen() {
     useFocusEffect(
         useCallback(() => {
             fetchData();
-        }, []),
+        }, [])
     );
 
-    const renderItem = ({item}) => (
+    useEffect(() => {
+        console.log('FEEDBACKS_RECEIVED:', feedbacks);
+    }, [feedbacks]);
+
+    const renderItem = ({ item }) => (
         <View style={styles.itemContainer}>
             <View style={styles.row}>
-                <Image source={{uri: item.avatar}} style={styles.avatar} />
+                <Image
+                    source={{ uri: item.avatar || 'https://placehold.co/48x48' }}
+                    style={styles.avatar}
+                />
                 <View style={styles.nameContainer}>
-                    <Text style={styles.name}>{item.name}</Text>
+                    <Text style={styles.name}>{item.name || 'Không rõ tên'}</Text>
                     <Text style={styles.role}>{item.departmentCode}</Text>
                 </View>
             </View>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.feedback}>{item.content}</Text>
-            <Text style={styles.time}>{item.createdAt}</Text>
+            <Text style={styles.time}>
+                {dayjs(item.createdAt).format('HH:mm DD/MM/YYYY')}
+            </Text>
         </View>
     );
 
@@ -60,7 +70,7 @@ export default function FeedbackScreen() {
             <FlatList
                 data={feedbacks}
                 renderItem={renderItem}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item._id}
                 contentContainerStyle={styles.list}
                 refreshing={isLoading}
                 onRefresh={fetchData}
@@ -99,6 +109,9 @@ const styles = StyleSheet.create({
     },
     itemContainer: {
         marginBottom: 16,
+        backgroundColor: '#f7f7f7',
+        padding: 12,
+        borderRadius: 8,
     },
     row: {
         flexDirection: 'row',
