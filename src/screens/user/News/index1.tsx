@@ -6,20 +6,20 @@ import {
     StyleSheet,
     ScrollView,
     ActivityIndicator,
-    TouchableOpacity
+    TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import useNewsStore from '../../../stores/newsStore';
+import { INews } from '../../../shared-types/Response/NewsResponse'; 
 
 export default function NewsDetail() {
     const route = useRoute<RouteProp<{params: {id: string}}, 'params'>>();
     const {id} = route.params;
     const [bookmarked, setBookmarked] = useState(false);
     const {selectedNews, fetchNewsDetail, isLoading} = useNewsStore();
-    const toggleBookmark = () => {
-        setBookmarked(prev => !prev);
-    };
+
+    const toggleBookmark = () => setBookmarked(prev => !prev);
 
     useEffect(() => {
         if (id) {
@@ -30,10 +30,8 @@ export default function NewsDetail() {
     if (isLoading || !selectedNews) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size='large' color='#339CFF' />
-                <Text style={{marginTop: 12}}>
-                    Đang tải chi tiết tin tức...
-                </Text>
+                <ActivityIndicator size="large" color="#339CFF" />
+                <Text style={{marginTop: 12}}>Đang tải chi tiết tin tức...</Text>
             </View>
         );
     }
@@ -43,16 +41,15 @@ export default function NewsDetail() {
             <Image
                 source={{
                     uri:
-                        selectedNews.image ||
+                        (selectedNews as any).image ||
                         'https://vov2.vov.vn/sites/default/files/2021-02/z2346000241203_2c20d4b68755b5f540ee91114347778a.jpg',
                 }}
                 style={styles.image}
             />
-
             <View style={styles.desc}>
                 <View style={styles.categoryRow}>
                     <Text style={styles.category}>
-                        {selectedNews.newsType || 'Tin tức'}
+                        {(selectedNews as any).newsType || 'Tin tức'}
                     </Text>
                     <TouchableOpacity onPress={toggleBookmark}>
                         <Icon
@@ -64,7 +61,10 @@ export default function NewsDetail() {
                 </View>
 
                 <Text style={styles.author}>
-                    Tác giả: <Text style={styles.authorName}>CF15 Office</Text>
+                    Tác giả:{' '}
+                    <Text style={styles.authorName}>
+                        {selectedNews.author || 'CF15 Office'}
+                    </Text>
                 </Text>
                 <Text style={styles.title}>{selectedNews.title}</Text>
                 <Text style={styles.content}>
@@ -74,6 +74,7 @@ export default function NewsDetail() {
         </ScrollView>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {

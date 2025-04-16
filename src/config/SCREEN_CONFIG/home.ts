@@ -39,6 +39,9 @@ const HOME_SCREENS = {
     GARDENDECLARE: {
         key: 'GARDENDECLARE',
         headerTitle: 'KHAI BÁO KHU VƯỜN',
+    GARDENINFO1: {
+        key: 'GARDENINFO1',
+        headerTitle: 'THÔNG TIN KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
     DIRECT_EXPORT_FILLED_GAS_TANK: {

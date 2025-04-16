@@ -289,6 +289,93 @@ export default function Main({navigation}) {
                                 </Text>
                             </TouchableOpacity>
                         ))}
+                        <TouchableOpacity style={MainStyles.menuButton}>
+                            <Image
+                                source={images.gardener}
+                                style={MainStyles.menuButtonImage}
+                            />
+                            <Text style={MainStyles.menuButtonText}>
+                                Khai báo khu vườn
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.GARDENINFO.key)
+                            }>
+                            <Image
+                                source={images.garden}
+                                style={MainStyles.menuButtonImage}
+                            />
+                            <Text style={MainStyles.menuButtonText}>
+                                Thông tin khu vườn
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity style={MainStyles.menuButton}>
+                            <Image
+                                source={images.workers}
+                                style={MainStyles.menuButtonImage}
+                            />
+                            <Text style={MainStyles.menuButtonText}>
+                                Người lao động
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.BROWSEJOBS.key)
+                            }>
+                            <Image
+                                source={images.toDoList}
+                                style={MainStyles.menuButtonImage}
+                            />
+                            <Text style={MainStyles.menuButtonText}>
+                                Duyệt công việc
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.FEEDBACK.key)
+                            }>
+                            <Image
+                                source={images.feedBack}
+                                style={MainStyles.menuButtonImage}
+                            />
+                            <Text style={MainStyles.menuButtonText}>Góp ý</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.NEWS.key)
+                            }>
+                            <Image
+                                source={images.megaphone}
+                                style={MainStyles.menuButtonImage}
+                            />
+                            <Text style={MainStyles.menuButtonText}>
+                                Tin tức
+                            </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={MainStyles.menuButton}
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.DOCUMENT.key)
+                            }>
+                            <Image
+                                source={images.document}
+                                style={MainStyles.menuButtonImage}
+                            />
+                            <Text style={MainStyles.menuButtonText}>
+                                Tài liệu
+                            </Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
