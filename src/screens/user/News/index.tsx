@@ -11,6 +11,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import Loading from '../../subscreen/Loading';
 import useNewsStore from '../../../stores/newsStore';
+import { INews } from '../../../shared-types/Response/NewsResponse'; 
 
 export default function News({navigation}: {navigation: any}) {
     const {news, fetchNews, isLoading} = useNewsStore();
@@ -22,9 +23,10 @@ export default function News({navigation}: {navigation: any}) {
         fetchNews();
     }, []);
 
-    const handleItemPress = (item: any) => {
+    const handleItemPress = (item: INews) => {
         navigation.navigate(SCREEN_INFO.NEWS1.key, {id: item._id});
     };
+
     const toggleBookmark = (id: string) => {
         setBookmarkedItems(prev => ({
             ...prev,
@@ -32,7 +34,7 @@ export default function News({navigation}: {navigation: any}) {
         }));
     };
 
-    const renderItem = ({item}: {item: any}) => (
+    const renderItem = ({item}: {item: INews}) => (
         <TouchableOpacity
             style={styles.itemContainer}
             onPress={() => handleItemPress(item)}
@@ -40,20 +42,23 @@ export default function News({navigation}: {navigation: any}) {
             <Image
                 source={{
                     uri:
-                        item.image ||
+                        (item as any).image || // fallback nếu image không có trong INews
                         'https://vov2.vov.vn/sites/default/files/2021-02/z2346000241203_2c20d4b68755b5f540ee91114347778a.jpg',
                 }}
                 style={styles.image}
             />
 
             <View style={styles.textContainer}>
-                <Text style={styles.title}>{item.newsType}</Text>
+                <Text style={styles.title}>{(item as any).newsType}</Text>
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.description}>
                     {item.content?.slice(0, 100)}...
                 </Text>
                 <Text style={styles.author}>
-                    Tác giả: <Text style={{color: '#339CFF'}}>CF15 Office</Text>
+                    Tác giả:{' '}
+                    <Text style={{color: '#339CFF'}}>
+                        {item.author || 'CF15 Office'}
+                    </Text>
                 </Text>
             </View>
             <TouchableOpacity
@@ -97,6 +102,7 @@ export default function News({navigation}: {navigation: any}) {
         </View>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: {

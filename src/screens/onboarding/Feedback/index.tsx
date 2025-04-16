@@ -49,12 +49,12 @@ export default function FeedbackScreen() {
         <View style={styles.itemContainer}>
             <View style={styles.row}>
                 <Image
-                    source={{ uri: item.avatar || 'https://placehold.co/48x48' }}
+                    source={{ uri: item.avatar || 'https://www.shutterstock.com/image-vector/user-icon-flat-style-person-260nw-1212192763.jpg' }}
                     style={styles.avatar}
                 />
                 <View style={styles.nameContainer}>
-                    <Text style={styles.name}>{item.name || 'Không rõ tên'}</Text>
-                    <Text style={styles.role}>{item.departmentCode}</Text>
+                    <Text style={styles.name}>{item.fullName || 'Không rõ tên'}</Text>
+                    <Text style={styles.role}>{item.departmentName}</Text>
                 </View>
             </View>
             <Text style={styles.title}>{item.title}</Text>

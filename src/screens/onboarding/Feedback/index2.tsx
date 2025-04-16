@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -8,7 +8,7 @@ import {
     SafeAreaView,
     ActivityIndicator,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useFeedbackStore from '../../../stores/feedbackStore';
 
@@ -19,7 +19,7 @@ export default function Feedback1() {
     const [errorContent, setErrorContent] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const {submitFeedback} = useFeedbackStore();
+    const { submitFeedback } = useFeedbackStore();
     const navigation = useNavigation();
 
     const handleSubmit = async () => {
@@ -42,7 +42,7 @@ export default function Feedback1() {
         if (hasError) return;
 
         setLoading(true);
-        await submitFeedback(title, content);
+        await submitFeedback({ title, content });
         setLoading(false);
         navigation.navigate(SCREEN_INFO.FEEDBACK.key);
     };

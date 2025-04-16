@@ -1,14 +1,11 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
+import { INews } from '../shared-types/Response/NewsResponse';
 
-type NewsItem = {
-    _id: string;
-    title: string;
-    content: string;
-    image: string;
-    newsType: string;
-    createdAt?: string;
+type NewsItem = INews & {
+    image?: string;
+    newsType?: string;
 };
 
 type NewsState = {
@@ -21,17 +18,17 @@ type NewsState = {
 
 const backendURL = 'http://cf15officeservice.checkee.vn';
 
-const useNewsStore = create<NewsState>(set => ({
+const useNewsStore = create<NewsState>((set) => ({
     news: [],
     selectedNews: null,
     isLoading: false,
 
     fetchNews: async () => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             const res = await axiosClient.get(`${backendURL}/resources/news`);
             const newsData = res.data?.data || [];
-            set({news: newsData});
+            set({ news: newsData });
         } catch (error: any) {
             console.log('FETCH_NEWS_ERROR:', error?.response?.data || error.message);
             Snackbar.show({
@@ -39,15 +36,15 @@ const useNewsStore = create<NewsState>(set => ({
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
-            set({isLoading: false});
+            set({ isLoading: false });
         }
     },
 
     fetchNewsDetail: async (id: string) => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             const res = await axiosClient.get(`${backendURL}/resources/news/${id}`);
-            set({selectedNews: res.data?.data || null});
+            set({ selectedNews: res.data?.data || null });
         } catch (error: any) {
             console.log('FETCH_NEWS_DETAIL_ERROR:', error?.response?.data || error.message);
             Snackbar.show({
@@ -55,7 +52,7 @@ const useNewsStore = create<NewsState>(set => ({
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
-            set({isLoading: false});
+            set({ isLoading: false });
         }
     },
 }));
