@@ -31,12 +31,7 @@ export default function Profile({navigation}) {
                 <View style={styles.container}>
                     <View style={styles.avatarWrapper}>
                         <Image
-                            source={{
-                                uri: `${userInfo.avatar}`,
-                                // headers: {
-                                //     Authorization: `${asyncStorageHelper.token}`,
-                                // },
-                            }}
+                            source={{uri: `${userInfo.avatar}`}}
                             style={styles.avatar}
                         />
                     </View>
@@ -94,7 +89,7 @@ export default function Profile({navigation}) {
                                     )}
                                     {renderInfoRow(
                                         'Phòng ban',
-                                        `${userInfo.userType.department}`,
+                                        `${userInfo.departmentName}`,
                                     )}
                                     {renderInfoRow(
                                         'Đơn vị',
@@ -238,7 +233,7 @@ const styles = StyleSheet.create({
     },
     container: {
         width: 372,
-        height: 653,
+        //height: 653,
         backgroundColor: '#4CAF50',
         alignItems: 'center',
         marginTop: 112,

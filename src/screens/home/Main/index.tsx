@@ -22,7 +22,6 @@ export default function Main({navigation}) {
     console.log('Token hiện tại:', asyncStorageHelper.token);
     console.log('User', asyncStorageHelper.userAccount);
 
-    const a = 'https://reactjs.org/logo-og.png';
     const isRollCall = true;
 
     const getGreeting = () => {
@@ -49,6 +48,71 @@ export default function Main({navigation}) {
         }, ${mDate.format('DD.MM.YYYY')}`;
     };
 
+    const menuItems = [
+        {
+            key: 'gardenInfo',
+            label: 'Thông tin khu vườn',
+            buttonImage: images.garden,
+            navigateTo: SCREEN_INFO.GARDENINFO.key,
+        },
+        // {
+        //     key: 'gardenDeclare',
+        //     label: 'Khai báo khu vườn',
+        //     buttonImage: images.gardener,
+        //     navigateTo: SCREEN_INFO.GARDENDECLARE.key,
+        // },
+        {
+            key: 'employee',
+            label: 'Người lao động',
+            buttonImage: images.workers,
+            navigateTo: '',
+        },
+        {
+            key: 'browseJobs',
+            label: 'Duyệt công việc',
+            buttonImage: images.toDoList,
+            navigateTo: SCREEN_INFO.BROWSEJOBS.key,
+        },
+        {
+            key: 'feedback',
+            label: 'Góp ý',
+            buttonImage: images.feedBack,
+            navigateTo: SCREEN_INFO.FEEDBACK.key,
+        },
+        {
+            key: 'news',
+            label: 'Tin tức',
+            buttonImage: images.megaphone,
+            navigateTo: SCREEN_INFO.NEWS.key,
+        },
+        {
+            key: 'document',
+            label: 'Tài liệu',
+            buttonImage: images.document,
+            navigateTo: SCREEN_INFO.DOCUMENT.key,
+        },
+    ];
+
+    const filterMenuByRole = (role: string) => {
+        if (role === 'LEADER') {
+            return menuItems;
+        }
+
+        if (role === 'WORKER') {
+            return menuItems.filter(
+                item =>
+                    item.key === 'feedback' ||
+                    item.key === 'news' ||
+                    item.key === 'document',
+            );
+        }
+
+        return menuItems;
+        //return []; // Nếu không hợp lệ, trả mảng trống
+    };
+
+    const menuList = filterMenuByRole(userInfo.userType.level);
+
     return (
         <View style={MainStyles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -68,7 +132,6 @@ export default function Main({navigation}) {
                                 uri: userInfo.avatar,
                             }}
                             style={MainStyles.avatar}
-                            resizeMode='contain'
                         />
                     </View>
                 </View>
@@ -210,89 +273,22 @@ export default function Main({navigation}) {
                 <View style={MainStyles.mainMenu}>
                     <Text style={MainStyles.mainMenuTitle}>Chức năng</Text>
                     <View style={MainStyles.warpMenuButton}>
-                        <TouchableOpacity style={MainStyles.menuButton}>
-                            <Image
-                                source={images.gardener}
-                                style={MainStyles.menuButtonImage}
-                            />
-                            <Text style={MainStyles.menuButtonText}>
-                                Khai báo khu vườn
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={MainStyles.menuButton}>
-                            <Image
-                                source={images.garden}
-                                style={MainStyles.menuButtonImage}
-                            />
-                            <Text style={MainStyles.menuButtonText}>
-                                Thông tin khu vườn
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={MainStyles.menuButton}>
-                            <Image
-                                source={images.workers}
-                                style={MainStyles.menuButtonImage}
-                            />
-                            <Text style={MainStyles.menuButtonText}>
-                                Người lao động
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={MainStyles.menuButton}
-                            onPress={() =>
-                                navigation.navigate(SCREEN_INFO.BROWSEJOBS.key)
-                            }>
-                            <Image
-                                source={images.toDoList}
-                                style={MainStyles.menuButtonImage}
-                            />
-                            <Text style={MainStyles.menuButtonText}>
-                                Duyệt công việc
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={MainStyles.menuButton}
-                            onPress={() =>
-                                navigation.navigate(SCREEN_INFO.FEEDBACK.key)
-                            }>
-                            <Image
-                                source={images.feedBack}
-                                style={MainStyles.menuButtonImage}
-                            />
-                            <Text style={MainStyles.menuButtonText}>Góp ý</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={MainStyles.menuButton}
-                            onPress={() =>
-                                navigation.navigate(SCREEN_INFO.NEWS.key)
-                            }>
-                            <Image
-                                source={images.megaphone}
-                                style={MainStyles.menuButtonImage}
-                            />
-                            <Text style={MainStyles.menuButtonText}>
-                                Tin tức
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={MainStyles.menuButton}
-                            onPress={() =>
-                                navigation.navigate(SCREEN_INFO.DOCUMENT.key)
-                            }>
-                            <Image
-                                source={images.document}
-                                style={MainStyles.menuButtonImage}
-                            />
-                            <Text style={MainStyles.menuButtonText}>
-                                Tài liệu
-                            </Text>
-                        </TouchableOpacity>
+                        {menuList.map(item => (
+                            <TouchableOpacity
+                                key={item.key}
+                                style={MainStyles.menuButton}
+                                onPress={() =>
+                                    navigation.navigate(item.navigateTo)
+                                }>
+                                <Image
+                                    source={item.buttonImage}
+                                    style={MainStyles.menuButtonImage}
+                                />
+                                <Text style={MainStyles.menuButtonText}>
+                                    {item.label}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
                     </View>
                 </View>
             </ScrollView>
@@ -332,8 +328,7 @@ const MainStyles = StyleSheet.create({
     avatar: {
         margin: 'auto',
         width: 50,
-        height: 50,
-        aspectRatio: 1,
+        height: 52,
         borderRadius: 25,
     },
     rollCall: {

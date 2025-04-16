@@ -5,6 +5,17 @@ import asyncStorageHelper from '../utils/localStorageHelper/index';
 
 const backendURL = 'http://cf15officeservice.checkee.vn';
 
+type userAccount = {
+    username: string;
+    password: string;
+    phoneNumber: string;
+};
+
+const fixAvatarPath = (path: string) => {
+    const updatedPath = path.replace(/\\/g, '/');
+    return updatedPath;
+};
+
 const useAuthStore = create(set => ({
     userInfo: null,
     isLoading: false,
@@ -21,7 +32,9 @@ const useAuthStore = create(set => ({
             if (response) {
                 const userData = {
                     ...response.data.data,
-                    avatar: `${backendURL}${response.data.data.avatar}`,
+                    avatar: `${backendURL}${fixAvatarPath(
+                        response.data.data.avatar,
+                    )}`,
                 };
 
                 asyncStorageHelper.userAccount = userData;
@@ -100,6 +113,46 @@ const useAuthStore = create(set => ({
                     Snackbar.show({
                         text: 'Không thể kết nối đến máy chủ, hãy kiểm tra lại internet của bạn!',
                         duration: Snackbar.LENGTH_SHORT,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    updatePassword: async (userAccount: userAccount) => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.post(
+                `${backendURL}/resources/update-password`,
+                userAccount,
+            );
+
+            if (response) {
+                Snackbar.show({
+                    text: 'Đổi mật khẩu thành công!',
+                    duration: Snackbar.LENGTH_SHORT,
+                });
+            }
+            console.log(response);
+
+            set({isLoading: false});
+        } catch (error) {
+            set({isLoading: true});
+
+            const _error: any = error;
+
+            setTimeout(() => {
+                if (_error.response.status === 404) {
+                    Snackbar.show({
+                        text: 'Không tìm thấy ảnh đại diện!',
+                        duration: Snackbar.LENGTH_SHORT,
+                    });
+                }
+
+                if (_error.response.status === 500) {
+                    Snackbar.show({
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        duration: Snackbar.LENGTH_LONG,
                     });
                 }
             }, 100);

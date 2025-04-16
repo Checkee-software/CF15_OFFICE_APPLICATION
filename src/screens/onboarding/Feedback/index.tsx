@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {
     View,
     Text,
@@ -21,11 +21,7 @@ export default function FeedbackScreen() {
     const navigation = useNavigation();
     const route = useRoute();
 
-    const {
-        feedbacks,
-        fetchFeedbacks,
-        isLoading,
-    } = useFeedbackStore();
+    const {feedbacks, fetchFeedbacks, isLoading} = useFeedbackStore();
 
     const fetchData = async () => {
         try {
@@ -38,22 +34,24 @@ export default function FeedbackScreen() {
     useFocusEffect(
         useCallback(() => {
             fetchData();
-        }, [])
+        }, []),
     );
 
     useEffect(() => {
         console.log('FEEDBACKS_RECEIVED:', feedbacks);
     }, [feedbacks]);
 
-    const renderItem = ({ item }) => (
+    const renderItem = ({item}) => (
         <View style={styles.itemContainer}>
             <View style={styles.row}>
                 <Image
-                    source={{ uri: item.avatar || 'https://placehold.co/48x48' }}
+                    source={{uri: item.avatar || 'https://placehold.co/48x48'}}
                     style={styles.avatar}
                 />
                 <View style={styles.nameContainer}>
-                    <Text style={styles.name}>{item.name || 'Không rõ tên'}</Text>
+                    <Text style={styles.name}>
+                        {item.name || 'Không rõ tên'}
+                    </Text>
                     <Text style={styles.role}>{item.departmentCode}</Text>
                 </View>
             </View>

@@ -11,6 +11,7 @@ import {
     Animated,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import useAuthStore from '../../../stores/authStore';
 
 export default function UpdatePassword() {
     const [newPassword, setNewPassword] = React.useState('');
@@ -19,6 +20,8 @@ export default function UpdatePassword() {
     const [showNewPassword, setShowNewPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
     const successAnimation = React.useRef(new Animated.Value(0)).current;
+
+    const {userInfo, updatePassword} = useAuthStore();
 
     const isMinLength = newPassword.length >= 8;
     const hasNumber = /[0-9]/.test(newPassword);
@@ -31,6 +34,14 @@ export default function UpdatePassword() {
 
     const handleConfirm = () => {
         console.log('Mật khẩu hợp lệ và đã xác nhận.');
+
+        const updateUserAccount = {
+            username: userInfo.username,
+            phoneNumber: userInfo.phoneNumber,
+            password: newPassword,
+        };
+
+        console.log(updateUserAccount);
 
         setShowSuccess(true);
         Animated.timing(successAnimation, {
@@ -71,7 +82,7 @@ export default function UpdatePassword() {
                     <Text style={styles.label}>
                         Tài khoản <Text style={styles.required}>*</Text>
                     </Text>
-                    <Text style={styles.accountText}>robertambercf15.com</Text>
+                    <Text style={styles.accountText}>{userInfo.username}</Text>
                 </View>
 
                 <View style={styles.section}>
@@ -277,7 +288,7 @@ const styles = StyleSheet.create({
     },
     confirmButton: {
         backgroundColor: '#4CAF50',
-        width: 372,
+        // width: 372,
         height: 44,
         justifyContent: 'center',
         borderRadius: 22,

@@ -28,7 +28,7 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
 
     const [userAccount, setUserAccount] = useState({
-        username: 'lamphucf15', //cf15office
+        username: 'workerlamphu3', //cf15office
         phoneNumber: '',
         password: '00000000', //CF15@FFICE2025
     });
@@ -56,7 +56,7 @@ export default function Login() {
             password: userAccount.password,
         };
 
-        await login(_userAccount);
+        login(_userAccount);
     };
 
     return (

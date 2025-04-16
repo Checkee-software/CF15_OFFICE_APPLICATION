@@ -6,6 +6,7 @@ import {
     Image,
     StyleSheet,
     TouchableOpacity,
+    FlatList,
 } from 'react-native';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -13,6 +14,100 @@ import images from '../../../assets/images';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 
 const Document = ({navigation}) => {
+    const fakeDocumentList = [
+        {
+            _id: 1,
+            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
+            author: 'Victoria Secret',
+            dateTimeCreate: '08:34 24/02/2025',
+        },
+        {
+            _id: 2,
+            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
+            author: 'Victoria Secret',
+            dateTimeCreate: '08:34 24/02/2025',
+        },
+        {
+            _id: 3,
+            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
+            author: 'Victoria Secret',
+            dateTimeCreate: '08:34 24/02/2025',
+        },
+        {
+            _id: 4,
+            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
+            author: 'Victoria Secret',
+            dateTimeCreate: '08:34 24/02/2025',
+        },
+        {
+            _id: 5,
+            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
+            author: 'Victoria Secret',
+            dateTimeCreate: '08:34 24/02/2025',
+        },
+        {
+            _id: 6,
+            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
+            author: 'Victoria Secret',
+            dateTimeCreate: '08:34 24/02/2025',
+        },
+        {
+            _id: 7,
+            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
+            author: 'Victoria Secret',
+            dateTimeCreate: '08:34 24/02/2025',
+        },
+        {
+            _id: 8,
+            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
+            author: 'Victoria Secret',
+            dateTimeCreate: '08:34 24/02/2025',
+        },
+        {
+            _id: 9,
+            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
+            author: 'Victoria Secret',
+            dateTimeCreate: '08:34 24/02/2025',
+        },
+    ];
+
+    type itemDocument = {
+        _id: string;
+        title: string;
+        author: string;
+        dateTimeCreate: string;
+    };
+
+    const renderItemDocument = (itemDocument: itemDocument) => (
+        <TouchableOpacity
+            style={DocumentStyles.warpDocumentContentAndIcon}
+            onPress={() =>
+                navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key)
+            }>
+            <View style={DocumentStyles.iconDocument}>
+                <Image
+                    style={DocumentStyles.iconDocumentImage}
+                    source={images.fileTypeDocument}
+                    resizeMode='contain'
+                />
+            </View>
+
+            <View style={DocumentStyles.documentContent}>
+                <Text style={DocumentStyles.documentContentText}>
+                    {itemDocument.title}
+                </Text>
+
+                <Text style={DocumentStyles.documentAuthor}>
+                    {itemDocument.author}
+                </Text>
+
+                <Text style={DocumentStyles.documentTimeSent}>
+                    {itemDocument.dateTimeCreate}
+                </Text>
+            </View>
+        </TouchableOpacity>
+    );
+
     return (
         <View style={DocumentStyles.container}>
             <ScrollView keyboardShouldPersistTaps='handled'>
@@ -30,92 +125,12 @@ const Document = ({navigation}) => {
                 </View>
 
                 <View style={DocumentStyles.listDocument}>
-                    <TouchableOpacity
-                        style={DocumentStyles.warpDocumentContentAndIcon}
-                        onPress={() =>
-                            navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key)
-                        }>
-                        <View style={DocumentStyles.iconDocument}>
-                            <Image
-                                style={DocumentStyles.iconDocumentImage}
-                                source={images.fileTypeDocument}
-                                resizeMode='contain'
-                            />
-                        </View>
-
-                        <View style={DocumentStyles.documentContent}>
-                            <Text style={DocumentStyles.documentContentText}>
-                                Lorem ipsum dolor sit amet consectetur. Morbi
-                                velit mauris ut ac elit
-                            </Text>
-
-                            <Text style={DocumentStyles.documentAuthor}>
-                                Victoria Secret
-                            </Text>
-
-                            <Text style={DocumentStyles.documentTimeSent}>
-                                08:34 24/02/2025
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={DocumentStyles.warpDocumentContentAndIcon}
-                        onPress={() =>
-                            navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key)
-                        }>
-                        <View style={DocumentStyles.iconDocument}>
-                            <Image
-                                style={DocumentStyles.iconDocumentImage}
-                                source={images.fileTypeDocument}
-                                resizeMode='contain'
-                            />
-                        </View>
-
-                        <View style={DocumentStyles.documentContent}>
-                            <Text style={DocumentStyles.documentContentText}>
-                                Lorem ipsum dolor sit amet consectetur. Morbi
-                                velit mauris ut ac elit
-                            </Text>
-
-                            <Text style={DocumentStyles.documentAuthor}>
-                                Victoria Secret
-                            </Text>
-
-                            <Text style={DocumentStyles.documentTimeSent}>
-                                08:34 24/02/2025
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={DocumentStyles.warpDocumentContentAndIcon}
-                        onPress={() =>
-                            navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key)
-                        }>
-                        <View style={DocumentStyles.iconDocument}>
-                            <Image
-                                style={DocumentStyles.iconDocumentImage}
-                                source={images.fileTypeDocument}
-                                resizeMode='contain'
-                            />
-                        </View>
-
-                        <View style={DocumentStyles.documentContent}>
-                            <Text style={DocumentStyles.documentContentText}>
-                                Lorem ipsum dolor sit amet consectetur. Morbi
-                                velit mauris ut ac elit
-                            </Text>
-
-                            <Text style={DocumentStyles.documentAuthor}>
-                                Victoria Secret
-                            </Text>
-
-                            <Text style={DocumentStyles.documentTimeSent}>
-                                08:34 24/02/2025
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
+                    <FlatList
+                        scrollEnabled={false}
+                        data={fakeDocumentList}
+                        renderItem={({item}) => renderItemDocument(item)}
+                        keyExtractor={item => item._id}
+                    />
                 </View>
             </ScrollView>
         </View>
@@ -146,10 +161,11 @@ const DocumentStyles = StyleSheet.create({
     },
     listDocument: {
         backgroundColor: '#fff',
+        marginTop: 15,
         gap: 20,
-        marginTop: 16,
     },
     warpDocumentContentAndIcon: {
+        marginBottom: 15,
         flexDirection: 'row',
         flex: 1,
         gap: 8,
