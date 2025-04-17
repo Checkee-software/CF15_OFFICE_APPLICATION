@@ -1,4 +1,4 @@
-import {ScreenInformation} from './types';
+import { ScreenInformation } from './types';
 
 const HOME_SCREENS = {
     MAIN: {
@@ -39,6 +39,8 @@ const HOME_SCREENS = {
     GARDENDECLARE: {
         key: 'GARDENDECLARE',
         headerTitle: 'KHAI BÁO KHU VƯỜN',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     GARDENINFO1: {
         key: 'GARDENINFO1',
         headerTitle: 'THÔNG TIN KHU VƯỜN',
