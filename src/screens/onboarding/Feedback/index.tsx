@@ -21,7 +21,7 @@ export default function FeedbackScreen() {
     const navigation = useNavigation();
     const route = useRoute();
 
-    const {feedbacks, fetchFeedbacks, isLoading} = useFeedbackStore();
+    const {feedbacks, fetchFeedbacks, isLoading,  getFullAvatarUrl} = useFeedbackStore();
 
     const fetchData = async () => {
         try {
@@ -41,31 +41,34 @@ export default function FeedbackScreen() {
         console.log('FEEDBACKS_RECEIVED:', feedbacks);
     }, [feedbacks]);
 
-    const renderItem = ({item}) => (
-        <View style={styles.itemContainer}>
-            <View style={styles.row}>
-                <Image
-                    source={{
-                        uri:
-                            item.avatar ||
-                            'https://www.shutterstock.com/image-vector/user-icon-flat-style-person-260nw-1212192763.jpg',
-                    }}
-                    style={styles.avatar}
-                />
-                <View style={styles.nameContainer}>
-                    <Text style={styles.name}>
-                        {item.fullName || 'Không rõ tên'}
-                    </Text>
-                    <Text style={styles.role}>{item.departmentName}</Text>
+    const renderItem = ({ item }) => {
+        const avatarUrl = getFullAvatarUrl(item.avatar) || 'https://www.shutterstock.com/image-vector/user-icon-flat-style-person-260nw-1212192763.jpg';
+   
+        return (
+            <View style={styles.itemContainer}>
+                <View style={styles.row}>
+                    <Image
+                        source={{
+                            uri: avatarUrl,
+                        }}
+                        style={styles.avatar}
+                    />
+                    <View style={styles.nameContainer}>
+                        <Text style={styles.name}>
+                            {item.fullName || 'Không rõ tên'}
+                        </Text>
+                        <Text style={styles.role}>{item.departmentName}</Text>
+                    </View>
                 </View>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.feedback}>{item.content}</Text>
+                <Text style={styles.time}>
+                    {dayjs(item.createdAt).format('HH:mm DD/MM/YYYY')}
+                </Text>
             </View>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.feedback}>{item.content}</Text>
-            <Text style={styles.time}>
-                {dayjs(item.createdAt).format('HH:mm DD/MM/YYYY')}
-            </Text>
-        </View>
-    );
+        );
+    };
+    
 
     return (
         <View style={styles.container}>
