@@ -33,7 +33,9 @@ const useAuthStore = create(set => ({
                 const userData = {
                     ...response.data.data,
                     avatar: `${backendURL}${fixAvatarPath(
-                        response.data.data.avatar,
+                        response.data.data.avatar.path
+                            ? response.data.data.avatar.path
+                            : response.data.data.avatar,
                     )}`,
                 };
 
@@ -45,6 +47,8 @@ const useAuthStore = create(set => ({
             set({isLoading: false});
 
             const _error = error;
+
+            console.log(_error);
 
             setTimeout(() => {
                 if (_error.response.status === 401) {

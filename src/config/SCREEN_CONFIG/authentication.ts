@@ -84,10 +84,7 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.BROWSEJOBS.headerTitle,
         },
     },
-<<<<<<< HEAD
 
-=======
->>>>>>> f9e2c03d7902d76f0106c65c84b86d3733bbc84e
     {
         name: SCREEN_INFO.GARDENINFO.key,
         component: GardenInfo,
@@ -95,20 +92,19 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.GARDENINFO.headerTitle,
         },
     },
-<<<<<<< HEAD
 
     {
         name: SCREEN_INFO.GARDENDECLARE.key,
         component: GardenDeclare,
         options: {
             title: SCREEN_INFO.GARDENDECLARE.headerTitle,
-=======
+        },
+    },
     {
         name: SCREEN_INFO.GARDENINFO1.key,
         component: GardenInfo1,
         options: {
             title: SCREEN_INFO.GARDENINFO1.headerTitle,
->>>>>>> f9e2c03d7902d76f0106c65c84b86d3733bbc84e
         },
     },
     /* HOME */
