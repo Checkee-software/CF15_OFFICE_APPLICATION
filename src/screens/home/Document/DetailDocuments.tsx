@@ -4,69 +4,142 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
+    FlatList,
 } from 'react-native';
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
+import moment from 'moment';
+import {useWindowDimensions} from 'react-native';
+import RenderHtml from 'react-native-render-html';
+import RNFS from 'react-native-fs';
+import Snackbar from 'react-native-snackbar';
 
-const DetailDocuments = () => {
+const DetailDocuments = ({route}) => {
+    const {width} = useWindowDimensions();
+
+    type AttachedFiles = {
+        destination: string;
+        encoding: string;
+        fieldname: string;
+        mimetype: string;
+        originalname: string;
+        filename: string;
+        path: string;
+        size: number;
+    };
+
+    const formatFileSize = (size: number) => {
+        if (size >= 1024 * 1024) {
+            return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+        } else if (size >= 1024) {
+            return `${(size / 1024).toFixed(2)} KB`;
+        } else {
+            return `${size} Bytes`;
+        }
+    };
+
+    const fixFilePath = (path: string) => {
+        const updatedPath = path.replace(/\\/g, '/');
+        return `http://cf15officeservice.checkee.vn${updatedPath}`;
+    };
+
+    const downloadFile = async (fileUrl: string, fileName: string) => {
+        const updatedFileUrl = fixFilePath(fileUrl);
+        try {
+            const downloadDest = `${RNFS.DownloadDirectoryPath}/${fileName}`;
+            const options = {
+                fromUrl: updatedFileUrl,
+                toFile: downloadDest,
+            };
+            const result = await RNFS.downloadFile(options).promise;
+            if (result.statusCode === 200) {
+                Snackbar.show({
+                    text: 'Đã tải tập tin về điện thoại của bạn!',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            } else {
+                Snackbar.show({
+                    text: 'Tải file không thành công!',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            }
+        } catch (error) {
+            Snackbar.show({
+                text: 'Có lỗi xảy ra khi tải file.',
+                duration: Snackbar.LENGTH_LONG,
+            });
+        }
+    };
+
+    const renderItemAttachedFiles = (itemAttachedFiles: AttachedFiles) => (
+        <View style={DetailDocumentsStyles.cardDocument}>
+            <View style={DetailDocumentsStyles.leftCardDocument}>
+                <MaterialCommunityIcons
+                    name='text-box'
+                    color={'rgba(255, 78, 69, 1)'}
+                    size={28}
+                />
+                <View style={DetailDocumentsStyles.infoDocument}>
+                    <Text style={DetailDocumentsStyles.infoDocumentText}>
+                        {itemAttachedFiles.originalname}
+                    </Text>
+                    <Text style={DetailDocumentsStyles.infoDocumentSizeText}>
+                        {formatFileSize(itemAttachedFiles.size)}
+                    </Text>
+                </View>
+            </View>
+
+            <TouchableOpacity
+                onPress={() =>
+                    downloadFile(
+                        itemAttachedFiles.path,
+                        itemAttachedFiles.filename,
+                    )
+                }>
+                <Feather
+                    name='download'
+                    color={'rgba(33, 150, 243, 1)'}
+                    size={22}
+                />
+            </TouchableOpacity>
+        </View>
+    );
+
     return (
         <View style={DetailDocumentsStyles.container}>
             <ScrollView>
                 <View style={DetailDocumentsStyles.header}>
                     <Text style={DetailDocumentsStyles.headerTitle}>
-                        Lorem ipsum dolor sit amet consectetur. Tortor eget quis
-                        cursus neque nullam sapien nec..
+                        {route.params.itemDocument.title}
                     </Text>
 
                     <Text style={DetailDocumentsStyles.creator}>
-                        Người tạo: Victoria Secret
+                        Người tạo:
                     </Text>
                 </View>
 
                 <View style={DetailDocumentsStyles.body}>
                     <View style={DetailDocumentsStyles.warpCreateAndPromulgate}>
                         <Text style={DetailDocumentsStyles.dateTimeCreate}>
-                            Tạo lúc: 08:00 12/02/2025
+                            Tạo lúc:{' '}
+                            {moment(route.params.itemDocument.createdAt).format(
+                                'HH:mm DD/MM/YYYY',
+                            )}
                         </Text>
                         <Text style={DetailDocumentsStyles.dateTimePromulgate}>
-                            Ngày BH: 08:00 20/02/2025
+                            Ngày BH:{' '}
+                            {moment(
+                                route.params.itemDocument.dateOfIssue,
+                            ).format('HH:mm DD/MM/YYYY')}
                         </Text>
                     </View>
 
                     <View style={DetailDocumentsStyles.documentContent}>
-                        <Text>
-                            Lorem ipsum dolor sit amet consectetur. Viverra
-                            commodo purus nisi duis elit habitant.. Arcu urna ac
-                            maecenas elementum consequat nunc a.. Est et
-                            venenatis nisl elit. Amet lobortis scelerisque
-                            dictum ut nibh tellus bibendum a pellentesque..
-                            Feugiat quam sapien vel massa. Amet porttitor
-                            tristique amet mauris viverra quisque.. Amet nibh id
-                            diam porta nulla ut faucibus nunc.. Nisl neque
-                            integer suspendisse mattis. Lorem vitae ligula ipsum
-                            hendrerit odio amet sit cursus.. Posuere
-                            pellentesque elementum amet nisi arcu facilisis..
-                            Odio nec facilisis senectus turpis ridiculus..
-                            Cursus ligula molestie vitae porttitor quis.. Sem
-                            sit consectetur arcu ac pellentesque nibh.. Viverra
-                            in viverra non nisl hendrerit cras sed rhoncus
-                            tristique.. Vitae pellentesque non sit at sit in
-                            amet ut id.. Consequat amet eget scelerisque augue.
-                            Nunc a cursus et mauris diam lacus sapien donec
-                            cras.. Quisque erat cursus non morbi venenatis
-                            hendrerit.. Tristique massa gravida elementum at et
-                            nisl non ultrices.. Eget vel sed consequat ut
-                            adipiscing ut nunc imperdiet.. Sit proin ut
-                            dignissim id donec posuere mi.. Pellentesque pretium
-                            neque arcu sed dignissim a.. Sapien lacus feugiat et
-                            augue. Eu mauris sit purus rhoncus aliquam..
-                            Fermentum dui turpis congue pharetra tempus.. Duis
-                            aliquet mollis adipiscing mi urna.. Ut mauris
-                            pellentesque ut facilisis. Quis eget mauris est non
-                            ac suspendisse lobortis auctor tellus.. Commodo
-                            mollis ultrices montes arcu sodales quis.. T
-                        </Text>
+                        <RenderHtml
+                            contentWidth={width}
+                            source={{html: route.params.itemDocument.content}}
+                        />
                     </View>
                 </View>
 
@@ -75,39 +148,25 @@ const DetailDocuments = () => {
                         Tài liệu đính kèm
                     </Text>
                     <View style={DetailDocumentsStyles.listAttachedDocuments}>
-                        <View style={DetailDocumentsStyles.cardDocument}>
-                            <View
-                                style={DetailDocumentsStyles.leftCardDocument}>
-                                <MaterialCommunityIcons
-                                    name='text-box'
-                                    color={'rgba(255, 78, 69, 1)'}
-                                    size={28}
-                                />
+                        <FlatList
+                            scrollEnabled={false}
+                            data={route.params.itemDocument.files}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({item}) =>
+                                renderItemAttachedFiles(item)
+                            }
+                            ListEmptyComponent={
                                 <View
-                                    style={DetailDocumentsStyles.infoDocument}>
+                                    style={
+                                        DetailDocumentsStyles.emptyContainer
+                                    }>
                                     <Text
-                                        style={
-                                            DetailDocumentsStyles.infoDocumentText
-                                        }>
-                                        name_of_document.pdf
-                                    </Text>
-                                    <Text
-                                        style={
-                                            DetailDocumentsStyles.infoDocumentSizeText
-                                        }>
-                                        Kích cỡ: 4.8mb
+                                        style={DetailDocumentsStyles.emptyText}>
+                                        Không có tài liệu nào được đính kèm
                                     </Text>
                                 </View>
-                            </View>
-
-                            <TouchableOpacity>
-                                <Feather
-                                    name='download'
-                                    color={'rgba(33, 150, 243, 1)'}
-                                    size={22}
-                                />
-                            </TouchableOpacity>
-                        </View>
+                            }
+                        />
                     </View>
                 </View>
             </ScrollView>
@@ -172,32 +231,39 @@ const DetailDocumentsStyles = StyleSheet.create({
     },
     listAttachedDocuments: {
         marginVertical: 10,
-        gap: 12,
     },
     cardDocument: {
         borderRadius: 8,
         padding: 10,
+        flex: 1,
         backgroundColor: 'rgba(128, 128, 128, 0.15)',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        marginBottom: 10,
     },
     leftCardDocument: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        flex: 1,
         gap: 10,
     },
-    infoDocument: {
-        // flexDirection: 'row',
-        // alignItems: 'center',
-        // justifyContent: 'space-between',
-    },
+    infoDocument: {},
     infoDocumentText: {
         fontSize: 11,
+        //flexShrink: 1,
     },
     infoDocumentSizeText: {
         fontSize: 11,
         color: 'rgba(128, 128, 128, 1)',
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyText: {
+        fontSize: 15,
+        color: 'black',
     },
 });

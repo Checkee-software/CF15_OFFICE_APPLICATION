@@ -44,7 +44,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.NEWS.headerTitle,
         },
     },
-
     {
         name: SCREEN_INFO.NEWS1.key,
         component: News1,
@@ -52,7 +51,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.NEWS1.headerTitle,
         },
     },
-
     {
         name: SCREEN_INFO.MAIN.key,
         component: Main,
@@ -60,7 +58,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.MAIN.headerTitle,
         },
     },
-
     {
         name: SCREEN_INFO.FEEDBACK.key,
         component: Feedback,
@@ -68,7 +65,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.FEEDBACK.headerTitle,
         },
     },
-
     {
         name: SCREEN_INFO.FEEDBACK1.key,
         component: Feedback1,
@@ -76,7 +72,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.FEEDBACK1.headerTitle,
         },
     },
-
     {
         name: SCREEN_INFO.BROWSEJOBS.key,
         component: BrowseJobs,
@@ -84,7 +79,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.BROWSEJOBS.headerTitle,
         },
     },
-
     {
         name: SCREEN_INFO.GARDENINFO.key,
         component: GardenInfo,
@@ -92,7 +86,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.GARDENINFO.headerTitle,
         },
     },
-
     {
         name: SCREEN_INFO.GARDENDECLARE.key,
         component: GardenDeclare,
@@ -252,5 +245,7 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         },
     },
 ];
+
+Object.freeze(AUTHENTICATION_SCREENS);
 
 Object.freeze(AUTHENTICATION_SCREENS);

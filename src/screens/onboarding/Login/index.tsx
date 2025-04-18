@@ -28,9 +28,9 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
 
     const [userAccount, setUserAccount] = useState({
-        username: '', //cf15office
+        username: 'lamphucf15', //cf15office
         phoneNumber: '',
-        password: '', //CF15@FFICE2025
+        password: '123456789', //CF15@FFICE2025
     });
 
     const onChangeUserName = value => {

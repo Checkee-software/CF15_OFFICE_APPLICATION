@@ -29,15 +29,20 @@ const useAuthStore = create(set => ({
                 userAccount,
             );
 
-            if (response) {
+            if (response.data.data) {
                 const userData = {
                     ...response.data.data,
-                    avatar: `${backendURL}${fixAvatarPath(
+                };
+
+                if (response.data.data.avatar) {
+                    userData.avatar = `${backendURL}${fixAvatarPath(
                         response.data.data.avatar.path
                             ? response.data.data.avatar.path
                             : response.data.data.avatar,
-                    )}`,
-                };
+                    )}`;
+                } else {
+                    userAccount.avatar = '';
+                }
 
                 asyncStorageHelper.userAccount = userData;
                 set({userInfo: userData, isLogin: true});
@@ -47,8 +52,6 @@ const useAuthStore = create(set => ({
             set({isLoading: false});
 
             const _error = error;
-
-            console.log(_error);
 
             setTimeout(() => {
                 if (_error.response.status === 401) {
@@ -81,8 +84,6 @@ const useAuthStore = create(set => ({
             const response = await axiosClient.get(
                 `${backendURL}/resources/users/detail/:${userId}`,
             );
-
-            console.log(response);
 
             if (response?.data?.data) {
                 const userData = {
@@ -126,30 +127,26 @@ const useAuthStore = create(set => ({
     updatePassword: async (userAccount: userAccount) => {
         set({isLoading: true});
         try {
-            const response = await axiosClient.post(
+            const response = await axiosClient.patch(
                 `${backendURL}/resources/update-password`,
                 userAccount,
             );
 
-            if (response) {
-                Snackbar.show({
-                    text: 'Đổi mật khẩu thành công!',
-                    duration: Snackbar.LENGTH_SHORT,
-                });
-            }
-            console.log(response);
-
             set({isLoading: false});
-        } catch (error) {
-            set({isLoading: true});
 
-            const _error: any = error;
+            return response.data.data;
+        } catch (error: any) {
+            set({isLoading: false});
+
+            const _error = error;
 
             setTimeout(() => {
                 if (_error.response.status === 404) {
                     Snackbar.show({
-                        text: 'Không tìm thấy ảnh đại diện!',
-                        duration: Snackbar.LENGTH_SHORT,
+                        text: 'Mật khẩu hiện tại không đúng! Hãy kiểm tra lại.',
+                        //dòng dưới dùng khi api sửa lại đúng lỗi (hiện tại là Không tìm thấy người dùng!)
+                        //text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
                     });
                 }
 
@@ -160,6 +157,7 @@ const useAuthStore = create(set => ({
                     });
                 }
             }, 100);
+            return false;
         }
     },
 

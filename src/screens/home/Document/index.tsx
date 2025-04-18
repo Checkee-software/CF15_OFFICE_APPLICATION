@@ -8,81 +8,42 @@ import {
     TouchableOpacity,
     FlatList,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import images from '../../../assets/images';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
+import {useDocumentStore} from '../../../stores/documentStore';
+import moment from 'moment';
 
 const Document = ({navigation}) => {
-    const fakeDocumentList = [
-        {
-            _id: 1,
-            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
-            author: 'Victoria Secret',
-            dateTimeCreate: '08:34 24/02/2025',
-        },
-        {
-            _id: 2,
-            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
-            author: 'Victoria Secret',
-            dateTimeCreate: '08:34 24/02/2025',
-        },
-        {
-            _id: 3,
-            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
-            author: 'Victoria Secret',
-            dateTimeCreate: '08:34 24/02/2025',
-        },
-        {
-            _id: 4,
-            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
-            author: 'Victoria Secret',
-            dateTimeCreate: '08:34 24/02/2025',
-        },
-        {
-            _id: 5,
-            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
-            author: 'Victoria Secret',
-            dateTimeCreate: '08:34 24/02/2025',
-        },
-        {
-            _id: 6,
-            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
-            author: 'Victoria Secret',
-            dateTimeCreate: '08:34 24/02/2025',
-        },
-        {
-            _id: 7,
-            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
-            author: 'Victoria Secret',
-            dateTimeCreate: '08:34 24/02/2025',
-        },
-        {
-            _id: 8,
-            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
-            author: 'Victoria Secret',
-            dateTimeCreate: '08:34 24/02/2025',
-        },
-        {
-            _id: 9,
-            title: 'Lorem ipsum dolor sit amet consectetur. Morbivelit mauris ut ac elit',
-            author: 'Victoria Secret',
-            dateTimeCreate: '08:34 24/02/2025',
-        },
-    ];
+    const {listDocument, getListDocument, isLoading} = useDocumentStore();
+
+    const [searchTitle, setSearchTitle] = useState('');
+
+    useEffect(() => {
+        getListDocument();
+    }, []);
 
     type itemDocument = {
         _id: string;
         title: string;
         author: string;
-        dateTimeCreate: string;
+        createdAt: string;
+        dateOfIssue: string;
+        receivedObject: string;
     };
+
+    const filterDocuments = listDocument.filter(item =>
+        item.title.toLowerCase().includes(searchTitle.toLowerCase()),
+    );
 
     const renderItemDocument = (itemDocument: itemDocument) => (
         <TouchableOpacity
             style={DocumentStyles.warpDocumentContentAndIcon}
             onPress={() =>
-                navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key)
+                navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key, {
+                    itemDocument,
+                })
             }>
             <View style={DocumentStyles.iconDocument}>
                 <Image
@@ -102,7 +63,7 @@ const Document = ({navigation}) => {
                 </Text>
 
                 <Text style={DocumentStyles.documentTimeSent}>
-                    {itemDocument.dateTimeCreate}
+                    {moment(itemDocument.createdAt).format('HH:mm DD/MM/YYYY')}
                 </Text>
             </View>
         </TouchableOpacity>
@@ -121,15 +82,26 @@ const Document = ({navigation}) => {
                         style={DocumentStyles.searchInput}
                         placeholder='Tìm kiếm tài liệu...'
                         placeholderTextColor={'rgba(128, 128, 128, 1)'}
+                        value={searchTitle}
+                        onChangeText={setSearchTitle}
                     />
                 </View>
 
                 <View style={DocumentStyles.listDocument}>
                     <FlatList
                         scrollEnabled={false}
-                        data={fakeDocumentList}
+                        data={filterDocuments}
                         renderItem={({item}) => renderItemDocument(item)}
                         keyExtractor={item => item._id}
+                        onRefresh={getListDocument}
+                        refreshing={isLoading}
+                        ListEmptyComponent={
+                            <View style={DocumentStyles.emptyContainer}>
+                                <Text style={DocumentStyles.emptyText}>
+                                    Hiện không có tài liệu nào
+                                </Text>
+                            </View>
+                        }
                     />
                 </View>
             </ScrollView>
@@ -201,5 +173,14 @@ const DocumentStyles = StyleSheet.create({
         color: 'rgba(128, 128, 128, 1)',
         alignSelf: 'flex-end',
         flexShrink: 1,
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyText: {
+        fontSize: 16,
+        color: 'gray',
     },
 });

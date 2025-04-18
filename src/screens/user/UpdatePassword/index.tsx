@@ -10,53 +10,69 @@ import {
     ScrollView,
     Animated,
 } from 'react-native';
+import Backdrop from '../../subscreen/Loading/index2';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import useAuthStore from '../../../stores/authStore';
 
 export default function UpdatePassword() {
+    const [currentPassword, setCurrentPassword] = React.useState('');
     const [newPassword, setNewPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
     const [showSuccess, setShowSuccess] = React.useState(false);
+    const [showCurrentPassword, setShowCurrentPassword] = React.useState(false);
     const [showNewPassword, setShowNewPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
     const successAnimation = React.useRef(new Animated.Value(0)).current;
 
-    const {userInfo, updatePassword} = useAuthStore();
+    const {userInfo, updatePassword, isLoading} = useAuthStore();
 
     const isMinLength = newPassword.length >= 8;
+    const hasCurrentPassword = currentPassword.length > 0;
     const hasNumber = /[0-9]/.test(newPassword);
     const hasUppercase = /[A-Z]/.test(newPassword);
     const hasSpecialChar = /[^A-Za-z0-9]/.test(newPassword);
     const isMatch = newPassword === confirmPassword;
 
     const isFormValid =
-        isMinLength && hasNumber && hasUppercase && hasSpecialChar && isMatch;
+        isMinLength &&
+        hasCurrentPassword &&
+        hasNumber &&
+        hasUppercase &&
+        hasSpecialChar &&
+        isMatch;
 
-    const handleConfirm = () => {
-        console.log('Mật khẩu hợp lệ và đã xác nhận.');
-
+    const handleConfirm = async () => {
         const updateUserAccount = {
             username: userInfo.username,
-            phoneNumber: userInfo.phoneNumber,
-            password: newPassword,
+            password: currentPassword,
+            newPassword: newPassword,
         };
 
-        console.log(updateUserAccount);
+        const resultUpdatePassword = await updatePassword(updateUserAccount);
 
-        setShowSuccess(true);
-        Animated.timing(successAnimation, {
-            toValue: 1,
-            duration: 300,
-            useNativeDriver: true,
-        }).start();
+        if (resultUpdatePassword) {
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
+            setShowCurrentPassword(false);
+            setShowNewPassword(false);
+            setShowConfirmPassword(false);
 
-        setTimeout(() => {
+            setShowSuccess(true);
             Animated.timing(successAnimation, {
-                toValue: 0,
+                toValue: 1,
                 duration: 300,
                 useNativeDriver: true,
-            }).start(() => setShowSuccess(false));
-        }, 3000);
+            }).start();
+
+            setTimeout(() => {
+                Animated.timing(successAnimation, {
+                    toValue: 0,
+                    duration: 300,
+                    useNativeDriver: true,
+                }).start(() => setShowSuccess(false));
+            }, 3000);
+        }
     };
 
     const dismissSuccess = () => {
@@ -65,6 +81,10 @@ export default function UpdatePassword() {
             duration: 300,
             useNativeDriver: true,
         }).start(() => setShowSuccess(false));
+    };
+
+    const toggleCurrentPasswordVisibility = () => {
+        setShowCurrentPassword(!showCurrentPassword);
     };
 
     const toggleNewPasswordVisibility = () => {
@@ -86,6 +106,29 @@ export default function UpdatePassword() {
                 </View>
 
                 <View style={styles.section}>
+                    <Text style={styles.label}>
+                        Mật khẩu hiện tại <Text style={styles.required}>*</Text>
+                    </Text>
+                    <View style={styles.inputContainerCurrentPassword}>
+                        <TextInput
+                            style={styles.inputWithIcon}
+                            secureTextEntry={!showCurrentPassword}
+                            value={currentPassword}
+                            onChangeText={setCurrentPassword}
+                        />
+                        {currentPassword.length > 0 && (
+                            <TouchableOpacity
+                                style={styles.eyeIcon}
+                                onPress={toggleCurrentPasswordVisibility}>
+                                <AntDesign
+                                    name={showCurrentPassword ? 'eye' : 'eyeo'}
+                                    size={20}
+                                    color='#666'
+                                />
+                            </TouchableOpacity>
+                        )}
+                    </View>
+
                     <Text style={styles.label}>
                         Mật khẩu mới <Text style={styles.required}>*</Text>
                     </Text>
@@ -171,6 +214,15 @@ export default function UpdatePassword() {
                             Mật khẩu xác nhận không khớp
                         </Text>
                     )}
+
+                    {newPassword.length !== 0 &&
+                        confirmPassword.length !== 0 &&
+                        newPassword === confirmPassword &&
+                        currentPassword.length === 0 && (
+                            <Text style={styles.errorText}>
+                                Bạn chưa nhập mật khẩu hiện tại
+                            </Text>
+                        )}
                 </View>
 
                 <TouchableOpacity
@@ -210,6 +262,8 @@ export default function UpdatePassword() {
                     </TouchableOpacity>
                 </Animated.View>
             )}
+
+            <Backdrop open={isLoading} />
         </View>
     );
 }
@@ -244,6 +298,12 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: '#ccc',
         color: '#555',
+    },
+    inputContainerCurrentPassword: {
+        position: 'relative',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
     },
     inputContainer: {
         position: 'relative',

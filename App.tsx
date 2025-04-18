@@ -21,10 +21,10 @@ const InitApp = () => {
             await asyncStorageHelper.awaitLoaded();
             const token = asyncStorageHelper.token;
             const userAccount = asyncStorageHelper.userAccount;
-            if (token !== '' && userAccount.userName !== '') {
+            if (token !== '' && userAccount?.userName !== '') {
                 autoLogin(userAccount);
             }
-            setIsReady(true);
+            setIsReady(prevState => !prevState);
         };
 
         init();
@@ -42,11 +42,9 @@ export default function App() {
     //     return <Loading />;
     // } else {
     //     return (
-    //         <AuthProvider>
-    //             <SafeAreaProvider>
-    //                 <Router />
-    //             </SafeAreaProvider>
-    //         </AuthProvider>
+    //         <SafeAreaProvider>
+    //             <Router />
+    //         </SafeAreaProvider>
     //     );
     // }
     return (
