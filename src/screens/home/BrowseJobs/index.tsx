@@ -5,13 +5,26 @@ import {
     TouchableOpacity,
     ScrollView,
     FlatList,
+    Alert,
+    TextInput,
 } from 'react-native';
 import CheckBox from 'react-native-check-box';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, {useState} from 'react';
 
 const BrowseJobs = () => {
+    const currentWorkerCheckDefault = {
+        jobsId: '',
+        workerId: '',
+        workerName: '',
+    };
+
     const [showListButton, setShowListButton] = useState([]);
+    const [showCancelInput, setShowCancelInput] = useState([]);
+
+    const [currentWorkerCheck, setCurrentWorkerCheck] = useState(
+        currentWorkerCheckDefault,
+    );
 
     const fakeBrowseJobsDataDefault = {
         mainJobTitle: 'Cải tạo đất cho khu vườn cf15',
@@ -26,7 +39,7 @@ const BrowseJobs = () => {
                         worker: 'Lê Chí Minh',
                         progress: '100%',
                         isCheck: false,
-                        checkType: 1,
+                        checkType: 0,
                     },
                 ],
             },
@@ -138,7 +151,7 @@ const BrowseJobs = () => {
                         worker: 'Hồ Trọng Điệp',
                         progress: '0%',
                         isCheck: false,
-                        checkType: 2,
+                        checkType: 0,
                     },
                 ],
             },
@@ -200,41 +213,32 @@ const BrowseJobs = () => {
         );
     };
 
-    const handleCheckJobs = jobsId => {
-        const updatedJobs = fakeBrowseJobsData.jobs.map(job => {
-            if (job._id === jobsId) {
-                return {
-                    ...job,
-                    isCheck: !job.isCheck,
-                    participant: job.participant.map(p => ({
-                        ...p,
-                        isCheck: true,
-                    })),
-                };
-            }
-            return job;
-        });
-
-        const updateFakeBrowseJobsData = {
-            mainJobTitle: fakeBrowseJobsData.mainJobTitle,
-            jobs: updatedJobs,
-        };
-
-        setFakeBrowseJobsData(updateFakeBrowseJobsData);
+    const toggleExpandCancelInput = () => {
+        setShowCancelInput(prevList =>
+            prevList.includes(currentWorkerCheck.workerId)
+                ? [...prevList]
+                : [...prevList, currentWorkerCheck.workerId],
+        );
     };
 
-    const handleCheckParticipant = workerId => {
+    const onChangeCancelReason = value => {
+        setCurrentWorkerCheck({...currentWorkerCheck, cancelReason: value});
+    };
+
+    const handleComfirmBrowseJobs = () => {
         const updatedJobs = fakeBrowseJobsData.jobs.map(job => {
             const updatedParticipants = job.participant.map(p =>
-                p._id === workerId ? {...p, isCheck: !p.isCheck} : p,
+                p._id === currentWorkerCheck.workerId
+                    ? {
+                          ...p,
+                          checkType: 1,
+                      }
+                    : p,
             );
-
-            const allChecked = updatedParticipants.every(p => p.isCheck);
 
             return {
                 ...job,
                 participant: updatedParticipants,
-                isCheck: allChecked,
             };
         });
 
@@ -243,10 +247,143 @@ const BrowseJobs = () => {
             jobs: updatedJobs,
         };
 
+        const findJobs = fakeBrowseJobsData.jobs.find(
+            item => item._id === currentWorkerCheck.jobsId,
+        );
+        const isAllCheckTrue = findJobs?.participant.every(
+            item => item.isCheck,
+        );
+
+        if (isAllCheckTrue) {
+            filterToggleExpand(currentWorkerCheck.jobsId);
+        }
+
         setFakeBrowseJobsData(updateFakeBrowseJobsData);
+        setCurrentWorkerCheck(currentWorkerCheckDefault);
     };
 
-    const handleCheckType = checkType => {};
+    const handleComfirmCancelJobs = () => {
+        const updatedJobs = fakeBrowseJobsData.jobs.map(job => {
+            const updatedParticipants = job.participant.map(p =>
+                p._id === currentWorkerCheck.workerId
+                    ? {
+                          ...p,
+                          checkType: 2,
+                          cancelReason: currentWorkerCheck.cancelReason,
+                      }
+                    : p,
+            );
+
+            return {
+                ...job,
+                participant: updatedParticipants,
+            };
+        });
+
+        const updateFakeBrowseJobsData = {
+            mainJobTitle: fakeBrowseJobsData.mainJobTitle,
+            jobs: updatedJobs,
+        };
+
+        const findJobs = fakeBrowseJobsData.jobs.find(
+            item => item._id === currentWorkerCheck.jobsId,
+        );
+        const isAllCheckTrue = findJobs?.participant.every(
+            item => item.isCheck,
+        );
+
+        if (isAllCheckTrue) {
+            filterToggleExpand(currentWorkerCheck.jobsId);
+        }
+
+        setFakeBrowseJobsData(updateFakeBrowseJobsData);
+        filterToggleExpandCancelInput();
+        setCurrentWorkerCheck(currentWorkerCheckDefault);
+    };
+
+    const filterToggleExpand = jobsId => {
+        setShowListButton(prevList => prevList.filter(item => item !== jobsId));
+    };
+
+    const filterToggleExpandCancelInput = () => {
+        setShowCancelInput(prevList =>
+            prevList.filter(item => item !== currentWorkerCheck.workerId),
+        );
+    };
+
+    const handleCheckParticipant = (workerId, workerName, jobsId) => {
+        if (
+            currentWorkerCheck.workerId === '' ||
+            currentWorkerCheck.workerId === workerId
+        ) {
+            if (currentWorkerCheck.workerId === workerId) {
+                setCurrentWorkerCheck(currentWorkerCheckDefault);
+            } else {
+                setCurrentWorkerCheck({
+                    jobsId: jobsId,
+                    workerId: workerId,
+                    workerName: workerName,
+                });
+            }
+
+            toggleExpand(jobsId);
+
+            const updatedJobs = fakeBrowseJobsData.jobs.map(job => {
+                const updatedParticipants = job.participant.map(p =>
+                    p._id === workerId ? {...p, isCheck: !p.isCheck} : p,
+                );
+
+                const allChecked = updatedParticipants.every(p => p.isCheck);
+
+                return {
+                    ...job,
+                    participant: updatedParticipants,
+                    isCheck: allChecked,
+                };
+            });
+
+            const updateFakeBrowseJobsData = {
+                mainJobTitle: fakeBrowseJobsData.mainJobTitle,
+                jobs: updatedJobs,
+            };
+
+            // Tìm job có jobId truyền vào
+            const targetJob = updatedJobs.find(job => job._id === jobsId);
+
+            // Kiểm tra nếu tất cả participant của job đó đều được check là false
+            const isAllParticipantUnCheck = targetJob.participant.every(
+                p => p.isCheck === false,
+            );
+
+            //chạy khi tất cả người lao động chưa check thì list button sẽ mất
+            if (isAllParticipantUnCheck) {
+                filterToggleExpand(jobsId);
+            }
+
+            const checkHideCancelInput = showCancelInput.includes(workerId);
+            if (checkHideCancelInput) {
+                filterToggleExpandCancelInput();
+            }
+
+            setFakeBrowseJobsData(updateFakeBrowseJobsData);
+        } else {
+            Alert.alert(
+                'Thông báo',
+                `Bạn đang chọn duyệt công việc cho nhân viên ${currentWorkerCheck.workerName}, hãy duyệt cho nhân viên này trước nhé!`,
+                [{text: 'OK'}],
+            );
+        }
+    };
+
+    const handleCheckType = (checkType: number) => {
+        console.log(checkType);
+
+        if (checkType === 1) {
+            handleComfirmBrowseJobs();
+        } else if (checkType === 3) {
+            toggleExpandCancelInput();
+        }
+    };
 
     return (
         <View style={BrowseJobsStyle.container}>
@@ -267,6 +404,7 @@ const BrowseJobs = () => {
                                         <CheckBox
                                             isChecked={item.isCheck}
                                             checkedCheckBoxColor='rgb(101, 84, 143)'
+                                            disabled={true}
                                         />
                                         <Text style={BrowseJobsStyle.jobsTitle}>
                                             {item.jobsTitle}
@@ -308,12 +446,11 @@ const BrowseJobs = () => {
                                                             <CheckBox
                                                                 checkedCheckBoxColor='rgb(101, 84, 143)'
                                                                 onClick={() => {
-                                                                    toggleExpand(
+                                                                    handleCheckParticipant(
+                                                                        participantItem._id,
+                                                                        participantItem.worker,
                                                                         item._id,
-                                                                    ),
-                                                                        handleCheckParticipant(
-                                                                            participantItem._id,
-                                                                        );
+                                                                    );
                                                                 }}
                                                                 isChecked={
                                                                     participantItem.isCheck
@@ -339,6 +476,54 @@ const BrowseJobs = () => {
                                                         participantItem.checkType,
                                                     )}
                                                 </View>
+
+                                                {participantItem.checkType ===
+                                                2 ? (
+                                                    <Text
+                                                        style={
+                                                            BrowseJobsStyle.cancelReasonText
+                                                        }>
+                                                        {`Lí do: ${participantItem.cancelReason}`}
+                                                    </Text>
+                                                ) : null}
+
+                                                {showCancelInput.includes(
+                                                    participantItem._id,
+                                                ) && (
+                                                    <View
+                                                        style={
+                                                            BrowseJobsStyle.cancelInputView
+                                                        }>
+                                                        <TextInput
+                                                            placeholder='Nhập lý do huỷ...'
+                                                            placeholderTextColor={
+                                                                '#888'
+                                                            }
+                                                            multiline
+                                                            onChangeText={
+                                                                onChangeCancelReason
+                                                            }
+                                                            style={
+                                                                BrowseJobsStyle.cancelInput
+                                                            }
+                                                        />
+
+                                                        <TouchableOpacity
+                                                            onPress={() =>
+                                                                handleComfirmCancelJobs()
+                                                            }
+                                                            style={
+                                                                BrowseJobsStyle.confirmReasonBtn
+                                                            }>
+                                                            <Text
+                                                                style={
+                                                                    BrowseJobsStyle.confirmReasonText
+                                                                }>
+                                                                OK
+                                                            </Text>
+                                                        </TouchableOpacity>
+                                                    </View>
+                                                )}
                                             </View>
                                         ),
                                     )}
@@ -444,7 +629,7 @@ const BrowseJobsStyle = StyleSheet.create({
     jobsParticipant: {
         marginTop: 15,
         marginLeft: 22,
-        gap: 20,
+        //gap: 20,
     },
     jobsParticipantName: {
         flexDirection: 'row',
@@ -508,6 +693,43 @@ const BrowseJobsStyle = StyleSheet.create({
         color: '#fff',
         fontWeight: '500',
         textAlign: 'center',
+    },
+    cancelInputView: {
+        marginTop: 10,
+        borderColor: '#f44336',
+        borderWidth: 1,
+        borderRadius: 8,
+        backgroundColor: '#fddede',
+        paddingHorizontal: 10,
+        position: 'relative',
+        minHeight: 125,
+        justifyContent: 'flex-start',
+    },
+    cancelInput: {
+        fontSize: 14,
+        color: '#333',
+    },
+    confirmReasonBtn: {
+        position: 'absolute',
+        bottom: 10,
+        right: 10,
+        backgroundColor: '#4CAF50',
+        borderRadius: 5,
+        paddingHorizontal: 12,
+        paddingVertical: 3,
+    },
+    confirmReasonText: {
+        textAlign: 'center',
+        color: '#fff',
+        fontWeight: 400,
+        fontSize: 12,
+    },
+    cancelReasonText: {
+        color: 'rgba(255, 78, 69, 1)',
+        fontSize: 12,
+        fontWeight: 400,
+        fontStyle: 'italic',
+        marginTop: 10,
     },
 });
 

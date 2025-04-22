@@ -74,7 +74,7 @@ export default function Router() {
                                                 }>
                                                 <Feather
                                                     name='chevron-left'
-                                                    size={26}
+                                                    size={24}
                                                 />
                                             </TouchableOpacity>
                                         ),
@@ -96,6 +96,11 @@ export default function Router() {
                 screenOptions={{
                     headerStyle: {
                         backgroundColor: 'white',
+                    },
+                    headerTitleStyle: {
+                        fontSize: 16,
+                        fontWeight: 700,
+                        color: 'rgba(0, 0, 0, 1)',
                     },
                     headerTitleAlign: 'center',
                     headerTintColor: 'black',

@@ -17,6 +17,7 @@ import Snackbar from 'react-native-snackbar';
 
 const DetailDocuments = ({route}) => {
     const {width} = useWindowDimensions();
+    console.log(route);
 
     type AttachedFiles = {
         destination: string;
@@ -115,7 +116,7 @@ const DetailDocuments = ({route}) => {
                     </Text>
 
                     <Text style={DetailDocumentsStyles.creator}>
-                        Người tạo:
+                        Người tạo: {route.params.itemDocument.createdBy}
                     </Text>
                 </View>
 
@@ -248,10 +249,11 @@ const DetailDocumentsStyles = StyleSheet.create({
         flex: 1,
         gap: 10,
     },
-    infoDocument: {},
+    infoDocument: {
+        width: '85%',
+    },
     infoDocumentText: {
         fontSize: 11,
-        //flexShrink: 1,
     },
     infoDocumentSizeText: {
         fontSize: 11,

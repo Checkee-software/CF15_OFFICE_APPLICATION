@@ -26,17 +26,34 @@ export default function Main({navigation}) {
 
     const getGreeting = () => {
         const hour = new Date().getHours();
-
-        if (hour >= 5 && hour < 11) {
-            return 'Chào buổi sáng';
-        } else if (hour >= 11 && hour < 13) {
-            return 'Chào buổi trưa';
-        } else if (hour >= 13 && hour < 18) {
-            return 'Chào buổi chiều';
+        if (hour >= 5 && hour < 13) {
+            const valueGreeting = {
+                greetingText: 'Chào buổi sáng',
+                colorGreetingText: 'rgba(76, 175, 80, 1)',
+            };
+            return valueGreeting;
+        }
+        // } else if (hour >= 11 && hour < 13) {
+        //     return 'Chào buổi trưa';
+        // }
+        else if (hour >= 13 && hour < 18) {
+            const valueGreeting = {
+                greetingText: 'Chào buổi chiều',
+                colorGreetingText: 'rgba(255, 152, 0, 1)',
+            };
+            return valueGreeting;
         } else if (hour >= 18 && hour < 22) {
-            return 'Chào buổi tối';
+            const valueGreeting = {
+                greetingText: 'Chào buổi tối',
+                colorGreetingText: 'rgba(33, 150, 243, 1)',
+            };
+            return valueGreeting;
         } else {
-            return 'Chúc ngủ ngon';
+            const valueGreeting = {
+                greetingText: 'Chúc ngủ ngon!',
+                colorGreetingText: 'rgba(66, 31, 25, 1)',
+            };
+            return valueGreeting;
         }
     };
 
@@ -63,15 +80,15 @@ export default function Main({navigation}) {
         // },
         {
             key: 'employee',
-            label: 'Người lao động',
+            label: 'Nhân sự',
             buttonImage: images.workers,
-            navigateTo: '',
+            navigateTo: SCREEN_INFO.WORKER.key,
         },
         {
             key: 'browseJobs',
-            label: 'Duyệt công việc',
+            label: 'Lịch làm việc',
             buttonImage: images.toDoList,
-            navigateTo: SCREEN_INFO.BROWSEJOBS.key,
+            navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
         },
         {
             key: 'feedback',
@@ -90,6 +107,12 @@ export default function Main({navigation}) {
             label: 'Tài liệu',
             buttonImage: images.document,
             navigateTo: SCREEN_INFO.DOCUMENT.key,
+        },
+        {
+            key: 'statistic',
+            label: 'Báo cáo thống kê',
+            buttonImage: images.pieChart,
+            navigateTo: SCREEN_INFO.STATISTIC.key,
         },
     ];
 
@@ -113,15 +136,25 @@ export default function Main({navigation}) {
 
     const menuList = filterMenuByRole(userInfo.userType.level);
 
+    const greetingValue = getGreeting();
+
     return (
         <View style={MainStyles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={MainStyles.welcomeUser}>
                     <View style={MainStyles.helloTime}>
-                        <Text style={MainStyles.helloTimeText}>
-                            {getGreeting()}
+                        <Text
+                            style={[
+                                MainStyles.helloTimeText,
+                                {color: greetingValue.colorGreetingText},
+                            ]}>
+                            {greetingValue.greetingText}
                         </Text>
-                        <Text style={MainStyles.helloUserText}>
+                        <Text
+                            style={[
+                                MainStyles.helloUserText,
+                                {color: greetingValue.colorGreetingText},
+                            ]}>
                             {userInfo.fullName}
                         </Text>
                     </View>
@@ -136,7 +169,7 @@ export default function Main({navigation}) {
                     </View>
                 </View>
 
-                <View
+                {/* <View
                     style={[
                         MainStyles.rollCall,
                         isRollCall
@@ -228,17 +261,20 @@ export default function Main({navigation}) {
                             </TouchableOpacity>
                         )}
                     </View>
-                </View>
+                </View> */}
 
                 <View style={MainStyles.syntheticJob}>
                     <View style={MainStyles.sideJob}>
                         <View style={MainStyles.warpSideJobText}>
-                            <Text style={MainStyles.sideJobHeaderText}>
-                                Công việc con 1/3
+                            <Text style={MainStyles.sideJobDoCurrent}>
+                                Đang thực hiện
                             </Text>
                             <Text style={MainStyles.sideJobContentText}>
-                                Lorem ipsum dolor sit amet consecte tur. Viverra
-                                id penatibus eget ut eget phasellus id.
+                                Nghiên cứu, phân tích giống cây cà phê chồn loại
+                                3.
+                            </Text>
+                            <Text style={MainStyles.sideJobRemaining}>
+                                Còn: 23 ngày, 12:05:32
                             </Text>
                         </View>
 
@@ -255,9 +291,9 @@ export default function Main({navigation}) {
                     <View style={MainStyles.totalJobProgress}>
                         <View style={MainStyles.onProgress}>
                             <Text style={MainStyles.onProgressText}>
-                                Đang thực hiện
+                                (12/04) Nghiên cứu giống chồn A
                             </Text>
-                            <Text style={MainStyles.onProgressText}>50%</Text>
+                            <Text style={MainStyles.onProgressValue}>50%</Text>
                         </View>
 
                         <Progress.Bar
@@ -307,17 +343,18 @@ const MainStyles = StyleSheet.create({
         alignItems: 'center',
         color: 'rgba(76, 175, 80, 1)',
         justifyContent: 'space-between',
-        marginBottom: 15,
+        marginBottom: 10,
     },
     helloTime: {
         flexDirection: 'column',
     },
     helloTimeText: {
-        color: 'rgba(76, 175, 80, 1)',
+        fontSize: 13,
+        fontWeight: 400,
     },
     helloUserText: {
-        color: 'rgba(76, 175, 80, 1)',
-        fontWeight: '500',
+        fontWeight: '600',
+        fontSize: 15,
     },
     avatarUser: {
         borderRadius: '50%',
@@ -332,7 +369,7 @@ const MainStyles = StyleSheet.create({
         borderRadius: 25,
     },
     rollCall: {
-        //marginVertical: 20,
+        marginBottom: 10,
         borderRadius: 15,
         padding: 10,
         flexDirection: 'row',
@@ -407,7 +444,7 @@ const MainStyles = StyleSheet.create({
         fontWeight: '500',
     },
     syntheticJob: {
-        marginTop: 15,
+        marginTop: 10,
     },
     sideJob: {
         flexDirection: 'row',
@@ -416,16 +453,22 @@ const MainStyles = StyleSheet.create({
     },
     warpSideJobText: {
         width: '70%',
+        gap: 14,
     },
-    sideJobHeaderText: {
+    sideJobDoCurrent: {
         fontWeight: 500,
-        width: '70%',
+        color: 'rgba(33, 150, 243, 1)',
     },
     sideJobContentText: {
-        marginTop: 6,
-        fontWeight: 300,
-        fontSize: 13,
+        fontWeight: 400,
+        fontSize: 14,
+        color: 'rgba(33, 33, 33, 1)',
+    },
+    sideJobRemaining: {
         color: 'rgba(128, 128, 128, 1)',
+        fontSize: 12,
+        fontStyle: 'italic',
+        fontWeight: 400,
     },
     progressValue: {
         color: 'black',
@@ -440,7 +483,14 @@ const MainStyles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     onProgressText: {
-        marginBottom: 5,
+        fontWeight: 400,
+        marginVertical: 5,
+        fontSize: 12,
+        flexShrink: 1,
+    },
+    onProgressValue: {
+        fontWeight: 400,
+        marginVertical: 5,
         fontSize: 12,
     },
     mainMenu: {

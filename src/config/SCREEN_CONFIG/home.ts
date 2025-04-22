@@ -46,6 +46,21 @@ const HOME_SCREENS = {
         headerTitle: 'THÔNG TIN KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    WORKER: {
+        key: 'WORKER',
+        headerTitle: 'DANH SÁCH NHÂN SỰ',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    WORKERINFO: {
+        key: 'WORKERINFO',
+        headerTitle: 'THÔNG TIN NGƯỜI LAO ĐỘNG',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    WORKSCHEDULE: {
+        key: 'WORKSCHEDULE',
+        headerTitle: 'LỊCH LÀM VIỆC',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     DIRECT_EXPORT_FILLED_GAS_TANK: {
         key: 'DIRECT_EXPORT_FILLED_GAS_TANK',
         headerTitle: 'Xuất bình (thẳng)',

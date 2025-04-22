@@ -2,7 +2,6 @@ import {
     View,
     Text,
     TextInput,
-    ScrollView,
     Image,
     StyleSheet,
     TouchableOpacity,
@@ -14,6 +13,7 @@ import images from '../../../assets/images';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useDocumentStore} from '../../../stores/documentStore';
 import moment from 'moment';
+//import images from '../../../assets/images';
 
 const Document = ({navigation}) => {
     const {listDocument, getListDocument, isLoading} = useDocumentStore();
@@ -71,40 +71,54 @@ const Document = ({navigation}) => {
 
     return (
         <View style={DocumentStyles.container}>
-            <ScrollView keyboardShouldPersistTaps='handled'>
-                <View style={DocumentStyles.warpSearchInputAndIcon}>
-                    <MaterialCommunityIcons
-                        name='feature-search'
-                        size={24}
-                        color={'rgba(128, 128, 128, 1)'}
-                    />
-                    <TextInput
-                        style={DocumentStyles.searchInput}
-                        placeholder='Tìm kiếm tài liệu...'
-                        placeholderTextColor={'rgba(128, 128, 128, 1)'}
-                        value={searchTitle}
-                        onChangeText={setSearchTitle}
-                    />
-                </View>
+            <View style={DocumentStyles.warpSearchInputAndIcon}>
+                <MaterialCommunityIcons
+                    name='feature-search'
+                    size={24}
+                    color={'rgba(128, 128, 128, 1)'}
+                />
+                <TextInput
+                    style={DocumentStyles.searchInput}
+                    placeholder='Tìm kiếm tài liệu...'
+                    placeholderTextColor={'rgba(128, 128, 128, 1)'}
+                    value={searchTitle}
+                    onChangeText={setSearchTitle}
+                />
+            </View>
 
-                <View style={DocumentStyles.listDocument}>
-                    <FlatList
-                        scrollEnabled={false}
-                        data={filterDocuments}
-                        renderItem={({item}) => renderItemDocument(item)}
-                        keyExtractor={item => item._id}
-                        onRefresh={getListDocument}
-                        refreshing={isLoading}
-                        ListEmptyComponent={
-                            <View style={DocumentStyles.emptyContainer}>
-                                <Text style={DocumentStyles.emptyText}>
-                                    Hiện không có tài liệu nào
-                                </Text>
-                            </View>
-                        }
-                    />
-                </View>
-            </ScrollView>
+            <View style={DocumentStyles.listDocument}>
+                {listDocument.length !== 0 ? (
+                    filterDocuments.length !== 0 ? (
+                        <FlatList
+                            data={filterDocuments}
+                            renderItem={({item}) => renderItemDocument(item)}
+                            keyExtractor={item => item._id}
+                            onRefresh={getListDocument}
+                            refreshing={isLoading}
+                        />
+                    ) : (
+                        <View style={DocumentStyles.documentEmpty}>
+                            <Image
+                                source={images.emptyDocumentList}
+                                style={DocumentStyles.emptyDocumentImg}
+                            />
+                            <Text style={DocumentStyles.emptyDocumentText}>
+                                {`Không tìm thấy tài liệu phù hợp với “${searchTitle}"`}
+                            </Text>
+                        </View>
+                    )
+                ) : (
+                    <View style={DocumentStyles.documentEmpty}>
+                        <Image
+                            source={images.emptyDocumentList}
+                            style={DocumentStyles.emptyDocumentImg}
+                        />
+                        <Text style={DocumentStyles.emptyDocumentText}>
+                            Không tìm thấy danh sách tài liệu!
+                        </Text>
+                    </View>
+                )}
+            </View>
         </View>
     );
 };
@@ -114,7 +128,6 @@ export default Document;
 const DocumentStyles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
         paddingHorizontal: 12,
         backgroundColor: '#fff',
     },
@@ -132,6 +145,7 @@ const DocumentStyles = StyleSheet.create({
         width: '100%',
     },
     listDocument: {
+        flex: 1,
         backgroundColor: '#fff',
         marginTop: 15,
         gap: 20,
@@ -174,13 +188,18 @@ const DocumentStyles = StyleSheet.create({
         alignSelf: 'flex-end',
         flexShrink: 1,
     },
-    emptyContainer: {
-        flex: 1,
+    documentEmpty: {
         justifyContent: 'center',
         alignItems: 'center',
+        flex: 1,
     },
-    emptyText: {
-        fontSize: 16,
-        color: 'gray',
+    emptyDocumentImg: {
+        width: 305,
+        height: 180,
+    },
+    emptyDocumentText: {
+        fontWeight: 400,
+        fontSize: 14,
+        color: 'rgba(128, 128, 128, 1)',
     },
 });

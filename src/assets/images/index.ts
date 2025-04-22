@@ -9,6 +9,13 @@ import document from './document.png';
 import gardener from './gardener.png';
 import fileTypeDocument from './file-type-document.png';
 import avatar from './Avatar.png';
+import pieChart from './pie-chart.png';
+import emptyNotificationList from './empty-notification-list.png';
+import emptyWorkerList from './empty-worker-list.png';
+import emptyDocumentList from './empty-document-list.png';
+import emptyScheduleList from './empty-schedule-list.png';
+import emptyHistoryList from './empty-history-list.png';
+import emptyWorkList from './empty-work-list.png';
 
 const images = {
     feedBack: feedBack,
@@ -22,9 +29,17 @@ const images = {
     gardener: gardener,
     fileTypeDocument: fileTypeDocument,
     avatar: avatar,
+    pieChart: pieChart,
+    emptyNotificationList: emptyNotificationList,
+    emptyWorkerList: emptyWorkerList,
+    emptyDocumentList: emptyDocumentList,
+    emptyScheduleList: emptyScheduleList,
+    emptyHistoryList: emptyHistoryList,
+    emptyWorkList: emptyWorkList,
 
     plant1: require('./plant1.jpg'),
     plant2: require('./plant2.jpg'),
+    emptyNews: require('./empty-schedule-list.png'),
 };
 
 export default images;

@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 
 export default function Loading() {
     return (
         <View style={styles.container}>
-            <ActivityIndicator size="large" color="#339CFF" />
+            {/* <ActivityIndicator size="large" color="#339CFF" /> */}
             <Text style={styles.text}>Đang tải dữ liệu...</Text>
         </View>
     );
@@ -21,5 +21,5 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontSize: 16,
         color: '#666',
-    }
+    },
 });

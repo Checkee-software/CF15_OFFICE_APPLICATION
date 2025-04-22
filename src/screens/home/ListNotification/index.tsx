@@ -4,27 +4,18 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
+    Image,
 } from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import images from '../../../assets/images';
 
 const ListNotification = () => {
     return (
         <View style={NotificationStyle.container}>
-            <ScrollView>
-                {/* <View style={NotificationStyle.header}>
-                    <TouchableOpacity>
-                        <MaterialIcons
-                            name='chevron-left'
-                            size={30}
-                            color='black'
-                        />
-                    </TouchableOpacity>
-                    <Text style={NotificationStyle.headerTitle}>THÔNG BÁO</Text>
-                </View> */}
-
+            {/* <ScrollView>
                 <View style={NotificationStyle.warpNotifi}>
                     <TouchableOpacity style={NotificationStyle.cardNotifi}>
                         <View style={NotificationStyle.headerNotifi}>
@@ -192,7 +183,17 @@ const ListNotification = () => {
                         </View>
                     </TouchableOpacity>
                 </View>
-            </ScrollView>
+            </ScrollView> */}
+
+            <View style={NotificationStyle.emptyListNotifyView}>
+                <Image
+                    source={images.emptyNotificationList}
+                    style={NotificationStyle.emptyListNotifyImg}
+                />
+                <Text style={NotificationStyle.emptyListNotifyText}>
+                    Hiện tại bạn không có thông báo!
+                </Text>
+            </View>
         </View>
     );
 };
@@ -204,6 +205,8 @@ const NotificationStyle = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 12,
         backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     header: {
         flexDirection: 'row',
@@ -249,5 +252,18 @@ const NotificationStyle = StyleSheet.create({
     },
     notifiContentText: {
         fontSize: 14,
+    },
+    emptyListNotifyView: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyListNotifyImg: {
+        width: 316,
+        height: 205,
+    },
+    emptyListNotifyText: {
+        color: 'rgba(0, 0, 0, 1)',
+        fontWeight: 400,
+        fontSize: 13,
     },
 });

@@ -1,7 +1,8 @@
 import React from 'react';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, TouchableOpacity, Alert} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Work from '../screens/home/Work';
+import WorkSchedule from '../screens/home/WorkSchedule';
 import CameraScanner from '../screens/global/CameraScanner';
 import History from '../screens/home/History';
 import Profile from '../screens/user/Profile';
@@ -38,6 +39,7 @@ const BottomTabsNavigator = ({navigation}) => {
                 name='Trang chủ'
                 options={{
                     headerTitle: 'CF15 OFFICE',
+                    headerTitleStyle: style.headerTitle,
                     headerShown: true,
                     tabBarIcon: ({size, color}) => (
                         <MaterialIcons name='home' size={28} color={color} />
@@ -66,25 +68,27 @@ const BottomTabsNavigator = ({navigation}) => {
                 name='Công việc'
                 options={{
                     headerShown: true,
+                    headerTitle: 'CÔNG VIỆC',
+                    headerTitleStyle: style.headerTitle,
                     tabBarIcon: ({size, color}) => (
                         <MaterialIcons name='work' size={26} color={color} />
                     ),
-                    headerRight: () => (
-                        <TouchableOpacity
-                            style={style.alertView}
-                            onPress={() =>
-                                navigation.navigate(
-                                    SCREEN_INFO.LISTNOTIFICATION.key,
-                                )
-                            }>
-                            <View style={style.alertDot} />
-                            <FontAwesome
-                                name='bell'
-                                size={26}
-                                color={'rgba(76, 175, 80, 1)'}
-                            />
-                        </TouchableOpacity>
-                    ),
+                    // headerRight: () => (
+                    //     <TouchableOpacity
+                    //         style={style.alertView}
+                    //         onPress={() =>
+                    //             navigation.navigate(
+                    //                 SCREEN_INFO.LISTNOTIFICATION.key,
+                    //             )
+                    //         }>
+                    //         <View style={style.alertDot} />
+                    //         <FontAwesome
+                    //             name='bell'
+                    //             size={26}
+                    //             color={'rgba(76, 175, 80, 1)'}
+                    //         />
+                    //     </TouchableOpacity>
+                    // ),
                 }}
             />
 
@@ -106,6 +110,16 @@ const BottomTabsNavigator = ({navigation}) => {
                     ),
                     tabBarLabel: () => null, // Ẩn label chỉ ở tab này
                 }}
+                listeners={{
+                    tabPress: e => {
+                        e.preventDefault(); // Chặn chuyển tab
+                        Alert.alert(
+                            'Thông báo',
+                            'Chức năng này đang được phát triển, bạn hãy quay lại sau nhé!',
+                            [{text: 'OK'}],
+                        );
+                    },
+                }}
             />
 
             <Tab.Screen
@@ -113,26 +127,38 @@ const BottomTabsNavigator = ({navigation}) => {
                 name='Lịch sử'
                 options={{
                     headerShown: true,
+                    headerTitle: 'LỊCH SỬ HOẠT ĐỘNG',
+                    headerTitleStyle: style.headerTitle,
                     tabBarIcon: ({size, color}) => (
                         <MaterialIcons name='history' size={26} color={color} />
                     ),
-                    headerRight: () => (
-                        <TouchableOpacity
-                            style={style.alertView}
-                            onPress={() =>
-                                navigation.navigate(
-                                    SCREEN_INFO.LISTNOTIFICATION.key,
-                                )
-                            }>
-                            <View style={style.alertDot} />
-                            <FontAwesome
-                                name='bell'
-                                size={26}
-                                color={'rgba(76, 175, 80, 1)'}
-                            />
-                        </TouchableOpacity>
-                    ),
+                    // headerRight: () => (
+                    //     <TouchableOpacity
+                    //         style={style.alertView}
+                    //         onPress={() =>
+                    //             navigation.navigate(
+                    //                 SCREEN_INFO.LISTNOTIFICATION.key,
+                    //             )
+                    //         }>
+                    //         <View style={style.alertDot} />
+                    //         <FontAwesome
+                    //             name='bell'
+                    //             size={26}
+                    //             color={'rgba(76, 175, 80, 1)'}
+                    //         />
+                    //     </TouchableOpacity>
+                    // ),
                 }}
+                // listeners={{
+                //     tabPress: e => {
+                //         e.preventDefault(); // Chặn chuyển tab
+                //         Alert.alert(
+                //             'Thông báo',
+                //             'Chức năng này đang được phát triển, bạn hãy quay lại sau nhé!',
+                //             [{text: 'OK'}],
+                //         );
+                //     },
+                // }}
             />
 
             <Tab.Screen
@@ -140,6 +166,8 @@ const BottomTabsNavigator = ({navigation}) => {
                 name='Hồ sơ'
                 options={{
                     headerShown: true,
+                    headerTitle: 'HỒ SƠ',
+                    headerTitleStyle: style.headerTitle,
                     tabBarIcon: ({size, color}) => (
                         <FontAwesome name='user' size={26} color={color} />
                     ),
@@ -168,6 +196,11 @@ const BottomTabsNavigator = ({navigation}) => {
 export default BottomTabsNavigator;
 
 const style = StyleSheet.create({
+    headerTitle: {
+        fontSize: 16,
+        fontWeight: 700,
+        color: 'rgba(0, 0, 0, 1)',
+    },
     cameraBottomTab: {
         borderRadius: '50%',
         backgroundColor: 'rgba(76, 175, 80, 1)',

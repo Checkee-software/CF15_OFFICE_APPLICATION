@@ -5,6 +5,7 @@ import {ScreenRegistry} from './types';
 import Main from '../../screens/home/Main';
 import Profile from '../../screens/user/Profile';
 import Document from '../../screens/home/Document';
+import WorkSchedule from '../../screens/home/WorkSchedule';
 import DetailDocuments from '../../screens/home/Document/DetailDocuments';
 import Statistic from '../../screens/home/Statistic';
 import BrowseJobs from '../../screens/home/BrowseJobs';
@@ -31,6 +32,8 @@ import News1 from '../../screens/user/News/index1';
 import GardenInfo from '../../screens/home/Garden/GardenInfo';
 import GardenDeclare from '../../screens/home/Garden/GardenDeclare';
 import GardenInfo1 from '../../screens/home/Garden/GardenInfo1';
+import Worker from '../../screens/home/Worker';
+import WorkerInfo from '../../screens/home/Worker/WorkerInfo';
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -98,6 +101,27 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: GardenInfo1,
         options: {
             title: SCREEN_INFO.GARDENINFO1.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.WORKER.key,
+        component: Worker,
+        options: {
+            title: SCREEN_INFO.WORKER.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.WORKERINFO.key,
+        component: WorkerInfo,
+        options: {
+            title: SCREEN_INFO.WORKERINFO.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.WORKSCHEDULE.key,
+        component: WorkSchedule,
+        options: {
+            title: SCREEN_INFO.WORKSCHEDULE.headerTitle,
         },
     },
     /* HOME */
