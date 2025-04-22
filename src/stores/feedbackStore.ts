@@ -77,7 +77,7 @@ const useFeedbackStore = create(set => ({
         set({isLoading: true});
         try {
             const res = await axiosClient.get(
-                `${backendURL}/resources/feedbacks`,
+                `${backendURL}/resources/feedbacks/collection`,
             );
             console.log('FETCH_FEEDBACKS_RESPONSE:', res.data);
             set({feedbacks: res.data?.data || []});

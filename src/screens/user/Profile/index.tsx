@@ -14,12 +14,16 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useAuthStore from '../../../stores/authStore';
 import moment from 'moment';
 import asyncStorageHelper from '../../../utils/localStorageHelper/index';
+import images from '../../../assets/images';
 
 export default function Profile({navigation}) {
     const {userInfo, logout} = useAuthStore();
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
-    //const navigation = useNavigation();
+    const [avatarSource, setAvatarSource] = useState({
+        uri: `${userInfo.avatar}`,
+    });
+
     const [showAccountInfo, setShowAccountInfo] = useState(false);
     return (
         <View style={styles.wrapper}>
@@ -31,8 +35,9 @@ export default function Profile({navigation}) {
                 <View style={styles.container}>
                     <View style={styles.avatarWrapper}>
                         <Image
-                            source={{uri: `${userInfo.avatar}`}}
+                            source={avatarSource}
                             style={styles.avatar}
+                            onError={() => setAvatarSource(images.avatar)}
                         />
                     </View>
 
