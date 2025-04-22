@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
     View,
     Text,
@@ -8,10 +8,10 @@ import {
     SafeAreaView,
     ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useFeedbackStore from '../../../stores/feedbackStore';
-
+import Icon from 'react-native-vector-icons/MaterialIcons';
 export default function Feedback1() {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -19,21 +19,21 @@ export default function Feedback1() {
     const [errorContent, setErrorContent] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const { submitFeedback } = useFeedbackStore();
+    const {submitFeedback} = useFeedbackStore();
     const navigation = useNavigation();
 
     const handleSubmit = async () => {
         let hasError = false;
 
         if (title.trim() === '') {
-            setErrorTitle('Tiêu đề không được để trống');
+            setErrorTitle('Bắt buộc!');
             hasError = true;
         } else {
             setErrorTitle('');
         }
 
         if (content.trim() === '') {
-            setErrorContent('Nội dung không được để trống');
+            setErrorContent('Bắt buộc!');
             hasError = true;
         } else {
             setErrorContent('');
@@ -42,8 +42,10 @@ export default function Feedback1() {
         if (hasError) return;
 
         setLoading(true);
-        await submitFeedback({ title, content });
+        await submitFeedback({title, content});
         setLoading(false);
+        setTitle('');
+        setContent('');
         navigation.navigate(SCREEN_INFO.FEEDBACK.key);
     };
 
@@ -53,18 +55,26 @@ export default function Feedback1() {
                 <Text style={styles.label}>
                     Tiêu đề <Text style={styles.required}>*</Text>
                 </Text>
-                <TextInput
+                <View
                     style={[
-                        styles.input,
+                        styles.inputContainer,
                         errorTitle ? styles.inputError : null,
-                    ]}
-                    placeholder='Nhập tiêu đề'
-                    value={title}
-                    onChangeText={text => {
-                        setTitle(text);
-                        if (text.trim()) setErrorTitle('');
-                    }}
-                />
+                    ]}>
+                    <TextInput
+                        style={styles.inputWithIcon}
+                        placeholder='Nhập tiêu đề'
+                        value={title}
+                        onChangeText={text => {
+                            setTitle(text);
+                            if (text.trim()) setErrorTitle('');
+                        }}
+                    />
+                    {title !== '' && (
+                        <TouchableOpacity onPress={() => setTitle('')}>
+                            <Icon name='close' size={20} color='gray' />
+                        </TouchableOpacity>
+                    )}
+                </View>
                 {errorTitle ? (
                     <Text style={styles.errorText}>{errorTitle}</Text>
                 ) : null}
@@ -157,5 +167,19 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 16,
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 6,
+        paddingHorizontal: 10,
+        marginBottom: 8,
+    },
+
+    inputWithIcon: {
+        flex: 1,
+        height: 40,
     },
 });

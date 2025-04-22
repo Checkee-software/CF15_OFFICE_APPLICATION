@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 import {
     View,
     Text,
@@ -6,144 +6,254 @@ import {
     ScrollView,
     TouchableOpacity,
 } from 'react-native';
-import {List} from 'react-native-paper';
-import {useNavigation} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
+import QRCode from 'react-native-qrcode-svg';
+import useGardenStore from '../../../stores/gardenStore';
+import Loading from '../../subscreen/Loading';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const GardenInfo1 = () => {
-    const navigation = useNavigation();
-    const [expanded1, setExpanded1] = useState(true);
-    const [expanded2, setExpanded2] = useState(false);
-    const [expanded3, setExpanded3] = useState(false);
+const CollapsibleRow = ({
+    label,
+    value,
+    expanded,
+    onToggle,
+    children,
+}: {
+    label: string;
+    value?: string | number;
+    expanded: boolean;
+    onToggle: () => void;
+    children?: React.ReactNode;
+}) => (
+    <>
+        <TouchableOpacity onPress={onToggle} style={styles.row}>
+            <Text style={styles.label}>{label}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={styles.value}>{value}</Text>
+                <Icon
+                    name={
+                        expanded ? 'keyboard-arrow-up' : 'keyboard-arrow-right'
+                    }
+                    size={20}
+                    color='green'
+                />
+            </View>
+        </TouchableOpacity>
+        {expanded && <View style={styles.indentedContent}>{children}</View>}
+    </>
+);
+
+const GardenDetailScreen = () => {
+    const route = useRoute<any>();
+    const id = route.params?.id;
+    const [showAreaInfo, setShowAreaInfo] = React.useState(false);
+    const [showLocationInfo, setShowLocationInfo] = React.useState(false);
+    const [showInfo, setShowInfo] = React.useState(false);
+    const [showManagementAreaInfo, setShowManagementAreaInfo] =
+        React.useState(false);
+
+    const {selectedGarden, fetchGardenDetail, isLoading} = useGardenStore();
+    
+
+    useEffect(() => {
+        if (id) {
+            fetchGardenDetail(id);
+        }
+    }, [id]);
+
+    if (isLoading || !selectedGarden) return <Loading />;
 
     return (
-        <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.content}>
-                <List.Accordion
-                    title='Thông tin khu vườn'
-                    expanded={expanded1}
-                    onPress={() => setExpanded1(!expanded1)}
-                    style={styles.accordion}
-                    titleStyle={styles.accordionTitle}>
-                    <View style={styles.infoBox}>
-                        <Row label='Tên khu vườn' value='Khu vườn CF-A1' />
-                        <Row label='Mã khu vườn' value='0015245627889' />
-                        <Row label='Diện tích khu vườn' value='1000m2' />
-                        <Row label='Diện tích giao khoán' value='500m2' />
+        <ScrollView contentContainerStyle={styles.container}>
+            <View style={styles.qrContainer}>
+                <QRCode value={selectedGarden.code || 'No Code'} size={372} />
+            </View>
+
+            <Section title='Thông tin khu vườn'>
+                <Row label='Tên khu vườn' value={selectedGarden.name} />
+                <View style={styles.row}>
+                    <Text style={styles.label}>Mã khu vườn</Text>
+                    <Text style={[styles.value, {color: 'green'}]}>
+                        {selectedGarden.code}
+                    </Text>
+                </View>
+
+                <CollapsibleRow
+                    label='Diện tích (m2)'
+                    value={selectedGarden.area?.totalSquare}
+                    expanded={showAreaInfo}
+                    onToggle={() => setShowAreaInfo(!showAreaInfo)}>
+                    <Row
+                        label='Chiều dài'
+                        value={`${selectedGarden.area?.length} m`}
+                    />
+                    <Row
+                        label='Chiều rộng'
+                        value={`${selectedGarden.area?.width} m`}
+                    />
+                </CollapsibleRow>
+
+                <CollapsibleRow
+                    label='Vị trí khu vườn'
+                    expanded={showLocationInfo}
+                    onToggle={() => setShowLocationInfo(!showLocationInfo)}>
+                    <Row
+                        label='Kinh độ'
+                        value={selectedGarden.location?.latitude}
+                    />
+                    <Row
+                        label='Vĩ độ'
+                        value={selectedGarden.location?.longitude}
+                    />
+                </CollapsibleRow>
+
+                <CollapsibleRow
+                    label='Người quản lý'
+                    value={selectedGarden.manager}
+                    expanded={showInfo}
+                    onToggle={() => setShowInfo(!showInfo)}>
+                    <Row
+                        label='Đơn vị'
+                        value={selectedGarden.unit || 'Không xác định'}
+                    />
+                    <Row
+                        label='Hợp đồng'
+                        value={selectedGarden.files?.filename}
+                    />
+
+                    <CollapsibleRow
+                        label='Diện tích giao khoán (m2)'
+                        value={selectedGarden.management?.area?.totalSquare}
+                        expanded={showManagementAreaInfo}
+                        onToggle={() =>
+                            setShowManagementAreaInfo(!showManagementAreaInfo)
+                        }>
                         <Row
-                            label='Vị trí khu vườn'
-                            valueComponent={
-                                <TouchableOpacity>
-                                    <Text style={styles.linkText}>
-                                        Bấm để xem
-                                    </Text>
-                                </TouchableOpacity>
-                            }
+                            label='Chiều dài'
+                            value={`${selectedGarden.management?.area?.length} m`}
                         />
-                    </View>
-                </List.Accordion>
+                        <Row
+                            label='Chiều rộng'
+                            value={`${selectedGarden.management?.area?.width} m`}
+                        />
+                    </CollapsibleRow>
+                </CollapsibleRow>
+            </Section>
 
-                <List.Accordion
-                    title='Thông tin cây trồng'
-                    expanded={expanded2}
-                    onPress={() => setExpanded2(!expanded2)}
-                    style={styles.accordion}
-                    titleStyle={styles.accordionTitle}>
-                    <View style={styles.infoBox}>
-                        <Row label='Giống cây trồng' value='Cà phê Arabica' />
-                        <Row label='Số cây trồng' value='500' />
+            <Section title='Thông tin cây trồng'>
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Tên giống</Text>
+                    <Text style={styles.infoValue}>
+                        {selectedGarden.productName}
+                    </Text>
+                </View>
+                <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Số lượng giống cây</Text>
+                    <Text
+                        style={
+                            styles.infoValue
+                        }>{`${selectedGarden.productQuantity} cây`}</Text>
+                </View>
 
-                        <View style={{marginTop: 10}}>
-                            <Text style={styles.subHeader}>
-                                Năm trồng / Số cây
-                            </Text>
-                            <View style={[styles.tableRow, styles.tableHeader]}>
-                                <Text style={styles.cellHeader}>Năm trồng</Text>
-                                <Text style={styles.cellHeader}>Số cây</Text>
-                            </View>
-                            <View style={styles.tableRow}>
-                                <Text style={styles.cell}>2015</Text>
-                                <Text style={styles.cell}>400</Text>
-                            </View>
-                            <View style={styles.tableRow}>
-                                <Text style={styles.cell}>2018</Text>
-                                <Text style={styles.cell}>100</Text>
-                            </View>
+                {selectedGarden.totalProductByYear?.map(item => (
+                    <View key={item._id} style={styles.yearBox}>
+                        <View style={styles.yearTitleRow}>
+                            <Text
+                                style={
+                                    styles.yearTitle
+                                }>{`Năm ${item.year}`}</Text>
+                            <Text
+                                style={
+                                    styles.plantedText
+                                }>{`Trồng ${item.quantity} cây`}</Text>
                         </View>
 
-                        <View style={{marginTop: 10}}>
-                            <Text style={styles.subHeader}>Chất lượng cây</Text>
-                            <View style={[styles.tableRow, styles.tableHeader]}>
-                                <Text style={styles.cellHeader}>A</Text>
-                                <Text style={styles.cellHeader}>B</Text>
-                                <Text style={styles.cellHeader}>C</Text>
-                                <Text style={styles.cellHeader}>D</Text>
-                            </View>
-                            <View style={styles.tableRow}>
-                                <Text style={styles.cell}>100</Text>
-                                <Text style={styles.cell}>150</Text>
-                                <Text style={styles.cell}>100</Text>
-                                <Text style={styles.cell}>150</Text>
-                            </View>
+                        <View style={styles.qualityRow}>
+                            <Text style={styles.qualityText}>{`A: ${
+                                item.qualities?.[0] ?? 0
+                            }`}</Text>
+                            <Text style={styles.separator}></Text>
+                            <Text style={styles.qualityText}>{`B: ${
+                                item.qualities?.[1] ?? 0
+                            }`}</Text>
+                            <Text style={styles.separator}></Text>
+                            <Text style={styles.qualityText}>{`C: ${
+                                item.qualities?.[2] ?? 0
+                            }`}</Text>
+                            <Text style={styles.separator}></Text>
+                            <Text style={styles.qualityText}>{`D: ${
+                                item.qualities?.[3] ?? 0
+                            }`}</Text>
                         </View>
                     </View>
-                </List.Accordion>
+                ))}
+            </Section>
 
-                <List.Accordion
-                    title='Thông tin cây trồng xen'
-                    expanded={expanded3}
-                    onPress={() => setExpanded3(!expanded3)}
-                    style={styles.accordion}
-                    titleStyle={styles.accordionTitle}>
-                    <View style={styles.infoBox}>
-                        <Row label='Kèn hồng' value='200' />
-                        <Row label='Muồng đen' value='300' />
-                    </View>
-                </List.Accordion>
-            </ScrollView>
-        </View>
+            {selectedGarden.sidePlants?.length > 0 && (
+                <Section title='Thông tin cây trồng xen'>
+                    <Row
+                        label='Số loại cây trồng xen'
+                        value={selectedGarden.sidePlants.length}
+                    />
+                    {selectedGarden.sidePlants.map(plant => (
+                        <Row
+                            key={plant._id}
+                            label={plant.name}
+                            value={`${plant.value} cây`}
+                        />
+                    ))}
+                </Section>
+            )}
+
+            <Section title='Quy trình trồng trọt'>
+                <Text>Chưa có quy trình nào!</Text>
+            </Section>
+            <Section title='Lịch sử thu hoạch'>
+                <Text>Chưa có lịch sử thu hoạch nào!</Text>
+            </Section>
+        </ScrollView>
     );
 };
 
-const Row = ({label, value, valueComponent}: any) => (
-    <View style={styles.row}>
-        <Text style={styles.label}>{label}</Text>
-        {valueComponent ? (
-            valueComponent
-        ) : (
-            <Text style={styles.value}>{value}</Text>
-        )}
+const Section = ({
+    title,
+    children,
+}: {
+    title: string;
+    children: React.ReactNode;
+}) => (
+    <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <View>{children}</View>
     </View>
 );
 
-export default GardenInfo1;
+const Row = ({label, value}: {label: string; value?: string | number}) => (
+    <View style={styles.row}>
+        <Text style={styles.label}>{label}</Text>
+        <Text style={styles.value}>{value}</Text>
+    </View>
+);
+
+export default GardenDetailScreen;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: 'white',
-    },
-    content: {
         padding: 16,
+        backgroundColor: '#fff',
     },
-    accordion: {
-        backgroundColor: '#F2F2F2',
-        borderRadius: 12,
-        marginTop: 12,
-        paddingHorizontal: 2,
-        elevation: 0,
-        paddingVertical: 4,
+
+    qrContainer: {
+        alignItems: 'center',
+        marginBottom: 20,
     },
-    accordionTitle: {
-        fontWeight: '600',
-        color: 'black',
+    section: {
+        marginBottom: 20,
     },
-    infoBox: {
-        paddingHorizontal: 18,
-        paddingBottom: 6,
-        backgroundColor: '#F2F2F2',
+    sectionTitle: {
+        fontSize: 16,
+        color: 'green',
         marginBottom: 10,
-        top: -12,
-        borderRadius: 12,
     },
     row: {
         flexDirection: 'row',
@@ -153,43 +263,78 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         color: '#444',
-        width: '50%',
     },
     value: {
         fontSize: 14,
-        color: '#000',
-        width: '50%',
-        textAlign: 'right',
-    },
-    linkText: {
-        color: '#007BFF',
-        textDecorationLine: 'none',
-        fontWeight: '600',
-        textAlign: 'right',
-    },
-    subHeader: {
-        marginBottom: 6,
-        marginTop: 10,
-        fontSize: 14,
+        fontWeight: '400',
         color: '#000',
     },
-    tableRow: {
+    indentedContent: {
+        paddingLeft: 20,
+    },
+
+    typeRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingVertical: 4,
+        paddingHorizontal: 10,
+        marginTop: 4,
     },
-    tableHeader: {
-        borderRadius: 8,
-    },
-    cell: {
-        flex: 1,
-        textAlign: 'center',
+    typeText: {
         fontSize: 14,
+        color: '#000',
+        fontWeight: '500',
     },
-    cellHeader: {
-        flex: 1,
-        textAlign: 'center',
+    infoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 6,
+    },
+    infoLabel: {
         fontSize: 14,
-        fontWeight: '600',
+        color: '#444',
+    },
+    infoValue: {
+        fontSize: 14,
+        color: '#000',
+    },
+    yearBox: {
+        borderBottomWidth: 2,
+        borderBottomColor: '#ddd',
+        borderRadius: 4,
+        marginTop: 10,
+        padding: 0,
+        overflow: 'hidden',
+    },
+    yearTitleRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+    },
+    yearTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#000',
+        paddingLeft: 34,
+    },
+    plantedText: {
+        fontWeight: 'bold',
+        fontSize: 14,
+        color: '#000',
+        paddingRight: 34,
+    },
+    qualityRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        paddingVertical: 8,
+        paddingHorizontal: 5,
+    },
+    qualityText: {
+        fontSize: 14,
+        color: '#000',
+    },
+    separator: {
+        fontSize: 14,
+        color: '#ddd',
     },
 });
