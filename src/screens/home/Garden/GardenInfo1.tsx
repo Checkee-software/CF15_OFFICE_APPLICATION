@@ -5,12 +5,14 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
+    Linking,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import QRCode from 'react-native-qrcode-svg';
 import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import useAuthStore from '../../../stores/authStore';
 
 const CollapsibleRow = ({
     label,
@@ -44,6 +46,7 @@ const CollapsibleRow = ({
 );
 
 const GardenDetailScreen = () => {
+    const {userInfo} = useAuthStore();
     const route = useRoute<any>();
     const id = route.params?.id;
     const [showAreaInfo, setShowAreaInfo] = React.useState(false);
@@ -53,7 +56,7 @@ const GardenDetailScreen = () => {
         React.useState(false);
 
     const {selectedGarden, fetchGardenDetail, isLoading} = useGardenStore();
-    
+    const [contractExpanded, setContractExpanded] = React.useState(false);
 
     useEffect(() => {
         if (id) {
@@ -116,10 +119,43 @@ const GardenDetailScreen = () => {
                         label='Đơn vị'
                         value={selectedGarden.unit || 'Không xác định'}
                     />
-                    <Row
-                        label='Hợp đồng'
-                        value={selectedGarden.files?.filename}
-                    />
+                    {userInfo?.userType?.level !== 'LEADER' && (
+                        <CollapsibleRow
+                            label='Hợp đồng'
+                            expanded={contractExpanded}
+                            onToggle={() =>
+                                setContractExpanded(!contractExpanded)
+                            }>
+                            {selectedGarden.management?.files?.length > 0 ? (
+                                selectedGarden.management.files.map(
+                                    (file, index) => (
+                                        <TouchableOpacity
+                                            key={index}
+                                            onPress={() =>
+                                                Linking.openURL(
+                                                    `http://cf15officeservice.checkee.vn${file.path.replace(
+                                                        /\\/g,
+                                                        '/',
+                                                    )}`,
+                                                )
+                                            }>
+                                            <Text
+                                                style={{
+                                                    color: 'green',
+                                                    marginBottom: 6,
+                                                }}>
+                                                {file.filename}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ),
+                                )
+                            ) : (
+                                <Text style={{color: '#888'}}>
+                                    Không có hợp đồng nào
+                                </Text>
+                            )}
+                        </CollapsibleRow>
+                    )}
 
                     <CollapsibleRow
                         label='Diện tích giao khoán (m2)'

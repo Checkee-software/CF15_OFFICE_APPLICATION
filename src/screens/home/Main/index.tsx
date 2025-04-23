@@ -118,7 +118,15 @@ export default function Main({navigation}) {
 
     const filterMenuByRole = (role: string) => {
         if (role === 'LEADER') {
-            return menuItems;
+            return menuItems.map(item => {
+                if (item.key === 'employee') {
+                    return {
+                        ...item,
+                        label: 'Đơn vị',
+                    };
+                }
+                return item;
+            });
         }
 
         if (role === 'WORKER') {

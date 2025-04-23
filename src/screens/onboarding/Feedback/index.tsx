@@ -16,12 +16,16 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useFeedbackStore from '../../../stores/feedbackStore';
 import dayjs from 'dayjs';
+import images from '../../../assets/images';
+import useAuthStore from '../../../stores/authStore';
 
 export default function FeedbackScreen() {
     const navigation = useNavigation();
     const route = useRoute();
+    const {userInfo} = useAuthStore();
 
-    const {feedbacks, fetchFeedbacks, isLoading,  getFullAvatarUrl} = useFeedbackStore();
+    const {feedbacks, fetchFeedbacks, isLoading, getFullAvatarUrl} =
+        useFeedbackStore();
 
     const fetchData = async () => {
         try {
@@ -41,9 +45,9 @@ export default function FeedbackScreen() {
         console.log('FEEDBACKS_RECEIVED:', feedbacks);
     }, [feedbacks]);
 
-    const renderItem = ({ item }) => {
-        const avatarUrl = getFullAvatarUrl(item.avatar) || 'https://www.shutterstock.com/image-vector/user-icon-flat-style-person-260nw-1212192763.jpg';
-   
+    const renderItem = ({item}) => {
+        const avatarUrl = getFullAvatarUrl(item.avatar) || images.avatar;
+
         return (
             <View style={styles.itemContainer}>
                 <View style={styles.row}>
@@ -57,7 +61,11 @@ export default function FeedbackScreen() {
                         <Text style={styles.name}>
                             {item.fullName || 'Không rõ tên'}
                         </Text>
-                        <Text style={styles.role}>{item.departmentName}</Text>
+                        <Text style={styles.role}>
+                            {userInfo?.userType?.level === 'DEPARTMENT'
+                                ? item.role
+                                : item.unit}
+                        </Text>
                     </View>
                 </View>
                 <Text style={styles.title}>{item.title}</Text>
@@ -68,7 +76,6 @@ export default function FeedbackScreen() {
             </View>
         );
     };
-    
 
     return (
         <View style={styles.container}>
@@ -159,9 +166,9 @@ const styles = StyleSheet.create({
         bottom: 44,
         right: 24,
         backgroundColor: '#4CAF50',
-        paddingVertical: 18,
-        paddingHorizontal: 20,
-        borderRadius: 30,
+        paddingVertical: 13,
+        paddingHorizontal: 10,
+        borderRadius: 15,
         flexDirection: 'row',
         alignItems: 'center',
         elevation: 3,

@@ -33,7 +33,7 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     GARDENINFO: {
         key: 'GARDENINFO',
-        headerTitle: 'THÔNG TIN KHU VƯỜN',
+        headerTitle: 'DANH SÁCH KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENDECLARE: {
@@ -43,7 +43,7 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     GARDENINFO1: {
         key: 'GARDENINFO1',
-        headerTitle: 'THÔNG TIN KHU VƯỜN',
+        headerTitle: 'CHI TIẾT KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
     WORKER: {

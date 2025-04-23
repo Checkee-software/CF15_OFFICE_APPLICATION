@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
     View,
     Text,
@@ -14,26 +14,60 @@ import Loading from '../../subscreen/Loading';
 import useNewsStore from '../../../stores/newsStore';
 import {INews} from '../../../shared-types/Response/NewsResponse';
 import images from '../../../assets/images';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useFocusEffect} from '@react-navigation/native';
+
 export default function News({navigation}: {navigation: any}) {
     const {news, fetchNews, isLoading} = useNewsStore();
     const [bookmarkedItems, setBookmarkedItems] = useState<{
         [key: string]: boolean;
     }>({});
     const [searchText, setSearchText] = useState('');
+    const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
 
     useEffect(() => {
         fetchNews();
     }, []);
 
-    const handleItemPress = (item: INews) => {
-        navigation.navigate(SCREEN_INFO.NEWS1.key, {id: item._id});
+    useFocusEffect(
+        useCallback(() => {
+            loadBookmarks();
+        }, []),
+    );
+
+    const loadBookmarks = async () => {
+        try {
+            const storedBookmarks = await AsyncStorage.getItem(
+                'bookmarkedItems',
+            );
+            if (storedBookmarks) {
+                setBookmarkedItems(JSON.parse(storedBookmarks));
+            }
+        } catch (error) {
+            console.error('Error loading bookmarks from AsyncStorage', error);
+        }
+    };
+
+    const saveBookmarks = async (updatedBookmarks: {
+        [key: string]: boolean;
+    }) => {
+        try {
+            await AsyncStorage.setItem(
+                'bookmarkedItems',
+                JSON.stringify(updatedBookmarks),
+            );
+        } catch (error) {
+            console.error('Error saving bookmarks to AsyncStorage', error);
+        }
     };
 
     const toggleBookmark = (id: string) => {
-        setBookmarkedItems(prev => ({
-            ...prev,
-            [id]: !prev[id],
-        }));
+        const updatedBookmarks = {
+            ...bookmarkedItems,
+            [id]: !bookmarkedItems[id],
+        };
+        setBookmarkedItems(updatedBookmarks);
+        saveBookmarks(updatedBookmarks);
     };
 
     const normalizeText = (text: string) => {
@@ -52,22 +86,27 @@ export default function News({navigation}: {navigation: any}) {
             ? normalizeText(item.content)
             : '';
 
-        return (
+        const matchesSearch =
             normalizedTitle.includes(normalizedSearch) ||
-            normalizedContent.includes(normalizedSearch)
-        );
+            normalizedContent.includes(normalizedSearch);
+        const isBookmarked = bookmarkedItems[item._id];
+
+        return showBookmarksOnly
+            ? matchesSearch && isBookmarked
+            : matchesSearch;
     });
 
     const renderItem = ({item}: {item: INews}) => (
         <TouchableOpacity
             style={styles.itemContainer}
-            onPress={() => handleItemPress(item)}
+            onPress={() =>
+                navigation.navigate(SCREEN_INFO.NEWS1.key, {id: item._id})
+            }
             activeOpacity={0.7}>
             <Image
                 source={item.image ? {uri: item.image} : images.plant2}
                 style={styles.image}
             />
-
             <View style={styles.textContainer}>
                 <Text style={styles.category}>{(item as any).newsType}</Text>
                 <Text style={styles.title}>{item.title}</Text>
@@ -106,20 +145,38 @@ export default function News({navigation}: {navigation: any}) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.searchContainer}>
-                <Icon
-                    name='search'
-                    size={20}
-                    color='#666'
-                    style={styles.searchIcon}
-                />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder='Tìm kiếm tin tức...'
-                    value={searchText}
-                    onChangeText={setSearchText}
-                    placeholderTextColor='#666'
-                />
+            <View style={styles.searchWrapper}>
+                <View style={styles.searchContainer}>
+                    <Icon
+                        name='search'
+                        size={20}
+                        color='#666'
+                        style={styles.searchIcon}
+                    />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder='Tìm kiếm tin tức...'
+                        value={searchText}
+                        onChangeText={setSearchText}
+                        placeholderTextColor='#666'
+                    />
+                </View>
+                <TouchableOpacity
+                    onPress={() => setShowBookmarksOnly(prev => !prev)}
+                    style={[
+                        styles.bookmarkIconWrapper,
+                        {
+                            backgroundColor: showBookmarksOnly
+                                ? '#FF98004D'
+                                : '#EDEDED',
+                        },
+                    ]}>
+                    <Icon
+                        name='bookmark'
+                        size={20}
+                        color={showBookmarksOnly ? 'orange' : '#C4C4C4'}
+                    />
+                </TouchableOpacity>
             </View>
 
             <FlatList
@@ -130,7 +187,7 @@ export default function News({navigation}: {navigation: any}) {
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Image
-                            source={images.plant2}
+                            source={images.emptyScheduleList}
                             style={styles.emptyImage}
                             resizeMode='contain'
                         />
@@ -139,11 +196,7 @@ export default function News({navigation}: {navigation: any}) {
                                 <Text style={styles.emptyText}>
                                     Không tìm thấy tin tức nào phù hợp với
                                 </Text>
-                                <Text
-                                    style={[
-                                        styles.emptyText,
-                                        {color: '#000', fontWeight: 'bold'},
-                                    ]}>
+                                <Text style={styles.emptyText}>
                                     "{searchText}"
                                 </Text>
                             </View>
@@ -164,22 +217,22 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    emptyImage: {
-        width: 250,
-        height: 250,
-        marginBottom: 20,
+    searchWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+        marginTop: 10,
     },
-
     searchContainer: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#f5f5f5',
         borderRadius: 20,
         paddingHorizontal: 10,
-        margin: 10,
         height: 50,
-        paddingVertical: 5,
-        width: 350,
+        marginRight: 10,
     },
     searchIcon: {
         marginRight: 8,
@@ -188,6 +241,14 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 14,
         color: '#000',
+    },
+    bookmarkIconWrapper: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#EDEDED',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     itemContainer: {
         flexDirection: 'row',
@@ -198,8 +259,8 @@ const styles = StyleSheet.create({
         borderBottomColor: '#eee',
     },
     image: {
-        width: 92,
-        height: 92,
+        width: 100,
+        height: 100,
         borderRadius: 8,
     },
     textContainer: {
@@ -230,9 +291,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 50,
     },
-
+    emptyImage: {
+        width: 250,
+        height: 250,
+        marginBottom: 20,
+    },
     emptyText: {
         fontSize: 18,
         color: 'gray',
