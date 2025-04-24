@@ -31,7 +31,9 @@ import Feedback1 from '../../screens/onboarding/Feedback/index2';
 import News from '../../screens/user/News';
 import News1 from '../../screens/user/News/index1';
 import GardenInfo from '../../screens/home/Garden/GardenInfo';
-import GardenDeclare from '../../screens/home/Garden/GardenDeclare';
+import GardenScan from '@/screens/home/Garden/GardenScan';
+import GardenDeclareWorker from '../../screens/home/Garden/GardenDeclareWorker';
+import GardenWorker from '@/screens/home/Garden/GardenDetailWorker';
 import GardenInfo1 from '../../screens/home/Garden/GardenInfo1';
 import Worker from '../../screens/home/Worker';
 import WorkerInfo from '../../screens/home/Worker/WorkerInfo';
@@ -92,17 +94,32 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         },
     },
     {
-        name: SCREEN_INFO.GARDENDECLARE.key,
-        component: GardenDeclare,
-        options: {
-            title: SCREEN_INFO.GARDENDECLARE.headerTitle,
-        },
-    },
-    {
         name: SCREEN_INFO.GARDENINFO1.key,
         component: GardenInfo1,
         options: {
             title: SCREEN_INFO.GARDENINFO1.headerTitle,
+        },
+    },
+    //khu vườn cho worker
+    {
+        name: SCREEN_INFO.GARDENWORKER.key,
+        component: GardenWorker,
+        options: {
+            title: SCREEN_INFO.GARDENWORKER.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.GARDENDECLAREWORKER.key,
+        component: GardenDeclareWorker,
+        options: {
+            title: SCREEN_INFO.GARDENDECLAREWORKER.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.GARDENCAMERASCAN.key,
+        component: GardenScan,
+        options: {
+            title: SCREEN_INFO.GARDENCAMERASCAN.headerTitle,
         },
     },
     {

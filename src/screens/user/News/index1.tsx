@@ -11,7 +11,9 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import useNewsStore from '../../../stores/newsStore';
-import { INews } from '../../../shared-types/Response/NewsResponse'; 
+import {INews} from '../../../shared-types/Response/NewsResponse';
+import images from '../../../assets/images';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function NewsDetail() {
     const route = useRoute<RouteProp<{params: {id: string}}, 'params'>>();
@@ -19,19 +21,57 @@ export default function NewsDetail() {
     const [bookmarked, setBookmarked] = useState(false);
     const {selectedNews, fetchNewsDetail, isLoading} = useNewsStore();
 
-    const toggleBookmark = () => setBookmarked(prev => !prev);
+    const toggleBookmark = () => {
+        setBookmarked(prev => !prev);
+        saveBookmark(id, !bookmarked);
+    };
+
+    const saveBookmark = async (id: string, status: boolean) => {
+        try {
+            const storedBookmarks = await AsyncStorage.getItem(
+                'bookmarkedItems',
+            );
+            const bookmarks = storedBookmarks
+                ? JSON.parse(storedBookmarks)
+                : {};
+            bookmarks[id] = status;
+            await AsyncStorage.setItem(
+                'bookmarkedItems',
+                JSON.stringify(bookmarks),
+            );
+        } catch (error) {
+            console.error('Error saving bookmark', error);
+        }
+    };
+
+    const loadBookmark = async (id: string) => {
+        try {
+            const storedBookmarks = await AsyncStorage.getItem(
+                'bookmarkedItems',
+            );
+            if (storedBookmarks) {
+                const bookmarks = JSON.parse(storedBookmarks);
+                setBookmarked(bookmarks[id] || false);
+            }
+        } catch (error) {
+            console.error('Error loading bookmark', error);
+        }
+    };
 
     useEffect(() => {
         if (id) {
             fetchNewsDetail(id);
+            loadBookmark(id);
         }
     }, [id]);
 
     if (isLoading || !selectedNews) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#339CFF" />
-                <Text style={{marginTop: 12}}>Đang tải chi tiết tin tức...</Text>
+                <ActivityIndicator size='large' color='#339CFF' />
+                <Text style={{marginTop: 12}}>
+                    Đang tải chi tiết tin tức...
+                </Text>
             </View>
         );
     }
@@ -39,11 +79,11 @@ export default function NewsDetail() {
     return (
         <ScrollView style={styles.container}>
             <Image
-                source={{
-                    uri:
-                        (selectedNews as any).image ||
-                        'https://vov2.vov.vn/sites/default/files/2021-02/z2346000241203_2c20d4b68755b5f540ee91114347778a.jpg',
-                }}
+                source={
+                    typeof selectedNews.image === 'string'
+                        ? {uri: selectedNews.image}
+                        : images.plant2
+                }
                 style={styles.image}
             />
             <View style={styles.desc}>
@@ -74,7 +114,6 @@ export default function NewsDetail() {
         </ScrollView>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {

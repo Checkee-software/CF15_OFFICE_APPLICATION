@@ -67,16 +67,24 @@ export default function Main({navigation}) {
 
     const menuItems = [
         {
+            key: 'gardenForWorker',
+            label: 'Khu vườn',
+            buttonImage: images.garden,
+            navigateTo: SCREEN_INFO.GARDENCAMERASCAN.key,
+            navigateNext: SCREEN_INFO.GARDENWORKER.key,
+        },
+        {
+            key: 'gardenDeclareForWorker',
+            label: 'Khai báo khu vườn',
+            buttonImage: images.gardener,
+            navigateTo: SCREEN_INFO.GARDENCAMERASCAN.key,
+            navigateNext: SCREEN_INFO.GARDENDECLAREWORKER.key,
+        },
+        {
             key: 'gardenInfo',
             label: 'Thông tin khu vườn',
             buttonImage: images.garden,
             navigateTo: SCREEN_INFO.GARDENINFO.key,
-        },
-        {
-            key: 'gardenDeclare',
-            label: 'Khai báo khu vườn',
-            buttonImage: images.gardener,
-            navigateTo: SCREEN_INFO.GARDENDECLARE.key,
         },
         {
             key: 'unit',
@@ -333,7 +341,9 @@ export default function Main({navigation}) {
                                 key={item.key}
                                 style={MainStyles.menuButton}
                                 onPress={() =>
-                                    navigation.navigate(item.navigateTo)
+                                    navigation.navigate(item.navigateTo, {
+                                        navigateNext: item.navigateNext || null,
+                                    })
                                 }>
                                 <Image
                                     source={item.buttonImage}

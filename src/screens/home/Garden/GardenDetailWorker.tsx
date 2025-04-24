@@ -68,9 +68,14 @@ const GardenDetailScreen = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.qrContainer}>
-                <QRCode value={selectedGarden.code || 'No Code'} size={372} />
-            </View>
+            {userInfo?.userType?.level !== 'WORKER' && (
+                <View style={styles.qrContainer}>
+                    <QRCode
+                        value={selectedGarden.code || 'No Code'}
+                        size={372}
+                    />
+                </View>
+            )}
 
             <Section title='Thông tin khu vườn'>
                 <Row label='Tên khu vườn' value={selectedGarden.name} />

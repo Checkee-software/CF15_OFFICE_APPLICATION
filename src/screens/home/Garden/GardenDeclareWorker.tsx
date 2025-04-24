@@ -4,7 +4,7 @@ import React from 'react';
 const GardenDeclare = () => {
     return (
         <View>
-            <Text>GardenDeclare</Text>
+            <Text>Garden Declare for worker</Text>
         </View>
     );
 };

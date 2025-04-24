@@ -99,14 +99,18 @@ const GardenInfo = () => {
                 contentContainerStyle={styles.listContainer}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
-                        {searchText === '' ? (
-                            <Text style={styles.emptyText}>
-                                Không có dữ liệu khu vườn
-                            </Text>
+                        {searchText.trim() ? (
+                            <View style={{alignItems: 'center'}}>
+                                <Text style={styles.emptyText}>
+                                    Không tìm thấy khu vườn liên quan tới
+                                </Text>
+                                <Text style={[styles.emptyText]}>
+                                    "{searchText}"
+                                </Text>
+                            </View>
                         ) : (
                             <Text style={styles.emptyText}>
-                                Không tìm thấy khu vườn liên quan tới {"\n"}
-                                 "{searchText}"
+                                Không có dữ liệu khu vườn
                             </Text>
                         )}
                     </View>
@@ -160,11 +164,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 250,
+        paddingTop: 350,
     },
     emptyText: {
         fontSize: 16,
         color: 'gray',
+        fontStyle: 'italic',
     },
     card: {
         flexDirection: 'row',

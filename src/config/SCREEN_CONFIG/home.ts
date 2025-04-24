@@ -33,17 +33,27 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     GARDENINFO: {
         key: 'GARDENINFO',
-        headerTitle: 'THÔNG TIN KHU VƯỜN',
+        headerTitle: 'DANH SÁCH KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
-    GARDENDECLARE: {
-        key: 'GARDENDECLARE',
+    GARDENWORKER: {
+        key: 'GARDENWORKER',
         headerTitle: 'KHAI BÁO KHU VƯỜN',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENDECLAREWORKER: {
+        key: 'GARDENDECLAREWORKER',
+        headerTitle: 'KHAI BÁO KHU VƯỜN',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENCAMERASCAN: {
+        key: 'GARDENCAMERASCAN',
+        headerTitle: 'QUÉT MÃ KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENINFO1: {
         key: 'GARDENINFO1',
-        headerTitle: 'THÔNG TIN KHU VƯỜN',
+        headerTitle: 'CHI TIẾT KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
     WORKER: {
