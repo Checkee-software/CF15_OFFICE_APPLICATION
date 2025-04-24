@@ -1,16 +1,35 @@
 import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
 import moment from 'moment';
+import useAuthStore from '@/stores/authStore';
 
 const WorkerInfo = ({route}) => {
-    console.log(route);
+    const {itemListWorker, itemWorkerBySearch} = route.params;
+
+    const {userInfo} = useAuthStore();
+
+    const item = itemListWorker ?? itemWorkerBySearch;
+
+    const formatPhoneNumber = (phoneNumber: string) => {
+        const cleaned = phoneNumber.startsWith('0')
+            ? phoneNumber.slice(1)
+            : phoneNumber;
+
+        // Cắt thành từng phần: 3-3-3
+        const part1 = cleaned.slice(0, 3);
+        const part2 = cleaned.slice(3, 6);
+        const part3 = cleaned.slice(6);
+
+        return `(+84) ${part1} ${part2} ${part3}`;
+    };
+
     return (
         <View style={WorkerInfoStyles.container}>
             <View style={WorkerInfoStyles.workerNameSection}>
                 <View style={WorkerInfoStyles.workerAvatar}>
                     <Image
                         source={{
-                            uri: route.params.itemListWorker.avatar,
+                            uri: item.avatar,
                         }}
                         style={WorkerInfoStyles.avatar}
                     />
@@ -18,10 +37,12 @@ const WorkerInfo = ({route}) => {
 
                 <View style={WorkerInfoStyles.warpWorkerNameAndRole}>
                     <Text style={WorkerInfoStyles.workerName}>
-                        {route.params.itemListWorker.fullName}
+                        {item.fullName}
                     </Text>
                     <Text style={WorkerInfoStyles.workerRole}>
-                        {route.params.itemListWorker.userType.unit}
+                        {userInfo.userType.level === 'DEPARTMENT'
+                            ? item.role
+                            : item.unit}
                     </Text>
                 </View>
             </View>
@@ -30,7 +51,7 @@ const WorkerInfo = ({route}) => {
                 <View style={WorkerInfoStyles.warpLabelAndValue}>
                     <Text style={WorkerInfoStyles.labelText}>Tài khoản</Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {route.params.itemListWorker.username}
+                        {item.username}
                     </Text>
                 </View>
 
@@ -39,23 +60,23 @@ const WorkerInfo = ({route}) => {
                         Số điện thoại
                     </Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {route.params.itemListWorker.phoneNumber}
+                        {formatPhoneNumber(item.phoneNumber)}
                     </Text>
                 </View>
 
                 <View style={WorkerInfoStyles.warpLabelAndValue}>
                     <Text style={WorkerInfoStyles.labelText}>CCCD</Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {route.params.itemListWorker.ID}
+                        {/* {item.ID} */}
+
+                        {'Chỗ này api chưa trả => không tính là bug'}
                     </Text>
                 </View>
 
                 <View style={WorkerInfoStyles.warpLabelAndValue}>
                     <Text style={WorkerInfoStyles.labelText}>Năm sinh</Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {moment(route.params.itemListWorker.dateOfBirth).format(
-                            'l',
-                        )}
+                        {moment(item.dateOfBirth).format('l')}
                     </Text>
                 </View>
             </View>
@@ -68,7 +89,8 @@ const WorkerInfo = ({route}) => {
                 <View style={WorkerInfoStyles.warpLabelAndValue}>
                     <Text style={WorkerInfoStyles.labelText}>Dân tộc</Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {route.params.itemListWorker.nation}
+                        {/* {item.nation} */}
+                        {'Chỗ này api chưa trả => không tính là bug'}
                     </Text>
                 </View>
 
@@ -77,16 +99,15 @@ const WorkerInfo = ({route}) => {
                         Ngày tuyển dụng
                     </Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {moment(
-                            route.params.itemListWorker.recruimentDate,
-                        ).format('l')}
+                        {moment(item.recruimentDate).format('l')}
                     </Text>
                 </View>
 
                 <View style={WorkerInfoStyles.warpLabelAndValue}>
                     <Text style={WorkerInfoStyles.labelText}>Đối tượng</Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {route.params.itemListWorker.contract}
+                        {/* {item.contract} */}
+                        {'Chỗ này api chưa trả => không tính là bug'}
                     </Text>
                 </View>
 
@@ -95,7 +116,8 @@ const WorkerInfo = ({route}) => {
                         Địa chỉ thường trú
                     </Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {route.params.itemListWorker.address.resident || ''}
+                        {'Chỗ này api chưa trả => không tính là bug'}
+                        {/* {item?.address.resident || ''} */}
                     </Text>
                 </View>
 
@@ -104,7 +126,8 @@ const WorkerInfo = ({route}) => {
                         Địa chỉ tạm trú
                     </Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {route.params.itemListWorker.address.temporary || ''}
+                        {/* {item?.address.temporary || ''} */}
+                        {'Chỗ này api chưa trả => không tính là bug'}
                     </Text>
                 </View>
             </View>

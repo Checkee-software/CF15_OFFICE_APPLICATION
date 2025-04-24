@@ -12,12 +12,14 @@ import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useAuthStore from '../../../stores/authStore';
+import {useWorkerStore} from '@/stores/workerStore';
 import moment from 'moment';
 import asyncStorageHelper from '../../../utils/localStorageHelper/index';
 import images from '../../../assets/images';
 
 export default function Profile({navigation}) {
     const {userInfo, logout} = useAuthStore();
+    const {resetStateWhenLogout} = useWorkerStore();
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [avatarSource, setAvatarSource] = useState({
@@ -37,7 +39,7 @@ export default function Profile({navigation}) {
                         <Image
                             source={avatarSource}
                             style={styles.avatar}
-                            onError={() => setAvatarSource(images.avatar)}
+                            //onError={() => setAvatarSource(images.avatar)}
                         />
                     </View>
 
@@ -156,6 +158,8 @@ export default function Profile({navigation}) {
                             <TouchableOpacity
                                 style={styles.modalButton}
                                 onPress={async () => {
+                                    resetStateWhenLogout();
+
                                     await logout();
                                     setShowLogoutModal(false);
                                     // TODO: Handle logout logic here

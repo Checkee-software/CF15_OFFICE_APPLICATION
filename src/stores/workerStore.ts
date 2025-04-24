@@ -28,7 +28,8 @@ interface DocumentStore {
     isLoading: boolean;
     listWorker: IUser[];
     listWorkerFilterByRole: listWorkerFilterByRole[];
-    getListWorker: () => Promise<void>;
+    getListWorkerByDepartment: () => Promise<void>;
+    getListWorkerByLeader: () => Promise<void>;
 }
 
 const fixAvatarPath = (path: string) => {
@@ -41,8 +42,9 @@ export const useWorkerStore = create<DocumentStore>(set => ({
     listWorker: [],
     listWorkerFilterByRole: [],
 
-    getListWorker: async () => {
+    getListWorkerByDepartment: async () => {
         set({isLoading: true});
+        //await new Promise(resolve => setTimeout(resolve, 1 * 10000));
         try {
             const response = await axiosClient.get(
                 `${backendURL}/resources/users/collection`,
@@ -66,6 +68,18 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     user => user.userType.level !== 'LEADER',
                 );
 
+                //thêm order cho 2 mảng
+                let order = 0;
+                filterLeaders.forEach(item => {
+                    item.order = order += 1;
+                });
+
+                order = 0;
+
+                filterWorkers.forEach(item => {
+                    item.order = order += 1;
+                });
+
                 const newListWorker = [
                     {
                         title: 'Cán bộ quản lý',
@@ -84,6 +98,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
             } else {
                 set({listWorker: [], listWorkerFilterByRole: []});
             }
+
             set({isLoading: false});
         } catch (error: any) {
             const _error = error;
@@ -98,5 +113,96 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                 }
             }, 100);
         }
+    },
+
+    getListWorkerByLeader: async () => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.get(
+                `${backendURL}/resources/users/collection`,
+            );
+
+            if (response) {
+                const updateImgPathListWorker = response.data.data.map(item => {
+                    if (item.avatar) {
+                        item.avatar = fixAvatarPath(item.avatar);
+                    }
+                    return {
+                        ...item,
+                    };
+                });
+
+                const filterRole = updateImgPathListWorker.filter(
+                    user => user.userType.level === 'WORKER',
+                );
+
+                //thêm order cho mảng
+                let order = 0;
+                filterRole.forEach(item => {
+                    item.order = order += 1;
+                });
+
+                set({
+                    listWorker: filterRole,
+                    listWorkerFilterByRole: filterRole,
+                });
+
+                //đoạn code dưới này dùng khi nó đẻ ra thêm nhiều unit
+                // const sortedUsers = filterRole.sort((a, b) =>
+                //     a.unit.localeCompare(b.unit),
+                // );
+
+                // // Thêm order tăng dần toàn bộ
+                // const usersWithOrder = sortedUsers.map((user, index) => ({
+                //     ...user,
+                //     order: index + 1,
+                // }));
+
+                // // Group lại theo unit
+                // const groupedResult = [];
+
+                // usersWithOrder.forEach(user => {
+                //     const group = groupedResult.find(
+                //         g => g.title === user.unit,
+                //     );
+
+                //     if (group) {
+                //         group.data.push(user);
+                //     } else {
+                //         groupedResult.push({
+                //             title: user.unit,
+                //             data: [user],
+                //         });
+                //     }
+                // });
+
+                // newListWorker = groupedResult;
+
+                // set({
+                //     listWorker: usersWithOrder,
+                //     listWorkerFilterByRole: newListWorker,
+                // });
+            } else {
+                set({listWorker: [], listWorkerFilterByRole: []});
+            }
+
+            set({isLoading: false});
+        } catch (error: any) {
+            const _error = error;
+            set({isLoading: false});
+
+            setTimeout(() => {
+                if (_error.response?.status === 500) {
+                    Snackbar.show({
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    resetStateWhenLogout: () => {
+        set({listWorker: [], listWorkerFilterByRole: []});
     },
 }));

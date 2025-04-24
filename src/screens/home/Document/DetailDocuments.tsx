@@ -17,7 +17,6 @@ import Snackbar from 'react-native-snackbar';
 
 const DetailDocuments = ({route}) => {
     const {width} = useWindowDimensions();
-    console.log(route);
 
     type AttachedFiles = {
         destination: string;

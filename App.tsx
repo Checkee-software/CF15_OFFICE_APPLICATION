@@ -18,13 +18,11 @@ const InitApp = () => {
 
     useEffect(() => {
         const init = async () => {
-            await asyncStorageHelper.awaitLoaded();
             const token = asyncStorageHelper.token;
-            const userAccount = asyncStorageHelper.userAccount;
-            if (token !== '' && userAccount?.userName !== '') {
-                autoLogin(userAccount);
+            if (token !== '') {
+                await autoLogin();
             }
-            setIsReady(prevState => !prevState);
+            setIsReady(true);
         };
 
         init();

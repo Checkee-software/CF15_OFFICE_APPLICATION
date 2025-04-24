@@ -8,8 +8,10 @@ import moment from 'moment';
 import images from '../../../assets/images';
 import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
 import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
+import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
+import Loading from '@/screens/subscreen/Loading';
 
-const WorkSchedule = () => {
+const WorkSchedule = ({navigation}) => {
     const {
         getListWorkSchedule,
         listWorkScheduleFilter,
@@ -222,7 +224,13 @@ const WorkSchedule = () => {
 
     const renderItemWorkSchedule = itemWorkSchedule => (
         <View style={WorkScheduleStyles.workScheduleMargin}>
-            <TouchableOpacity style={WorkScheduleStyles.workCard}>
+            <TouchableOpacity
+                style={WorkScheduleStyles.workCard}
+                onPress={() =>
+                    navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
+                        itemWorkSchedule,
+                    })
+                }>
                 <Progress.Circle
                     size={40}
                     color={renderCircleColor(itemWorkSchedule.status)}
@@ -288,6 +296,8 @@ const WorkSchedule = () => {
     useEffect(() => {
         handleGetListWorkSchedule();
     }, []);
+
+    if (isLoading) return <Loading />;
 
     return (
         <View style={WorkScheduleStyles.container}>

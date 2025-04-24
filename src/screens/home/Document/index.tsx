@@ -13,6 +13,7 @@ import images from '../../../assets/images';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useDocumentStore} from '../../../stores/documentStore';
 import moment from 'moment';
+import Loading from '@/screens/subscreen/Loading';
 //import images from '../../../assets/images';
 
 const Document = ({navigation}) => {
@@ -36,6 +37,13 @@ const Document = ({navigation}) => {
     const filterDocuments = listDocument.filter(item =>
         item.title.toLowerCase().includes(searchTitle.toLowerCase()),
     );
+
+    const handleReFetch = () => {
+        if (searchTitle !== '') {
+            setSearchTitle('');
+        }
+        getListDocument();
+    };
 
     const renderItemDocument = (itemDocument: itemDocument) => (
         <TouchableOpacity
@@ -69,6 +77,8 @@ const Document = ({navigation}) => {
         </TouchableOpacity>
     );
 
+    if (isLoading) return <Loading />;
+
     return (
         <View style={DocumentStyles.container}>
             <View style={DocumentStyles.warpSearchInputAndIcon}>
@@ -93,7 +103,7 @@ const Document = ({navigation}) => {
                             data={filterDocuments}
                             renderItem={({item}) => renderItemDocument(item)}
                             keyExtractor={item => item._id}
-                            onRefresh={getListDocument}
+                            onRefresh={handleReFetch}
                             refreshing={isLoading}
                         />
                     ) : (

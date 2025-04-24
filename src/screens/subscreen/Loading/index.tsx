@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, ActivityIndicator} from 'react-native';
 
 export default function Loading() {
     return (
         <View style={styles.container}>
-            {/* <ActivityIndicator size="large" color="#339CFF" /> */}
+            <ActivityIndicator size='large' color='#339CFF' />
             <Text style={styles.text}>Đang tải dữ liệu...</Text>
         </View>
     );
@@ -13,7 +13,7 @@ export default function Loading() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
     },

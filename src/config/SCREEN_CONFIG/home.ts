@@ -61,6 +61,21 @@ const HOME_SCREENS = {
         headerTitle: 'LỊCH LÀM VIỆC',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    SCHEDULEDETAIL: {
+        key: 'SCHEDULEDETAIL',
+        headerTitle: 'CHI TIẾT LỊCH LÀM VIỆC',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    UNIT: {
+        key: 'UNIT',
+        headerTitle: 'ĐƠN VỊ',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    STATISTIC: {
+        key: 'STATISTIC',
+        headerTitle: 'BÁO CÁO THỐNG KÊ',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     DIRECT_EXPORT_FILLED_GAS_TANK: {
         key: 'DIRECT_EXPORT_FILLED_GAS_TANK',
         headerTitle: 'Xuất bình (thẳng)',
@@ -113,12 +128,6 @@ const HOME_SCREENS = {
         key: 'SELLING',
         headerTitle: 'Bán hàng',
         buttonLabel: 'Bán hàng',
-        isOpenQRCamera: false,
-    } as ScreenInformation,
-    STATISTIC: {
-        key: 'STATISTIC',
-        headerTitle: 'Báo cáo thống kê',
-        buttonLabel: 'Báo cáo thống kê',
         isOpenQRCamera: false,
     } as ScreenInformation,
 };

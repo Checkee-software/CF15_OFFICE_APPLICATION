@@ -72,12 +72,18 @@ export default function Main({navigation}) {
             buttonImage: images.garden,
             navigateTo: SCREEN_INFO.GARDENINFO.key,
         },
-        // {
-        //     key: 'gardenDeclare',
-        //     label: 'Khai báo khu vườn',
-        //     buttonImage: images.gardener,
-        //     navigateTo: SCREEN_INFO.GARDENDECLARE.key,
-        // },
+        {
+            key: 'gardenDeclare',
+            label: 'Khai báo khu vườn',
+            buttonImage: images.gardener,
+            navigateTo: SCREEN_INFO.GARDENDECLARE.key,
+        },
+        {
+            key: 'unit',
+            label: 'Đơn vị',
+            buttonImage: images.workers,
+            navigateTo: SCREEN_INFO.UNIT.key,
+        },
         {
             key: 'employee',
             label: 'Nhân sự',
@@ -117,21 +123,29 @@ export default function Main({navigation}) {
     ];
 
     const filterMenuByRole = (role: string) => {
+        if (role === 'DEPARTMENT') {
+            return menuItems.filter(
+                item => item.key !== 'unit' && item.key !== 'gardenDeclare',
+            );
+        }
+
         if (role === 'LEADER') {
-            return menuItems;
+            return menuItems.filter(
+                item => item.key !== 'employee' && item.key !== 'gardenDeclare',
+            );
         }
 
         if (role === 'WORKER') {
             return menuItems.filter(
                 item =>
-                    item.key === 'feedback' ||
-                    item.key === 'news' ||
-                    item.key === 'document',
+                    item.key !== 'unit' &&
+                    item.key !== 'employee' &&
+                    item.key !== 'gardenInfo',
             );
         }
 
-        return menuItems;
-        //return []; // Nếu không hợp lệ, trả mảng trống
+        //return menuItems;
+        return []; // Nếu không hợp lệ, trả mảng trống
     };
 
     const menuList = filterMenuByRole(userInfo.userType.level);
@@ -169,99 +183,104 @@ export default function Main({navigation}) {
                     </View>
                 </View>
 
-                {/* <View
-                    style={[
-                        MainStyles.rollCall,
-                        isRollCall
-                            ? {backgroundColor: 'rgba(76, 175, 80, 0.15)'}
-                            : {backgroundColor: 'rgba(255, 152, 0, 0.15)'},
-                    ]}>
-                    <View style={MainStyles.leftRollCall}>
-                        <Text style={MainStyles.todayDateText}>
-                            {formatDateWithWeekdayNumber()}
-                        </Text>
-                        {isRollCall ? (
-                            <Text style={MainStyles.workingTimeText}>
-                                Thời gian làm việc: 00:06:32
+                {userInfo.userType.level === 'WORKER' ? (
+                    <View
+                        style={[
+                            MainStyles.rollCall,
+                            isRollCall
+                                ? {backgroundColor: 'rgba(76, 175, 80, 0.15)'}
+                                : {backgroundColor: 'rgba(255, 152, 0, 0.15)'},
+                        ]}>
+                        <View style={MainStyles.leftRollCall}>
+                            <Text style={MainStyles.todayDateText}>
+                                {formatDateWithWeekdayNumber()}
                             </Text>
-                        ) : (
-                            <Text style={MainStyles.rollCallRemindText}>
-                                Hôm nay bạn chưa điểm danh
-                            </Text>
-                        )}
+                            {isRollCall ? (
+                                <Text style={MainStyles.workingTimeText}>
+                                    Thời gian làm việc: 00:06:32
+                                </Text>
+                            ) : (
+                                <Text style={MainStyles.rollCallRemindText}>
+                                    Hôm nay bạn chưa điểm danh
+                                </Text>
+                            )}
 
-                        <View style={MainStyles.rollCallStreak}>
-                            <MaterialCommunityIcons
-                                name='check-circle-outline'
-                                size={20}
-                                color='green'
-                            />
+                            <View style={MainStyles.rollCallStreak}>
+                                <MaterialCommunityIcons
+                                    name='check-circle-outline'
+                                    size={20}
+                                    color='green'
+                                />
 
-                            <MaterialCommunityIcons
-                                name='close-circle'
-                                size={20}
-                                color='rgba(255, 78, 69, 1)'
-                            />
+                                <MaterialCommunityIcons
+                                    name='close-circle'
+                                    size={20}
+                                    color='rgba(255, 78, 69, 1)'
+                                />
 
-                            <MaterialCommunityIcons
-                                name='check-circle-outline'
-                                size={20}
-                                color='green'
-                            />
+                                <MaterialCommunityIcons
+                                    name='check-circle-outline'
+                                    size={20}
+                                    color='green'
+                                />
 
-                            <MaterialCommunityIcons
-                                name='check-circle-outline'
-                                size={20}
-                                color='rgba(255, 152, 0, 1)'
-                            />
+                                <MaterialCommunityIcons
+                                    name='check-circle-outline'
+                                    size={20}
+                                    color='rgba(255, 152, 0, 1)'
+                                />
 
-                            <MaterialCommunityIcons
-                                name='check-circle-outline'
-                                size={20}
-                                color='gray'
-                            />
+                                <MaterialCommunityIcons
+                                    name='check-circle-outline'
+                                    size={20}
+                                    color='gray'
+                                />
 
-                            <MaterialCommunityIcons
-                                name='check-circle-outline'
-                                size={20}
-                                color='gray'
-                            />
+                                <MaterialCommunityIcons
+                                    name='check-circle-outline'
+                                    size={20}
+                                    color='gray'
+                                />
 
-                            <MaterialCommunityIcons
-                                name='check-circle-outline'
-                                size={20}
-                                color='gray'
-                            />
+                                <MaterialCommunityIcons
+                                    name='check-circle-outline'
+                                    size={20}
+                                    color='gray'
+                                />
+                            </View>
                         </View>
-                    </View>
 
-                    <View style={MainStyles.btnRollCallContainer}>
-                        {isRollCall ? (
-                            <View
-                                style={
-                                    MainStyles.warpButtonRollCalledAndEndWorking
-                                }>
-                                <View style={MainStyles.btnRollCalled}>
-                                    <Text style={MainStyles.btnRollCallText}>
-                                        Đã điểm danh
-                                    </Text>
+                        <View style={MainStyles.btnRollCallContainer}>
+                            {isRollCall ? (
+                                <View
+                                    style={
+                                        MainStyles.warpButtonRollCalledAndEndWorking
+                                    }>
+                                    <View style={MainStyles.btnRollCalled}>
+                                        <Text
+                                            style={MainStyles.btnRollCallText}>
+                                            Đã điểm danh
+                                        </Text>
+                                    </View>
+                                    <TouchableOpacity
+                                        style={MainStyles.btnEndWorking}>
+                                        <Text
+                                            style={MainStyles.btnRollCallText}>
+                                            Kết thúc
+                                        </Text>
+                                    </TouchableOpacity>
                                 </View>
+                            ) : (
                                 <TouchableOpacity
-                                    style={MainStyles.btnEndWorking}>
+                                    style={MainStyles.btnRollCall}>
                                     <Text style={MainStyles.btnRollCallText}>
-                                        Kết thúc
+                                        Điểm Danh
                                     </Text>
                                 </TouchableOpacity>
-                            </View>
-                        ) : (
-                            <TouchableOpacity style={MainStyles.btnRollCall}>
-                                <Text style={MainStyles.btnRollCallText}>
-                                    Điểm Danh
-                                </Text>
-                            </TouchableOpacity>
-                        )}
+                            )}
+                        </View>
                     </View>
-                </View> */}
+                ) : null}
 
                 <View style={MainStyles.syntheticJob}>
                     <View style={MainStyles.sideJob}>

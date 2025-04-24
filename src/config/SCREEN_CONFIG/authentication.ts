@@ -3,6 +3,7 @@ import {ScreenRegistry} from './types';
 
 /* screens */
 import Main from '../../screens/home/Main';
+import Unit from '@/screens/home/unit';
 import Profile from '../../screens/user/Profile';
 import Document from '../../screens/home/Document';
 import WorkSchedule from '../../screens/home/WorkSchedule';
@@ -34,6 +35,7 @@ import GardenDeclare from '../../screens/home/Garden/GardenDeclare';
 import GardenInfo1 from '../../screens/home/Garden/GardenInfo1';
 import Worker from '../../screens/home/Worker';
 import WorkerInfo from '../../screens/home/Worker/WorkerInfo';
+import ScheduleDetail from '@/screens/home/WorkSchedule/ScheduleDetail';
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -122,6 +124,20 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: WorkSchedule,
         options: {
             title: SCREEN_INFO.WORKSCHEDULE.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.SCHEDULEDETAIL.key,
+        component: ScheduleDetail,
+        options: {
+            title: SCREEN_INFO.SCHEDULEDETAIL.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.UNIT.key,
+        component: Unit,
+        options: {
+            title: SCREEN_INFO.UNIT.headerTitle,
         },
     },
     /* HOME */

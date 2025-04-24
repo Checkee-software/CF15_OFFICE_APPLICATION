@@ -161,10 +161,56 @@ const useAuthStore = create(set => ({
         }
     },
 
-    autoLogin: (userAccount: any) => {
-        set({isLoading: true});
-        set({userInfo: userAccount, isLogin: true});
-        set({isLoading: false});
+    autoLogin: async () => {
+        try {
+            const response = await axiosClient.get(
+                `${backendURL}/resources/check-access`,
+            );
+
+            if (response.data.data) {
+                const userData = {
+                    ...response.data.data,
+                };
+
+                if (response.data.data.avatar) {
+                    userData.avatar = `${backendURL}${fixAvatarPath(
+                        response.data.data.avatar.path
+                            ? response.data.data.avatar.path
+                            : response.data.data.avatar,
+                    )}`;
+                } else {
+                    userAccount.avatar = '';
+                }
+
+                set({userInfo: userData, isLogin: true});
+                return true;
+            }
+        } catch (error: any) {
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error.response.status === 401) {
+                    Snackbar.show({
+                        text: 'Tài khoản hoặc mật khẩu không chính xác',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+
+                if (_error.response.status === 404) {
+                    Snackbar.show({
+                        text: 'Không tìm thấy api này',
+                        duration: Snackbar.LENGTH_SHORT,
+                    });
+                }
+
+                if (_error.response.status === 500) {
+                    Snackbar.show({
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
     },
 
     logout: async () => {

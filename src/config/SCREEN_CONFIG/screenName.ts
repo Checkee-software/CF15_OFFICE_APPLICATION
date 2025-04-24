@@ -15,6 +15,8 @@ export type ScreenName =
     | 'WORKER'
     | 'WORKERINFO'
     | 'WORKSCHEDULE'
+    | 'SCHEDULEDETAIL'
+    | 'UNIT'
     | 'DIRECT_EXPORT_FILLED_GAS_TANK'
     | 'WAREHOUSE_EXPORT_FILLED_GAS_TANK'
     | 'DIRECT_EXPORT_GAS_TANK'

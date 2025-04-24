@@ -6,7 +6,6 @@ import {
     TouchableOpacity,
     TextInput,
     Image,
-    SectionList,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -15,13 +14,8 @@ import images from '../../../assets/images';
 import {useWorkerStore} from '../../../stores/workerStore';
 import Loading from '@/screens/subscreen/Loading';
 
-const Woker = ({navigation}) => {
-    const {
-        listWorker,
-        listWorkerFilterByRole,
-        getListWorkerByDepartment,
-        isLoading,
-    } = useWorkerStore();
+const Unit = ({navigation}) => {
+    const {listWorker, getListWorkerByLeader, isLoading} = useWorkerStore();
 
     const [searchWorker, setSearchWorker] = useState('');
 
@@ -33,78 +27,40 @@ const Woker = ({navigation}) => {
         if (searchWorker.length !== 0) {
             setSearchWorker('');
         }
-        getListWorkerByDepartment();
+        getListWorkerByLeader();
     };
 
-    const renderWorkerBySearch = (itemWorkerBySearch: any) => (
-        <View style={WokerStyles.listWorkerMargin}>
+    const renderWorker = (itemListWorker: any) => (
+        <View style={UnitStyles.listWorkerMargin}>
             <TouchableOpacity
-                style={WokerStyles.workerCard}
-                onPress={() =>
-                    navigation.navigate(SCREEN_INFO.WORKERINFO.key, {
-                        itemWorkerBySearch,
-                    })
-                }>
-                <View style={WokerStyles.leftWorkerCard}>
-                    <View style={WokerStyles.workerAvatar}>
-                        <Image
-                            source={{
-                                uri: itemWorkerBySearch.avatar,
-                            }}
-                            style={WokerStyles.avatar}
-                        />
-                    </View>
-
-                    <View style={WokerStyles.workerNameAndUnit}>
-                        <Text style={WokerStyles.workerName}>
-                            {itemWorkerBySearch.fullName}
-                        </Text>
-                        <Text style={WokerStyles.workerUnit}>
-                            {itemWorkerBySearch.userType.unit}
-                        </Text>
-                    </View>
-                </View>
-
-                <View>
-                    <Text style={WokerStyles.workerOrder}>
-                        {itemWorkerBySearch.order}
-                    </Text>
-                </View>
-            </TouchableOpacity>
-        </View>
-    );
-
-    const renderListWorker = (itemListWorker: any) => (
-        <View style={WokerStyles.listWorkerMargin}>
-            <TouchableOpacity
-                style={WokerStyles.workerCard}
+                style={UnitStyles.workerCard}
                 onPress={() =>
                     navigation.navigate(SCREEN_INFO.WORKERINFO.key, {
                         itemListWorker,
                     })
                 }>
-                <View style={WokerStyles.leftWorkerCard}>
-                    <View style={WokerStyles.workerAvatar}>
+                <View style={UnitStyles.leftWorkerCard}>
+                    <View style={UnitStyles.workerAvatar}>
                         <Image
                             source={{
                                 uri: itemListWorker.avatar,
                             }}
-                            style={WokerStyles.avatar}
+                            style={UnitStyles.avatar}
                         />
                     </View>
 
-                    <View style={WokerStyles.workerNameAndUnit}>
-                        <Text style={WokerStyles.workerName}>
+                    <View style={UnitStyles.workerNameAndUnit}>
+                        <Text style={UnitStyles.workerName}>
                             {itemListWorker.fullName}
                         </Text>
-                        <Text style={WokerStyles.workerUnit}>
-                            {itemListWorker.userType.unit}
+                        <Text style={UnitStyles.workerUnit}>
+                            {itemListWorker.userType.role}
                         </Text>
                     </View>
                 </View>
 
                 <View>
-                    <Text style={WokerStyles.workerOrder}>
+                    <Text style={UnitStyles.workerOrder}>
                         {itemListWorker.order}
                     </Text>
                 </View>
@@ -113,72 +69,56 @@ const Woker = ({navigation}) => {
     );
 
     useEffect(() => {
-        getListWorkerByDepartment();
+        getListWorkerByLeader();
     }, []);
 
     if (isLoading) return <Loading />;
 
     return (
-        <View style={WokerStyles.container}>
-            <View style={WokerStyles.searchInput}>
+        <View style={UnitStyles.container}>
+            <View style={UnitStyles.searchInput}>
                 <MaterialIcons
                     name='search'
                     color={'rgba(128, 128, 128, 1)'}
                     size={22}
                 />
                 <TextInput
-                    value={searchWorker}
                     placeholder='Tìm kiếm nhân sự'
                     placeholderTextColor={'rgba(128, 128, 128, 1)'}
-                    style={WokerStyles.input}
+                    style={UnitStyles.input}
                     onChangeText={setSearchWorker}
                 />
             </View>
 
-            {searchWorker !== '' ? (
+            {listWorker.length !== 0 ? (
                 filterWorkerBySearch.length !== 0 ? (
-                    <View style={WokerStyles.searchListWorker}>
+                    <View style={UnitStyles.listWorker}>
                         <FlatList
                             data={filterWorkerBySearch}
-                            renderItem={({item}) => renderWorkerBySearch(item)}
+                            renderItem={({item}) => renderWorker(item)}
                             keyExtractor={item => item._id}
                             onRefresh={handleReFetch}
                             refreshing={isLoading}
                         />
                     </View>
                 ) : (
-                    <View style={WokerStyles.workerEmpty}>
+                    <View style={UnitStyles.workerEmpty}>
                         <Image
                             source={images.emptyWorkerList}
-                            style={WokerStyles.emptyWorkerImg}
+                            style={UnitStyles.emptyWorkerImg}
                         />
-                        <Text style={WokerStyles.emptyWorkerText}>
+                        <Text style={UnitStyles.emptyWorkerText}>
                             {`Không tìm thấy nhân sự phù hợp với ${searchWorker}`}
                         </Text>
                     </View>
                 )
-            ) : listWorker.length > 0 ? (
-                <View style={WokerStyles.listWorker}>
-                    <SectionList
-                        sections={listWorkerFilterByRole}
-                        keyExtractor={item => item._id}
-                        onRefresh={handleReFetch}
-                        refreshing={isLoading}
-                        renderItem={({item}) => renderListWorker(item)}
-                        renderSectionHeader={({section}) => (
-                            <Text style={WokerStyles.workerRole}>
-                                {`${section.title} (${section.data.length})`}
-                            </Text>
-                        )}
-                    />
-                </View>
             ) : (
-                <View style={WokerStyles.workerEmpty}>
+                <View style={UnitStyles.workerEmpty}>
                     <Image
                         source={images.emptyWorkerList}
-                        style={WokerStyles.emptyWorkerImg}
+                        style={UnitStyles.emptyWorkerImg}
                     />
-                    <Text style={WokerStyles.emptyWorkerText}>
+                    <Text style={UnitStyles.emptyWorkerText}>
                         Không tìm thấy danh sách nhân sự!
                     </Text>
                 </View>
@@ -187,7 +127,7 @@ const Woker = ({navigation}) => {
     );
 };
 
-const WokerStyles = StyleSheet.create({
+const UnitStyles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: 20,
@@ -206,17 +146,8 @@ const WokerStyles = StyleSheet.create({
         width: '92%',
     },
     listWorker: {
-        marginTop: 10,
         flex: 1,
-    },
-    workerByRoleSection: {
-        gap: 15,
-    },
-    workerRole: {
-        marginTop: 10,
-        fontWeight: 500,
-        fontSize: 14,
-        color: 'rgba(0, 0, 0, 1)',
+        paddingVertical: 10,
     },
     listWorkerMargin: {
         marginVertical: 12,
@@ -281,10 +212,6 @@ const WokerStyles = StyleSheet.create({
         fontSize: 14,
         color: 'rgba(128, 128, 128, 1)',
     },
-    searchListWorker: {
-        paddingVertical: 10,
-        flex: 1,
-    },
 });
 
-export default Woker;
+export default Unit;

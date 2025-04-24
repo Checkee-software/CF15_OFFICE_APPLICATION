@@ -12,6 +12,11 @@ interface workScheduleStore {
     getListWorkSchedule: () => Promise<void>;
 }
 
+const fixAvatarPath = (path: string) => {
+    const updatedPath = path.replace(/\\/g, '/');
+    return `http://cf15officeservice.checkee.vn${updatedPath}`;
+};
+
 export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     isLoading: false,
     listWorkSchedule: [],
@@ -24,10 +29,50 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 `${backendURL}/resources/schedules/collection`,
             );
 
-            set({
-                listWorkSchedule: response.data?.data || [],
-                listWorkScheduleFilter: response.data?.data || [],
-            });
+            if (response) {
+                const updateImgPathListSchedule = response.data.data.map(
+                    item => {
+                        item.childTasks.tasks.map(childTasksItem => {
+                            childTasksItem.isCheck = false;
+                            childTasksItem.isComfirmTaskCheck = false;
+
+                            childTasksItem.staff.map(staffItem => {
+                                staffItem.isCheckStaff = false;
+                                staffItem.isComfirmStaffCheck = false;
+
+                                return {...staffItem};
+                            });
+
+                            return {...childTasksItem};
+                        });
+
+                        item.employees.map(employees => {
+                            if (employees.avatar) {
+                                employees.avatar = fixAvatarPath(
+                                    employees.avatar,
+                                );
+                            }
+
+                            return {...employees};
+                        });
+
+                        return {
+                            ...item,
+                        };
+                    },
+                );
+
+                set({
+                    listWorkSchedule: updateImgPathListSchedule,
+                    listWorkScheduleFilter: updateImgPathListSchedule,
+                });
+            } else {
+                set({
+                    listWorkSchedule: [],
+                    listWorkScheduleFilter: [],
+                });
+            }
+
             set({isLoading: false});
         } catch (error: any) {
             set({isLoading: false});

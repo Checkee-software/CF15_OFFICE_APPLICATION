@@ -23,6 +23,9 @@ const BottomTabsNavigator = ({navigation}) => {
                 },
                 tabBarStyle: {
                     height: 55,
+                    borderColor: '#D3D3D3',
+                    borderTopWidth: 1,
+                    boxShadow: '-1 2 0 #00000040',
                 },
                 headerShown: false,
                 animation: 'shift',
@@ -42,7 +45,11 @@ const BottomTabsNavigator = ({navigation}) => {
                     headerTitleStyle: style.headerTitle,
                     headerShown: true,
                     tabBarIcon: ({size, color}) => (
-                        <MaterialIcons name='home' size={28} color={color} />
+                        <MaterialIcons
+                            name='dashboard'
+                            size={26}
+                            color={color}
+                        />
                     ),
                     headerRight: () => (
                         <TouchableOpacity
