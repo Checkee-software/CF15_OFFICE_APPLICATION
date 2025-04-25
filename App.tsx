@@ -19,9 +19,9 @@ const InitApp = () => {
     useEffect(() => {
         const init = async () => {
             const token = asyncStorageHelper.token;
-            if (token !== '') {
-                await autoLogin();
-            }
+            // if (token !== '') {
+            //     await autoLogin();
+            // }
             setIsReady(true);
         };
 

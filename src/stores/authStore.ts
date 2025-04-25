@@ -54,23 +54,14 @@ const useAuthStore = create(set => ({
             const _error = error;
 
             setTimeout(() => {
-                if (_error.response.status === 401) {
+                if (_error?.response?.data) {
                     Snackbar.show({
-                        text: 'Tài khoản hoặc mật khẩu không chính xác',
+                        text: _error.response.data,
                         duration: Snackbar.LENGTH_LONG,
                     });
-                }
-
-                if (_error.response.status === 404) {
+                } else {
                     Snackbar.show({
-                        text: 'Không tìm thấy api này',
-                        duration: Snackbar.LENGTH_SHORT,
-                    });
-                }
-
-                if (_error.response.status === 500) {
-                    Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }

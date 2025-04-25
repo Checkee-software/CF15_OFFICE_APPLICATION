@@ -46,6 +46,11 @@ const HOME_SCREENS = {
         headerTitle: 'KHAI BÁO KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    GARDENHISTORY: {
+        key: 'GARDENHISTORY',
+        headerTitle: 'Lịch sử',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     GARDENCAMERASCAN: {
         key: 'GARDENCAMERASCAN',
         headerTitle: 'QUÉT MÃ KHU VƯỜN',
