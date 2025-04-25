@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -46,6 +46,7 @@ const CollapsibleRow = ({
 );
 
 const GardenDetailScreen = () => {
+    const [isHarvesting, setIsHarvesting] = useState(false);
     const {userInfo} = useAuthStore();
     const route = useRoute<any>();
     const id = route.params?.id;
@@ -70,6 +71,50 @@ const GardenDetailScreen = () => {
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.qrContainer}>
                 <QRCode value={selectedGarden.code || 'No Code'} size={372} />
+            </View>
+
+            <View style={styles.harvestRow}>
+                {userInfo?.userType?.level === 'LEADER' ? (
+                    <View
+                        style={[
+                            styles.harvestButton,
+                            {backgroundColor: '#4CAF5026', width: '90%'},
+                        ]}>
+                        <Text style={[styles.buttonText, {color: '#4CAF50'}]}>
+                            Đang thu hoạch
+                        </Text>
+                    </View>
+                ) : (
+                    <>
+                        <TouchableOpacity
+                            style={[
+                                styles.harvestButton,
+                                isHarvesting
+                                    ? styles.harvestingButton
+                                    : styles.startButton,
+                            ]}
+                            onPress={() => setIsHarvesting(true)}
+                            disabled={isHarvesting}>
+                            <Text
+                                style={[
+                                    styles.buttonText,
+                                    isHarvesting && {color: 'green'},
+                                ]}>
+                                {isHarvesting
+                                    ? 'Đang thu hoạch'
+                                    : 'Bắt đầu thu hoạch'}
+                            </Text>
+                        </TouchableOpacity>
+
+                        {isHarvesting && (
+                            <TouchableOpacity
+                                style={styles.endButton}
+                                onPress={() => setIsHarvesting(false)}>
+                                <Text style={styles.buttonText}>Kết thúc</Text>
+                            </TouchableOpacity>
+                        )}
+                    </>
+                )}
             </View>
 
             <Section title='Thông tin khu vườn'>
@@ -372,5 +417,40 @@ const styles = StyleSheet.create({
     separator: {
         fontSize: 14,
         color: '#ddd',
+    },
+    harvestRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 20,
+        width: '100%',
+    },
+    harvestButton: {
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        borderRadius: 3,
+        alignItems: 'center',
+        width: 200,
+        marginHorizontal: 5,
+    },
+    startButton: {
+        backgroundColor: '#FFA500',
+        width: '90%',
+    },
+    harvestingButton: {
+        backgroundColor: '#4CAF5026',
+        color: 'green',
+    },
+    endButton: {
+        backgroundColor: '#FF0000',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 3,
+        alignItems: 'center',
+        minWidth: 100,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
