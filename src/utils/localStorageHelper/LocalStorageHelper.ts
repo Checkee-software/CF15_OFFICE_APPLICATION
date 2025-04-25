@@ -2,27 +2,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface IClientStorage {
     token?: string;
-    userAccount?: {
-        userId: string;
-        status: boolean;
-        nation: string;
-        contract: string;
-        userName: string;
-        fullName: string;
-        dateOfBirth: string;
-        recruimentDate: string;
-        phoneNumber: string;
-        ID: string;
-        userType: {
-            level: string;
-            role: string;
-            department: string;
-            departmentName: string;
-            unit: string;
-        };
-        address: string;
-        avatar: string;
-    };
 }
 
 const STORAGE_KEY = 'checkee';
@@ -42,27 +21,6 @@ export default class LocalStorageHelper {
     // ☣️ Khai báo field cần lưu ở đây
     private data: IClientStorage = {
         token: '',
-        userAccount: {
-            userId: '',
-            status: false,
-            nation: '',
-            contract: '',
-            userName: '',
-            fullName: '',
-            dateOfBirth: '',
-            recruimentDate: '',
-            phoneNumber: '',
-            ID: '',
-            userType: {
-                level: '',
-                role: '',
-                department: '',
-                departmentName: '',
-                unit: '',
-            },
-            address: '',
-            avatar: '',
-        },
     };
 
     protected constructor() {
@@ -141,32 +99,6 @@ export default class LocalStorageHelper {
 
     public async clearToken() {
         this.data.token = '';
-        await this.save();
-    }
-
-    public get userAccount() {
-        return this.data.userAccount;
-    }
-
-    public set userAccount(
-        v:
-            | {
-                  userAccount: {
-                      fullName: string;
-                      address: {};
-                      phoneNumber: number;
-                      userType: {};
-                      userName: string;
-                  };
-              }
-            | undefined,
-    ) {
-        this.data.userAccount = v;
-        this.save();
-    }
-
-    public async clearUserAccount() {
-        this.data.userAccount = undefined;
         await this.save();
     }
 }

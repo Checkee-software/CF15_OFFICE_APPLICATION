@@ -46,7 +46,7 @@ export default function Feedback1() {
         setLoading(false);
         setTitle('');
         setContent('');
-        navigation.navigate(SCREEN_INFO.FEEDBACK.key);
+        navigation.goBack();
     };
 
     return (

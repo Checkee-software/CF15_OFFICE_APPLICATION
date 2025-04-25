@@ -105,6 +105,7 @@ const Document = ({navigation}) => {
                             keyExtractor={item => item._id}
                             onRefresh={handleReFetch}
                             refreshing={isLoading}
+                            showsVerticalScrollIndicator={false}
                         />
                     ) : (
                         <View style={DocumentStyles.documentEmpty}>
@@ -113,7 +114,7 @@ const Document = ({navigation}) => {
                                 style={DocumentStyles.emptyDocumentImg}
                             />
                             <Text style={DocumentStyles.emptyDocumentText}>
-                                {`Không tìm thấy tài liệu phù hợp với “${searchTitle}"`}
+                                {`Không tìm thấy tài liệu phù hợp với \n“${searchTitle}"`}
                             </Text>
                         </View>
                     )
@@ -208,6 +209,7 @@ const DocumentStyles = StyleSheet.create({
         height: 180,
     },
     emptyDocumentText: {
+        textAlign: 'center',
         fontWeight: 400,
         fontSize: 14,
         color: 'rgba(128, 128, 128, 1)',

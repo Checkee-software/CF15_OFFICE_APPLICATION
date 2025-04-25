@@ -91,6 +91,8 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     },
                 ];
 
+                console.log(newListWorker);
+
                 set({
                     listWorker: updateImgPathListWorker,
                     listWorkerFilterByRole: newListWorker,

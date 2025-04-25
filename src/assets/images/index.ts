@@ -8,7 +8,7 @@ import megaphone from './megaphone.png';
 import document from './document.png';
 import gardener from './gardener.png';
 import fileTypeDocument from './file-type-document.png';
-import avatar from './Avatar.png';
+import avatar from './avatar.png';
 import pieChart from './pie-chart.png';
 import emptyNotificationList from './empty-notification-list.png';
 import emptyWorkerList from './empty-worker-list.png';
@@ -40,6 +40,7 @@ const images = {
     plant1: require('./plant1.jpg'),
     plant2: require('./plant2.jpg'),
     emptyNews: require('./empty-schedule-list.png'),
+    emptyGarden: require('./not-found-any-garden.png'),
 };
 
 export default images;

@@ -16,6 +16,7 @@ import RNFS from 'react-native-fs';
 import Snackbar from 'react-native-snackbar';
 
 const DetailDocuments = ({route}) => {
+    console.log(route);
     const {width} = useWindowDimensions();
 
     type AttachedFiles = {
@@ -136,9 +137,15 @@ const DetailDocuments = ({route}) => {
                     </View>
 
                     <View style={DetailDocumentsStyles.documentContent}>
+                        {/* <Text>{route.params.itemDocument.content}</Text> */}
                         <RenderHtml
                             contentWidth={width}
                             source={{html: route.params.itemDocument.content}}
+                            tagsStyles={{
+                                strong: {fontWeight: 'bold'},
+                                em: {fontStyle: 'italic'},
+                                span: {color: '#ff0000'},
+                            }}
                         />
                     </View>
                 </View>
@@ -249,6 +256,7 @@ const DetailDocumentsStyles = StyleSheet.create({
         gap: 10,
     },
     infoDocument: {
+        gap: 4,
         width: '85%',
     },
     infoDocumentText: {

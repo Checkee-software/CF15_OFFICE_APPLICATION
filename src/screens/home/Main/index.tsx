@@ -20,9 +20,11 @@ export default function Main({navigation}) {
     const {userInfo} = useAuthStore();
 
     console.log('Token hiện tại:', asyncStorageHelper.token);
-    console.log('User', asyncStorageHelper.userAccount);
 
-    const isRollCall = true;
+    const isRollCall =
+        userInfo.userType.level === 'WORKER'
+            ? !Math.round(Math.random())
+            : undefined;
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -99,7 +101,7 @@ export default function Main({navigation}) {
             navigateTo: SCREEN_INFO.WORKER.key,
         },
         {
-            key: 'browseJobs',
+            key: 'workschedule',
             label: 'Lịch làm việc',
             buttonImage: images.toDoList,
             navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
@@ -133,13 +135,19 @@ export default function Main({navigation}) {
     const filterMenuByRole = (role: string) => {
         if (role === 'DEPARTMENT') {
             return menuItems.filter(
-                item => item.key !== 'unit' && item.key !== 'gardenDeclare',
+                item =>
+                    item.key !== 'gardenForWorker' &&
+                    item.key !== 'gardenDeclareForWorker' &&
+                    item.key !== 'unit',
             );
         }
 
         if (role === 'LEADER') {
             return menuItems.filter(
-                item => item.key !== 'employee' && item.key !== 'gardenDeclare',
+                item =>
+                    item.key !== 'gardenForWorker' &&
+                    item.key !== 'gardenDeclareForWorker' &&
+                    item.key !== 'employee',
             );
         }
 
@@ -152,7 +160,6 @@ export default function Main({navigation}) {
             );
         }
 
-        //return menuItems;
         return []; // Nếu không hợp lệ, trả mảng trống
     };
 
@@ -183,9 +190,13 @@ export default function Main({navigation}) {
 
                     <View style={MainStyles.avatarUser}>
                         <Image
-                            source={{
-                                uri: userInfo.avatar,
-                            }}
+                            source={
+                                userInfo.avatar
+                                    ? {
+                                          uri: userInfo.avatar,
+                                      }
+                                    : images.avatar
+                            }
                             style={MainStyles.avatar}
                         />
                     </View>
@@ -306,7 +317,7 @@ export default function Main({navigation}) {
                         </View>
 
                         <Progress.Circle
-                            size={84}
+                            size={80}
                             progress={0.7} // Từ 0.0 đến 1.0
                             showsText={true}
                             textStyle={MainStyles.progressValue}
@@ -398,7 +409,7 @@ const MainStyles = StyleSheet.create({
         borderRadius: 25,
     },
     rollCall: {
-        marginBottom: 10,
+        marginVertical: 10,
         borderRadius: 15,
         padding: 10,
         flexDirection: 'row',
@@ -459,8 +470,8 @@ const MainStyles = StyleSheet.create({
     btnRollCall: {
         backgroundColor: '#ff9800', // cam chính
         borderRadius: 100,
-        width: 80,
-        height: 80,
+        width: 72,
+        height: 72,
         borderWidth: 6,
         borderColor: 'rgba(255, 152, 0, 0.3)', // viền ngoài
         alignItems: 'center',

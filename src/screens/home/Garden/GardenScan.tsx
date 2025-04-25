@@ -4,20 +4,15 @@ import {
     TouchableOpacity,
     StyleSheet,
     TextInput,
+    Linking,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {
-    useCameraPermission,
-    useCameraDevice,
-    Camera,
-} from 'react-native-vision-camera';
+import {useCameraDevice, Camera} from 'react-native-vision-camera';
 
 const GardenScan = ({navigation, route}) => {
     const {navigateNext} = route.params || {};
 
-    const [isReady, setIsReady] = useState(false);
-
-    const {hasPermission, requestPermission} = useCameraPermission();
+    const [permissionState, setPermissionState] = useState();
 
     // doesnt show first render
     const [cameraStyles, setCameraStyles] = useState<ViewStyle>({
@@ -27,65 +22,62 @@ const GardenScan = ({navigation, route}) => {
 
     const device = useCameraDevice('back');
 
-    useEffect(() => {
-        if (!hasPermission) {
-            requestPermission();
+    const getPermission = async () => {
+        const permission = await Camera.requestCameraPermission();
+
+        if (permission === 'denied') {
+            await Linking.openSettings();
         }
-    }, [hasPermission]);
+
+        setPermissionState(permission);
+    };
 
     useEffect(() => {
-        if (device) {
-            setTimeout(() => setIsReady(true), 100); // Chờ Camera mount xong
-        }
-    }, [device]);
+        getPermission();
+    }, []);
 
     return (
-        <View style={CameraScannerStyles.container}>
-            {isReady ? (
-                hasPermission ? (
-                    <>
-                        <Camera
-                            device={device}
-                            isActive={true}
-                            style={cameraStyles}
-                            onLayout={() => {
-                                setCameraStyles(CameraScannerStyles.camera);
-                            }}
+        <>
+            {permissionState === 'granted' && device != null ? (
+                <View style={CameraScannerStyles.container}>
+                    <Camera
+                        device={device}
+                        isActive={true}
+                        style={cameraStyles}
+                        onLayout={() => {
+                            setCameraStyles(CameraScannerStyles.camera);
+                        }}
+                    />
+
+                    <View style={CameraScannerStyles.inputView}>
+                        <TextInput
+                            placeholder='Nhập mã khu vườn'
+                            placeholderTextColor={'#808080'}
+                            style={CameraScannerStyles.inputManualSearch}
                         />
 
-                        <View style={CameraScannerStyles.inputView}>
-                            <TextInput
-                                placeholder='Nhập mã khu vườn'
-                                placeholderTextColor={'#808080'}
-                                style={CameraScannerStyles.inputManualSearch}
-                            />
-
-                            <TouchableOpacity
+                        <TouchableOpacity
+                            style={CameraScannerStyles.confirmManualSearchBtn}
+                            onPress={() => navigation.navigate(navigateNext)}>
+                            <Text
                                 style={
-                                    CameraScannerStyles.confirmManualSearchBtn
-                                }
-                                onPress={() =>
-                                    navigation.navigate(navigateNext)
+                                    CameraScannerStyles.confirmManualSearchText
                                 }>
-                                <Text
-                                    style={
-                                        CameraScannerStyles.confirmManualSearchText
-                                    }>
-                                    Xác nhận
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </>
-                ) : (
-                    <View
-                        style={CameraScannerStyles.viewRequestCameraPermission}>
-                        <TouchableOpacity onPress={() => requestPermission()}>
-                            <Text>Cấp quyền camera</Text>
+                                Xác nhận
+                            </Text>
                         </TouchableOpacity>
                     </View>
-                )
-            ) : null}
-        </View>
+                </View>
+            ) : (
+                <View style={CameraScannerStyles.requestPermissionContainer}>
+                    <Text style={CameraScannerStyles.requestPermissionText}>
+                        {permissionState !== 'granted'
+                            ? 'Bạn cần cấp quyền truy cập camera để có thể sử dụng chức năng này'
+                            : 'Đang tải camera...'}
+                    </Text>
+                </View>
+            )}
+        </>
     );
 };
 
@@ -136,6 +128,21 @@ const CameraScannerStyles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    notHavePermission: {
+        backgroundColor: 'black',
+    },
+    requestPermissionContainer: {
+        paddingHorizontal: 20,
+        backgroundColor: 'black',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
+    },
+    requestPermissionText: {
+        color: '#fff',
+        fontSize: 16,
+        textAlign: 'center',
     },
 });
 

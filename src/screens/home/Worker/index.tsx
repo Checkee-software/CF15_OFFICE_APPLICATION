@@ -48,9 +48,13 @@ const Woker = ({navigation}) => {
                 <View style={WokerStyles.leftWorkerCard}>
                     <View style={WokerStyles.workerAvatar}>
                         <Image
-                            source={{
-                                uri: itemWorkerBySearch.avatar,
-                            }}
+                            source={
+                                itemWorkerBySearch.avatar
+                                    ? {
+                                          uri: itemWorkerBySearch.avatar,
+                                      }
+                                    : images.avatar
+                            }
                             style={WokerStyles.avatar}
                         />
                     </View>
@@ -86,9 +90,13 @@ const Woker = ({navigation}) => {
                 <View style={WokerStyles.leftWorkerCard}>
                     <View style={WokerStyles.workerAvatar}>
                         <Image
-                            source={{
-                                uri: itemListWorker.avatar,
-                            }}
+                            source={
+                                itemListWorker.avatar
+                                    ? {
+                                          uri: itemListWorker.avatar,
+                                      }
+                                    : images.avatar
+                            }
                             style={WokerStyles.avatar}
                         />
                     </View>
@@ -153,7 +161,7 @@ const Woker = ({navigation}) => {
                             style={WokerStyles.emptyWorkerImg}
                         />
                         <Text style={WokerStyles.emptyWorkerText}>
-                            {`Không tìm thấy nhân sự phù hợp với ${searchWorker}`}
+                            {`Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`}
                         </Text>
                     </View>
                 )
@@ -277,6 +285,7 @@ const WokerStyles = StyleSheet.create({
         height: 180,
     },
     emptyWorkerText: {
+        textAlign: 'center',
         fontWeight: 400,
         fontSize: 14,
         color: 'rgba(128, 128, 128, 1)',

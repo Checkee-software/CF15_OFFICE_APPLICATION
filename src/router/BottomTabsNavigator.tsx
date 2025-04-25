@@ -11,8 +11,12 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
+import useAuthStore from '@/stores/authStore';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 const BottomTabsNavigator = ({navigation}) => {
+    const {userInfo} = useAuthStore();
+
     const Tab = createBottomTabNavigator();
 
     return (
@@ -75,7 +79,10 @@ const BottomTabsNavigator = ({navigation}) => {
                 name='Công việc'
                 options={{
                     headerShown: true,
-                    headerTitle: 'CÔNG VIỆC',
+                    headerTitle:
+                        userInfo.userType.level === EOrganization.LEADER
+                            ? 'CÔNG VIỆC KHU VƯỜN'
+                            : 'CÔNG VIỆC',
                     headerTitleStyle: style.headerTitle,
                     tabBarIcon: ({size, color}) => (
                         <MaterialIcons name='work' size={26} color={color} />

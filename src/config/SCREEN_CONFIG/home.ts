@@ -38,7 +38,7 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     GARDENWORKER: {
         key: 'GARDENWORKER',
-        headerTitle: 'KHAI BÁO KHU VƯỜN',
+        headerTitle: 'THÔNG TIN KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENDECLAREWORKER: {

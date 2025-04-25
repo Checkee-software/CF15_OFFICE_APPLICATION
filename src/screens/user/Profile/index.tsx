@@ -14,7 +14,6 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useAuthStore from '../../../stores/authStore';
 import {useWorkerStore} from '@/stores/workerStore';
 import moment from 'moment';
-import asyncStorageHelper from '../../../utils/localStorageHelper/index';
 import images from '../../../assets/images';
 
 export default function Profile({navigation}) {
@@ -22,11 +21,10 @@ export default function Profile({navigation}) {
     const {resetStateWhenLogout} = useWorkerStore();
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const [avatarSource, setAvatarSource] = useState({
-        uri: `${userInfo.avatar}`,
-    });
 
     const [showAccountInfo, setShowAccountInfo] = useState(false);
+
+    console.log(userInfo);
     return (
         <View style={styles.wrapper}>
             <ScrollView
@@ -37,9 +35,14 @@ export default function Profile({navigation}) {
                 <View style={styles.container}>
                     <View style={styles.avatarWrapper}>
                         <Image
-                            source={avatarSource}
+                            source={
+                                userInfo.avatar
+                                    ? {
+                                          uri: userInfo.avatar,
+                                      }
+                                    : images.avatar
+                            }
                             style={styles.avatar}
-                            //onError={() => setAvatarSource(images.avatar)}
                         />
                     </View>
 

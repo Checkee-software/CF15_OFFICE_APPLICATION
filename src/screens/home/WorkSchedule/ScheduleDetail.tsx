@@ -20,8 +20,6 @@ import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/Schedule
 import moment from 'moment';
 
 const ScheduleDetail = ({route}) => {
-    console.log(route);
-
     const [showListRadioButton, setShowListRadioButton] = useState(false);
     const [radioSelectedType, setRadioSelectedType] = useState(0);
     const [currentSelectedMainTask, setCurrentSelectedMainTask] =

@@ -42,9 +42,13 @@ const Unit = ({navigation}) => {
                 <View style={UnitStyles.leftWorkerCard}>
                     <View style={UnitStyles.workerAvatar}>
                         <Image
-                            source={{
-                                uri: itemListWorker.avatar,
-                            }}
+                            source={
+                                itemListWorker.avatar
+                                    ? {
+                                          uri: itemListWorker.avatar,
+                                      }
+                                    : images.avatar
+                            }
                             style={UnitStyles.avatar}
                         />
                     </View>
@@ -108,7 +112,7 @@ const Unit = ({navigation}) => {
                             style={UnitStyles.emptyWorkerImg}
                         />
                         <Text style={UnitStyles.emptyWorkerText}>
-                            {`Không tìm thấy nhân sự phù hợp với ${searchWorker}`}
+                            {`Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`}
                         </Text>
                     </View>
                 )
@@ -208,6 +212,7 @@ const UnitStyles = StyleSheet.create({
         height: 180,
     },
     emptyWorkerText: {
+        textAlign: 'center',
         fontWeight: 400,
         fontSize: 14,
         color: 'rgba(128, 128, 128, 1)',
