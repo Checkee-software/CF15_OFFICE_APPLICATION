@@ -15,7 +15,7 @@ import images from '../../../assets/images';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
-import useAuthStore from '../../../stores/authStore';
+import {useAuthStore} from '../../../stores/authStore';
 import {Dimensions} from 'react-native';
 import Backdrop from '../../subscreen/Loading/index2';
 
@@ -33,11 +33,11 @@ export default function Login() {
         password: '', //CF15@FFICE2025 123456789A@
     });
 
-    const onChangeUserName = value => {
+    const onChangeUserName = (value: string) => {
         setUserAccount({...userAccount, username: value});
     };
 
-    const onChangePassword = value => {
+    const onChangePassword = (value: string) => {
         setUserAccount({...userAccount, password: value});
     };
 

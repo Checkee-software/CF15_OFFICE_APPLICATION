@@ -9,14 +9,14 @@ import {
     TextInput,
 } from 'react-native';
 import images from '../../../assets/images';
-import useAuthStore from '@/stores/authStore';
+import {useAuthStore} from '@/stores/authStore';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 const WorkScreen = () => {
     const {userInfo} = useAuthStore();
-    const [radioSelectedType, setRadioSelectedType] = useState(1);
-    const [showListRadioButton, setShowListRadioButton] = useState([]);
+    const [radioSelectedType, setRadioSelectedType] = useState([]);
+    const [showComfirmView, setShowComfirmView] = useState([]);
 
     const fakeDataGardenWork = [
         {
@@ -83,87 +83,94 @@ const WorkScreen = () => {
             </View>
 
             <View style={styles.comfirmView}>
-                <View style={styles.listRadioButton}>
-                    <TouchableOpacity
-                        style={styles.warpRadioText}
-                        onPress={() => setRadioSelectedType(1)}>
-                        <MaterialIcons
-                            name={
-                                radioSelectedType === 1
-                                    ? 'radio-button-checked'
-                                    : 'radio-button-off'
-                            }
-                            color={
-                                radioSelectedType === 1 ? '#2196F3' : '#49454f'
-                            }
-                            size={20}
-                        />
-                        <Text style={styles.radioBtnText}>Không</Text>
-                    </TouchableOpacity>
+                {showComfirmView.map(itemComfirm => (
+                    <>
+                        <View style={styles.listRadioButton}>
+                            <TouchableOpacity style={styles.warpRadioText}>
+                                <MaterialIcons
+                                    name={
+                                        itemComfirm.radioSelectedType === 1
+                                            ? 'radio-button-checked'
+                                            : 'radio-button-off'
+                                    }
+                                    color={
+                                        itemComfirm.radioSelectedType === 1
+                                            ? '#2196F3'
+                                            : '#49454f'
+                                    }
+                                    size={20}
+                                />
+                                <Text style={styles.radioBtnText}>Không</Text>
+                            </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={styles.warpRadioText}
-                        onPress={() => setRadioSelectedType(2)}>
-                        <MaterialIcons
-                            name={
-                                radioSelectedType === 2
-                                    ? 'radio-button-checked'
-                                    : 'radio-button-off'
-                            }
-                            color={
-                                radioSelectedType === 2 ? '#2196F3' : '#49454f'
-                            }
-                            size={20}
-                        />
-                        <Text style={styles.radioBtnText}>Duyệt</Text>
-                    </TouchableOpacity>
+                            <TouchableOpacity style={styles.warpRadioText}>
+                                <MaterialIcons
+                                    name={
+                                        itemComfirm.radioSelectedType === 2
+                                            ? 'radio-button-checked'
+                                            : 'radio-button-off'
+                                    }
+                                    color={
+                                        itemComfirm.radioSelectedType === 2
+                                            ? '#2196F3'
+                                            : '#49454f'
+                                    }
+                                    size={20}
+                                />
+                                <Text style={styles.radioBtnText}>Duyệt</Text>
+                            </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={styles.warpRadioText}
-                        onPress={() => setRadioSelectedType(3)}>
-                        <MaterialIcons
-                            name={
-                                radioSelectedType === 3
-                                    ? 'radio-button-checked'
-                                    : 'radio-button-off'
-                            }
-                            color={
-                                radioSelectedType === 2 ? '#2196F3' : '#49454f'
-                            }
-                            size={20}
-                        />
-                        <Text style={styles.radioBtnText}>Hủy bỏ</Text>
-                    </TouchableOpacity>
-                </View>
+                            <TouchableOpacity style={styles.warpRadioText}>
+                                <MaterialIcons
+                                    name={
+                                        itemComfirm.radioSelectedType === 3
+                                            ? 'radio-button-checked'
+                                            : 'radio-button-off'
+                                    }
+                                    color={
+                                        itemComfirm.radioSelectedType === 2
+                                            ? '#2196F3'
+                                            : '#49454f'
+                                    }
+                                    size={20}
+                                />
+                                <Text style={styles.radioBtnText}>Hủy bỏ</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                {radioSelectedType === 1 ? null : radioSelectedType === 2 ? (
-                    <View style={styles.comfirmContent}>
-                        <Text style={styles.comfirmText}>
-                            Bạn chắc chắn muốn duyệt công việc này?
-                        </Text>
-                        <TouchableOpacity style={styles.approveRequestBtn}>
-                            <Text style={styles.approveRequestText}>
-                                Duyệt yêu cầu
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    <View style={styles.comfirmContent}>
-                        <Text style={styles.comfirmText}>
-                            Bạn chắc chắn muốn huỷ bỏ công việc này?
-                        </Text>
-                        <TextInput
-                            style={styles.cancelProgressInput}
-                            placeholder='Nhập lý do huỷ...'
-                            placeholderTextColor={'#808080'}
-                            multiline
-                            numberOfLines={5}
-                        />
-                        <TouchableOpacity style={styles.cancelWorkBtn}>
-                            <Text style={styles.cancelWorkBtnText}>Hủy bỏ</Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
+                        {/* {itemComfirm.radioSelectedType === 2 ? (
+                            <View style={styles.comfirmContent}>
+                                <Text style={styles.comfirmText}>
+                                    Bạn chắc chắn muốn duyệt công việc này?
+                                </Text>
+                                <TouchableOpacity
+                                    style={styles.approveRequestBtn}>
+                                    <Text style={styles.approveRequestText}>
+                                        Duyệt yêu cầu
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            <View style={styles.comfirmContent}>
+                                <Text style={styles.comfirmText}>
+                                    Bạn chắc chắn muốn huỷ bỏ công việc này?
+                                </Text>
+                                <TextInput
+                                    style={styles.cancelProgressInput}
+                                    placeholder='Nhập lý do huỷ...'
+                                    placeholderTextColor={'#808080'}
+                                    multiline
+                                    numberOfLines={5}
+                                />
+                                <TouchableOpacity style={styles.cancelWorkBtn}>
+                                    <Text style={styles.cancelWorkBtnText}>
+                                        Hủy bỏ
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        )} */}
+                    </>
+                ))}
             </View>
         </View>
     );

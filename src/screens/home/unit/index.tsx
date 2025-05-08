@@ -14,7 +14,7 @@ import images from '../../../assets/images';
 import {useWorkerStore} from '../../../stores/workerStore';
 import Loading from '@/screens/subscreen/Loading';
 
-const Unit = ({navigation}) => {
+const Unit = ({navigation}: any) => {
     const {listWorker, getListWorkerByLeader, isLoading} = useWorkerStore();
 
     const [searchWorker, setSearchWorker] = useState('');
@@ -74,6 +74,7 @@ const Unit = ({navigation}) => {
 
     useEffect(() => {
         getListWorkerByLeader();
+        // eslint-disable-next-line
     }, []);
 
     if (isLoading) return <Loading />;

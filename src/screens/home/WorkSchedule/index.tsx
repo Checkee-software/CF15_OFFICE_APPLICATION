@@ -11,7 +11,7 @@ import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/Schedule
 import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
 import Loading from '@/screens/subscreen/Loading';
 
-const WorkSchedule = ({navigation}) => {
+const WorkSchedule = ({navigation}: any) => {
     const {
         getListWorkSchedule,
         listWorkScheduleFilter,
@@ -33,7 +33,7 @@ const WorkSchedule = ({navigation}) => {
     const [selectedStatus, setSelectedStatus] = useState(1);
     const [searchSchedule, setSearchSchedule] = useState('');
 
-    const renderCircleColor = status => {
+    const renderCircleColor = (status: string) => {
         switch (status) {
             case 'PROCESSING':
             case 'ALMOST_EXPIRE':
@@ -47,11 +47,11 @@ const WorkSchedule = ({navigation}) => {
                 return '#FF4E45';
 
             default:
-                return null;
+                return undefined;
         }
     };
 
-    const renderStatusTitle = status => {
+    const renderStatusTitle = (status: string) => {
         switch (status) {
             case 'PENDING':
                 return (
@@ -100,7 +100,7 @@ const WorkSchedule = ({navigation}) => {
         }
     };
 
-    const renderWorkSchedule = (status, finishedDate) => {
+    const renderWorkSchedule = (status: string, finishedDate: string) => {
         const targetTime = moment(finishedDate);
         const now = moment();
 
@@ -203,7 +203,7 @@ const WorkSchedule = ({navigation}) => {
         item.title.toLowerCase().includes(searchSchedule.toLowerCase()),
     );
 
-    const selectScheduleType = value => {
+    const selectScheduleType = (value: number) => {
         if (value === 1) {
             resetData();
         } else if (value === 2) {
@@ -222,7 +222,7 @@ const WorkSchedule = ({navigation}) => {
         setSelectedStatus(value);
     };
 
-    const renderItemWorkSchedule = itemWorkSchedule => (
+    const renderItemWorkSchedule = (itemWorkSchedule: any) => (
         <View style={WorkScheduleStyles.workScheduleMargin}>
             <TouchableOpacity
                 style={WorkScheduleStyles.workCard}
@@ -234,7 +234,7 @@ const WorkSchedule = ({navigation}) => {
                 <Progress.Circle
                     size={40}
                     color={renderCircleColor(itemWorkSchedule.status)}
-                    progress={0.2} // Từ 0.0 đến 1.0
+                    progress={0} // Từ 0.0 đến 1.0
                     showsText={true}
                     textStyle={WorkScheduleStyles.progressValue}
                     unfilledColor={'rgba(211, 211, 211, 1)'}
@@ -257,7 +257,7 @@ const WorkSchedule = ({navigation}) => {
 
                             <Text style={WorkScheduleStyles.value}>
                                 {`${itemWorkSchedule.childTasks.tasks.reduce(
-                                    (count, task) => {
+                                    (count: number, task: any) => {
                                         return task.completedPercent === 100
                                             ? count + 1
                                             : count;
@@ -295,6 +295,7 @@ const WorkSchedule = ({navigation}) => {
 
     useEffect(() => {
         handleGetListWorkSchedule();
+        // eslint-disable-next-line
     }, []);
 
     if (isLoading) return <Loading />;
@@ -306,7 +307,7 @@ const WorkSchedule = ({navigation}) => {
                     data={statusList}
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    keyExtractor={item => item.value}
+                    keyExtractor={item => item.label}
                     renderItem={({item}) => (
                         <TouchableOpacity
                             onPress={() => selectScheduleType(item.value)}
@@ -431,7 +432,7 @@ const WorkScheduleStyles = StyleSheet.create({
         fontSize: 10,
     },
     warpInfoWork: {
-        gap: 12,
+        gap: 8,
         width: '84%',
     },
     pendingAndAlmostExpireText: {
@@ -460,6 +461,7 @@ const WorkScheduleStyles = StyleSheet.create({
         fontSize: 14,
     },
     warpChildTasksAndStaffs: {
+        marginTop: 6,
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '70%',
@@ -482,6 +484,7 @@ const WorkScheduleStyles = StyleSheet.create({
         fontWeight: 500,
     },
     workScheduleTime: {
+        marginTop: 6,
         flexDirection: 'row',
         justifyContent: 'flex-end',
         alignItems: 'center',

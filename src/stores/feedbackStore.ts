@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import useAuthStore from './authStore';
+import {useAuthStore} from './authStore';
 import {ICreate as ICreateFormData} from '../shared-types/form-data/FeedbackFormData/FeedbackFormData';
 
 const backendURL = 'http://cf15officeservice.checkee.vn';

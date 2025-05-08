@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, View, TouchableOpacity, Alert} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Work from '../screens/home/Work';
-import WorkSchedule from '../screens/home/WorkSchedule';
+//import WorkSchedule from '../screens/home/WorkSchedule';
 import CameraScanner from '../screens/global/CameraScanner';
 import History from '../screens/home/History';
 import Profile from '../screens/user/Profile';
@@ -11,10 +11,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
-import useAuthStore from '@/stores/authStore';
+import {useAuthStore} from '@/stores/authStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
-const BottomTabsNavigator = ({navigation}) => {
+const BottomTabsNavigator = ({navigation}: any) => {
     const {userInfo} = useAuthStore();
 
     const Tab = createBottomTabNavigator();

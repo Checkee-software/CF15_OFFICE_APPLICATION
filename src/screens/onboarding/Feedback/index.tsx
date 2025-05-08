@@ -7,21 +7,15 @@ import {
     Image,
     TouchableOpacity,
 } from 'react-native';
-import {
-    useNavigation,
-    useRoute,
-    useFocusEffect,
-} from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useFeedbackStore from '../../../stores/feedbackStore';
 import dayjs from 'dayjs';
 import images from '../../../assets/images';
-import useAuthStore from '../../../stores/authStore';
+import {useAuthStore} from '../../../stores/authStore';
 
-export default function FeedbackScreen() {
-    const navigation = useNavigation();
-    const route = useRoute();
+export default function FeedbackScreen({navigation}: any) {
     const {userInfo} = useAuthStore();
 
     const {feedbacks, fetchFeedbacks, isLoading, getFullAvatarUrl} =
@@ -38,6 +32,7 @@ export default function FeedbackScreen() {
     useFocusEffect(
         useCallback(() => {
             fetchData();
+            // eslint-disable-next-line
         }, []),
     );
 
@@ -45,7 +40,7 @@ export default function FeedbackScreen() {
         console.log('FEEDBACKS_RECEIVED:', feedbacks);
     }, [feedbacks]);
 
-    const renderItem = ({item}) => {
+    const renderItem = ({item}: any) => {
         const avatarUrl = getFullAvatarUrl(item.avatar) || images.avatar;
 
         return (

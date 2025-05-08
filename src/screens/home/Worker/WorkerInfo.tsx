@@ -1,15 +1,17 @@
 import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
 import moment from 'moment';
-import useAuthStore from '@/stores/authStore';
+import {useAuthStore} from '@/stores/authStore';
 import images from '@/assets/images';
+import {
+    EOrganization,
+    organizations,
+} from '@/shared-types/common/Permissions/Permissions';
 
-const WorkerInfo = ({route}) => {
+const WorkerInfo = ({route}: any) => {
     const {itemListWorker, itemWorkerBySearch} = route.params;
 
-    console.log(route.params);
-
-    const {userInfo} = useAuthStore();
+    const {userInfo}: any = useAuthStore();
 
     const item = itemListWorker ?? itemWorkerBySearch;
 
@@ -26,10 +28,20 @@ const WorkerInfo = ({route}) => {
         return `(+84) ${part1} ${part2} ${part3}`;
     };
 
+    const renderLevelUser = (level: string) => {
+        const levelUser = organizations.find(item => item.code === level);
+        return levelUser?.label;
+    };
+
     return (
         <View style={WorkerInfoStyles.container}>
             <View style={WorkerInfoStyles.workerNameSection}>
-                <View style={WorkerInfoStyles.workerAvatar}>
+                <View
+                    style={
+                        userInfo.userType.level === 'DEPARTMENT'
+                            ? WorkerInfoStyles.workerAvatar
+                            : WorkerInfoStyles.workerAvatar2
+                    }>
                     <Image
                         source={
                             item.avatar
@@ -47,9 +59,10 @@ const WorkerInfo = ({route}) => {
                         {item.fullName}
                     </Text>
                     <Text style={WorkerInfoStyles.workerRole}>
-                        {userInfo.userType.level === 'DEPARTMENT'
-                            ? item.role
-                            : item.unit}
+                        {userInfo.userType.level === 'DEPARTMENT' &&
+                        item.userType.level === EOrganization.LEADER
+                            ? `${item.role} ${item.unit}`
+                            : `${item.unit} `}
                     </Text>
                 </View>
             </View>
@@ -88,6 +101,16 @@ const WorkerInfo = ({route}) => {
                 <Text style={WorkerInfoStyles.otherInfoText}>
                     Thông tin khác
                 </Text>
+
+                <View style={WorkerInfoStyles.warpLabelAndValue}>
+                    <Text style={WorkerInfoStyles.labelText}>
+                        Cấp tài khoản
+                    </Text>
+
+                    <Text style={WorkerInfoStyles.valueText}>
+                        {renderLevelUser(item.userType.level)}
+                    </Text>
+                </View>
 
                 <View style={WorkerInfoStyles.warpLabelAndValue}>
                     <Text style={WorkerInfoStyles.labelText}>Dân tộc</Text>
@@ -154,6 +177,12 @@ const WorkerInfoStyles = StyleSheet.create({
         width: 72,
         height: 72,
         backgroundColor: 'rgba(76, 175, 80, 1)',
+    },
+    workerAvatar2: {
+        borderRadius: '50%',
+        width: 72,
+        height: 72,
+        backgroundColor: '#D3D3D3',
     },
     avatar: {
         borderRadius: 150,

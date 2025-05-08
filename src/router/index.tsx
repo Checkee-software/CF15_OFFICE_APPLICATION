@@ -6,8 +6,7 @@ import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 import {UNAUTHENTICATION_SCREENS} from '../config/SCREEN_CONFIG/unauthentication';
 import {AUTHENTICATION_SCREENS} from '../config/SCREEN_CONFIG/authentication';
 import BottomTabsNavigator from './BottomTabsNavigator';
-import useAuthStore from '../stores/authStore';
-import asyncStorageHelper from '../utils/localStorageHelper/index';
+import {useAuthStore} from '../stores/authStore';
 import Feather from 'react-native-vector-icons/Feather';
 import {TouchableOpacity} from 'react-native';
 

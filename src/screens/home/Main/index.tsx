@@ -13,10 +13,10 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import moment from 'moment';
 import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import useAuthStore from '../../../stores/authStore';
+import {useAuthStore} from '../../../stores/authStore';
 import asyncStorageHelper from '../../../utils/localStorageHelper/index';
 
-export default function Main({navigation}) {
+export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
 
     console.log('Token hiện tại:', asyncStorageHelper.token);

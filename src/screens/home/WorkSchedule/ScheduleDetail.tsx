@@ -19,7 +19,7 @@ import CheckBox from 'react-native-check-box';
 import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
 import moment from 'moment';
 
-const ScheduleDetail = ({route}) => {
+const ScheduleDetail = ({route}: any) => {
     const [showListRadioButton, setShowListRadioButton] = useState(false);
     const [radioSelectedType, setRadioSelectedType] = useState(0);
     const [currentSelectedMainTask, setCurrentSelectedMainTask] =
@@ -47,7 +47,7 @@ const ScheduleDetail = ({route}) => {
         }
     };
 
-    const renderStatusText = status => {
+    const renderStatusText = (status: string) => {
         if (status === EScheduleStatus.PENDING) {
             return 'Đang chờ';
         } else if (status === EScheduleStatus.PROCESSING) {
@@ -63,7 +63,7 @@ const ScheduleDetail = ({route}) => {
         }
     };
 
-    const renderScheduleRemain = finishedDate => {
+    const renderScheduleRemain = (finishedDate: string) => {
         const targetTime = moment(finishedDate);
         const now = moment();
 
@@ -78,7 +78,7 @@ const ScheduleDetail = ({route}) => {
         return `Còn ${days} ngày, ${hours} giờ ${minutes} phút`;
     };
 
-    const renderTaskEndIn = finishedDate => {
+    const renderTaskEndIn = (finishedDate: string) => {
         const day = moment(finishedDate).format('L');
         const hour = moment(finishedDate).format('LT');
         return `${hour} ${day}`;
@@ -194,7 +194,9 @@ const ScheduleDetail = ({route}) => {
             <View style={ScheduleDetailStyles.rightChildTask}>
                 <Text
                     style={
-                        itemChildTask.staff.every(item => item.isCheckStaff)
+                        itemChildTask.staff.every(
+                            (item: {isCheckStaff: any}) => item.isCheckStaff,
+                        )
                             ? ScheduleDetailStyles.taskTitleIsDone
                             : ScheduleDetailStyles.taskTitleNotDone
                     }>
@@ -204,7 +206,10 @@ const ScheduleDetail = ({route}) => {
                 <View style={ScheduleDetailStyles.progressTask}>
                     <Text
                         style={
-                            itemChildTask.staff.every(item => item.isCheckStaff)
+                            itemChildTask.staff.every(
+                                (item: {isCheckStaff: any}) =>
+                                    item.isCheckStaff,
+                            )
                                 ? ScheduleDetailStyles.taskTitleIsDone
                                 : ScheduleDetailStyles.taskTitleNotDone
                         }>
@@ -218,7 +223,7 @@ const ScheduleDetail = ({route}) => {
                 </View>
 
                 <View style={ScheduleDetailStyles.taskParticipant}>
-                    {itemChildTask.staff.map(itemStaff => (
+                    {itemChildTask.staff.map((itemStaff: any) => (
                         <View
                             style={ScheduleDetailStyles.warpParticipant}
                             key={itemStaff.userId}>

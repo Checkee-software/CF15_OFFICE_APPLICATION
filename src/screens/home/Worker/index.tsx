@@ -15,7 +15,7 @@ import images from '../../../assets/images';
 import {useWorkerStore} from '../../../stores/workerStore';
 import Loading from '@/screens/subscreen/Loading';
 
-const Woker = ({navigation}) => {
+const Woker = ({navigation}: any) => {
     const {
         listWorker,
         listWorkerFilterByRole,
@@ -122,6 +122,7 @@ const Woker = ({navigation}) => {
 
     useEffect(() => {
         getListWorkerByDepartment();
+        // eslint-disable-next-line
     }, []);
 
     if (isLoading) return <Loading />;

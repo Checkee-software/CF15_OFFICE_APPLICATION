@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 
 /* configurations */
 import asyncStorageHelper from './src/utils/localStorageHelper/index';
-import useAuthStore from './src/stores/authStore';
+import {useAuthStore} from './src/stores/authStore';
 
 /* packages */
 import {SafeAreaProvider} from 'react-native-safe-area-context';
@@ -29,6 +29,7 @@ const InitApp = () => {
         };
 
         init();
+        // eslint-disable-next-line
     }, []);
 
     if (!isReady) {

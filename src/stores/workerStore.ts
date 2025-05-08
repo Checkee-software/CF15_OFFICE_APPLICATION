@@ -30,6 +30,7 @@ interface DocumentStore {
     listWorkerFilterByRole: listWorkerFilterByRole[];
     getListWorkerByDepartment: () => Promise<void>;
     getListWorkerByLeader: () => Promise<void>;
+    resetStateWhenLogout: () => void;
 }
 
 const fixAvatarPath = (path: string) => {
@@ -51,32 +52,36 @@ export const useWorkerStore = create<DocumentStore>(set => ({
             );
 
             if (response) {
-                const updateImgPathListWorker = response.data.data.map(item => {
-                    if (item.avatar) {
-                        item.avatar = fixAvatarPath(item.avatar);
-                    }
-                    return {
-                        ...item,
-                    };
-                });
+                const updateImgPathListWorker = response.data.data.map(
+                    (item: {avatar: string}) => {
+                        if (item.avatar) {
+                            item.avatar = fixAvatarPath(item.avatar);
+                        }
+                        return {
+                            ...item,
+                        };
+                    },
+                );
 
                 const filterLeaders = updateImgPathListWorker.filter(
-                    user => user.userType.level === 'LEADER',
+                    (user: {userType: {level: string}}) =>
+                        user.userType.level === 'LEADER',
                 );
 
                 const filterWorkers = updateImgPathListWorker.filter(
-                    user => user.userType.level !== 'LEADER',
+                    (user: {userType: {level: string}}) =>
+                        user.userType.level !== 'LEADER',
                 );
 
                 //thêm order cho 2 mảng
                 let order = 0;
-                filterLeaders.forEach(item => {
+                filterLeaders.forEach((item: {order: number}) => {
                     item.order = order += 1;
                 });
 
                 order = 0;
 
-                filterWorkers.forEach(item => {
+                filterWorkers.forEach((item: {order: number}) => {
                     item.order = order += 1;
                 });
 
@@ -125,22 +130,25 @@ export const useWorkerStore = create<DocumentStore>(set => ({
             );
 
             if (response) {
-                const updateImgPathListWorker = response.data.data.map(item => {
-                    if (item.avatar) {
-                        item.avatar = fixAvatarPath(item.avatar);
-                    }
-                    return {
-                        ...item,
-                    };
-                });
+                const updateImgPathListWorker = response.data.data.map(
+                    (item: {avatar: string}) => {
+                        if (item.avatar) {
+                            item.avatar = fixAvatarPath(item.avatar);
+                        }
+                        return {
+                            ...item,
+                        };
+                    },
+                );
 
                 const filterRole = updateImgPathListWorker.filter(
-                    user => user.userType.level === 'WORKER',
+                    (user: {userType: {level: string}}) =>
+                        user.userType.level === 'WORKER',
                 );
 
                 //thêm order cho mảng
                 let order = 0;
-                filterRole.forEach(item => {
+                filterRole.forEach((item: {order: number}) => {
                     item.order = order += 1;
                 });
 

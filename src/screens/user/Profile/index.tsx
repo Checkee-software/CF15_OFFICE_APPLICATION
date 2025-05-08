@@ -8,15 +8,14 @@ import {
     ScrollView,
     Modal,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Feather';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import useAuthStore from '../../../stores/authStore';
+import {useAuthStore} from '../../../stores/authStore';
 import {useWorkerStore} from '@/stores/workerStore';
 import moment from 'moment';
 import images from '../../../assets/images';
 
-export default function Profile({navigation}) {
+export default function Profile({navigation}: any) {
     const {userInfo, logout} = useAuthStore();
     const {resetStateWhenLogout} = useWorkerStore();
 
@@ -24,14 +23,9 @@ export default function Profile({navigation}) {
 
     const [showAccountInfo, setShowAccountInfo] = useState(false);
 
-    console.log(userInfo);
     return (
         <View style={styles.wrapper}>
-            <ScrollView
-                contentContainerStyle={{
-                    alignItems: 'center',
-                    paddingBottom: 50,
-                }}>
+            <ScrollView contentContainerStyle={styles.scrollViewStyle}>
                 <View style={styles.container}>
                     <View style={styles.avatarWrapper}>
                         <Image
@@ -242,6 +236,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    scrollViewStyle: {
+        alignItems: 'center',
+        paddingBottom: 50,
     },
     container: {
         width: 372,

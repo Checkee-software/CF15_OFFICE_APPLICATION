@@ -16,13 +16,14 @@ import moment from 'moment';
 import Loading from '@/screens/subscreen/Loading';
 //import images from '../../../assets/images';
 
-const Document = ({navigation}) => {
+const Document = ({navigation}: any) => {
     const {listDocument, getListDocument, isLoading} = useDocumentStore();
 
     const [searchTitle, setSearchTitle] = useState('');
 
     useEffect(() => {
         getListDocument();
+        // eslint-disable-next-line
     }, []);
 
     type itemDocument = {
@@ -101,7 +102,9 @@ const Document = ({navigation}) => {
                     filterDocuments.length !== 0 ? (
                         <FlatList
                             data={filterDocuments}
-                            renderItem={({item}) => renderItemDocument(item)}
+                            renderItem={({item}: any) =>
+                                renderItemDocument(item)
+                            }
                             keyExtractor={item => item._id}
                             onRefresh={handleReFetch}
                             refreshing={isLoading}

@@ -10,6 +10,8 @@ interface workScheduleStore {
     listWorkSchedule: IList[];
     listWorkScheduleFilter: IList[];
     getListWorkSchedule: () => Promise<void>;
+    filterByStatus: (status: string) => void;
+    resetData: () => void;
 }
 
 const fixAvatarPath = (path: string) => {
@@ -31,12 +33,12 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
 
             if (response) {
                 const updateImgPathListSchedule = response.data.data.map(
-                    item => {
-                        item.childTasks.tasks.map(childTasksItem => {
+                    (item: any) => {
+                        item.childTasks.tasks.map((childTasksItem: any) => {
                             childTasksItem.isCheck = false;
                             childTasksItem.isComfirmTaskCheck = false;
 
-                            childTasksItem.staff.map(staffItem => {
+                            childTasksItem.staff.map((staffItem: any) => {
                                 staffItem.isCheckStaff = false;
                                 staffItem.isComfirmStaffCheck = false;
 
@@ -46,7 +48,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                             return {...childTasksItem};
                         });
 
-                        item.employees.map(employees => {
+                        item.employees.map((employees: any) => {
                             if (employees.avatar) {
                                 employees.avatar = fixAvatarPath(
                                     employees.avatar,

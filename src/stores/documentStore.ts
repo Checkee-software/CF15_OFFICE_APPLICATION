@@ -14,8 +14,6 @@ interface DocumentStore {
 export const useDocumentStore = create<DocumentStore>(set => ({
     isLoading: false,
     listDocument: [],
-    fileUrl: '',
-    fileName: '',
 
     getListDocument: async () => {
         set({isLoading: true});
