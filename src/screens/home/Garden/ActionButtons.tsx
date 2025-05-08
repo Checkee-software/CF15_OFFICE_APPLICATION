@@ -14,6 +14,7 @@ const ActionButtons = ({
     onCloseAlert,
     onConfirmReport,
     onCancelReport,
+    onlyShowReportButton,
 }: {
     visible: boolean;
     showAlert?: boolean;
@@ -26,11 +27,13 @@ const ActionButtons = ({
     onCloseAlert?: () => void;
     onConfirmReport?: () => void;
     onCancelReport?: () => void;
+    onlyShowReportButton?: boolean;
 }) => {
     if (!visible) return null;
 
     return (
         <View style={styles.snackbarContainer}>
+            {/* Alert message */}
             {showAlert && !isSaved && !showReportConfirmation && (
                 <View style={styles.alertInSnackbar}>
                     <Icon name='warning' size={20} color='#F59E0B' />
@@ -48,6 +51,7 @@ const ActionButtons = ({
                 </View>
             )}
 
+            {/* Report confirmation */}
             {showReportConfirmation && (
                 <View style={styles.confirmationContainer}>
                     <Text style={styles.confirmationText}>
@@ -72,6 +76,7 @@ const ActionButtons = ({
                 </View>
             )}
 
+            {/* Saved alert */}
             {isSaved && !showReportConfirmation && (
                 <View style={styles.successAlert}>
                     <Icon name='check-circle' size={20} color='#22C55E' />
@@ -79,38 +84,50 @@ const ActionButtons = ({
                 </View>
             )}
 
-            {!showReportConfirmation && (
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={[styles.snackbarButton, styles.exitActionButton]}
-                        onPress={onExit}>
-                        <Icon name='arrow-back' size={24} color='#fff' />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[
-                            styles.snackbarButton,
-                            isSaved
-                                ? styles.saveButtonDisabled
-                                : styles.saveButton,
-                        ]}
-                        onPress={onSaveTemp}
-                        disabled={isSaved}>
-                        <Text
-                            style={
+            {/* Action buttons */}
+            <View style={styles.buttonContainer}>
+                {!onlyShowReportButton && (
+                    <>
+                        <TouchableOpacity
+                            style={[
+                                styles.snackbarButton,
+                                styles.exitActionButton,
+                            ]}
+                            onPress={onExit}>
+                            <Icon name='arrow-back' size={24} color='#fff' />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[
+                                styles.snackbarButton,
                                 isSaved
-                                    ? styles.disabledButtonText
-                                    : styles.snackbarText
-                            }>
-                            Lưu tạm
-                        </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.snackbarButton, styles.reportButton]}
-                        onPress={onReport}>
-                        <Text style={styles.snackbarText1}>Báo cáo</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
+                                    ? styles.saveButtonDisabled
+                                    : styles.saveButton,
+                            ]}
+                            onPress={onSaveTemp}
+                            disabled={isSaved}>
+                            <Text
+                                style={
+                                    isSaved
+                                        ? styles.disabledButtonText
+                                        : styles.snackbarText
+                                }>
+                                Lưu tạm
+                            </Text>
+                        </TouchableOpacity>
+                    </>
+                )}
+
+                <TouchableOpacity
+                    style={[
+                        styles.snackbarButton,
+                        styles.reportButton,
+                        onlyShowReportButton ? styles.reportButtonOnly : null,
+                    ]}
+                    onPress={onReport}>
+                    <Text style={styles.snackbarText1}>Báo cáo</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -118,84 +135,11 @@ const ActionButtons = ({
 export default ActionButtons;
 
 const styles = StyleSheet.create({
-    input: {
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: 'gray',
-        paddingHorizontal: 12,
-        height: 40,
-        marginBottom: 12,
-        fontSize: 14,
-    },
-    container: {
-        padding: 16,
-        backgroundColor: '#fff',
-    },
-    infoContainer: {
-        backgroundColor: '#fff',
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 16,
-    },
-    gardenName: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    gardenCode: {
-        color: 'green',
-        fontWeight: '500',
-        marginTop: 2,
-    },
-    productBox: {
-        marginTop: 12,
-        backgroundColor: '#4CAF5026',
-        padding: 10,
-        borderRadius: 6,
-    },
-    productLabel: {
-        fontSize: 14,
-        fontWeight: '500',
-        marginBottom: 4,
-    },
-    productRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    productText: {
-        fontSize: 14,
-        color: '#333',
-        marginLeft: 4,
-    },
-    headerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 8,
-    },
-    taskHeader: {
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    linkText: {
-        color: 'blue',
-        textDecorationLine: 'underline',
+    reportButtonOnly: {
+        width: '80%',
+        alignSelf: 'center',
     },
 
-    exitButton: {
-        backgroundColor: 'red',
-        padding: 12,
-        alignItems: 'center',
-        borderRadius: 24,
-        marginTop: 16,
-    },
-    exitText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-
-    requiredMark: {
-        color: 'red',
-    },
     snackbarContainer: {
         position: 'absolute',
         bottom: 0,

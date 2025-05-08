@@ -10,30 +10,38 @@ import {Dropdown} from 'react-native-element-dropdown';
 
 const TaskBlock = ({
     title,
-    options,
+    itemOptions,
+    typeOptions,
     valueOptions,
     onDeclare,
     isDropdown = true,
+    showWarning = false,
 }: {
     title: string;
-    options?: {label: string; value: string}[];
+    itemOptions?: {label: string; value: string}[];
+    typeOptions?: {label: string; value: string}[];
     valueOptions?: {label: string; value: string}[];
     onDeclare: (data: any) => void;
     isDropdown?: boolean;
+    showWarning?: boolean;
 }) => {
     const [type, setType] = React.useState<string | null>(null);
+    const [item, setItem] = React.useState<string | null>(null);
     const [value, setValue] = React.useState<string | null>('');
 
     const handleDeclare = () => {
         if (value) {
             const data = isDropdown
-                ? {type, value, time: new Date()}
+                ? {item, type, value, time: new Date()}
                 : {value, time: new Date()};
             onDeclare(data);
             setType(null);
             setValue(null);
+            setItem(null);
         }
     };
+
+    const isButtonDisabled = isDropdown ? !item || !type || !value : !value;
 
     return (
         <View
@@ -46,11 +54,23 @@ const TaskBlock = ({
             {isDropdown ? (
                 <>
                     <Text style={styles.label}>
+                        Loại vật tư <Text style={styles.requiredMark}>*</Text>
+                    </Text>
+                    <Dropdown
+                        style={styles.dropdown}
+                        data={itemOptions || []}
+                        labelField='label'
+                        valueField='value'
+                        placeholder='Chọn'
+                        value={item}
+                        onChange={item => setItem(item.value)}
+                    />
+                    <Text style={styles.label}>
                         Loại định mức <Text style={styles.requiredMark}>*</Text>
                     </Text>
                     <Dropdown
                         style={styles.dropdown}
-                        data={options || []}
+                        data={typeOptions || []}
                         labelField='label'
                         valueField='value'
                         placeholder='Chọn'
@@ -72,14 +92,24 @@ const TaskBlock = ({
                     />
                 </>
             ) : (
-                <>
-                    <TextInput
-                        style={styles.input}
-                        value={value}
-                        onChangeText={setValue}
-                        placeholder='Nhập khối lượng'
-                    />
-                </>
+                <TextInput
+                    style={styles.input}
+                    value={value ?? ''}
+                    onChangeText={text => {
+                        const numericText = text.replace(/[^0-9.]/g, '');
+                        setValue(numericText);
+                    }}
+                    placeholder='Nhập khối lượng'
+                    keyboardType='numeric'
+                />
+            )}
+
+            {showWarning && (
+                <Text style={styles.warningText}>
+                    Vui lòng thực hiện "báo cáo" khối lượng thu hoạch hiện tại
+                    để tiếp tục khai báo thu hoạch{'\n'}
+                    (Khai báo thu hoạch chỉ có thể khai báo 1 lần/lúc)
+                </Text>
             )}
 
             <TouchableOpacity
@@ -88,8 +118,10 @@ const TaskBlock = ({
                     isDropdown
                         ? styles.declareButtonDropdown
                         : styles.declareButtonInput,
+                    isButtonDisabled && styles.declareButtonDisabled,
                 ]}
-                onPress={handleDeclare}>
+                onPress={handleDeclare}
+                disabled={isButtonDisabled}>
                 <Text style={styles.declareText}>Khai báo</Text>
             </TouchableOpacity>
         </View>
@@ -103,9 +135,10 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         paddingHorizontal: 12,
         height: 40,
-        marginBottom: 12,
+        marginBottom: 7,
         fontSize: 14,
-        alignContent: 'center',
+        textAlign: 'center',
+        textAlignVertical: 'center',
     },
     taskBlock: {
         padding: 12,
@@ -142,10 +175,13 @@ const styles = StyleSheet.create({
         marginTop: 12,
     },
     declareButtonDropdown: {
-        backgroundColor: '#4CAF50', 
+        backgroundColor: '#4CAF50',
     },
     declareButtonInput: {
-        backgroundColor: '#2196F3', 
+        backgroundColor: '#2196F3',
+    },
+    declareButtonDisabled: {
+        backgroundColor: 'gray',
     },
     declareText: {
         color: '#fff',
@@ -153,6 +189,12 @@ const styles = StyleSheet.create({
     },
     requiredMark: {
         color: 'red',
+    },
+    warningText: {
+        color: 'gray',
+        marginTop: 8,
+        fontSize: 14,
+        textAlign: 'center',
     },
 });
 

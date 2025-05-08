@@ -7,13 +7,15 @@ const TaskSummary = ({
     data,
     index,
     onRemove,
-    optionMap = {},
+    itemMap = {},
+    typeMap = {},
 }: {
     title: string;
     data: any;
     index: number;
     onRemove: (index: number) => void;
-    optionMap?: {[key: string]: string};
+    itemMap?: {[key: string]: string};
+    typeMap?: {[key: string]: string};
 }) => {
     const formatTime = (date: Date) => {
         const d = new Date(date);
@@ -25,30 +27,16 @@ const TaskSummary = ({
         return `${h}:${m} ${day}/${month}/${year}`;
     };
 
-    const getUnit = (taskTitle: string): string => {
-        switch (taskTitle) {
-            case 'Bón phân':
-                return 'lít';
-            case 'Phun thuốc':
-                return 'thùng';
-            case 'Tưới tiêu':
-                return 'm3 khối';
-            case 'Thu hoạch':
-                return 'kg';
-            default:
-                return '';
-        }
-    };
-
     const renderHarvestDetails = (data: any) => {
         if (title === 'Thu hoạch') {
             return (
                 <>
                     <View style={styles.summaryRow}>
-                        <Text style={styles.label}>Khối lượng</Text>
-                        <Text style={styles.value}>{data.value} / {getUnit(title)}</Text>
+                        <Text style={styles.label}>Khối lượng (KG)</Text>
+                        <Text style={styles.value}>
+                            {data.value} 
+                        </Text>
                     </View>
-                    
                 </>
             );
         }
@@ -56,11 +44,15 @@ const TaskSummary = ({
             <>
                 <View style={styles.summaryRow}>
                     <Text style={styles.label}>Loại vật tư</Text>
-                    <Text style={styles.value}>{optionMap[data.type]}</Text>
+                    <Text style={styles.value}>
+                        {itemMap[data.item] || data.item}
+                    </Text>
                 </View>
                 <View style={styles.summaryRow}>
                     <Text style={styles.label}>Định mức</Text>
-                    <Text style={styles.value}>{data.value} / {getUnit(title)}</Text>
+                    <Text style={styles.value}>
+                        {data.value} / {typeMap?.[data.type] || data.type}
+                    </Text>
                 </View>
             </>
         );
@@ -71,12 +63,14 @@ const TaskSummary = ({
             style={[
                 styles.taskBlock,
                 styles.summaryBox,
-                title === 'Thu hoạch' ? styles.summaryBoxHarvest : styles.summaryBoxDefault,
+                title === 'Thu hoạch'
+                    ? styles.summaryBoxHarvest
+                    : styles.summaryBoxDefault,
             ]}>
             <View style={styles.summaryHeader}>
                 <Text style={styles.taskTitle}>{title}</Text>
                 <TouchableOpacity onPress={() => onRemove(index)}>
-                    <Icon name="delete" size={20} color="gray" />
+                    <Icon name='delete' size={20} color='gray' />
                 </TouchableOpacity>
             </View>
             <View style={styles.summaryRow}>
@@ -86,38 +80,10 @@ const TaskSummary = ({
             {renderHarvestDetails(data)}
         </View>
     );
-    
 };
 
 const styles = StyleSheet.create({
-    input: {
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: 'gray',
-        paddingHorizontal: 12,
-        height: 40,
-        marginBottom: 12,
-        fontSize: 14,
-    },
-    container: {
-        padding: 16,
-        backgroundColor: '#fff',
-    },
-    infoContainer: {
-        backgroundColor: '#fff',
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 16,
-    },
-    gardenName: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    gardenCode: {
-        color: 'green',
-        fontWeight: '500',
-        marginTop: 2,
-    },
+
     productBox: {
         marginTop: 12,
         backgroundColor: '#4CAF5026',
@@ -163,7 +129,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     label: {
-        fontSize: 13,
+        fontSize: 14,
         marginTop: 6,
         marginBottom: 4,
     },
@@ -221,13 +187,11 @@ const styles = StyleSheet.create({
         color: 'red',
     },
     summaryBoxDefault: {
-        borderColor: '#4CAF50', 
+        borderColor: '#4CAF50',
     },
     summaryBoxHarvest: {
-        borderColor: '#2196F3', 
+        borderColor: '#2196F3',
     },
-    
-    
 });
 
 export default TaskSummary;

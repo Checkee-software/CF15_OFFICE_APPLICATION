@@ -13,24 +13,20 @@ import {useNavigation} from '@react-navigation/native';
 import TaskBlock from './TaskBlock';
 import TaskSummary from './TaskSummary';
 import ActionButtons from './ActionButtons';
-
-const fertilizerOptions = [
+import HarvestSection from './HarvestSection';
+const itemOption = [
     {label: 'Phân khô', value: '1'},
     {label: 'Phân hữu cơ', value: '2'},
-];
-const harvestOptions = [
-    {label: 'Cà phê quả tươi', value: '1'},
-    {label: 'Cà phê nhân', value: '2'},
-];
-
-const sprayOptions = [
-    {label: 'Thuốc trừ sâu', value: '1'},
-    {label: 'Thuốc diệt cỏ', value: '2'},
+    {label: 'Thuốc trừ sâu', value: '3'},
+    {label: 'Thuốc diệt cỏ', value: '4'},
+    {label: 'Nước khoáng', value: '5'},
+    {label: 'Nước máy', value: '6'},
 ];
 
-const wateringOptions = [
-    {label: 'Nước khoáng', value: '1'},
-    {label: 'Nước máy', value: '2'},
+const typeOption = [
+    {label: 'm3', value: 'm3'},
+    {label: 'lít', value: 'lít'},
+    {label: 'thùng', value: 'thùng'},
 ];
 
 const valueOptions = [
@@ -52,6 +48,9 @@ const GardenDeclare = () => {
     }>({type: null, index: null});
     const [showExitAlert, setShowExitAlert] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+    const [isHarvestDeclared, setIsHarvestDeclared] = useState(false);
+    const [onlyShowReportButton, setOnlyShowReportButton] = useState(false);
+
 
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
 
@@ -63,6 +62,7 @@ const GardenDeclare = () => {
         setFertilizerList(newList);
         setSelectedTask({type: 'fertilizer', index: newList.length - 1});
         setIsSaved(false);
+        setOnlyShowReportButton(false);
     };
 
     const handleAddSpray = (data: any) => {
@@ -70,6 +70,7 @@ const GardenDeclare = () => {
         setSprayList(newList);
         setSelectedTask({type: 'spray', index: newList.length - 1});
         setIsSaved(false);
+        setOnlyShowReportButton(false);
     };
 
     const handleAddWatering = (data: any) => {
@@ -77,6 +78,7 @@ const GardenDeclare = () => {
         setWateringList(newList);
         setSelectedTask({type: 'watering', index: newList.length - 1});
         setIsSaved(false);
+        setOnlyShowReportButton(false);
     };
 
     const handleAddHarvest = (data: any) => {
@@ -84,6 +86,7 @@ const GardenDeclare = () => {
         setHarvestList(newList);
         setSelectedTask({type: 'harvest', index: newList.length - 1});
         setIsSaved(false);
+        setOnlyShowReportButton(true); 
     };
 
     const handleRemoveHarvest = (index: number) => {
@@ -149,6 +152,8 @@ const GardenDeclare = () => {
     const handleCloseAlert = () => {
         setShowExitAlert(false);
     };
+    
+    
 
     return (
         <View style={{flex: 1}}>
@@ -169,48 +174,23 @@ const GardenDeclare = () => {
                         </View>
                     </View>
                 </View>
-                <View style={styles.headerRow}>
-                    <Text style={styles.taskHeader}>Thu hoạch</Text>
-                    <TouchableOpacity
-                        onPress={() =>
-                            navigation.navigate(SCREEN_INFO.GARDENHISTORY.key)
-                        }>
-                        <Text style={styles.linkText}>Lịch sử thu hoạch</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <TaskBlock
-                    title='Khối lượng thu hoạch (kg)'
-                    onDeclare={handleAddHarvest}
-                    isDropdown={false}
+                <HarvestSection
+                    harvestList={harvestList}
+                    onAddHarvest={handleAddHarvest}
+                    onRemoveHarvest={handleRemoveHarvest}
+                    setIsHarvestDeclared={setIsHarvestDeclared}
+                    setOnlyShowReportButton={setOnlyShowReportButton}
                 />
-
-                {harvestList.map((item, index) => (
-                    <TaskSummary
-                        key={index}
-                        title='Thu hoạch'
-                        data={item}
-                        index={index}
-                        onRemove={handleRemoveHarvest}
-                    />
-                ))}
-                <View style={styles.headerRow}>
-                    <Text style={styles.taskHeader}>Công việc (3)</Text>
-                    <TouchableOpacity
-                        onPress={() =>
-                            navigation.navigate(SCREEN_INFO.GARDENHISTORY.key)
-                        }>
-                        <Text style={styles.linkText}>Lịch sử khai báo</Text>
-                    </TouchableOpacity>
-                </View>
 
                 {/* Bón phân */}
                 <TaskBlock
                     title='Bón phân'
-                    options={fertilizerOptions}
-                    onDeclare={handleAddFertilizer}
+                    itemOptions={itemOption}
+                    typeOptions={typeOption}
                     valueOptions={valueOptions}
+                    onDeclare={handleAddFertilizer}
                 />
+
                 {fertilizerList.map((item, index) => (
                     <TaskSummary
                         key={index}
@@ -218,8 +198,11 @@ const GardenDeclare = () => {
                         data={item}
                         index={index}
                         onRemove={handleRemoveFertilizer}
-                        optionMap={Object.fromEntries(
-                            fertilizerOptions.map(o => [o.value, o.label]),
+                        itemMap={Object.fromEntries(
+                            itemOption.map(o => [o.value, o.label]),
+                        )}
+                        typeMap={Object.fromEntries(
+                            typeOption.map(o => [o.value, o.label]),
                         )}
                     />
                 ))}
@@ -227,9 +210,10 @@ const GardenDeclare = () => {
                 {/* Phun thuốc */}
                 <TaskBlock
                     title='Phun thuốc'
-                    options={sprayOptions}
-                    onDeclare={handleAddSpray}
+                    itemOptions={itemOption}
+                    typeOptions={typeOption}
                     valueOptions={valueOptions}
+                    onDeclare={handleAddSpray}
                 />
                 {sprayList.map((item, index) => (
                     <TaskSummary
@@ -238,8 +222,11 @@ const GardenDeclare = () => {
                         data={item}
                         index={index}
                         onRemove={handleRemoveSpray}
-                        optionMap={Object.fromEntries(
-                            sprayOptions.map(o => [o.value, o.label]),
+                        itemMap={Object.fromEntries(
+                            itemOption.map(o => [o.value, o.label]),
+                        )}
+                        typeMap={Object.fromEntries(
+                            typeOption.map(o => [o.value, o.label]),
                         )}
                     />
                 ))}
@@ -247,7 +234,8 @@ const GardenDeclare = () => {
                 {/* Tưới tiêu */}
                 <TaskBlock
                     title='Tưới tiêu'
-                    options={wateringOptions}
+                    itemOptions={itemOption}
+                    typeOptions={typeOption}
                     onDeclare={handleAddWatering}
                     valueOptions={valueOptions}
                 />
@@ -258,8 +246,11 @@ const GardenDeclare = () => {
                         data={item}
                         index={index}
                         onRemove={handleRemoveWatering}
-                        optionMap={Object.fromEntries(
-                            wateringOptions.map(o => [o.value, o.label]),
+                        itemMap={Object.fromEntries(
+                            itemOption.map(o => [o.value, o.label]),
+                        )}
+                        typeMap={Object.fromEntries(
+                            typeOption.map(o => [o.value, o.label]),
                         )}
                     />
                 ))}
@@ -282,6 +273,7 @@ const GardenDeclare = () => {
                 onCloseAlert={handleCloseAlert}
                 onConfirmReport={handleConfirmReport}
                 onCancelReport={handleCancelReport}
+                onlyShowReportButton={onlyShowReportButton}
             />
         </View>
     );
