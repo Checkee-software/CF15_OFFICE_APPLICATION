@@ -5,16 +5,48 @@ import {
     StyleSheet,
     TextInput,
     Linking,
+    Image,
+    ViewStyle,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {useCameraDevice, Camera} from 'react-native-vision-camera';
+import {
+    useCameraDevice,
+    Camera,
+    CameraPermissionRequestResult,
+} from 'react-native-vision-camera';
+import useGardenStore from '@/stores/gardenStore';
+import images from '../../../assets/images';
 
-const GardenScan = ({navigation, route}) => {
+const GardenScan = ({navigation, route}: any) => {
+    const [notFound, setNotFound] = useState(false);
+
     const {navigateNext} = route.params || {};
+    const [codeInput, setCodeInput] = useState('');
+    const {searchGardens, gardens} = useGardenStore();
+    const handleConfirm = async () => {
+        const code = codeInput.trim();
+        if (!code) return;
 
-    const [permissionState, setPermissionState] = useState();
+        console.log('[INPUT] Searching for garden with code:', code);
 
-    // doesnt show first render
+        await searchGardens(code);
+
+        const updatedGardens = useGardenStore.getState().gardens;
+        console.log('[RESULT] Garden found:', updatedGardens);
+
+        if (updatedGardens) {
+            setNotFound(false);
+            navigation.navigate(navigateNext, {
+                garden: updatedGardens,
+            });
+        } else {
+            setNotFound(true);
+        }
+    };
+
+    const [permissionState, setPermissionState] =
+        useState<CameraPermissionRequestResult>();
+
     const [cameraStyles, setCameraStyles] = useState<ViewStyle>({
         width: 0,
         height: 0,
@@ -38,7 +70,31 @@ const GardenScan = ({navigation, route}) => {
 
     return (
         <>
-            {permissionState === 'granted' && device != null ? (
+            {notFound ? (
+                <View style={CameraScannerStyles.notFoundContainer}>
+                    <View style={{alignItems: 'center'}}>
+                        <Image
+                            source={images.emptyGarden}
+                            style={{
+                                width: 400,
+                                height: 400,
+                                marginVertical: 24,
+                            }}
+                            resizeMode='contain'
+                        />
+                        <Text style={CameraScannerStyles.notFoundText}>
+                            Không tìm thấy khu vườn phù hợp!
+                        </Text>
+                        <TouchableOpacity
+                            style={CameraScannerStyles.goBackButton}
+                            onPress={() => navigation.goBack()}>
+                            <Text style={CameraScannerStyles.goBackText}>
+                                Quay về
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            ) : permissionState === 'granted' && device != null ? (
                 <View style={CameraScannerStyles.container}>
                     <Camera
                         device={device}
@@ -54,11 +110,13 @@ const GardenScan = ({navigation, route}) => {
                             placeholder='Nhập mã khu vườn'
                             placeholderTextColor={'#808080'}
                             style={CameraScannerStyles.inputManualSearch}
+                            value={codeInput}
+                            onChangeText={setCodeInput}
                         />
 
                         <TouchableOpacity
                             style={CameraScannerStyles.confirmManualSearchBtn}
-                            onPress={() => navigation.navigate(navigateNext)}>
+                            onPress={handleConfirm}>
                             <Text
                                 style={
                                     CameraScannerStyles.confirmManualSearchText
@@ -143,6 +201,37 @@ const CameraScannerStyles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         textAlign: 'center',
+    },
+
+    notFoundContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        paddingHorizontal: 20,
+    },
+    notFoundText: {
+        fontSize: 16,
+        color: '#333',
+        textAlign: 'center',
+        marginBottom: 16,
+    },
+    goBackButton: {
+        borderColor: '#4CAF50',
+        borderWidth: 1,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 20,
+    },
+    goBackText: {
+        color: '#4CAF50',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    headerText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 12,
     },
 });
 

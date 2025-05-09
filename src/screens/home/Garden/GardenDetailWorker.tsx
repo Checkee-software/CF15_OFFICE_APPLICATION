@@ -8,11 +8,10 @@ import {
     Linking,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
-import QRCode from 'react-native-qrcode-svg';
 import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import useAuthStore from '../../../stores/authStore';
+import {useAuthStore} from '../../../stores/authStore';
 
 const CollapsibleRow = ({
     label,
@@ -45,59 +44,43 @@ const CollapsibleRow = ({
     </>
 );
 
-const GardenDetailScreen = () => {
+const GardenWorker = () => {
     const {userInfo} = useAuthStore();
     const route = useRoute<any>();
-    const id = route.params?.id;
     const [showAreaInfo, setShowAreaInfo] = React.useState(false);
     const [showLocationInfo, setShowLocationInfo] = React.useState(false);
     const [showInfo, setShowInfo] = React.useState(false);
     const [showManagementAreaInfo, setShowManagementAreaInfo] =
         React.useState(false);
 
-    const {selectedGarden, fetchGardenDetail, isLoading} = useGardenStore();
+    const {gardens, searchGardens, isLoading} = useGardenStore();
     const [contractExpanded, setContractExpanded] = React.useState(false);
 
-    useEffect(() => {
-        if (id) {
-            fetchGardenDetail(id);
-        }
-    }, [id]);
-
-    if (isLoading || !selectedGarden) return <Loading />;
+    if (isLoading || !gardens) return <Loading />;
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            {userInfo?.userType?.level !== 'WORKER' && (
-                <View style={styles.qrContainer}>
-                    <QRCode
-                        value={selectedGarden.code || 'No Code'}
-                        size={372}
-                    />
-                </View>
-            )}
-
             <Section title='Thông tin khu vườn'>
-                <Row label='Tên khu vườn' value={selectedGarden.name} />
+                <Row label='Tên khu vườn' value={gardens.name} />
                 <View style={styles.row}>
                     <Text style={styles.label}>Mã khu vườn</Text>
                     <Text style={[styles.value, {color: 'green'}]}>
-                        {selectedGarden.code}
+                        {gardens.code}
                     </Text>
                 </View>
 
                 <CollapsibleRow
                     label='Diện tích (m2)'
-                    value={selectedGarden.area?.totalSquare}
+                    value={gardens.area?.totalSquare}
                     expanded={showAreaInfo}
                     onToggle={() => setShowAreaInfo(!showAreaInfo)}>
                     <Row
                         label='Chiều dài'
-                        value={`${selectedGarden.area?.length} m`}
+                        value={`${gardens.area?.length} m`}
                     />
                     <Row
                         label='Chiều rộng'
-                        value={`${selectedGarden.area?.width} m`}
+                        value={`${gardens.area?.width} m`}
                     />
                 </CollapsibleRow>
 
@@ -105,77 +88,34 @@ const GardenDetailScreen = () => {
                     label='Vị trí khu vườn'
                     expanded={showLocationInfo}
                     onToggle={() => setShowLocationInfo(!showLocationInfo)}>
-                    <Row
-                        label='Kinh độ'
-                        value={selectedGarden.location?.latitude}
-                    />
-                    <Row
-                        label='Vĩ độ'
-                        value={selectedGarden.location?.longitude}
-                    />
+                    <Row label='Kinh độ' value={gardens.location?.latitude} />
+                    <Row label='Vĩ độ' value={gardens.location?.longitude} />
                 </CollapsibleRow>
 
                 <CollapsibleRow
                     label='Người quản lý'
-                    value={selectedGarden.manager}
+                    value={gardens.manager}
                     expanded={showInfo}
                     onToggle={() => setShowInfo(!showInfo)}>
                     <Row
                         label='Đơn vị'
-                        value={selectedGarden.unit || 'Không xác định'}
+                        value={gardens.unit || 'Không xác định'}
                     />
-                    {userInfo?.userType?.level !== 'LEADER' && (
-                        <CollapsibleRow
-                            label='Hợp đồng'
-                            expanded={contractExpanded}
-                            onToggle={() =>
-                                setContractExpanded(!contractExpanded)
-                            }>
-                            {selectedGarden.management?.files?.length > 0 ? (
-                                selectedGarden.management.files.map(
-                                    (file, index) => (
-                                        <TouchableOpacity
-                                            key={index}
-                                            onPress={() =>
-                                                Linking.openURL(
-                                                    `http://cf15officeservice.checkee.vn${file.path.replace(
-                                                        /\\/g,
-                                                        '/',
-                                                    )}`,
-                                                )
-                                            }>
-                                            <Text
-                                                style={{
-                                                    color: 'green',
-                                                    marginBottom: 6,
-                                                }}>
-                                                {file.filename}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ),
-                                )
-                            ) : (
-                                <Text style={{color: '#888'}}>
-                                    Không có hợp đồng nào
-                                </Text>
-                            )}
-                        </CollapsibleRow>
-                    )}
 
                     <CollapsibleRow
                         label='Diện tích giao khoán (m2)'
-                        value={selectedGarden.management?.area?.totalSquare}
+                        value={gardens.management?.area?.totalSquare}
                         expanded={showManagementAreaInfo}
                         onToggle={() =>
                             setShowManagementAreaInfo(!showManagementAreaInfo)
                         }>
                         <Row
                             label='Chiều dài'
-                            value={`${selectedGarden.management?.area?.length} m`}
+                            value={`${gardens.management?.area?.length} m`}
                         />
                         <Row
                             label='Chiều rộng'
-                            value={`${selectedGarden.management?.area?.width} m`}
+                            value={`${gardens.management?.area?.width} m`}
                         />
                     </CollapsibleRow>
                 </CollapsibleRow>
@@ -184,19 +124,17 @@ const GardenDetailScreen = () => {
             <Section title='Thông tin cây trồng'>
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Tên giống</Text>
-                    <Text style={styles.infoValue}>
-                        {selectedGarden.productName}
-                    </Text>
+                    <Text style={styles.infoValue}>{gardens.productName}</Text>
                 </View>
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Số lượng giống cây</Text>
                     <Text
                         style={
                             styles.infoValue
-                        }>{`${selectedGarden.productQuantity} cây`}</Text>
+                        }>{`${gardens.productQuantity} cây`}</Text>
                 </View>
 
-                {selectedGarden.totalProductByYear?.map(item => (
+                {gardens.totalProductByYear?.map(item => (
                     <View key={item._id} style={styles.yearBox}>
                         <View style={styles.yearTitleRow}>
                             <Text
@@ -230,13 +168,13 @@ const GardenDetailScreen = () => {
                 ))}
             </Section>
 
-            {selectedGarden.sidePlants?.length > 0 && (
+            {gardens.sidePlants?.length > 0 && (
                 <Section title='Thông tin cây trồng xen'>
                     <Row
                         label='Số loại cây trồng xen'
-                        value={selectedGarden.sidePlants.length}
+                        value={gardens.sidePlants.length}
                     />
-                    {selectedGarden.sidePlants.map(plant => (
+                    {gardens.sidePlants.map(plant => (
                         <Row
                             key={plant._id}
                             label={plant.name}
@@ -276,7 +214,7 @@ const Row = ({label, value}: {label: string; value?: string | number}) => (
     </View>
 );
 
-export default GardenDetailScreen;
+export default GardenWorker;
 
 const styles = StyleSheet.create({
     container: {
