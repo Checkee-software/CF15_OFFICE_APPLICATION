@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import Loading from '../../subscreen/Loading';
 import useNewsStore from '../../../stores/newsStore';
-import {INews} from '../../../shared-types/Response/NewsResponse';
+import {INews} from '../../../shared-types/Response/NewsResponse/NewsResponse';
 import images from '../../../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
@@ -104,7 +104,7 @@ export default function News({navigation}: {navigation: any}) {
             }
             activeOpacity={0.7}>
             <Image
-                source={item.image ? {uri: item.image} : images.plant2}
+                source={item.imagePath ? {uri: item.imagePath} : images.plant2}
                 style={styles.image}
             />
             <View style={styles.textContainer}>

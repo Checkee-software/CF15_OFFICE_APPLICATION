@@ -11,7 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import useNewsStore from '../../../stores/newsStore';
-import {INews} from '../../../shared-types/Response/NewsResponse';
+import {INews} from '../../../shared-types/Response/NewsResponse/NewsResponse';
 import images from '../../../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -80,8 +80,8 @@ export default function NewsDetail() {
         <ScrollView style={styles.container}>
             <Image
                 source={
-                    typeof selectedNews.image === 'string'
-                        ? {uri: selectedNews.image}
+                    typeof selectedNews.imagePath === 'string'
+                        ? {uri: selectedNews.imagePath}
                         : images.plant2
                 }
                 style={styles.image}
