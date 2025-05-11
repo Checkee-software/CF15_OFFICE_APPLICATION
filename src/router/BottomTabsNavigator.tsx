@@ -80,7 +80,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
                 options={{
                     headerShown: true,
                     headerTitle:
-                        userInfo.userType.level === EOrganization.LEADER
+                        userInfo.userType.level !== EOrganization.WORKER
                             ? 'CÔNG VIỆC KHU VƯỜN'
                             : 'CÔNG VIỆC',
                     headerTitleStyle: style.headerTitle,

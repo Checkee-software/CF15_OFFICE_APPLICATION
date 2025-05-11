@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Backdrop from '../../subscreen/Loading/index2';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import useAuthStore from '../../../stores/authStore';
+import {useAuthStore} from '../../../stores/authStore';
 
 export default function UpdatePassword() {
     const [currentPassword, setCurrentPassword] = React.useState('');

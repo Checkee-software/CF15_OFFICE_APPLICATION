@@ -12,7 +12,7 @@ import QRCode from 'react-native-qrcode-svg';
 import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import useAuthStore from '../../../stores/authStore';
+import {useAuthStore} from '../../../stores/authStore';
 
 const CollapsibleRow = ({
     label,

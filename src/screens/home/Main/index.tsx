@@ -21,10 +21,7 @@ export default function Main({navigation}: any) {
 
     console.log('Token hiện tại:', asyncStorageHelper.token);
 
-    const isRollCall =
-        userInfo.userType.level === 'WORKER'
-            ? !Math.round(Math.random())
-            : undefined;
+    const [isRollCall, setIsRollCall] = useState(false);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -216,7 +213,7 @@ export default function Main({navigation}: any) {
                             </Text>
                             {isRollCall ? (
                                 <Text style={MainStyles.workingTimeText}>
-                                    Thời gian làm việc: 00:06:32
+                                    Thời gian làm việc: 00:00:00
                                 </Text>
                             ) : (
                                 <Text style={MainStyles.rollCallRemindText}>
@@ -291,7 +288,8 @@ export default function Main({navigation}: any) {
                                 </View>
                             ) : (
                                 <TouchableOpacity
-                                    style={MainStyles.btnRollCall}>
+                                    style={MainStyles.btnRollCall}
+                                    onPress={() => setIsRollCall(true)}>
                                     <Text style={MainStyles.btnRollCallText}>
                                         Điểm Danh
                                     </Text>
