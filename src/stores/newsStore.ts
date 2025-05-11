@@ -1,12 +1,9 @@
 import { create } from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import { INews } from '../shared-types/Response/NewsResponse';
+import { INews } from '../shared-types/Response/NewsResponse/NewsResponse';
 
-type NewsItem = INews & {
-    image?: string;
-    newsType?: string;
-};
+type NewsItem = INews
 
 type NewsState = {
     news: NewsItem[];
@@ -26,7 +23,7 @@ const useNewsStore = create<NewsState>((set) => ({
     fetchNews: async () => {
         set({ isLoading: true });
         try {
-            const res = await axiosClient.get(`${backendURL}/resources/news`);
+            const res = await axiosClient.get(`${backendURL}/resources/news/collection`);
             const newsData = res.data?.data || [];
             set({ news: newsData });
         } catch (error: any) {
@@ -43,7 +40,7 @@ const useNewsStore = create<NewsState>((set) => ({
     fetchNewsDetail: async (id: string) => {
         set({ isLoading: true });
         try {
-            const res = await axiosClient.get(`${backendURL}/resources/news/${id}`);
+            const res = await axiosClient.get(`${backendURL}/resources/news/detail/${id}`);
             set({ selectedNews: res.data?.data || null });
         } catch (error: any) {
             console.log('FETCH_NEWS_DETAIL_ERROR:', error?.response?.data || error.message);

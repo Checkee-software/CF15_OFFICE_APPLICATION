@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 8,
         width: 312,
-        height: 197,
+        height: 220,
         padding: 16,
         alignItems: 'flex-start',
     },
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         marginTop: 15,
-    },
+       },
     modalButton: {
         flex: 1,
         alignItems: 'flex-end',

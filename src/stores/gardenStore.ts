@@ -4,17 +4,18 @@ import Snackbar from 'react-native-snackbar';
 import {IGarden} from '@/shared-types/Response/GardenResponse/GardenResponse';
 
 type GardenState = {
-    gardens: IGarden[];
+    gardens: IGarden | null;
     selectedGarden: IGarden | null;
     isLoading: boolean;
     fetchGardens: () => Promise<void>;
     fetchGardenDetail: (id: string) => Promise<void>;
+    searchGardens: (code: string) => Promise<void>;  
 };
 
 const backendURL = 'http://cf15officeservice.checkee.vn';
 
 const useGardenStore = create<GardenState>(set => ({
-    gardens: [],
+    gardens: null,
     selectedGarden: null,
     isLoading: false,
 
@@ -59,6 +60,28 @@ const useGardenStore = create<GardenState>(set => ({
             set({isLoading: false});
         }
     },
+
+    searchGardens: async (code: string) => {
+    set({isLoading: true});
+    try {
+        const res = await axiosClient.get(
+            `${backendURL}/resources/gardens/find?code=${code}`,
+        );
+        set({gardens: res.data?.data || null}); 
+    } catch (error: any) {
+        console.log(
+            'SEARCH_GARDENS_ERROR:',
+            error?.response?.data || error.message,
+        );
+        Snackbar.show({
+            text: 'Không thể tìm thấy khu vườn',
+            duration: Snackbar.LENGTH_SHORT,
+        });
+        set({gardens: null}); 
+    } finally {
+        set({isLoading: false});
+    }
+},
 }));
 
 export default useGardenStore;

@@ -14,6 +14,7 @@ export type ScreenName =
     | 'GARDENDECLAREWORKER'
     | 'GARDENINFO1'
     | 'GARDENHISTORY'
+    | 'GARDENDETAILWORKER'
     | 'WORKER'
     | 'WORKERINFO'
     | 'GARDENCAMERASCAN'
