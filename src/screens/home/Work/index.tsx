@@ -62,7 +62,7 @@ const WorkScreen = () => {
                             ? '#FF4E45'
                             : '#000000',
                     marginBottom:
-                        index + 1 === listGardenWorkFilter.length ? 200 : 15,
+                        index + 1 === listGardenWorkFilter.length ? 70 : 15,
                 },
             ]}>
             <View style={styles.gardenTitleSection}>
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
     },
     cancelProgressInput: {
         fontSize: 13,
-        color: '#808080',
+        color: '#000',
         textAlignVertical: 'top',
         borderColor: '#FF4E45',
         borderWidth: 1,

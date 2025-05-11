@@ -13,6 +13,7 @@ import {
     useCameraDevice,
     Camera,
     CameraPermissionRequestResult,
+    useCodeScanner,
 } from 'react-native-vision-camera';
 import useGardenStore from '@/stores/gardenStore';
 import images from '../../../assets/images';
@@ -23,6 +24,16 @@ const GardenScan = ({navigation, route}: any) => {
     const {navigateNext} = route.params || {};
     const [codeInput, setCodeInput] = useState('');
     const {searchGardens, gardens} = useGardenStore();
+
+    const codeScanner = useCodeScanner({
+        codeTypes: ['qr'],
+        onCodeScanned: codes => {
+            console.log(`onCodeScanned `, codes);
+            console.log(`onCodeScanned value`, codes[0].value);
+            //props.onRead(codes[0].value);
+        },
+    });
+
     const handleConfirm = async () => {
         const code = codeInput.trim();
         if (!code) return;
@@ -97,6 +108,7 @@ const GardenScan = ({navigation, route}: any) => {
             ) : permissionState === 'granted' && device != null ? (
                 <View style={CameraScannerStyles.container}>
                     <Camera
+                        codeScanner={codeScanner}
                         device={device}
                         isActive={true}
                         style={cameraStyles}
