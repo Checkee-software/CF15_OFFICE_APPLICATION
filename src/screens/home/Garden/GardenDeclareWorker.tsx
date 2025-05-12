@@ -42,7 +42,8 @@ const valueOptions = [
 
 const GardenDeclare = () => {
     const {userInfo} = useAuthStore();
-    const {gardens, searchGardens, isLoading} = useGardenStore();
+    const {gardens, searchGardens, isLoading, postHarvestReport} =
+        useGardenStore();
     const route = useRoute<any>();
     const navigation = useNavigation();
     const [fertilizerList, setFertilizerList] = React.useState<any[]>([]);
@@ -136,9 +137,26 @@ const GardenDeclare = () => {
         setShowReportConfirmation(true);
     };
 
-    const handleConfirmReport = () => {
+    const handleConfirmReport = async () => {
+        if (gardens?._id && harvestList.length > 0) {
+            const amount = Number(harvestList[0].value || 0);
+            console.log('GỬI POST HARVEST REPORT VỚI:', {
+                _id: gardens._id,
+                amount,
+            });
+
+            await postHarvestReport(gardens._id, amount);
+            setHarvestList([]);
+        } else {
+            console.log('Thiếu gardens._id hoặc harvestList rỗng');
+        }
+
         setShowReportConfirmation(false);
         setSelectedTask({type: null, index: null});
+        setIsSaved(true);
+        setTimeout(() => {
+            setIsSaved(false);
+        }, 5000);
     };
 
     const handleCancelReport = () => {
@@ -178,93 +196,95 @@ const GardenDeclare = () => {
                         </View>
                     </View>
                 </View>
-                {gardens?.isHarvest && (
+                {gardens?.isHarvest ? (
                     <HarvestSection
                         harvestList={harvestList}
                         onAddHarvest={handleAddHarvest}
                         onRemoveHarvest={handleRemoveHarvest}
                         setIsHarvestDeclared={setIsHarvestDeclared}
                         setOnlyShowReportButton={setOnlyShowReportButton}
+                        gardenId={gardens?._id} 
                     />
+                ) : (
+                    <>
+                        {/* Bón phân */}
+                        <TaskBlock
+                            title='Bón phân'
+                            itemOptions={itemOption}
+                            typeOptions={typeOption}
+                            valueOptions={valueOptions}
+                            onDeclare={handleAddFertilizer}
+                        />
+                        {fertilizerList.map((item, index) => (
+                            <TaskSummary
+                                key={index}
+                                title='Bón phân'
+                                data={item}
+                                index={index}
+                                onRemove={handleRemoveFertilizer}
+                                itemMap={Object.fromEntries(
+                                    itemOption.map(o => [o.value, o.label]),
+                                )}
+                                typeMap={Object.fromEntries(
+                                    typeOption.map(o => [o.value, o.label]),
+                                )}
+                            />
+                        ))}
+
+                        {/* Phun thuốc */}
+                        <TaskBlock
+                            title='Phun thuốc'
+                            itemOptions={itemOption}
+                            typeOptions={typeOption}
+                            valueOptions={valueOptions}
+                            onDeclare={handleAddSpray}
+                        />
+                        {sprayList.map((item, index) => (
+                            <TaskSummary
+                                key={index}
+                                title='Phun thuốc'
+                                data={item}
+                                index={index}
+                                onRemove={handleRemoveSpray}
+                                itemMap={Object.fromEntries(
+                                    itemOption.map(o => [o.value, o.label]),
+                                )}
+                                typeMap={Object.fromEntries(
+                                    typeOption.map(o => [o.value, o.label]),
+                                )}
+                            />
+                        ))}
+
+                        {/* Tưới tiêu */}
+                        <TaskBlock
+                            title='Tưới tiêu'
+                            itemOptions={itemOption}
+                            typeOptions={typeOption}
+                            valueOptions={valueOptions}
+                            onDeclare={handleAddWatering}
+                        />
+                        {wateringList.map((item, index) => (
+                            <TaskSummary
+                                key={index}
+                                title='Tưới tiêu'
+                                data={item}
+                                index={index}
+                                onRemove={handleRemoveWatering}
+                                itemMap={Object.fromEntries(
+                                    itemOption.map(o => [o.value, o.label]),
+                                )}
+                                typeMap={Object.fromEntries(
+                                    typeOption.map(o => [o.value, o.label]),
+                                )}
+                            />
+                        ))}
+                    </>
                 )}
 
-                {/* Bón phân */}
-                <TaskBlock
-                    title='Bón phân'
-                    itemOptions={itemOption}
-                    typeOptions={typeOption}
-                    valueOptions={valueOptions}
-                    onDeclare={handleAddFertilizer}
-                />
-
-                {fertilizerList.map((item, index) => (
-                    <TaskSummary
-                        key={index}
-                        title='Bón phân'
-                        data={item}
-                        index={index}
-                        onRemove={handleRemoveFertilizer}
-                        itemMap={Object.fromEntries(
-                            itemOption.map(o => [o.value, o.label]),
-                        )}
-                        typeMap={Object.fromEntries(
-                            typeOption.map(o => [o.value, o.label]),
-                        )}
-                    />
-                ))}
-
-                {/* Phun thuốc */}
-                <TaskBlock
-                    title='Phun thuốc'
-                    itemOptions={itemOption}
-                    typeOptions={typeOption}
-                    valueOptions={valueOptions}
-                    onDeclare={handleAddSpray}
-                />
-                {sprayList.map((item, index) => (
-                    <TaskSummary
-                        key={index}
-                        title='Phun thuốc'
-                        data={item}
-                        index={index}
-                        onRemove={handleRemoveSpray}
-                        itemMap={Object.fromEntries(
-                            itemOption.map(o => [o.value, o.label]),
-                        )}
-                        typeMap={Object.fromEntries(
-                            typeOption.map(o => [o.value, o.label]),
-                        )}
-                    />
-                ))}
-
-                {/* Tưới tiêu */}
-                <TaskBlock
-                    title='Tưới tiêu'
-                    itemOptions={itemOption}
-                    typeOptions={typeOption}
-                    onDeclare={handleAddWatering}
-                    valueOptions={valueOptions}
-                />
-                {wateringList.map((item, index) => (
-                    <TaskSummary
-                        key={index}
-                        title='Tưới tiêu'
-                        data={item}
-                        index={index}
-                        onRemove={handleRemoveWatering}
-                        itemMap={Object.fromEntries(
-                            itemOption.map(o => [o.value, o.label]),
-                        )}
-                        typeMap={Object.fromEntries(
-                            typeOption.map(o => [o.value, o.label]),
-                        )}
-                    />
-                ))}
-
                 <TouchableOpacity
-                    style={styles.exitButton}
+                    style={styles.exitButton1}
                     onPress={handleExit}>
-                    <Text style={styles.exitText}>+ Thoát ra</Text>
+                    <Text style={styles.exitText1}> Thoát ra</Text>
                 </TouchableOpacity>
             </ScrollView>
 
@@ -339,14 +359,17 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline',
     },
 
-    exitButton: {
+    exitButton1: {
+        position: 'absolute',
+        bottom: 26,  
+        left: 16,    
+        right: 16,   
         backgroundColor: 'red',
         padding: 12,
         alignItems: 'center',
         borderRadius: 24,
-        marginTop: 16,
     },
-    exitText: {
+    exitText1: {
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 16,

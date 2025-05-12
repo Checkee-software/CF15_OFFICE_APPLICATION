@@ -31,9 +31,10 @@ const TaskBlock = ({
 
     const handleDeclare = () => {
         if (value) {
+            const numericValue = parseFloat(value); // chuyển sang số
             const data = isDropdown
-                ? {item, type, value, time: new Date()}
-                : {value, time: new Date()};
+                ? {item, type, value: numericValue, time: new Date()}
+                : {value: numericValue, time: new Date()};
             onDeclare(data);
             setType(null);
             setValue(null);
