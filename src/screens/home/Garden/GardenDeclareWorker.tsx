@@ -14,6 +14,10 @@ import TaskBlock from './TaskBlock';
 import TaskSummary from './TaskSummary';
 import ActionButtons from './ActionButtons';
 import HarvestSection from './HarvestSection';
+import {useAuthStore} from '../../../stores/authStore';
+import useGardenStore from '../../../stores/gardenStore';
+import {useRoute} from '@react-navigation/native';
+
 const itemOption = [
     {label: 'Phân khô', value: '1'},
     {label: 'Phân hữu cơ', value: '2'},
@@ -37,6 +41,9 @@ const valueOptions = [
 ];
 
 const GardenDeclare = () => {
+    const {userInfo} = useAuthStore();
+    const {gardens, searchGardens, isLoading} = useGardenStore();
+    const route = useRoute<any>();
     const navigation = useNavigation();
     const [fertilizerList, setFertilizerList] = React.useState<any[]>([]);
     const [sprayList, setSprayList] = React.useState<any[]>([]);
@@ -50,7 +57,6 @@ const GardenDeclare = () => {
     const [isSaved, setIsSaved] = useState(false);
     const [isHarvestDeclared, setIsHarvestDeclared] = useState(false);
     const [onlyShowReportButton, setOnlyShowReportButton] = useState(false);
-
 
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
 
@@ -86,7 +92,7 @@ const GardenDeclare = () => {
         setHarvestList(newList);
         setSelectedTask({type: 'harvest', index: newList.length - 1});
         setIsSaved(false);
-        setOnlyShowReportButton(true); 
+        setOnlyShowReportButton(true);
     };
 
     const handleRemoveHarvest = (index: number) => {
@@ -152,15 +158,13 @@ const GardenDeclare = () => {
     const handleCloseAlert = () => {
         setShowExitAlert(false);
     };
-    
-    
 
     return (
         <View style={{flex: 1}}>
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.infoContainer}>
-                    <Text style={styles.gardenName}>Khu vườn CF-A4</Text>
-                    <Text style={styles.gardenCode}>009831234578232</Text>
+                    <Text style={styles.gardenName}>{gardens?.name}</Text>
+                    <Text style={styles.gardenCode}>{gardens?.code}</Text>
                     <View style={styles.productBox}>
                         <Text style={styles.productLabel}>
                             Sản phẩm/cây trồng
@@ -174,13 +178,15 @@ const GardenDeclare = () => {
                         </View>
                     </View>
                 </View>
-                <HarvestSection
-                    harvestList={harvestList}
-                    onAddHarvest={handleAddHarvest}
-                    onRemoveHarvest={handleRemoveHarvest}
-                    setIsHarvestDeclared={setIsHarvestDeclared}
-                    setOnlyShowReportButton={setOnlyShowReportButton}
-                />
+                {gardens?.isHarvest && (
+                    <HarvestSection
+                        harvestList={harvestList}
+                        onAddHarvest={handleAddHarvest}
+                        onRemoveHarvest={handleRemoveHarvest}
+                        setIsHarvestDeclared={setIsHarvestDeclared}
+                        setOnlyShowReportButton={setOnlyShowReportButton}
+                    />
+                )}
 
                 {/* Bón phân */}
                 <TaskBlock

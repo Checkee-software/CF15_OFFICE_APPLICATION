@@ -56,7 +56,9 @@ const GardenDetailScreen = () => {
     const [showManagementAreaInfo, setShowManagementAreaInfo] =
         React.useState(false);
 
-    const {selectedGarden, fetchGardenDetail, isLoading} = useGardenStore();
+    const {selectedGarden, fetchGardenDetail, isLoading, postHarvestStatus} =
+        useGardenStore();
+
     const [contractExpanded, setContractExpanded] = React.useState(false);
 
     useEffect(() => {
@@ -64,6 +66,10 @@ const GardenDetailScreen = () => {
             fetchGardenDetail(id);
         }
     }, [id]);
+
+    useEffect(() => {
+        setIsHarvesting(!!selectedGarden?.isHarvest);
+    }, [selectedGarden]);
 
     if (isLoading || !selectedGarden) return <Loading />;
 
@@ -75,45 +81,73 @@ const GardenDetailScreen = () => {
 
             <View style={styles.harvestRow}>
                 {userInfo?.userType?.level === 'LEADER' ? (
-                    <View
-                        style={[
-                            styles.harvestButton,
-                            {backgroundColor: '#4CAF5026', width: '90%'},
-                        ]}>
-                        <Text style={[styles.buttonText, {color: '#4CAF50'}]}>
-                            Đang thu hoạch
-                        </Text>
-                    </View>
-                ) : (
-                    <>
-                        <TouchableOpacity
+                    selectedGarden?.isHarvest ? (
+                        <View
                             style={[
                                 styles.harvestButton,
-                                isHarvesting
-                                    ? styles.harvestingButton
-                                    : styles.startButton,
-                            ]}
-                            onPress={() => setIsHarvesting(true)}
-                            disabled={isHarvesting}>
+                                {backgroundColor: '#4CAF5026', width: '90%'},
+                            ]}>
                             <Text
-                                style={[
-                                    styles.buttonText,
-                                    isHarvesting && {color: 'green'},
-                                ]}>
-                                {isHarvesting
-                                    ? 'Đang thu hoạch'
-                                    : 'Bắt đầu thu hoạch'}
+                                style={[styles.buttonText, {color: '#4CAF50'}]}>
+                                Đang thu hoạch
                             </Text>
-                        </TouchableOpacity>
+                        </View>
+                    ) : null
+                ) : selectedGarden?.isHarvest &&
+                  selectedGarden?.currentHarvestId ? (
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                        }}>
+                        <View
+                            style={[
+                                styles.halfButton,
+                                {backgroundColor: '#4CAF5026'},
+                            ]}>
+                            <Text
+                                style={[styles.buttonText, {color: '#4CAF50'}]}>
+                                Đang thu hoạch
+                            </Text>
+                        </View>
+                        <TouchableOpacity
+                            style={[
+                                styles.halfButton,
+                                {backgroundColor: '#FF0000'},
+                            ]}
+                            onPress={async () => {
+                                try {
+                                    await postHarvestStatus(
+                                        selectedGarden._id,
+                                        '0',
+                                        selectedGarden.currentHarvestId,
+                                    );
 
-                        {isHarvesting && (
-                            <TouchableOpacity
-                                style={styles.endButton}
-                                onPress={() => setIsHarvesting(false)}>
-                                <Text style={styles.buttonText}>Kết thúc</Text>
-                            </TouchableOpacity>
-                        )}
-                    </>
+                                    await fetchGardenDetail(selectedGarden._id);
+                                } catch (err) {
+                                    console.error('Failed to end harvest', err);
+                                }
+                            }}>
+                            <Text style={styles.buttonText}>Kết thúc</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : (
+                    <TouchableOpacity
+                        style={[styles.harvestButton, styles.startButton]}
+                        onPress={async () => {
+                            try {
+                                await postHarvestStatus(
+                                    selectedGarden._id,
+                                    '1',
+                                );
+                                await fetchGardenDetail(selectedGarden._id);
+                            } catch (err) {
+                                console.error('Failed to start harvest', err);
+                            }
+                        }}>
+                        <Text style={styles.buttonText}>Bắt đầu thu hoạch</Text>
+                    </TouchableOpacity>
                 )}
             </View>
 
@@ -319,6 +353,14 @@ const Row = ({label, value}: {label: string; value?: string | number}) => (
 export default GardenDetailScreen;
 
 const styles = StyleSheet.create({
+    halfButton: {
+        flex: 1,
+        paddingVertical: 12,
+        marginHorizontal: 4,
+        borderRadius: 3,
+        alignItems: 'center',
+    },
+
     container: {
         padding: 16,
         backgroundColor: '#fff',

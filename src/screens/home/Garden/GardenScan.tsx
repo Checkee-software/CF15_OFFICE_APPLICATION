@@ -20,26 +20,16 @@ import images from '../../../assets/images';
 
 const GardenScan = ({navigation, route}: any) => {
     const [notFound, setNotFound] = useState(false);
+    const [codeInput, setCodeInput] = useState('');
+    const [hasScanned, setHasScanned] = useState(false);
 
     const {navigateNext} = route.params || {};
-    const [codeInput, setCodeInput] = useState('');
-    const {searchGardens, gardens} = useGardenStore();
+    const {searchGardens} = useGardenStore();
 
-    const codeScanner = useCodeScanner({
-        codeTypes: ['qr'],
-        onCodeScanned: codes => {
-            console.log(`onCodeScanned `, codes);
-            console.log(`onCodeScanned value`, codes[0].value);
-            //props.onRead(codes[0].value);
-        },
-    });
-
-    const handleConfirm = async () => {
-        const code = codeInput.trim();
+    const handleSearch = async (code: string) => {
         if (!code) return;
 
-        console.log('[INPUT] Searching for garden with code:', code);
-
+        console.log('[SEARCH] Searching for garden with code:', code);
         await searchGardens(code);
 
         const updatedGardens = useGardenStore.getState().gardens;
@@ -52,12 +42,34 @@ const GardenScan = ({navigation, route}: any) => {
             });
         } else {
             setNotFound(true);
+            setHasScanned(false); 
         }
+    };
+
+    const codeScanner = useCodeScanner({
+        codeTypes: ['qr'],
+        onCodeScanned: async codes => {
+            if (hasScanned) return;
+
+            const scannedCode = codes[0]?.value?.trim();
+            if (!scannedCode) return;
+
+            setHasScanned(true);
+            setCodeInput(scannedCode);
+            await handleSearch(scannedCode);
+        },
+    });
+
+    const handleConfirm = async () => {
+        const code = codeInput.trim();
+        if (!code) return;
+
+        setHasScanned(true);
+        await handleSearch(code);
     };
 
     const [permissionState, setPermissionState] =
         useState<CameraPermissionRequestResult>();
-
     const [cameraStyles, setCameraStyles] = useState<ViewStyle>({
         width: 0,
         height: 0,
@@ -67,11 +79,9 @@ const GardenScan = ({navigation, route}: any) => {
 
     const getPermission = async () => {
         const permission = await Camera.requestCameraPermission();
-
         if (permission === 'denied') {
             await Linking.openSettings();
         }
-
         setPermissionState(permission);
     };
 
