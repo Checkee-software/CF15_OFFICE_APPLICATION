@@ -366,8 +366,7 @@ const GardenDetailScreen = () => {
                                         marginTop: 10,
                                         padding: 8,
 
-                                        borderWidth: 1,
-                                        borderColor: '#eee',
+     
                                     }}>
                                     <Row
                                         label='Khối lượng (kg)'
@@ -382,14 +381,14 @@ const GardenDetailScreen = () => {
                                         value={entry.userFullName}
                                     />
 
-                                    <Row
+                                    {/* <Row
                                         label='Người xác nhận'
                                         value={entry.verifier || '---'}
                                     />
                                     <Row
                                         label='Trạng thái'
                                         value={entry.status}
-                                    />
+                                    /> */}
                                 </View>
                             ))}
                         </View>
