@@ -84,7 +84,6 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     },
 
     getDetailWorkSchedule: async (mainTaskId: string) => {
-        console.log('mainTaskId', mainTaskId);
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
@@ -139,6 +138,48 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 `${backendURL}/resources/schedules/sub-tasks/apply-personal-task/${mainTaskId}`,
                 formUpdateProgress,
             );
+            set({isLoading: false});
+            return response;
+        } catch (error: any) {
+            set({isLoading: false});
+
+            const _error = error;
+
+            return _error.response;
+        }
+    },
+
+    browseTaskImplementerByManagement: async (
+        mainTaskId: string,
+        formBrowseTask: IApplyPersonalTask,
+    ) => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.post(
+                `${backendURL}/resources/schedules/sub-tasks/submit-personal-task/${mainTaskId}`,
+                formBrowseTask,
+            );
+
+            console.log(response);
+            set({isLoading: false});
+            return response;
+        } catch (error: any) {
+            set({isLoading: false});
+
+            const _error = error;
+
+            return _error.response;
+        }
+    },
+
+    completedTaskByManagement: async (mainTaskId: string, taskId: string) => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.post(
+                `${backendURL}/resources/schedules/sub-tasks/confirm-task/${mainTaskId}/${taskId}`,
+            );
+
+            console.log(response);
             set({isLoading: false});
             return response;
         } catch (error: any) {

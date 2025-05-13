@@ -20,7 +20,7 @@ const InitApp = () => {
         const init = async () => {
             const token = asyncStorageHelper.token;
 
-            console.log(token);
+            //console.log(token);
             if (token !== '') {
                 await autoLogin();
             }

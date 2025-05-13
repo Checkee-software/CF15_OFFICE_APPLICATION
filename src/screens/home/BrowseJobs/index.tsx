@@ -376,7 +376,7 @@ const BrowseJobs = () => {
     };
 
     const handleCheckType = (checkType: number) => {
-        console.log(checkType);
+        //console.log(checkType);
 
         if (checkType === 1) {
             handleComfirmBrowseJobs();

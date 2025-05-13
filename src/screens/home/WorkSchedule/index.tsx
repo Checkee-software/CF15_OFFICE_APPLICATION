@@ -41,7 +41,7 @@ const WorkSchedule = ({navigation}: any) => {
             case 'EXPIRED':
                 return '#2196F3';
 
-            case 'COMPLETED':
+            case 'COMPELETED':
                 return '#4CAF50';
 
             case 'CANCELED':
@@ -68,7 +68,7 @@ const WorkSchedule = ({navigation}: any) => {
                     </Text>
                 );
 
-            case 'COMPLETED':
+            case 'COMPELETED':
                 return (
                     <Text style={WorkScheduleStyles.completedText}>
                         Hoàn thành
@@ -99,6 +99,24 @@ const WorkSchedule = ({navigation}: any) => {
             default:
                 return null;
         }
+    };
+
+    const calculateTotalPercent = taskItem => {
+        const tasks = taskItem?.childTasks.tasks;
+        const totalTasks = tasks?.length;
+
+        const completedTasks = tasks
+            ? tasks.filter(task => task.status === EScheduleStatus.COMPLETED)
+                  .length
+            : 0;
+
+        const overallProgress = totalTasks
+            ? (completedTasks / totalTasks) * 100
+            : 0;
+
+        const overallProgressFormat = overallProgress / 100;
+
+        return overallProgressFormat;
     };
 
     const renderWorkSchedule = (status: string, finishedDate: string) => {
@@ -248,7 +266,12 @@ const WorkSchedule = ({navigation}: any) => {
                 <Progress.Circle
                     size={40}
                     color={renderCircleColor(itemWorkSchedule.status)}
-                    progress={0} // Từ 0.0 đến 1.0
+                    progress={calculateTotalPercent(itemWorkSchedule)} // Từ 0.0 đến 1.0
+                    formatText={() =>
+                        `${Math.round(
+                            calculateTotalPercent(itemWorkSchedule) * 100,
+                        )}%`
+                    }
                     showsText={true}
                     textStyle={WorkScheduleStyles.progressValue}
                     unfilledColor={'rgba(211, 211, 211, 1)'}
@@ -304,6 +327,7 @@ const WorkSchedule = ({navigation}: any) => {
     );
 
     const handleGetListWorkSchedule = async () => {
+        resetData();
         await getListWorkSchedule();
         if (searchSchedule !== '') {
             setSearchSchedule('');
