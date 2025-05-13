@@ -19,7 +19,8 @@ export default function NewsDetail() {
     const route = useRoute<RouteProp<{params: {id: string}}, 'params'>>();
     const {id} = route.params;
     const [bookmarked, setBookmarked] = useState(false);
-    const {selectedNews, fetchNewsDetail, isLoading} = useNewsStore();
+    const {selectedNews, fetchNewsDetail, isLoading, getFullAvatarUrl} =
+        useNewsStore();
 
     const toggleBookmark = () => {
         setBookmarked(prev => !prev);
@@ -80,12 +81,13 @@ export default function NewsDetail() {
         <ScrollView style={styles.container}>
             <Image
                 source={
-                    typeof selectedNews.imagePath === 'string'
-                        ? {uri: selectedNews.imagePath}
+                    selectedNews.imagePath
+                        ? {uri: getFullAvatarUrl(selectedNews.imagePath)}
                         : images.plant2
                 }
                 style={styles.image}
             />
+
             <View style={styles.desc}>
                 <View style={styles.categoryRow}>
                     <Text style={styles.category}>

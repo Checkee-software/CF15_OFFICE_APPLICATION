@@ -18,7 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
 
 export default function News({navigation}: {navigation: any}) {
-    const {news, fetchNews, isLoading} = useNewsStore();
+    const {news, fetchNews, isLoading, getFullAvatarUrl} = useNewsStore();
     const [bookmarkedItems, setBookmarkedItems] = useState<{
         [key: string]: boolean;
     }>({});
@@ -104,7 +104,11 @@ export default function News({navigation}: {navigation: any}) {
             }
             activeOpacity={0.7}>
             <Image
-                source={item.imagePath ? {uri: item.imagePath} : images.plant2}
+                source={
+                    item.imagePath
+                        ? {uri: getFullAvatarUrl(item.imagePath)}
+                        : images.plant2
+                }
                 style={styles.image}
             />
             <View style={styles.textContainer}>

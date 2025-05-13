@@ -1,6 +1,4 @@
-'use client';
-
-import { useState } from 'react';
+import {useEffect} from 'react';
 import {
     View,
     Text,
@@ -9,159 +7,107 @@ import {
     SafeAreaView,
     StatusBar,
 } from 'react-native';
+import {useRoute, RouteProp} from '@react-navigation/native';
+import useGardenStore from '../../../stores/gardenStore';
 
 const STATUS_COLORS = {
-    approved: '#4CAF50',
-    pending: '#FFA500',
-    canceled: '#F44336',
+    VERIFIED: '#4CAF50',
+    NONE: '#FFA500',
+    DENIED: '#F44336',
 };
 
+type RootStackParamList = {
+    GardenHistory: {gardenId: string};
+};
+
+type RouteParams = RouteProp<RootStackParamList, 'GardenHistory'>;
+
 const GardenHistory = () => {
-    const [activities, setActivities] = useState([
-        {
-            date: '19/04/2025',
-            items: [
-                {
-                    type: 'Bón phân',
-                    status: 'Đã duyệt',
-                    statusKey: 'approved',
-                    approver: 'Ngô Trọng Ẩn',
-                    time: '09:00 19/04/2025',
-                    quotaType: 'Phân khô',
-                    quota: 1.5,
-                },
-                {
-                    type: 'Phun thuốc',
-                    status: 'Chờ xét duyệt',
-                    statusKey: 'pending',
-                    time: '14:00 19/04/2025',
-                    quotaType: 'Thuốc trừ sâu',
-                    quota: 1.5,
-                },
-                {
-                    type: 'Phun thuốc',
-                    status: 'Đã huỷ',
-                    statusKey: 'canceled',
-                    approver: 'Ngô Trọng Ẩn',
-                    reason: 'Không tưới nước đủ khu vực mình đảm nhiệm',
-                    time: '14:00 19/04/2025',
-                    quotaType: 'Thuốc trừ sâu',
-                    quota: 1.5,
-                },
-            ],
-        },
-        {
-            date: '17/04/2025',
-            items: [
-                {
-                    type: 'Bón phân',
-                    status: 'Đã duyệt',
-                    statusKey: 'approved',
-                    approver: 'Ngô Trọng Ẩn',
-                    time: '13:43 19/04/2025',
-                    quotaType: 'Phân khô',
-                    quota: 1.5,
-                },
-            ],
-        },
-    ]);
+    const route = useRoute<RouteParams>();
+    const {fetchHarvestHistory, harvestHistory, isLoading} = useGardenStore();
+    const {gardenId} = route.params;
+
+    useEffect(() => {
+        if (gardenId) {
+            fetchHarvestHistory(gardenId);
+        }
+    }, [gardenId, fetchHarvestHistory]);
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <StatusBar barStyle='dark-content' backgroundColor='#FFFFFF' />
-            <View style={styles.header}>
-                <Text style={styles.linkText}>{'< '}Lịch sử khai báo</Text>
-            </View>
 
             <ScrollView
                 style={styles.container}
                 showsVerticalScrollIndicator={false}>
-                {activities.map((day, index) => (
-                    <View key={index} style={styles.dayContainer}>
-                        <Text style={styles.dateText}>Ngày {day.date}</Text>
+                {isLoading ? (
+                    <Text>Loading...</Text>
+                ) : (
+                    harvestHistory.map((item, index) => (
+                        <View
+                            key={index}
+                            style={[
+                                styles.card,
+                                {
+                                    borderColor:
+                                        STATUS_COLORS[item.status] || '#000',
+                                },
+                            ]}>
+                            <View style={styles.headerRow}>
+                                <Text style={styles.typeText}>Thu hoạch</Text>
+                                <Text
+                                    style={[
+                                        styles.statusText,
+                                        {
+                                            color:
+                                                STATUS_COLORS[item.status] ||
+                                                '#000',
+                                        },
+                                    ]}>
+                                    {item?.status === 'VERIFIED'
+                                        ? 'Đã duyệt'
+                                        : item.status === 'DENIED'
+                                        ? 'Đã huỷ'
+                                        : 'Chờ xét duyệt'}
+                                </Text>
+                            </View>
 
-                        {day.items.map((item, idx) => (
-                            <View
-                                key={idx}
-                                style={[
-                                    styles.card,
-                                    {
-                                        borderColor:
-                                            STATUS_COLORS[item.statusKey],
-                                    },
-                                ]}>
-                                <View style={styles.headerRow}>
-                                    <Text style={styles.typeText}>
-                                        {item.type}
+                            {item.verifierName && (
+                                <View style={styles.row}>
+                                    <Text style={styles.label}>
+                                        Người duyệt
                                     </Text>
+                                    <Text style={styles.valueBlue}>
+                                        {item.verifierName}
+                                    </Text>
+                                </View>
+                            )}
+
+                            {item.status === 'DENIED' && item.verifierName && (
+                                <View style={styles.row}>
+                                    <Text style={styles.label}>Lí do huỷ</Text>
                                     <Text
                                         style={[
-                                            styles.statusText,
-                                            {
-                                                color: STATUS_COLORS[
-                                                    item.statusKey
-                                                ],
-                                            },
+                                            styles.valueRed,
+                                            styles.reasonText,
                                         ]}>
-                                        {item.status}
+                                        {item.verifierName}
                                     </Text>
                                 </View>
-
-                                {item.approver && (
-                                    <View style={styles.row}>
-                                        <Text style={styles.label}>
-                                            Người duyệt
-                                        </Text>
-                                        <Text style={styles.valueBlue}>
-                                            {item.approver}
-                                        </Text>
-                                    </View>
-                                )}
-
-                                {item.reason && (
-                                    <View style={styles.row}>
-                                        <Text style={styles.label}>
-                                            Lí do huỷ
-                                        </Text>
-                                        <Text
-                                            style={[
-                                                styles.valueRed,
-                                                styles.reasonText,
-                                            ]}>
-                                            {item.reason}
-                                        </Text>
-                                    </View>
-                                )}
-
-                                <View style={styles.row}>
-                                    <Text style={styles.label}>
-                                        Thực hiện lúc
-                                    </Text>
-                                    <Text style={styles.value}>
-                                        {item.time}
-                                    </Text>
-                                </View>
-
-                                <View style={styles.row}>
-                                    <Text style={styles.label}>
-                                        Loại định mức
-                                    </Text>
-                                    <Text style={styles.value}>
-                                        {item.quotaType}
-                                    </Text>
-                                </View>
-
-                                <View style={styles.row}>
-                                    <Text style={styles.label}>Định mức</Text>
-                                    <Text style={styles.value}>
-                                        {item.quota}
-                                    </Text>
-                                </View>
+                            )}
+                            <View style={styles.row}>
+                                <Text style={styles.label}>Thực hiện lúc</Text>
+                                <Text style={styles.value}>
+                                    {new Date(item.createdAt).toLocaleString()}
+                                </Text>
                             </View>
-                        ))}
-                    </View>
-                ))}
-                <View style={styles.bottomPadding} />
+                            <View style={styles.row}>
+                                <Text style={styles.label}>Khối lượng KG</Text>
+                                <Text style={styles.value}>{item.amount}</Text>
+                            </View>
+                        </View>
+                    ))
+                )}
             </ScrollView>
         </SafeAreaView>
     );
@@ -172,31 +118,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#FFFFFF',
     },
-    header: {
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
-    },
     container: {
         flex: 1,
         backgroundColor: '#FFFFFF',
         paddingHorizontal: 16,
-    },
-    dayContainer: {
-        marginBottom: 10,
-    },
-    linkText: {
-        color: '#2196F3',
-        fontSize: 16,
-        fontWeight: '500',
-    },
-    dateText: {
-        fontSize: 16,
-        fontWeight: '500',
-        marginVertical: 16,
-        textAlign: 'center',
-        color: '#000000',
     },
     card: {
         borderWidth: 1.5,
@@ -232,7 +157,7 @@ const styles = StyleSheet.create({
         color: '#666666',
     },
     value: {
-        fontWeight: '500',
+        fontWeight: '400',
         fontSize: 14,
         color: '#000000',
         textAlign: 'right',

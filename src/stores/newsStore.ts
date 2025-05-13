@@ -1,9 +1,9 @@
-import { create } from 'zustand';
+import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import { INews } from '../shared-types/Response/NewsResponse/NewsResponse';
+import {INews} from '../shared-types/Response/NewsResponse/NewsResponse';
 
-type NewsItem = INews
+type NewsItem = INews;
 
 type NewsState = {
     news: NewsItem[];
@@ -11,45 +11,67 @@ type NewsState = {
     isLoading: boolean;
     fetchNews: () => Promise<void>;
     fetchNewsDetail: (id: string) => Promise<void>;
+    getFullAvatarUrl: (imagePath?: string) => string; 
 };
 
 const backendURL = 'http://cf15officeservice.checkee.vn';
 
-const useNewsStore = create<NewsState>((set) => ({
+const useNewsStore = create<NewsState>(set => ({
     news: [],
     selectedNews: null,
     isLoading: false,
+    getFullAvatarUrl: (imagePath?: string): string => {
+        if (!imagePath) {
+            return ''; 
+        }
+
+        if (imagePath.startsWith('http')) {
+            return imagePath;
+        }
+
+        return `${backendURL}${imagePath.replace(/\\/g, '/')}`;
+    },
 
     fetchNews: async () => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
-            const res = await axiosClient.get(`${backendURL}/resources/news/collection`);
+            const res = await axiosClient.get(
+                `${backendURL}/resources/news/collection`,
+            );
             const newsData = res.data?.data || [];
-            set({ news: newsData });
+            set({news: newsData});
         } catch (error: any) {
-            console.log('FETCH_NEWS_ERROR:', error?.response?.data || error.message);
+            console.log(
+                'FETCH_NEWS_ERROR:',
+                error?.response?.data || error.message,
+            );
             Snackbar.show({
                 text: 'Không thể tải danh sách tin tức',
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
-            set({ isLoading: false });
+            set({isLoading: false});
         }
     },
 
     fetchNewsDetail: async (id: string) => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
-            const res = await axiosClient.get(`${backendURL}/resources/news/detail/${id}`);
-            set({ selectedNews: res.data?.data || null });
+            const res = await axiosClient.get(
+                `${backendURL}/resources/news/detail/${id}`,
+            );
+            set({selectedNews: res.data?.data || null});
         } catch (error: any) {
-            console.log('FETCH_NEWS_DETAIL_ERROR:', error?.response?.data || error.message);
+            console.log(
+                'FETCH_NEWS_DETAIL_ERROR:',
+                error?.response?.data || error.message,
+            );
             Snackbar.show({
                 text: 'Không thể tải chi tiết tin tức',
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
-            set({ isLoading: false });
+            set({isLoading: false});
         }
     },
 }));

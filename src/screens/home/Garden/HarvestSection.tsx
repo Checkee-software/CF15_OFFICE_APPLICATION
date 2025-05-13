@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import TaskBlock from './TaskBlock';
 import TaskSummary from './TaskSummary';
@@ -10,26 +10,38 @@ interface Props {
     onAddHarvest: (data: any) => void;
     onRemoveHarvest: (index: number) => void;
     setIsHarvestDeclared?: (value: boolean) => void;
-    setOnlyShowReportButton?: (value: boolean) => void; 
+    setOnlyShowReportButton?: (value: boolean) => void;
+    gardenId: string;
 }
 
-const HarvestSection: React.FC<Props> = ({ harvestList, onAddHarvest, onRemoveHarvest, setOnlyShowReportButton }) => {
+const HarvestSection: React.FC<Props> = ({
+    harvestList,
+    onAddHarvest,
+    onRemoveHarvest,
+    setOnlyShowReportButton,
+    gardenId,
+}) => {
     const navigation = useNavigation();
     const [isHarvestDeclared, setIsHarvestDeclared] = React.useState(false);
 
     const handleAddHarvest = (data: any) => {
         onAddHarvest(data);
         setIsHarvestDeclared(true);
-        setOnlyShowReportButton?.(true); // ✅ Kích hoạt chỉ hiện nút báo cáo
+        setOnlyShowReportButton?.(true);
     };
 
-    const hasUnDeclaredHarvest = harvestList.some(item => !item.declared); // Giả sử mỗi item có thuộc tính declared
+    const hasUnDeclaredHarvest = harvestList.some(item => !item.declared);
 
     return (
         <View>
             <View style={styles.headerRow}>
                 <Text style={styles.taskHeader}>Thu hoạch</Text>
-                <TouchableOpacity onPress={() => navigation.navigate(SCREEN_INFO.GARDENHISTORY.key)}>
+                <TouchableOpacity
+                    onPress={() =>
+                        navigation.navigate(SCREEN_INFO.GARDENHISTORY.key, {
+                            gardenId,
+                        })
+                    }>
                     <Text style={styles.linkText}>Lịch sử thu hoạch</Text>
                 </TouchableOpacity>
             </View>
@@ -38,7 +50,7 @@ const HarvestSection: React.FC<Props> = ({ harvestList, onAddHarvest, onRemoveHa
                 title='Khối lượng thu hoạch (kg)'
                 onDeclare={handleAddHarvest}
                 isDropdown={false}
-                showWarning={hasUnDeclaredHarvest} // Thêm prop showWarning
+                showWarning={hasUnDeclaredHarvest || harvestList.length > 0}
             />
 
             {harvestList.map((item, index) => (
@@ -53,7 +65,6 @@ const HarvestSection: React.FC<Props> = ({ harvestList, onAddHarvest, onRemoveHa
         </View>
     );
 };
-
 
 const styles = StyleSheet.create({
     headerRow: {
