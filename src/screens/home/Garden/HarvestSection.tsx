@@ -19,6 +19,7 @@ const HarvestSection: React.FC<Props> = ({
     onAddHarvest,
     onRemoveHarvest,
     setOnlyShowReportButton,
+    gardenId,
 }) => {
     const navigation = useNavigation();
     const [isHarvestDeclared, setIsHarvestDeclared] = React.useState(false);
@@ -38,7 +39,7 @@ const HarvestSection: React.FC<Props> = ({
                 <TouchableOpacity
                     onPress={() =>
                         navigation.navigate(SCREEN_INFO.GARDENHISTORY.key, {
-                            gardenId, 
+                            gardenId,
                         })
                     }>
                     <Text style={styles.linkText}>Lịch sử thu hoạch</Text>
@@ -49,7 +50,7 @@ const HarvestSection: React.FC<Props> = ({
                 title='Khối lượng thu hoạch (kg)'
                 onDeclare={handleAddHarvest}
                 isDropdown={false}
-                showWarning={hasUnDeclaredHarvest} // Thêm prop showWarning
+                showWarning={hasUnDeclaredHarvest || harvestList.length > 0}
             />
 
             {harvestList.map((item, index) => (

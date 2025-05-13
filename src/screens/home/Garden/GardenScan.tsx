@@ -42,7 +42,7 @@ const GardenScan = ({navigation, route}: any) => {
             });
         } else {
             setNotFound(true);
-            setHasScanned(false); 
+            setHasScanned(false);
         }
     };
 

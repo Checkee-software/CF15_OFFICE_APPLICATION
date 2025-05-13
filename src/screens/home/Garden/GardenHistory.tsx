@@ -11,9 +11,9 @@ import {useRoute, RouteProp} from '@react-navigation/native';
 import useGardenStore from '../../../stores/gardenStore';
 
 const STATUS_COLORS = {
-    VERIFIED: '#4CAF50',  // Đã duyệt
-    NONE: '#FFA500',      // Chờ xét duyệt
-    DENIED: '#F44336',    // Đã huỷ
+    VERIFIED: '#4CAF50',
+    NONE: '#FFA500',
+    DENIED: '#F44336',
 };
 
 type RootStackParamList = {
@@ -44,19 +44,27 @@ const GardenHistory = () => {
                     <Text>Loading...</Text>
                 ) : (
                     harvestHistory.map((item, index) => (
-                        <View key={index} style={styles.card}>
+                        <View
+                            key={index}
+                            style={[
+                                styles.card,
+                                {
+                                    borderColor:
+                                        STATUS_COLORS[item.status] || '#000',
+                                },
+                            ]}>
                             <View style={styles.headerRow}>
-                                <Text style={styles.typeText}>
-                                    Thu hoạch
-                                </Text>
+                                <Text style={styles.typeText}>Thu hoạch</Text>
                                 <Text
                                     style={[
                                         styles.statusText,
                                         {
-                                            color: STATUS_COLORS[item.status] || '#000',
+                                            color:
+                                                STATUS_COLORS[item.status] ||
+                                                '#000',
                                         },
                                     ]}>
-                                    {item.status === 'VERIFIED'
+                                    {item?.status === 'VERIFIED'
                                         ? 'Đã duyệt'
                                         : item.status === 'DENIED'
                                         ? 'Đã huỷ'
@@ -66,7 +74,9 @@ const GardenHistory = () => {
 
                             {item.verifierName && (
                                 <View style={styles.row}>
-                                    <Text style={styles.label}>Người duyệt</Text>
+                                    <Text style={styles.label}>
+                                        Người duyệt
+                                    </Text>
                                     <Text style={styles.valueBlue}>
                                         {item.verifierName}
                                     </Text>
@@ -77,22 +87,23 @@ const GardenHistory = () => {
                                 <View style={styles.row}>
                                     <Text style={styles.label}>Lí do huỷ</Text>
                                     <Text
-                                        style={[styles.valueRed, styles.reasonText]}>
+                                        style={[
+                                            styles.valueRed,
+                                            styles.reasonText,
+                                        ]}>
                                         {item.verifierName}
                                     </Text>
                                 </View>
                             )}
-
                             <View style={styles.row}>
-                                <Text style={styles.label}>Khối lượng</Text>
-                                <Text style={styles.value}>{item.amount}</Text>
-                            </View>
-
-                            <View style={styles.row}>
-                                <Text style={styles.label}>Thời gian</Text>
+                                <Text style={styles.label}>Thực hiện lúc</Text>
                                 <Text style={styles.value}>
                                     {new Date(item.createdAt).toLocaleString()}
                                 </Text>
+                            </View>
+                            <View style={styles.row}>
+                                <Text style={styles.label}>Khối lượng KG</Text>
+                                <Text style={styles.value}>{item.amount}</Text>
                             </View>
                         </View>
                     ))
@@ -146,7 +157,7 @@ const styles = StyleSheet.create({
         color: '#666666',
     },
     value: {
-        fontWeight: '500',
+        fontWeight: '400',
         fontSize: 14,
         color: '#000000',
         textAlign: 'right',

@@ -4,6 +4,7 @@ import Snackbar from 'react-native-snackbar';
 import {IGarden} from '@/shared-types/Response/GardenResponse/GardenResponse';
 import {
     THarvestHistory,
+    TCollection,
     IHavestHistory,
 } from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
 
@@ -21,7 +22,9 @@ type GardenState = {
     ) => Promise<void>;
     postHarvestReport: (_id: string, amount: number) => Promise<void>;
     harvestHistory: IHavestHistory[];
+    
     fetchHarvestHistory: (_id: string) => Promise<void>;
+    fetchHarvestCollection: (_id: string) => Promise<void>;
 };
 
 const backendURL = 'http://cf15officeservice.checkee.vn';
@@ -156,6 +159,27 @@ const useGardenStore = create<GardenState>(set => ({
         try {
             const res = await axiosClient.get<THarvestHistory>(
                 `${backendURL}/resources/gardens/harvest/history?_id=${_id}`,
+            );
+            set({harvestHistory: res.data?.data || []});
+        } catch (error: any) {
+            console.log(
+                'FETCH_HARVEST_HISTORY_ERROR:',
+                error?.response?.data || error.message,
+            );
+            Snackbar.show({
+                text: 'Không thể tải lịch sử thu hoạch',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+        } finally {
+            set({isLoading: false});
+        }
+    },
+
+    fetchHarvestCollection: async (_id: string) => {
+        set({isLoading: true});
+        try {
+            const res = await axiosClient.get<TCollection>(
+                `${backendURL}/resources/gardens/harvest/collection?_id=${_id}`,
             );
             set({harvestHistory: res.data?.data || []});
         } catch (error: any) {

@@ -164,14 +164,13 @@ const GardenDeclare = () => {
     };
 
     const handleExit = () => {
-        if (selectedTask.type !== null) {
-            setShowExitAlert(true);
+    if (selectedTask.type !== null) {
+        setShowExitAlert(true);
+    } else {
+        navigation.goBack(); 
+    }
+};
 
-            setTimeout(() => {
-                setShowExitAlert(false);
-            }, 5000);
-        }
-    };
 
     const handleCloseAlert = () => {
         setShowExitAlert(false);
@@ -190,8 +189,7 @@ const GardenDeclare = () => {
                         <View style={styles.productRow}>
                             <Icon name='add-circle' color='green' size={20} />
                             <Text style={styles.productText}>
-                                {' '}
-                                Cà phê Arabica
+                                {gardens?.productName}
                             </Text>
                         </View>
                     </View>
@@ -281,12 +279,13 @@ const GardenDeclare = () => {
                     </>
                 )}
 
-                <TouchableOpacity
-                    style={styles.exitButton1}
-                    onPress={handleExit}>
-                    <Text style={styles.exitText1}> Thoát ra</Text>
-                </TouchableOpacity>
+
             </ScrollView>
+            <View style={styles.footer}>
+            <TouchableOpacity style={styles.exitButton1} onPress={handleExit}>
+                <Text style={styles.exitText1}>Thoát ra</Text>
+            </TouchableOpacity>
+        </View>
 
             <ActionButtons
                 visible={hasDeclarations}
@@ -360,14 +359,11 @@ const styles = StyleSheet.create({
     },
 
     exitButton1: {
-        position: 'absolute',
-        bottom: 26,  
-        left: 16,    
-        right: 16,   
         backgroundColor: 'red',
         padding: 12,
         alignItems: 'center',
         borderRadius: 24,
+        marginTop: 16,
     },
     exitText1: {
         color: '#fff',
@@ -378,6 +374,12 @@ const styles = StyleSheet.create({
     requiredMark: {
         color: 'red',
     },
+    footer: {
+    padding: 12,
+    backgroundColor: '#fff',
+    borderColor: '#ccc',
+},
+
 });
 
 export default GardenDeclare;

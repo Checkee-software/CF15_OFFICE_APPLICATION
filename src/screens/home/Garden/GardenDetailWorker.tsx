@@ -53,10 +53,21 @@ const GardenWorker = () => {
     const [showManagementAreaInfo, setShowManagementAreaInfo] =
         React.useState(false);
 
-    const {gardens, searchGardens, isLoading} = useGardenStore();
+    const {gardens, searchGardens, isLoading, harvestHistory} =
+        useGardenStore();
     const [contractExpanded, setContractExpanded] = React.useState(false);
 
-    if (isLoading || !gardens) return <Loading />;
+    useEffect(() => {
+        if (gardens?._id && !harvestHistory) {
+            useGardenStore.getState().fetchHarvestCollection(gardens._id);
+        } else if (gardens?._id) {
+            useGardenStore.getState().fetchHarvestCollection(gardens._id);
+        }
+    }, [gardens._id]);
+
+    if (isLoading || !gardens) {
+        return <Loading />;
+    }
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -172,9 +183,9 @@ const GardenWorker = () => {
                 <Section title='Thông tin cây trồng xen'>
                     <Row
                         label='Số loại cây trồng xen'
-                        value={gardens.sidePlants.length}
+                        value={gardens?.sidePlants?.length}
                     />
-                    {gardens.sidePlants.map(plant => (
+                    {gardens?.sidePlants?.map(plant => (
                         <Row
                             key={plant._id}
                             label={plant.name}
@@ -184,11 +195,68 @@ const GardenWorker = () => {
                 </Section>
             )}
 
-            <Section title='Quy trình trồng trọt'>
-                <Text>Chưa có quy trình nào!</Text>
-            </Section>
-            <Section title='Lịch sử thu hoạch'>
-                <Text>Chưa có lịch sử thu hoạch nào!</Text>
+            <Section title={`Lịch sử thu hoạch (${harvestHistory?.length})`}>
+                {harvestHistory?.length === 0 ? (
+                    <Text>Chưa có lịch sử thu hoạch nào!</Text>
+                ) : (
+                    harvestHistory?.map(harvestItem => (
+                        <View
+                            key={harvestItem._id}
+                            style={{
+                                marginBottom: 10,
+                                paddingBottom: 10,
+                                borderBottomWidth: 1,
+                                borderBottomColor: '#ccc',
+                            }}>
+                            <Row
+                                label='Ngày bắt đầu'
+                                value={new Date(
+                                    harvestItem?.createdAt,
+                                ).toLocaleString('vi-VN')}
+                            />
+                            <Row
+                                label='Ngày kết thúc'
+                                value={new Date(
+                                    harvestItem?.endAt,
+                                ).toLocaleString('vi-VN')}
+                            />
+
+                            {harvestItem?.data?.map(entry => (
+                                <View
+                                    key={entry._id}
+                                    style={{
+                                        marginTop: 10,
+                                        padding: 8,
+
+                                        borderWidth: 1,
+                                        borderColor: '#eee',
+                                    }}>
+                                    <Row
+                                        label='Khối lượng (kg)'
+                                        value={
+                                            entry.amount != null
+                                                ? entry.amount.toString()
+                                                : '---'
+                                        }
+                                    />
+                                    <Row
+                                        label='Nhân sự'
+                                        value={entry.userFullName}
+                                    />
+
+                                    <Row
+                                        label='Người xác nhận'
+                                        value={entry.verifier || '---'}
+                                    />
+                                    <Row
+                                        label='Trạng thái'
+                                        value={entry.status}
+                                    />
+                                </View>
+                            ))}
+                        </View>
+                    ))
+                )}
             </Section>
         </ScrollView>
     );

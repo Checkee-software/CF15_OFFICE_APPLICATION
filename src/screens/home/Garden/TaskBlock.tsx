@@ -31,7 +31,7 @@ const TaskBlock = ({
 
     const handleDeclare = () => {
         if (value) {
-            const numericValue = parseFloat(value); // chuyển sang số
+            const numericValue = parseFloat(value);
             const data = isDropdown
                 ? {item, type, value: numericValue, time: new Date()}
                 : {value: numericValue, time: new Date()};
@@ -42,7 +42,8 @@ const TaskBlock = ({
         }
     };
 
-    const isButtonDisabled = isDropdown ? !item || !type || !value : !value;
+    const isButtonDisabled = showWarning || (isDropdown ? !item || !type || !value : !value);
+
 
     return (
         <View
