@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {View, Text, StyleSheet, FlatList, TextInput, Image} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {TouchableOpacity} from 'react-native';
@@ -106,6 +107,19 @@ const WorkSchedule = ({navigation}: any) => {
 
         // Tính khoảng cách
         const duration = moment.duration(targetTime.diff(now));
+
+        // Nếu thời gian đã trễ
+        if (duration.asMilliseconds() < 0) {
+            return (
+                <Text
+                    style={[
+                        WorkScheduleStyles.expiredAndCancelTextTime,
+                        {textAlign: 'right'},
+                    ]}>
+                    Hết hạn
+                </Text>
+            );
+        }
 
         // Tính số ngày, giờ, phút
         const days = Math.floor(duration.asDays());
@@ -291,6 +305,10 @@ const WorkSchedule = ({navigation}: any) => {
 
     const handleGetListWorkSchedule = async () => {
         await getListWorkSchedule();
+        if (searchSchedule !== '') {
+            setSearchSchedule('');
+        }
+        setSelectedStatus(1);
     };
 
     useEffect(() => {
@@ -344,28 +362,30 @@ const WorkSchedule = ({navigation}: any) => {
                     />
                 </View>
 
-                {filterSchedule.length !== 0 ? (
-                    <FlatList
-                        data={filterSchedule}
-                        showsHorizontalScrollIndicator={false}
-                        keyExtractor={item => item._id}
-                        renderItem={({item}) => renderItemWorkSchedule(item)}
-                        onRefresh={getListWorkSchedule}
-                        refreshing={isLoading}
-                    />
-                ) : (
-                    <View style={WorkScheduleStyles.scheduleListEmpty}>
-                        <Image
-                            source={images.emptyScheduleList}
-                            style={WorkScheduleStyles.emptyScheduleListImg}
-                        />
-                        <Text style={WorkScheduleStyles.emptyScheduleListText}>
-                            {searchSchedule.length !== 0
-                                ? `Không tìm thấy lịch công việc nào phù hợp với \n“${searchSchedule}"`
-                                : 'Không tìm thấy lịch công việc nào'}
-                        </Text>
-                    </View>
-                )}
+                <FlatList
+                    data={filterSchedule}
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={item => item._id}
+                    renderItem={({item}) => renderItemWorkSchedule(item)}
+                    onRefresh={handleGetListWorkSchedule}
+                    refreshing={isLoading}
+                    ListEmptyComponent={
+                        <View style={WorkScheduleStyles.scheduleListEmpty}>
+                            <Image
+                                source={images.emptyScheduleList}
+                                style={WorkScheduleStyles.emptyScheduleListImg}
+                            />
+                            <Text
+                                style={
+                                    WorkScheduleStyles.emptyScheduleListText
+                                }>
+                                {searchSchedule.length !== 0
+                                    ? `Không tìm thấy lịch công việc nào phù hợp với \n“${searchSchedule}"`
+                                    : 'Không tìm thấy lịch công việc nào'}
+                            </Text>
+                        </View>
+                    }
+                />
             </View>
         </View>
     );
@@ -520,10 +540,10 @@ const WorkScheduleStyles = StyleSheet.create({
     scheduleListEmpty: {
         justifyContent: 'center',
         alignItems: 'center',
+        //width: '100%',
     },
     emptyScheduleListImg: {
-        maxWidth: '50%',
-        height: '50%',
+        height: '40%',
         aspectRatio: 1,
     },
     emptyScheduleListText: {

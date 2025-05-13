@@ -95,39 +95,28 @@ const Unit = ({navigation}: any) => {
                 />
             </View>
 
-            {listWorker.length !== 0 ? (
-                filterWorkerBySearch.length !== 0 ? (
-                    <View style={UnitStyles.listWorker}>
-                        <FlatList
-                            data={filterWorkerBySearch}
-                            renderItem={({item}) => renderWorker(item)}
-                            keyExtractor={item => item._id}
-                            onRefresh={handleReFetch}
-                            refreshing={isLoading}
-                        />
-                    </View>
-                ) : (
-                    <View style={UnitStyles.workerEmpty}>
-                        <Image
-                            source={images.emptyWorkerList}
-                            style={UnitStyles.emptyWorkerImg}
-                        />
-                        <Text style={UnitStyles.emptyWorkerText}>
-                            {`Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`}
-                        </Text>
-                    </View>
-                )
-            ) : (
-                <View style={UnitStyles.workerEmpty}>
-                    <Image
-                        source={images.emptyWorkerList}
-                        style={UnitStyles.emptyWorkerImg}
-                    />
-                    <Text style={UnitStyles.emptyWorkerText}>
-                        Không tìm thấy danh sách nhân sự!
-                    </Text>
-                </View>
-            )}
+            <View style={UnitStyles.listWorker}>
+                <FlatList
+                    data={filterWorkerBySearch}
+                    renderItem={({item}) => renderWorker(item)}
+                    keyExtractor={item => item._id}
+                    onRefresh={handleReFetch}
+                    refreshing={isLoading}
+                    ListEmptyComponent={
+                        <View style={UnitStyles.workerEmpty}>
+                            <Image
+                                source={images.emptyWorkerList}
+                                style={UnitStyles.emptyWorkerImg}
+                            />
+                            <Text style={UnitStyles.emptyWorkerText}>
+                                {searchWorker.length !== 0
+                                    ? `Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`
+                                    : 'Không tìm thấy nhân sự nào'}
+                            </Text>
+                        </View>
+                    }
+                />
+            </View>
         </View>
     );
 };

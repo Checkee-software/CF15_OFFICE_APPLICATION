@@ -98,40 +98,27 @@ const Document = ({navigation}: any) => {
             </View>
 
             <View style={DocumentStyles.listDocument}>
-                {listDocument.length !== 0 ? (
-                    filterDocuments.length !== 0 ? (
-                        <FlatList
-                            data={filterDocuments}
-                            renderItem={({item}: any) =>
-                                renderItemDocument(item)
-                            }
-                            keyExtractor={item => item._id}
-                            onRefresh={handleReFetch}
-                            refreshing={isLoading}
-                            showsVerticalScrollIndicator={false}
-                        />
-                    ) : (
+                <FlatList
+                    data={filterDocuments}
+                    renderItem={({item}: any) => renderItemDocument(item)}
+                    keyExtractor={item => item._id}
+                    onRefresh={handleReFetch}
+                    refreshing={isLoading}
+                    showsVerticalScrollIndicator={false}
+                    ListEmptyComponent={
                         <View style={DocumentStyles.documentEmpty}>
                             <Image
                                 source={images.emptyDocumentList}
                                 style={DocumentStyles.emptyDocumentImg}
                             />
                             <Text style={DocumentStyles.emptyDocumentText}>
-                                {`Không tìm thấy tài liệu phù hợp với \n“${searchTitle}"`}
+                                {searchTitle !== ''
+                                    ? `Không tìm thấy tài liệu phù hợp với \n“${searchTitle}"`
+                                    : 'Không tìm thấy danh sách tài liệu!'}
                             </Text>
                         </View>
-                    )
-                ) : (
-                    <View style={DocumentStyles.documentEmpty}>
-                        <Image
-                            source={images.emptyDocumentList}
-                            style={DocumentStyles.emptyDocumentImg}
-                        />
-                        <Text style={DocumentStyles.emptyDocumentText}>
-                            Không tìm thấy danh sách tài liệu!
-                        </Text>
-                    </View>
-                )}
+                    }
+                />
             </View>
         </View>
     );
@@ -205,11 +192,11 @@ const DocumentStyles = StyleSheet.create({
     documentEmpty: {
         justifyContent: 'center',
         alignItems: 'center',
-        flex: 1,
     },
     emptyDocumentImg: {
-        width: 305,
-        height: 180,
+        minWidth: '100%',
+        height: '35%',
+        aspectRatio: 1,
     },
     emptyDocumentText: {
         textAlign: 'center',

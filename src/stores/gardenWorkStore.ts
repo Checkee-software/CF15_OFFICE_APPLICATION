@@ -1,138 +1,149 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
+import {IGardenData} from '@/shared-types/Response/GardenDataResponse/GardenDataResponse';
+import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
 
 const backendURL = 'http://cf15officeservice.checkee.vn';
 
-interface IGardenWorkList {
-    gardenName: string;
-    gardenId: string;
-    doingAt: string;
-    doingBy: string;
-    workName: string;
-    materialName: string;
-    processesValue: string;
-    statusBrowse: string;
-    dateBrowse: string;
-    reason: string;
-}
-
 interface gardenWorkStore {
     isLoading: boolean;
-    listGardenWork: IGardenWorkList[];
-    listGardenWorkFilter: IGardenWorkList[];
+    isLoadingCreate: boolean;
+    listGardenWorkBrowse: IGardenData[];
+    listGardenWorkBrowseFilter: IGardenData[];
     badgeGardenWorkUnBrowse: number;
-    //getListWorkSchedule: () => Promise<void>;
+    getRequestDataGarden: () => Promise<any>;
+    createRateReportHarvest: (
+        harvestReportId: string,
+        formRateReport: IRateReportHarvest,
+    ) => Promise<void | undefined>;
     filterByStatus: (status: string) => void;
     resetData: () => void;
-    setBrowsed: () => void;
-    setBadgeUnBrowse: (newList: []) => void;
+    setBrowsed: (newList: any) => void;
+    setBadgeUnBrowse: () => void;
 }
 
 export const useGardenWorkStore = create<gardenWorkStore>(set => ({
     isLoading: false,
+    isLoadingCreate: false,
     badgeGardenWorkUnBrowse: 0,
-    listGardenWork: [
-        {
-            gardenName: 'Khu vườn CF-A4',
-            gardenId: '009831234578232',
-            doingAt: '15:00 19/04/2025',
-            doingBy: 'Lê Thị Hoài An',
-            workName: 'Bón phân',
-            materialName: 'Phân kali',
-            processesValue: '1.5/lít',
-            statusBrowse: 'PENDING',
-            dateBrowse: '',
-            reason: '',
-        },
-        {
-            gardenName: 'Khu vườn CF-A5',
-            gardenId: '009831234578233',
-            doingAt: '15:00 24/05/2025',
-            doingBy: 'Lê Văn B',
-            workName: 'Đào hố',
-            materialName: 'Xẻng và cát',
-            processesValue: '3.5/lít',
-            statusBrowse: 'PENDING',
-            dateBrowse: '',
-            reason: '',
-        },
-        {
-            gardenName: 'Khu vườn CF-A5',
-            gardenId: '009831234578234',
-            doingAt: '15:00 12/05/2025',
-            doingBy: 'Barcelona FC',
-            workName: 'Tưới cỏ sân bóng và đá bóng',
-            materialName: 'Trái bóng và sân cỏ',
-            processesValue: '5.5/lít',
-            statusBrowse: 'PENDING',
-            dateBrowse: '',
-            reason: '',
-        },
-    ],
+    listGardenWorkBrowse: [],
+    listGardenWorkBrowseFilter: [],
 
-    listGardenWorkFilter: [
-        {
-            gardenName: 'Khu vườn CF-A4',
-            gardenId: '009831234578232',
-            doingAt: '15:00 19/04/2025',
-            doingBy: 'Lê Thị Hoài An',
-            workName: 'Bón phân',
-            materialName: 'Phân kali',
-            processesValue: '1.5/lít',
-            statusBrowse: 'PENDING',
-            dateBrowse: '',
-            reason: '',
-        },
-        {
-            gardenName: 'Khu vườn CF-A5',
-            gardenId: '009831234578233',
-            doingAt: '15:00 24/05/2025',
-            doingBy: 'Lê Văn B',
-            workName: 'Đào hố',
-            materialName: 'Xẻng và cát',
-            processesValue: '3.5/lít',
-            statusBrowse: 'PENDING',
-            dateBrowse: '',
-            reason: '',
-        },
-        {
-            gardenName: 'Khu vườn CF-A5',
-            gardenId: '009831234578234',
-            doingAt: '15:00 12/05/2025',
-            doingBy: 'Barcelona FC',
-            workName: 'Tưới cỏ sân bóng và đá bóng',
-            materialName: 'Trái bóng và sân cỏ',
-            processesValue: '5.5/lít',
-            statusBrowse: 'PENDING',
-            dateBrowse: '',
-            reason: '',
-        },
-    ],
+    getRequestDataGarden: async () => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.get<any>(
+                `${backendURL}/resources/gardens/request-data`,
+            );
+
+            set({
+                listGardenWorkBrowse: response.data?.data || [],
+                listGardenWorkBrowseFilter:
+                    response.data?.data.filter(
+                        (item: {status: any}) => item.status === 'NONE',
+                    ) || [],
+                badgeGardenWorkUnBrowse:
+                    response.data?.data.filter(
+                        (item: {status: any}) => item.status === 'NONE',
+                    ).length || 0,
+            });
+
+            set({isLoading: false});
+
+            return response.data.data;
+        } catch (error: any) {
+            set({isLoading: false});
+
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error?.response?.data) {
+                    Snackbar.show({
+                        text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                } else {
+                    Snackbar.show({
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    createRateReportHarvest: async (
+        harvestReportId: string,
+        formRateReport: IRateReportHarvest,
+    ) => {
+        set({isLoadingCreate: true});
+        try {
+            const response = await axiosClient.post(
+                `${backendURL}/resources/gardens/harvest/rate-report/${harvestReportId}`,
+                formRateReport,
+            );
+
+            if (response.data?.data) {
+                setTimeout(() => {
+                    if (response.data?.data) {
+                        Snackbar.show({
+                            text: `${response.data.message}`,
+                            duration: Snackbar.LENGTH_LONG,
+                        });
+                    }
+                }, 100);
+            }
+
+            set({isLoadingCreate: false});
+        } catch (error: any) {
+            set({isLoadingCreate: false});
+
+            const _error = error;
+
+            console.log(_error);
+
+            setTimeout(() => {
+                if (_error?.response?.data) {
+                    Snackbar.show({
+                        text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                } else {
+                    Snackbar.show({
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
 
     filterByStatus: status =>
         set(state => ({
-            listGardenWorkFilter: state.listGardenWork.filter(
-                item => item.statusBrowse === status,
+            listGardenWorkBrowseFilter: state.listGardenWorkBrowse.filter(
+                item => item.status === status,
             ),
         })),
 
     setBadgeUnBrowse: () =>
         set(state => ({
-            badgeGardenWorkUnBrowse: state.listGardenWork.filter(
-                item => item.statusBrowse === 'PENDING',
+            badgeGardenWorkUnBrowse: state.listGardenWorkBrowse.filter(
+                item => item.status === 'NONE',
             ).length,
         })),
 
-    setBrowsed: (newList: []) =>
-        set(state => ({
+    setBrowsed: (newList: any) =>
+        set(() => ({
             listGardenWorkFilter: newList,
             listGardenWork: newList,
             badgeGardenWorkUnBrowse: newList.filter(
-                item => item.statusBrowse === 'PENDING',
+                (item: {status: string}) => item.status === 'NONE',
             ).length,
         })),
 
     resetData: () =>
-        set(state => ({listGardenWorkFilter: state.listGardenWork})),
+        set(state => ({
+            listGardenWorkBrowseFilter: state.listGardenWorkBrowse,
+        })),
 }));

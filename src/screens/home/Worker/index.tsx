@@ -145,28 +145,27 @@ const Woker = ({navigation}: any) => {
             </View>
 
             {searchWorker !== '' ? (
-                filterWorkerBySearch.length !== 0 ? (
-                    <View style={WokerStyles.searchListWorker}>
-                        <FlatList
-                            data={filterWorkerBySearch}
-                            renderItem={({item}) => renderWorkerBySearch(item)}
-                            keyExtractor={item => item._id}
-                            onRefresh={handleReFetch}
-                            refreshing={isLoading}
-                        />
-                    </View>
-                ) : (
-                    <View style={WokerStyles.workerEmpty}>
-                        <Image
-                            source={images.emptyWorkerList}
-                            style={WokerStyles.emptyWorkerImg}
-                        />
-                        <Text style={WokerStyles.emptyWorkerText}>
-                            {`Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`}
-                        </Text>
-                    </View>
-                )
-            ) : listWorker.length > 0 ? (
+                <View style={WokerStyles.searchListWorker}>
+                    <FlatList
+                        data={filterWorkerBySearch}
+                        renderItem={({item}) => renderWorkerBySearch(item)}
+                        keyExtractor={item => item._id}
+                        onRefresh={handleReFetch}
+                        refreshing={isLoading}
+                        ListEmptyComponent={
+                            <View style={WokerStyles.workerEmpty}>
+                                <Image
+                                    source={images.emptyWorkerList}
+                                    style={WokerStyles.emptyWorkerImg}
+                                />
+                                <Text style={WokerStyles.emptyWorkerText}>
+                                    {`Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`}
+                                </Text>
+                            </View>
+                        }
+                    />
+                </View>
+            ) : (
                 <View style={WokerStyles.listWorker}>
                     <SectionList
                         sections={listWorkerFilterByRole}
@@ -179,17 +178,18 @@ const Woker = ({navigation}: any) => {
                                 {`${section.title} (${section.data.length})`}
                             </Text>
                         )}
+                        ListEmptyComponent={
+                            <View style={WokerStyles.workerEmpty}>
+                                <Image
+                                    source={images.emptyWorkerList}
+                                    style={WokerStyles.emptyWorkerImg}
+                                />
+                                <Text style={WokerStyles.emptyWorkerText}>
+                                    Không tìm thấy danh sách nhân sự!
+                                </Text>
+                            </View>
+                        }
                     />
-                </View>
-            ) : (
-                <View style={WokerStyles.workerEmpty}>
-                    <Image
-                        source={images.emptyWorkerList}
-                        style={WokerStyles.emptyWorkerImg}
-                    />
-                    <Text style={WokerStyles.emptyWorkerText}>
-                        Không tìm thấy danh sách nhân sự!
-                    </Text>
                 </View>
             )}
         </View>
@@ -279,11 +279,11 @@ const WokerStyles = StyleSheet.create({
     workerEmpty: {
         justifyContent: 'center',
         alignItems: 'center',
-        flex: 1,
     },
     emptyWorkerImg: {
-        width: 305,
-        height: 180,
+        minWidth: '100%',
+        height: '30%',
+        aspectRatio: 1,
     },
     emptyWorkerText: {
         textAlign: 'center',

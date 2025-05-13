@@ -7,23 +7,38 @@ import {
     TouchableOpacity,
     FlatList,
     TextInput,
-    ScrollView,
 } from 'react-native';
 import images from '../../../assets/images';
 import {useAuthStore} from '@/stores/authStore';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import {useGardenWorkStore} from '../../../stores/gardenWorkStore';
+import Backdrop from '@/screens/subscreen/Loading/index2';
+import Loading from '@/screens/subscreen/Loading';
+import moment from 'moment';
+import Snackbar from 'react-native-snackbar';
+import {EStatusData} from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
+import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
 
 const WorkScreen = () => {
+    interface listRadioBtn {
+        _id: string;
+        radioSelectedType: number;
+    }
+
+    type initialRadioState = listRadioBtn[];
+
     const {
-        listGardenWork,
-        listGardenWorkFilter,
+        listGardenWorkBrowse,
+        listGardenWorkBrowseFilter,
         badgeGardenWorkUnBrowse,
+        isLoading,
+        isLoadingCreate,
+        getRequestDataGarden,
         filterByStatus,
-        resetData,
-        setBrowsed,
         setBadgeUnBrowse,
+        setBrowsed,
+        createRateReportHarvest,
     } = useGardenWorkStore();
 
     const statusList = [
@@ -34,22 +49,22 @@ const WorkScreen = () => {
 
     const [selectedStatus, setSelectedStatus] = useState(1);
     const {userInfo} = useAuthStore();
-    const [showComfirmView, setShowComfirmView] = useState([]);
+    const [showComfirmView, setShowComfirmView] = useState<initialRadioState>(
+        [],
+    );
     const [reasonCancel, setReasonCancel] = useState('');
 
     const selectBrowseType = (value: number) => {
         if (value === 1) {
             //resetData();
-            filterByStatus('PENDING');
+            filterByStatus('NONE');
         } else if (value === 2) {
-            filterByStatus('BROWSED');
+            filterByStatus('VERIFIED');
         } else if (value === 3) {
-            filterByStatus('CANCEL');
+            filterByStatus('DENIED');
         }
         setSelectedStatus(value);
     };
-
-    console.log(badgeGardenWorkUnBrowse);
 
     const renderGardenWork = (itemGardenWork: any, index: number) => (
         <View
@@ -58,25 +73,31 @@ const WorkScreen = () => {
                 // eslint-disable-next-line react-native/no-inline-styles
                 {
                     borderColor:
-                        itemGardenWork.statusBrowse === 'CANCEL'
+                        itemGardenWork.status === 'DENIED'
                             ? '#FF4E45'
                             : '#000000',
                     marginBottom:
-                        index + 1 === listGardenWorkFilter.length ? 70 : 15,
+                        index + 1 === listGardenWorkBrowseFilter.length
+                            ? 70
+                            : 15,
                 },
             ]}>
             <View style={styles.gardenTitleSection}>
                 <Text style={styles.gardenName}>
                     {itemGardenWork.gardenName}
                 </Text>
-                <Text style={styles.gardenId}>{itemGardenWork.gardenId}</Text>
+                <Text style={styles.gardenId}>{itemGardenWork.gardenCode}</Text>
             </View>
 
             <View style={styles.gardenContentSection}>
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Thực hiện lúc</Text>
 
-                    <Text style={styles.value}>{itemGardenWork.doingAt}</Text>
+                    <Text style={styles.value}>
+                        {moment(itemGardenWork.createdAt).format(
+                            'HH:mm DD/MM/YYYY',
+                        )}
+                    </Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
@@ -100,25 +121,20 @@ const WorkScreen = () => {
 
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Định mức</Text>
-                    <Text style={styles.value}>
-                        {itemGardenWork.processesValue}
-                    </Text>
+                    <Text style={styles.value}>{itemGardenWork.amount}</Text>
                 </View>
             </View>
 
-            {itemGardenWork.statusBrowse === 'PENDING' ? (
+            {itemGardenWork.status === 'NONE' ? (
                 <View style={styles.comfirmView}>
                     {showComfirmView.map((itemComfirm: any) =>
-                        itemComfirm.gardenId === itemGardenWork.gardenId ? (
-                            <React.Fragment key={itemComfirm.gardenId}>
+                        itemComfirm._id === itemGardenWork._id ? (
+                            <React.Fragment key={itemComfirm._id}>
                                 <View style={styles.listRadioButton}>
                                     <TouchableOpacity
                                         style={styles.warpRadioText}
                                         onPress={() =>
-                                            selectRadioType(
-                                                itemComfirm.gardenId,
-                                                1,
-                                            )
+                                            selectRadioType(itemComfirm._id, 1)
                                         }>
                                         <MaterialIcons
                                             name={
@@ -143,10 +159,7 @@ const WorkScreen = () => {
                                     <TouchableOpacity
                                         style={styles.warpRadioText}
                                         onPress={() =>
-                                            selectRadioType(
-                                                itemComfirm.gardenId,
-                                                2,
-                                            )
+                                            selectRadioType(itemComfirm._id, 2)
                                         }>
                                         <MaterialIcons
                                             name={
@@ -171,10 +184,7 @@ const WorkScreen = () => {
                                     <TouchableOpacity
                                         style={styles.warpRadioText}
                                         onPress={() =>
-                                            selectRadioType(
-                                                itemComfirm.gardenId,
-                                                3,
-                                            )
+                                            selectRadioType(itemComfirm._id, 3)
                                         }>
                                         <MaterialIcons
                                             name={
@@ -223,7 +233,7 @@ const WorkScreen = () => {
                                             <TouchableOpacity
                                                 onPress={() =>
                                                     selectRadioType(
-                                                        itemComfirm.gardenId,
+                                                        itemComfirm._id,
                                                         1,
                                                     )
                                                 }
@@ -239,7 +249,7 @@ const WorkScreen = () => {
                                                 style={styles.approveRequestBtn}
                                                 onPress={() =>
                                                     comfirmBrowse(
-                                                        itemComfirm.gardenId,
+                                                        itemComfirm._id,
                                                         itemComfirm.radioSelectedType,
                                                     )
                                                 }>
@@ -260,12 +270,14 @@ const WorkScreen = () => {
             ) : (
                 <View style={styles.statusBrowse}>
                     <View style={styles.browseInfo}>
-                        {itemGardenWork.statusBrowse === 'BROWSED' ? (
+                        {itemGardenWork.status === 'VERIFIED' ? (
                             <View style={styles.warpLabelAndValue}>
                                 <Text style={styles.label}>Duyệt lúc</Text>
 
                                 <Text style={styles.value}>
-                                    {itemGardenWork.doingAt}
+                                    {moment(itemGardenWork.updatedAt).format(
+                                        'HH:mm DD/MM/YYYY',
+                                    )}
                                 </Text>
                             </View>
                         ) : (
@@ -274,7 +286,9 @@ const WorkScreen = () => {
                                     <Text style={styles.label}>Hủy bỏ lúc</Text>
 
                                     <Text style={styles.value}>
-                                        {itemGardenWork.dateBrowse}
+                                        {moment(
+                                            itemGardenWork.updatedAt,
+                                        ).format('HH:mm DD/MM/YYYY')}
                                     </Text>
                                 </View>
 
@@ -282,7 +296,7 @@ const WorkScreen = () => {
                                     <Text style={styles.label}>Lý do hủy</Text>
 
                                     <Text style={styles.reasonValue}>
-                                        {itemGardenWork.reason}
+                                        {itemGardenWork.message}
                                     </Text>
                                 </View>
                             </>
@@ -293,128 +307,164 @@ const WorkScreen = () => {
         </View>
     );
 
-    const selectRadioType = (gardenId: string, radioType: number) => {
+    const selectRadioType = (_id: string, radioType: number) => {
         setShowComfirmView(prev =>
             prev.map(item =>
-                item.gardenId === gardenId
+                item._id === _id
                     ? {...item, radioSelectedType: radioType}
                     : item,
             ),
         );
     };
 
-    const comfirmBrowse = (gardenId: string, radioType: number) => {
+    const comfirmBrowse = async (id: string, radioType: number) => {
         if (radioType === 2) {
-            const d = new Date();
-            const dateFormat = d.toLocaleDateString();
-            //setBrowsed(gardenId, dateFormat);
+            const formRateReport: any = {
+                status: EStatusData.VERIFIED,
+                verifier: '1',
+                message: '',
+            };
 
-            const newData = listGardenWork.map(item =>
-                item.gardenId === gardenId
-                    ? {...item, statusBrowse: 'BROWSED', dateBrowse: dateFormat}
-                    : item,
-            );
-
-            setBrowsed(newData);
-            filterByStatus('PENDING');
+            const result = await createRateReportHarvest(id, formRateReport);
+            if (result) {
+                handleGetRequestGardenData();
+            }
         } else {
-            const d = new Date();
-            const dateFormat = d.toLocaleDateString();
-            //setBrowsed(gardenId, dateFormat);
+            if (reasonCancel === '') {
+                Snackbar.show({
+                    text: 'Bạn chưa nhập lý do hủy bỏ',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            } else {
+                const formRateReport: any = {
+                    status: EStatusData.DENIED,
+                    verifier: '1',
+                    message: reasonCancel,
+                };
 
-            const newData = listGardenWork.map(item =>
-                item.gardenId === gardenId
-                    ? {
-                          ...item,
-                          statusBrowse: 'CANCEL',
-                          dateBrowse: dateFormat,
-                          reason: reasonCancel,
-                      }
-                    : item,
-            );
+                const result = await createRateReportHarvest(
+                    id,
+                    formRateReport,
+                );
 
-            setBrowsed(newData);
-            filterByStatus('PENDING');
+                if (result) {
+                    setReasonCancel('');
+                    handleGetRequestGardenData();
+                }
+            }
         }
     };
 
-    useEffect(() => {
-        filterByStatus('PENDING');
-        setBadgeUnBrowse();
+    const handleGetRequestGardenData = async () => {
+        const responseData = await getRequestDataGarden();
+        filterByStatus('NONE');
 
-        const initialRadioState = listGardenWorkFilter.map(item => ({
-            gardenId: item.gardenId,
+        const initialRadioState = responseData.map((item: {_id: string}) => ({
+            _id: item._id,
             radioSelectedType: 1,
         }));
 
+        setSelectedStatus(1);
         setShowComfirmView(initialRadioState);
+    };
+
+    useEffect(() => {
+        handleGetRequestGardenData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    if (isLoading) {
+        return <Loading />;
+    }
+
     return (
         <View style={styles.container}>
-            <View style={styles.workScheduleTypeHorizontalScroll}>
-                <FlatList
-                    data={statusList}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={item => item.label}
-                    renderItem={({item}) => (
-                        <TouchableOpacity
-                            onPress={() => selectBrowseType(item.value)}
-                            style={[
-                                styles.statusBtn,
-                                selectedStatus === item.value &&
-                                    styles.selectedStatusBtn,
-                            ]}>
-                            <View style={styles.warpTextAndBadge}>
-                                <Text
+            <>
+                {userInfo.userType.level !== EOrganization.WORKER ? (
+                    <View style={styles.workScheduleTypeHorizontalScroll}>
+                        <FlatList
+                            data={statusList}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            keyExtractor={item => item.label}
+                            renderItem={({item}) => (
+                                <TouchableOpacity
+                                    onPress={() => selectBrowseType(item.value)}
                                     style={[
-                                        styles.statusBtnText,
+                                        styles.statusBtn,
                                         selectedStatus === item.value &&
-                                            styles.selectedStatusBtnText,
+                                            styles.selectedStatusBtn,
                                     ]}>
-                                    {item.label}
-                                </Text>
-
-                                {item.value === 1 &&
-                                badgeGardenWorkUnBrowse !== 0 ? (
-                                    <View style={styles.newBrowseWork}>
-                                        <Text style={styles.newBrowseWorkText}>
-                                            {badgeGardenWorkUnBrowse}
+                                    <View style={styles.warpTextAndBadge}>
+                                        <Text
+                                            style={[
+                                                styles.statusBtnText,
+                                                selectedStatus === item.value &&
+                                                    styles.selectedStatusBtnText,
+                                            ]}>
+                                            {item.label}
                                         </Text>
-                                    </View>
-                                ) : null}
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                />
-            </View>
 
-            {userInfo.userType.level !== EOrganization.WORKER ? (
-                <View style={styles.gardenWorkList}>
-                    <FlatList
-                        data={listGardenWorkFilter}
-                        keyExtractor={item => item.gardenId}
-                        renderItem={({item, index}) =>
-                            renderGardenWork(item, index)
-                        }
-                        showsVerticalScrollIndicator={false}
-                        keyboardShouldPersistTaps='handled'
-                    />
-                </View>
-            ) : (
-                <View style={styles.emptyContainer}>
-                    <Image
-                        source={images.emptyWorkList}
-                        style={styles.emptyImage}
-                        resizeMode='contain'
-                    />
-                    <Text style={styles.emptyText}>
-                        Hiện tại không có công việc để thực hiện!
-                    </Text>
-                </View>
-            )}
+                                        {item.value === 1 &&
+                                        badgeGardenWorkUnBrowse !== 0 ? (
+                                            <View style={styles.newBrowseWork}>
+                                                <Text
+                                                    style={
+                                                        styles.newBrowseWorkText
+                                                    }>
+                                                    {badgeGardenWorkUnBrowse}
+                                                </Text>
+                                            </View>
+                                        ) : null}
+                                    </View>
+                                </TouchableOpacity>
+                            )}
+                        />
+                    </View>
+                ) : null}
+
+                {userInfo.userType.level !== EOrganization.WORKER ? (
+                    <View style={styles.gardenWorkList}>
+                        <FlatList
+                            data={listGardenWorkBrowseFilter}
+                            keyExtractor={item => item._id}
+                            renderItem={({item, index}) =>
+                                renderGardenWork(item, index)
+                            }
+                            onRefresh={handleGetRequestGardenData}
+                            refreshing={isLoading}
+                            showsVerticalScrollIndicator={false}
+                            keyboardShouldPersistTaps='handled'
+                            ListEmptyComponent={
+                                <View style={styles.emptyContainer}>
+                                    <Image
+                                        source={images.emptyWorkList}
+                                        style={styles.emptyImage}
+                                        resizeMode='contain'
+                                    />
+                                    <Text style={styles.emptyText}>
+                                        Hiện tại không có công việc để thực
+                                        hiện!
+                                    </Text>
+                                </View>
+                            }
+                        />
+                    </View>
+                ) : (
+                    <View style={styles.emptyContainer}>
+                        <Image
+                            source={images.emptyWorkList}
+                            style={styles.emptyImage}
+                            resizeMode='contain'
+                        />
+                        <Text style={styles.emptyText}>
+                            Hiện tại không có công việc để thực hiện!
+                        </Text>
+                    </View>
+                )}
+
+                <Backdrop open={isLoadingCreate} />
+            </>
         </View>
     );
 };
