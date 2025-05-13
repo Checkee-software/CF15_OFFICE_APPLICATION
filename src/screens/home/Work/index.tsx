@@ -18,7 +18,6 @@ import Loading from '@/screens/subscreen/Loading';
 import moment from 'moment';
 import Snackbar from 'react-native-snackbar';
 import {EStatusData} from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
-import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
 
 const WorkScreen = () => {
     interface listRadioBtn {
@@ -317,6 +316,20 @@ const WorkScreen = () => {
         );
     };
 
+    const handleGetRequestGardenData = async () => {
+        const responseData = await getRequestDataGarden();
+
+        filterByStatus('NONE');
+
+        const initialRadioState = responseData.map((item: {_id: string}) => ({
+            _id: item._id,
+            radioSelectedType: 1,
+        }));
+
+        setSelectedStatus(1);
+        setShowComfirmView(initialRadioState);
+    };
+
     const comfirmBrowse = async (id: string, radioType: number) => {
         if (radioType === 2) {
             const formRateReport: any = {
@@ -326,6 +339,7 @@ const WorkScreen = () => {
             };
 
             const result = await createRateReportHarvest(id, formRateReport);
+
             if (result) {
                 handleGetRequestGardenData();
             }
@@ -353,19 +367,6 @@ const WorkScreen = () => {
                 }
             }
         }
-    };
-
-    const handleGetRequestGardenData = async () => {
-        const responseData = await getRequestDataGarden();
-        filterByStatus('NONE');
-
-        const initialRadioState = responseData.map((item: {_id: string}) => ({
-            _id: item._id,
-            radioSelectedType: 1,
-        }));
-
-        setSelectedStatus(1);
-        setShowComfirmView(initialRadioState);
     };
 
     useEffect(() => {
@@ -440,7 +441,7 @@ const WorkScreen = () => {
                                     <Image
                                         source={images.emptyWorkList}
                                         style={styles.emptyImage}
-                                        resizeMode='contain'
+                                        //resizeMode='contain'
                                     />
                                     <Text style={styles.emptyText}>
                                         Hiện tại không có công việc để thực
@@ -593,14 +594,15 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     emptyContainer: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
         gap: 10,
     },
     emptyImage: {
-        height: 159,
+        height: '30%',
+        minWidth: '100%',
+        aspectRatio: 1,
     },
     emptyText: {
         textAlign: 'center',

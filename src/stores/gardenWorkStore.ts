@@ -96,6 +96,7 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
             }
 
             set({isLoadingCreate: false});
+            return response.data;
         } catch (error: any) {
             set({isLoadingCreate: false});
 

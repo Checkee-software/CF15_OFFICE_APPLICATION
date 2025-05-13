@@ -3,6 +3,7 @@ import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {IList} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {ISchedule} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
+import {IApplyPersonalTask} from '@/shared-types/form-data/ScheduleFormData/ScheduleFormData';
 
 const backendURL = 'http://cf15officeservice.checkee.vn';
 
@@ -83,49 +84,69 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     },
 
     getDetailWorkSchedule: async (mainTaskId: string) => {
+        console.log('mainTaskId', mainTaskId);
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
                 `${backendURL}/resources/schedules/detail/${mainTaskId}`,
             );
 
-            if (response) {
-                const updateImgPathDetailSchedule = response.data.data.map(
-                    (item: any) => {
-                        item.employees.map((employees: any) => {
-                            if (employees.avatar) {
-                                employees.avatar = fixAvatarPath(
-                                    employees.avatar,
-                                );
-                            }
+            console.log('response', response);
 
-                            return {...employees};
-                        });
+            if (response.data.data) {
+                const updateImgPathDetailSchedule = response.data.data;
+                updateImgPathDetailSchedule.employees =
+                    response.data.data.employees.map((employees: any) => {
+                        if (employees.avatar) {
+                            employees.avatar = fixAvatarPath(employees.avatar);
+                        }
 
-                        return {
-                            ...item,
-                        };
-                    },
-                );
+                        return {...employees};
+                    });
+                // console.log(updateImgPathDetailSchedule);
+                // set({
+                //     detailWorkSchedule: updateImgPathDetailSchedule,
+                // });
 
-                set({
-                    detailWorkSchedule: updateImgPathDetailSchedule,
-                });
+                set({isLoading: false});
+                return updateImgPathDetailSchedule;
             }
-            set({isLoading: false});
         } catch (error: any) {
             set({isLoading: false});
 
             const _error = error;
 
-            setTimeout(() => {
-                if (_error.response.status === 500) {
-                    Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
-                        duration: Snackbar.LENGTH_LONG,
-                    });
-                }
-            }, 100);
+            console.log(_error.response);
+
+            // setTimeout(() => {
+            //     if (_error.response.status === 500) {
+            //         Snackbar.show({
+            //             text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+            //             duration: Snackbar.LENGTH_LONG,
+            //         });
+            //     }
+            // }, 100);
+        }
+    },
+
+    updateProgressTaskByImplementer: async (
+        mainTaskId: string,
+        formUpdateProgress: IApplyPersonalTask,
+    ) => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.post(
+                `${backendURL}/resources/schedules/sub-tasks/apply-personal-task/${mainTaskId}`,
+                formUpdateProgress,
+            );
+            set({isLoading: false});
+            return response;
+        } catch (error: any) {
+            set({isLoading: false});
+
+            const _error = error;
+
+            return _error.response;
         }
     },
 

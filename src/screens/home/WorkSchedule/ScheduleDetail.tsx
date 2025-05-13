@@ -18,11 +18,16 @@ import RNFS from 'react-native-fs';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Snackbar from 'react-native-snackbar';
 import CheckBox from 'react-native-check-box';
-import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
+import {
+    EScheduleStatus,
+    IApplyPersonalTask,
+} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {ISchedule} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {useAuthStore} from '../../../stores/authStore';
+import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
 import moment from 'moment';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import Backdrop from '@/screens/subscreen/Loading/index2';
 
 const ScheduleDetail = ({route}: any) => {
     interface Staff {
@@ -49,6 +54,13 @@ const ScheduleDetail = ({route}: any) => {
     }
 
     type IsCheckList = Task[];
+
+    const {
+        isLoading,
+        updateProgressTaskByImplementer,
+        getDetailWorkSchedule,
+        detailWorkSchedule,
+    } = useWorkScheduleStore();
 
     console.log(route.params.itemWorkSchedule);
 
@@ -109,31 +121,20 @@ const ScheduleDetail = ({route}: any) => {
         }
     };
 
-    const calculateTotalPercent = () => {
-        const tasks = isCheckList;
+    const calculateTaskProgress = (task: any): number => {
+        const staffList = task.staff || [];
 
-        if (!Array.isArray(tasks) || tasks.length === 0) {
-            return 0;
-        }
+        const validStaff: Staff[] = staffList.filter(
+            (staff: Staff) => typeof staff.workingPercent === 'number',
+        );
 
-        const taskPercents = tasks.map(task => {
-            const staffList = task.staff || [];
-            if (staffList.length === 0) {
-                return 0;
-            }
+        if (validStaff.length === 0) return 0;
 
-            const total = staffList.reduce(
-                (sum: number, staff: any) => sum + (staff.workingPercent || 0),
-                0,
-            );
-            return total / staffList.length;
-        });
-
-        const sumAll = taskPercents.reduce((sum, percent) => sum + percent, 0);
-        const average = sumAll / taskPercents.length;
-
-        console.log(Math.min(100, Math.round(average)));
-        return Math.min(100, Math.round(average));
+        const totalPercent = validStaff.reduce(
+            (sum: number, staff: any) => sum + staff.workingPercent,
+            0,
+        );
+        return Math.min(100, Math.round(totalPercent / validStaff.length));
     };
 
     const downloadFile = async (fileUrl: string, fileName: string) => {
@@ -271,7 +272,7 @@ const ScheduleDetail = ({route}: any) => {
                     style={
                         itemChildTask.staff.every(
                             (item: {status: string}) =>
-                                item.status === 'COMPLETED',
+                                item.status === EScheduleStatus.COMPLETED,
                         )
                             ? ScheduleDetailStyles.taskTitleIsDone
                             : ScheduleDetailStyles.taskTitleNotDone
@@ -284,7 +285,7 @@ const ScheduleDetail = ({route}: any) => {
                         style={[
                             itemChildTask.staff.every(
                                 (item: {status: string}) =>
-                                    item.status === 'COMPLETED',
+                                    item.status === EScheduleStatus.COMPLETED,
                             )
                                 ? ScheduleDetailStyles.taskTitleIsDone
                                 : ScheduleDetailStyles.taskTitleNotDone && {
@@ -369,8 +370,7 @@ const ScheduleDetail = ({route}: any) => {
                                         </View>
                                     </>
                                 </>
-                            ) : itemStaff.workingPercent === 100 &&
-                              itemStaff.status === 'COMPLETED' ? (
+                            ) : itemStaff.workingPercent === 100 ? (
                                 <>
                                     <CheckBox
                                         isChecked={itemStaff.staffComfirmCheck}
@@ -437,7 +437,7 @@ const ScheduleDetail = ({route}: any) => {
 
         return (
             <View style={ScheduleDetailStyles.warpChildTask}>
-                {scheduleDetail?.status === 'COMPLETED' ? (
+                {itemCheck?.status === EScheduleStatus.COMPLETED ? (
                     <MaterialIcons
                         name='check-circle'
                         size={20}
@@ -446,7 +446,7 @@ const ScheduleDetail = ({route}: any) => {
                 ) : (
                     <CheckBox
                         onClick={() =>
-                            handleToggleMainTaskClick(scheduleDetail?._id || '')
+                            handleToggleMainTaskClick(itemCheck?.taskId || '')
                         }
                         checkedCheckBoxColor='rgb(255, 166, 33)'
                         isChecked={itemCheck.taskComfirmCheck}
@@ -467,9 +467,11 @@ const ScheduleDetail = ({route}: any) => {
                 <View style={ScheduleDetailStyles.rightChildTask}>
                     <Text
                         style={
-                            itemCheck.staff.every(
-                                (item: any) => item.staffComfirmCheck,
-                            )
+                            itemCheck.status === EScheduleStatus.COMPLETED
+                                ? ScheduleDetailStyles.taskTitleCompleted
+                                : itemCheck.staff.every(
+                                      (item: any) => item.staffComfirmCheck,
+                                  )
                                 ? ScheduleDetailStyles.taskTitleIsDone
                                 : itemCheck.isCurrentStep === false
                                 ? ScheduleDetailStyles.stepByStepTaskTitleNotDone
@@ -481,15 +483,17 @@ const ScheduleDetail = ({route}: any) => {
                     <View style={ScheduleDetailStyles.progressTask}>
                         <Text
                             style={
-                                itemCheck.staff.every(
-                                    (item: any) => item.staffComfirmCheck,
-                                )
+                                itemCheck.status === EScheduleStatus.COMPLETED
+                                    ? ScheduleDetailStyles.taskTitleCompleted
+                                    : itemCheck.staff.every(
+                                          (item: any) => item.staffComfirmCheck,
+                                      )
                                     ? ScheduleDetailStyles.taskTitleIsDone
                                     : itemCheck.isCurrentStep === false
                                     ? ScheduleDetailStyles.stepByStepTaskTitleNotDone
                                     : ScheduleDetailStyles.taskTitleNotDone
                             }>
-                            {`${calculateTotalPercent()}%`}
+                            {`${calculateTaskProgress(itemCheck)}%`}
                         </Text>
 
                         <Text
@@ -573,20 +577,28 @@ const ScheduleDetail = ({route}: any) => {
                                             </View>
                                         </>
                                     </>
-                                ) : itemStaff.workingPercent === 100 &&
-                                  itemStaff.status === 'COMPLETED' ? (
+                                ) : itemStaff.workingPercent === 100 ? (
                                     <>
-                                        <CheckBox
-                                            isChecked={
-                                                itemStaff.staffComfirmCheck
-                                            }
-                                            onClick={() =>
-                                                handleToggleStaffCheck(
-                                                    itemChildTask._id,
-                                                    itemStaff.userId,
-                                                )
-                                            }
-                                        />
+                                        {userInfo.userType.level ===
+                                        EOrganization.DEPARTMENT ? (
+                                            <CheckBox
+                                                isChecked={
+                                                    itemStaff.staffComfirmCheck
+                                                }
+                                                onClick={() =>
+                                                    handleToggleStaffCheck(
+                                                        itemChildTask._id,
+                                                        itemStaff.userId,
+                                                    )
+                                                }
+                                            />
+                                        ) : (
+                                            <MaterialIcons
+                                                name='check-circle'
+                                                size={20}
+                                                color='#FF9800'
+                                            />
+                                        )}
 
                                         <View
                                             style={
@@ -602,7 +614,9 @@ const ScheduleDetail = ({route}: any) => {
                                                 style={
                                                     ScheduleDetailStyles.taskWaitingBrowse
                                                 }>
-                                                {`Đã xong lúc ${itemStaff.subCompletedTime}`}
+                                                {`Đã xong lúc ${renderTaskEndIn(
+                                                    itemStaff.subCompletedTime,
+                                                )}`}
                                             </Text>
                                         </View>
                                     </>
@@ -1001,17 +1015,92 @@ const ScheduleDetail = ({route}: any) => {
         return true;
     };
 
-    const handleUpdateProgressTask = () => {
+    const handleUpdateProgressTask = async () => {
         const check = checkValidProgressValue();
 
         if (check) {
             const progressNumberType = Number(progressValue);
-            console.log(
-                currentSelectedChildTaskUpdateProgress,
-                progressNumberType,
-                currentSelectedStaff,
+
+            const formUpdateProgress: IApplyPersonalTask = {
+                percent: progressNumberType,
+                taskId: currentSelectedChildTaskUpdateProgress,
+            };
+            const result = await updateProgressTaskByImplementer(
+                scheduleDetail?._id,
+                formUpdateProgress,
             );
+
+            if (result.status === 200) {
+                setShowListUpdateProgressTask(false);
+                setProgressValue('');
+                setCurrentSelectedChildTaskUpdateProgress('');
+                setCurrentSelectedStaff('');
+
+                setTimeout(() => {
+                    Snackbar.show({
+                        text: result.data.message,
+                        duration: Snackbar.LENGTH_SHORT,
+                    });
+                }, 100);
+
+                handleGetDetailSchedule();
+            }
+
+            if (result.status === 400) {
+                setShowListUpdateProgressTask(false);
+                setTimeout(() => {
+                    Snackbar.show({
+                        text: result.data,
+                        duration: Snackbar.LENGTH_SHORT,
+                    });
+                }, 100);
+                setShowListUpdateProgressTask(true);
+            }
         }
+    };
+
+    const handleGetDetailSchedule = async () => {
+        const resultScheduleDetail = await getDetailWorkSchedule(
+            scheduleDetail?._id,
+        );
+        setScheduleDetail(resultScheduleDetail);
+        setIsCheckList(() =>
+            resultScheduleDetail.childTasks.tasks.map((taskItem: any) => {
+                // const allStaffCompleted = taskItem.staff.every(
+                //     (staffItem: any) => staffItem.completedTime !== null,
+                // );
+
+                return {
+                    isStepByStep:
+                        route.params.itemWorkSchedule.childTasks.isStepByStep,
+                    taskComfirmCheck:
+                        taskItem.status === EScheduleStatus.COMPLETED
+                            ? true
+                            : false,
+                    taskId: taskItem._id,
+                    name: taskItem.name,
+                    status: taskItem.status,
+                    isCurrentStep: taskItem.isCurrentStep,
+                    staff: taskItem.staff.map((staffItem: any) => {
+                        const isCompleted =
+                            staffItem.completedTime !== null ||
+                            staffItem.canceledTime !== null;
+                        return {
+                            userId: staffItem.userId,
+                            name: staffItem.name,
+                            status: staffItem.status,
+                            workingPercent: staffItem.workingPercent,
+                            subCompletedTime: staffItem.subCompletedTime,
+                            completedTime: staffItem.completedTime,
+                            canceledTime: staffItem.canceledTime,
+                            canceledNote: staffItem.canceledNote,
+                            staffCheck: isCompleted,
+                            staffComfirmCheck: isCompleted,
+                        };
+                    }),
+                };
+            }),
+        );
     };
 
     useEffect(() => {
@@ -1029,7 +1118,11 @@ const ScheduleDetail = ({route}: any) => {
                                 isStepByStep:
                                     route.params.itemWorkSchedule.childTasks
                                         .isStepByStep,
-                                taskComfirmCheck: false,
+                                taskComfirmCheck:
+                                    taskItem.status ===
+                                    EScheduleStatus.COMPLETED
+                                        ? true
+                                        : false,
                                 taskId: taskItem._id,
                                 name: taskItem.name,
                                 status: taskItem.status,
@@ -1065,7 +1158,6 @@ const ScheduleDetail = ({route}: any) => {
     return (
         <View style={ScheduleDetailStyles.container}>
             <ScrollView
-                keyboardShouldPersistTaps='handled'
                 contentContainerStyle={ScheduleDetailStyles.scrollViewStyle}>
                 <Text style={ScheduleDetailStyles.mainWorkTitle}>
                     {scheduleDetail?.title}
@@ -1293,6 +1385,8 @@ const ScheduleDetail = ({route}: any) => {
             ) : showListUpdateProgressTask ? (
                 renderUpdateProgressTask()
             ) : null}
+
+            <Backdrop open={isLoading} />
         </View>
     );
 };
@@ -1532,6 +1626,11 @@ const ScheduleDetailStyles = StyleSheet.create({
     },
     stepByStepTaskTitleNotDone: {
         color: '#808080',
+        fontWeight: 600,
+        fontSize: 14,
+    },
+    taskTitleCompleted: {
+        color: '#4CAF50',
         fontWeight: 600,
         fontSize: 14,
     },
