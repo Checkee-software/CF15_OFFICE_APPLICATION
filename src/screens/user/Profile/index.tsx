@@ -54,10 +54,13 @@ export default function Profile({navigation}: any) {
                         <Text style={styles.sectionLabel}>Công việc</Text>
 
                         <View style={styles.jobStats}>
-                            {renderStat('Tổng', '57')}
-                            {renderStat('Hoàn thành', '50')}
-                            {renderStat('Đang làm', '5')}
-                            {renderStat('Thất bại', '2')}
+                            {renderStat('Tổng', userInfo.tasks.total)}
+                            {renderStat(
+                                'Hoàn thành',
+                                userInfo.tasks.compeleted,
+                            )}
+                            {renderStat('Đang làm', userInfo.tasks.processing)}
+                            {renderStat('Thất bại', userInfo.tasks.expired)}
                         </View>
                     </View>
 
@@ -96,7 +99,7 @@ export default function Profile({navigation}: any) {
                                         `${userInfo.departmentName}`,
                                     )}
                                     {renderInfoRow(
-                                        'Đơn vị',
+                                        'Tổ',
                                         `${userInfo.userType.unit}`,
                                     )}
                                     {renderInfoRow(
@@ -417,7 +420,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         marginTop: 15,
-       },
+    },
     modalButton: {
         flex: 1,
         alignItems: 'flex-end',

@@ -13,7 +13,6 @@ interface workScheduleStore {
     listWorkScheduleFilter: IList[];
     detailWorkSchedule: ISchedule | null;
     getListWorkSchedule: () => Promise<void>;
-    getDetailWorkSchedule: (mainTaskId: string) => Promise<void>;
     filterByStatus: (status: string) => void;
     resetData: () => void;
 }
@@ -80,51 +79,6 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                     });
                 }
             }, 100);
-        }
-    },
-
-    getDetailWorkSchedule: async (mainTaskId: string) => {
-        set({isLoading: true});
-        try {
-            const response = await axiosClient.get(
-                `${backendURL}/resources/schedules/detail/${mainTaskId}`,
-            );
-
-            console.log('response', response);
-
-            if (response.data.data) {
-                const updateImgPathDetailSchedule = response.data.data;
-                updateImgPathDetailSchedule.employees =
-                    response.data.data.employees.map((employees: any) => {
-                        if (employees.avatar) {
-                            employees.avatar = fixAvatarPath(employees.avatar);
-                        }
-
-                        return {...employees};
-                    });
-                // console.log(updateImgPathDetailSchedule);
-                // set({
-                //     detailWorkSchedule: updateImgPathDetailSchedule,
-                // });
-
-                set({isLoading: false});
-                return updateImgPathDetailSchedule;
-            }
-        } catch (error: any) {
-            set({isLoading: false});
-
-            const _error = error;
-
-            console.log(_error.response);
-
-            // setTimeout(() => {
-            //     if (_error.response.status === 500) {
-            //         Snackbar.show({
-            //             text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
-            //             duration: Snackbar.LENGTH_LONG,
-            //         });
-            //     }
-            // }, 100);
         }
     },
 

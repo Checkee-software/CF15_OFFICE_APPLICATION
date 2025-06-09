@@ -38,7 +38,7 @@ const WorkerInfo = ({route}: any) => {
             <View style={WorkerInfoStyles.workerNameSection}>
                 <View
                     style={
-                        userInfo.userType.level === 'DEPARTMENT'
+                        userInfo.userType.level === EOrganization.DEPARTMENT
                             ? WorkerInfoStyles.workerAvatar
                             : WorkerInfoStyles.workerAvatar2
                     }>
@@ -58,12 +58,7 @@ const WorkerInfo = ({route}: any) => {
                     <Text style={WorkerInfoStyles.workerName}>
                         {item.fullName}
                     </Text>
-                    <Text style={WorkerInfoStyles.workerRole}>
-                        {userInfo.userType.level === 'DEPARTMENT' &&
-                        item.userType.level === EOrganization.LEADER
-                            ? `${item.role} ${item.unit}`
-                            : `${item.unit} `}
-                    </Text>
+                    <Text style={WorkerInfoStyles.workerRole}>{item.unit}</Text>
                 </View>
             </View>
 
@@ -111,6 +106,16 @@ const WorkerInfo = ({route}: any) => {
                         {renderLevelUser(item.userType.level)}
                     </Text>
                 </View>
+
+                {userInfo.userType.level === EOrganization.DEPARTMENT ? (
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>Vai trò</Text>
+
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {item.userType.role}
+                        </Text>
+                    </View>
+                ) : null}
 
                 <View style={WorkerInfoStyles.warpLabelAndValue}>
                     <Text style={WorkerInfoStyles.labelText}>Dân tộc</Text>

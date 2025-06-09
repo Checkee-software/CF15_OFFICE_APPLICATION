@@ -3,13 +3,12 @@ import {ScreenRegistry} from './types';
 
 /* screens */
 import Main from '../../screens/home/Main';
-import Unit from '@/screens/home/unit';
+import Unit from '@/screens/home/Unit';
 import Profile from '../../screens/user/Profile';
 import Document from '../../screens/home/Document';
 import WorkSchedule from '../../screens/home/WorkSchedule';
 import DetailDocuments from '../../screens/home/Document/DetailDocuments';
 import Statistic from '../../screens/home/Statistic';
-import BrowseJobs from '../../screens/home/BrowseJobs';
 import ImportTank from '../../screens/home/ImportTank';
 import ExportProduct from '../../screens/home/ExportProduct';
 import GasTankDetail from '../../screens/global/GasTankDetail';
@@ -78,13 +77,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: Feedback1,
         options: {
             title: SCREEN_INFO.FEEDBACK1.headerTitle,
-        },
-    },
-    {
-        name: SCREEN_INFO.BROWSEJOBS.key,
-        component: BrowseJobs,
-        options: {
-            title: SCREEN_INFO.BROWSEJOBS.headerTitle,
         },
     },
     {

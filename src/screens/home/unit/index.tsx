@@ -88,7 +88,7 @@ const Unit = ({navigation}: any) => {
                     size={22}
                 />
                 <TextInput
-                    placeholder='Tìm kiếm nhân sự'
+                    placeholder='Tìm kiếm người lao động'
                     placeholderTextColor={'rgba(128, 128, 128, 1)'}
                     style={UnitStyles.input}
                     onChangeText={setSearchWorker}
@@ -97,21 +97,24 @@ const Unit = ({navigation}: any) => {
 
             <View style={UnitStyles.listWorker}>
                 <FlatList
+                    contentContainerStyle={UnitStyles.flatListUnit}
                     data={filterWorkerBySearch}
                     renderItem={({item}) => renderWorker(item)}
                     keyExtractor={item => item._id}
                     onRefresh={handleReFetch}
                     refreshing={isLoading}
+                    keyboardShouldPersistTaps='handled'
                     ListEmptyComponent={
                         <View style={UnitStyles.workerEmpty}>
                             <Image
                                 source={images.emptyWorkerList}
                                 style={UnitStyles.emptyWorkerImg}
+                                resizeMode='contain'
                             />
                             <Text style={UnitStyles.emptyWorkerText}>
                                 {searchWorker.length !== 0
                                     ? `Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`
-                                    : 'Không tìm thấy nhân sự nào'}
+                                    : 'Không tìm thấy danh sách nhân sự!'}
                             </Text>
                         </View>
                     }
@@ -141,7 +144,10 @@ const UnitStyles = StyleSheet.create({
     },
     listWorker: {
         flex: 1,
-        paddingVertical: 10,
+        marginVertical: 5,
+    },
+    flatListUnit: {
+        flexGrow: 1,
     },
     listWorkerMargin: {
         marginVertical: 12,
@@ -193,13 +199,12 @@ const UnitStyles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     workerEmpty: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        flex: 1,
     },
     emptyWorkerImg: {
-        width: 305,
-        height: 180,
+        height: 200,
     },
     emptyWorkerText: {
         textAlign: 'center',

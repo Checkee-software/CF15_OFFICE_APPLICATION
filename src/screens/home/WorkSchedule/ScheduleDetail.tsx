@@ -7,85 +7,17 @@ import {
     TouchableOpacity,
     FlatList,
     Image,
-    TextInput,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
-import * as Progress from 'react-native-progress';
+import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import RNFS from 'react-native-fs';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import Snackbar from 'react-native-snackbar';
-import CheckBox from 'react-native-check-box';
-import {
-    EScheduleStatus,
-    IApplyPersonalTask,
-} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
-import {ISchedule} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
-import {useAuthStore} from '../../../stores/authStore';
-import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
+import {List} from 'react-native-paper';
 import moment from 'moment';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import Backdrop from '@/screens/subscreen/Loading/index2';
 
 const ScheduleDetail = ({route}: any) => {
-    interface Staff {
-        userId: string;
-        name: string;
-        status: string;
-        workingPercent: number;
-        subCompletedTime: string | null;
-        completedTime: string | null;
-        canceledTime: string | null;
-        canceledNote: string;
-        staffCheck: boolean;
-        staffComfirmCheck: boolean;
-    }
-
-    interface Task {
-        isStepByStep: boolean;
-        taskComfirmCheck: boolean;
-        taskId: string;
-        name: string;
-        status: string;
-        isCurrentStep: boolean;
-        staff: Staff[];
-    }
-
-    type IsCheckList = Task[];
-
-    const {
-        isLoading,
-        updateProgressTaskByImplementer,
-        getDetailWorkSchedule,
-        detailWorkSchedule,
-        browseTaskImplementerByManagement,
-        completedTaskByManagement,
-    } = useWorkScheduleStore();
-
-    //console.log(route.params.itemWorkSchedule);
-
-    const {userInfo} = useAuthStore();
-
-    const [showListRadioButton, setShowListRadioButton] = useState(false);
-    const [radioSelectedType, setRadioSelectedType] = useState(0);
-
-    const [showListUpdateProgressTask, setShowListUpdateProgressTask] =
-        useState(false);
-    const [currentSelectedChildTask, setCurrentSelectedChildTask] =
-        useState('');
-    const [currentSelectedStaff, setCurrentSelectedStaff] = useState('');
-    const [
-        currentSelectedChildTaskUpdateProgress,
-        setCurrentSelectedChildTaskUpdateProgress,
-    ] = useState('');
-    const [progressValue, setProgressValue] = useState('');
-
-    const [cancelReason, setCancelReason] = useState('');
-    const [isCheckList, setIsCheckList] = useState<IsCheckList>([]);
-    const [scheduleDetail, setScheduleDetail] = useState<ISchedule>();
-
     type AttachedFiles = {
         destination: string;
         encoding: string;
@@ -97,23 +29,9 @@ const ScheduleDetail = ({route}: any) => {
         size: number;
     };
 
-    const calculateTotalPercent = () => {
-        const tasks = scheduleDetail?.childTasks.tasks;
-        const totalTasks = tasks?.length;
+    const scheduleDetail = route.params.itemWorkSchedule;
 
-        const completedTasks = tasks
-            ? tasks.filter(task => task.status === EScheduleStatus.COMPLETED)
-                  .length
-            : 0;
-
-        const overallProgress = totalTasks
-            ? (completedTasks / totalTasks) * 100
-            : 0;
-
-        const overallProgressFormat = overallProgress / 100;
-
-        return overallProgressFormat;
-    };
+    console.log(route.params.itemWorkSchedule);
 
     const formatFileSize = (size: number) => {
         if (size >= 1024 * 1024) {
@@ -123,38 +41,6 @@ const ScheduleDetail = ({route}: any) => {
         } else {
             return `${size} Bytes`;
         }
-    };
-
-    const renderStatusText = (status: string) => {
-        if (status === EScheduleStatus.PENDING) {
-            return 'Đang chờ';
-        } else if (status === EScheduleStatus.PROCESSING) {
-            return 'Đang thực hiện';
-        } else if (status === EScheduleStatus.ALMOST_EXPIRE) {
-            return 'Sắp hết hạn';
-        } else if (status === EScheduleStatus.COMPLETED) {
-            return 'Hoàn thành';
-        } else if (status === EScheduleStatus.EXPIRED) {
-            return 'Trễ hạn';
-        } else {
-            return 'Đã huỷ';
-        }
-    };
-
-    const calculateTaskProgress = (task: any): number => {
-        const staffList = task.staff || [];
-
-        const validStaff: Staff[] = staffList.filter(
-            (staff: Staff) => typeof staff.workingPercent === 'number',
-        );
-
-        if (validStaff.length === 0) return 0;
-
-        const totalPercent = validStaff.reduce(
-            (sum: number, staff: any) => sum + staff.workingPercent,
-            0,
-        );
-        return Math.min(100, Math.round(totalPercent / validStaff.length));
     };
 
     const downloadFile = async (fileUrl: string, fileName: string) => {
@@ -270,7 +156,7 @@ const ScheduleDetail = ({route}: any) => {
                         </Text>
                         <Text style={ScheduleDetailStyles.workerUnit}>
                             {/* {itemStaff.userType.unit} */}
-                            Trưởng đơn vị 1
+                            Đội sản xuất phía Tây
                         </Text>
                     </View>
                 </View>
@@ -284,1036 +170,110 @@ const ScheduleDetail = ({route}: any) => {
         </View>
     );
 
-    const renderChildTaskJustSeen = (itemChildTask: any) => (
-        <View style={ScheduleDetailStyles.warpChildTask}>
-            {scheduleDetail?.status === EScheduleStatus.COMPLETED ? (
-                <MaterialIcons name='check-circle' size={20} color='#4CAF50' />
-            ) : null}
-            <View
-                style={[
-                    ScheduleDetailStyles.rightChildTask,
-                    {
-                        width:
-                            scheduleDetail?.status === EScheduleStatus.COMPLETED
-                                ? '88%'
-                                : '100%',
-                    },
-                ]}>
-                <Text
-                    style={
-                        scheduleDetail?.status === EScheduleStatus.COMPLETED
-                            ? ScheduleDetailStyles.taskTitleCompleted
-                            : ScheduleDetailStyles.taskTitleNotDone
-                    }>
-                    {itemChildTask.name}
-                </Text>
+    const renderChildTask = (itemChildTask: any) => (
+        <View style={ScheduleDetailStyles.childTaskInfo}>
+            <Text style={ScheduleDetailStyles.taskTitle}>
+                {itemChildTask.name}
+            </Text>
 
-                <View style={ScheduleDetailStyles.progressTask}>
-                    <Text
-                        style={[
-                            scheduleDetail?.status === EScheduleStatus.COMPLETED
-                                ? ScheduleDetailStyles.taskTitleCompleted
-                                : ScheduleDetailStyles.taskTitleNotDone && {
-                                      marginLeft: 10,
-                                  },
-                        ]}>
-                        {`${itemChildTask.completedPercent}%`}
-                    </Text>
-                    <Text style={ScheduleDetailStyles.taskEndIn}>
-                        {`Kết thúc vào ${renderTaskEndIn(
-                            itemChildTask.finishedTime,
-                        )}`}
-                    </Text>
-                </View>
+            <Text style={ScheduleDetailStyles.taskEndIn}>
+                {`Kết thúc vào ${renderTaskEndIn(itemChildTask.finishedTime)}`}
+            </Text>
 
-                <View style={ScheduleDetailStyles.taskParticipant}>
-                    {itemChildTask.staff.map((itemStaff: any) => (
-                        <View
-                            style={ScheduleDetailStyles.warpParticipant}
-                            key={itemStaff.userId}>
-                            {itemStaff.completedTime !== null ? (
-                                <>
-                                    <MaterialIcons
-                                        name='check-circle'
-                                        size={20}
-                                        color='#4CAF50'
-                                    />
-
-                                    <View
-                                        style={
-                                            ScheduleDetailStyles.warpInfoParticipant
-                                        }>
-                                        <Text
-                                            style={
-                                                ScheduleDetailStyles.staffName
-                                            }>
-                                            {itemStaff.name}
-                                        </Text>
-                                        <Text
-                                            style={
-                                                ScheduleDetailStyles.taskDoneWhen
-                                            }>
-                                            {`Hoàn thành lúc ${renderTaskEndIn(
-                                                itemStaff.completedTime,
-                                            )}`}
-                                        </Text>
-                                    </View>
-                                </>
-                            ) : itemStaff.status === 'CANCELED' ? (
-                                <>
-                                    <>
-                                        <AntDesign
-                                            name='closecircle'
-                                            size={20}
-                                            color='#FF4E45'
-                                        />
-
-                                        <View
-                                            style={
-                                                ScheduleDetailStyles.warpInfoParticipant
-                                            }>
-                                            <Text
-                                                style={
-                                                    ScheduleDetailStyles.cancelStaffName
-                                                }>
-                                                {itemStaff.name}
-                                            </Text>
-                                            <Text
-                                                style={
-                                                    ScheduleDetailStyles.taskCancelWhen
-                                                }>
-                                                {`Đã hủy lúc ${renderTaskEndIn(
-                                                    itemStaff.canceledTime,
-                                                )}`}
-                                            </Text>
-                                            <Text
-                                                style={
-                                                    ScheduleDetailStyles.taskCancelReason
-                                                }>
-                                                {`Lý do: ${itemStaff.canceledNote}`}
-                                            </Text>
-                                        </View>
-                                    </>
-                                </>
-                            ) : itemStaff.workingPercent === 100 ? (
-                                <>
-                                    <MaterialIcons
-                                        name='check-circle'
-                                        size={20}
-                                        color='#FF9800'
-                                    />
-
-                                    <View
-                                        style={
-                                            ScheduleDetailStyles.warpInfoParticipant
-                                        }>
-                                        <Text
-                                            style={
-                                                ScheduleDetailStyles.staffName
-                                            }>
-                                            {itemStaff.name}
-                                        </Text>
-                                        <Text
-                                            style={
-                                                ScheduleDetailStyles.taskWaitingBrowse
-                                            }>
-                                            {`Đã xong lúc ${renderTaskEndIn(
-                                                itemStaff.subCompletedTime,
-                                            )}`}
-                                        </Text>
-                                    </View>
-                                </>
-                            ) : (
-                                <>
-                                    <View
-                                        style={
-                                            ScheduleDetailStyles.warpInfoParticipant
-                                        }>
-                                        <Text
-                                            style={
-                                                ScheduleDetailStyles.staffName
-                                            }>
-                                            {itemStaff.name}
-                                        </Text>
-                                        <Text
-                                            style={
-                                                ScheduleDetailStyles.taskIsProcessing
-                                            }>
-                                            Tiến độ {itemStaff.workingPercent}%
-                                        </Text>
-                                    </View>
-                                </>
-                            )}
-                        </View>
-                    ))}
-                </View>
-            </View>
-        </View>
-    );
-
-    const renderChildTask = (itemChildTask: any) => {
-        const itemCheck = isCheckList.find(
-            (checkItem: any) => checkItem.taskId === itemChildTask._id,
-        );
-
-        if (!itemCheck) return null;
-
-        return (
-            <View style={ScheduleDetailStyles.warpChildTask}>
-                {itemCheck?.status === EScheduleStatus.COMPLETED &&
-                itemCheck.staff.every(
-                    (item: any) => item.staffComfirmCheck && item.staffCheck,
-                ) ? (
+            <View style={ScheduleDetailStyles.participant}>
+                <View style={ScheduleDetailStyles.statusTask}>
                     <MaterialIcons
                         name='check-circle'
                         size={20}
                         color='#4CAF50'
                     />
-                ) : (
-                    <CheckBox
-                        onClick={() =>
-                            handleToggleTaskClick(itemCheck?.taskId || '')
-                        }
-                        checkedCheckBoxColor='rgb(255, 166, 33)'
-                        isChecked={itemCheck.taskComfirmCheck}
-                        disabled={
-                            itemCheck.staff.every(
-                                (item: any) => item.staffComfirmCheck,
-                            )
-                                ? false
-                                : true
-                        }
-                        checkBoxColor={
-                            itemCheck.isCurrentStep === false
-                                ? '#B0B0B0'
-                                : '#000'
-                        }
-                    />
-                )}
-                <View style={ScheduleDetailStyles.rightChildTask}>
+                </View>
+                <View style={ScheduleDetailStyles.warpParticipant}>
+                    <Text style={ScheduleDetailStyles.participantName}>
+                        Hà Hoàng A
+                    </Text>
                     <Text
-                        style={
-                            itemCheck.status === EScheduleStatus.COMPLETED &&
-                            itemCheck.staff.every(
-                                (item: any) =>
-                                    item.staffComfirmCheck && item.staffCheck,
-                            )
-                                ? ScheduleDetailStyles.taskTitleCompleted
-                                : itemCheck.staff.every(
-                                      (item: any) =>
-                                          item.workingPercent === 100,
-                                  )
-                                ? ScheduleDetailStyles.taskTitleIsDone
-                                : itemCheck.isCurrentStep === false
-                                ? ScheduleDetailStyles.stepByStepTaskTitleNotDone
-                                : ScheduleDetailStyles.taskTitleNotDone
-                        }>
-                        {itemChildTask.name}
+                        style={[
+                            ScheduleDetailStyles.participantStatus,
+                            ScheduleDetailStyles.participantStatus2,
+                        ]}>
+                        Đã làm 800/2500 (m2) 15:33 25/05/2025
                     </Text>
-
-                    <View style={ScheduleDetailStyles.progressTask}>
-                        <Text
-                            style={
-                                itemCheck.status ===
-                                    EScheduleStatus.COMPLETED &&
-                                itemCheck.staff.every(
-                                    (item: any) =>
-                                        item.staffComfirmCheck &&
-                                        item.staffCheck,
-                                )
-                                    ? ScheduleDetailStyles.taskTitleCompleted
-                                    : itemCheck.staff.every(
-                                          (item: any) =>
-                                              item.workingPercent === 100,
-                                      )
-                                    ? ScheduleDetailStyles.taskTitleIsDone
-                                    : itemCheck.isCurrentStep === false
-                                    ? ScheduleDetailStyles.stepByStepTaskTitleNotDone
-                                    : ScheduleDetailStyles.taskTitleNotDone
-                            }>
-                            {`${calculateTaskProgress(itemCheck)}%`}
-                        </Text>
-
-                        <Text
-                            style={
-                                itemCheck.isCurrentStep === false
-                                    ? ScheduleDetailStyles.stepByStepTaskEndIn
-                                    : ScheduleDetailStyles.taskEndIn
-                            }>
-                            {`Kết thúc vào ${renderTaskEndIn(
-                                itemChildTask.finishedTime,
-                            )}`}
-                        </Text>
-                    </View>
-
-                    <View style={ScheduleDetailStyles.taskParticipant}>
-                        {itemCheck.staff.map((itemStaff: any) => (
-                            <View
-                                style={ScheduleDetailStyles.warpParticipant}
-                                key={itemStaff.userId}>
-                                {itemStaff.completedTime !== null ? (
-                                    <>
-                                        <MaterialIcons
-                                            name='check-circle'
-                                            size={20}
-                                            color='#4CAF50'
-                                        />
-
-                                        <View
-                                            style={
-                                                ScheduleDetailStyles.warpInfoParticipant
-                                            }>
-                                            <Text
-                                                style={
-                                                    ScheduleDetailStyles.staffName
-                                                }>
-                                                {itemStaff.name}
-                                            </Text>
-                                            <Text
-                                                style={
-                                                    ScheduleDetailStyles.taskDoneWhen
-                                                }>
-                                                {`Hoàn thành lúc ${renderTaskEndIn(
-                                                    itemStaff.completedTime,
-                                                )}`}
-                                            </Text>
-                                        </View>
-                                    </>
-                                ) : itemStaff.status === 'CANCELED' ? (
-                                    <>
-                                        <>
-                                            <AntDesign
-                                                name='closecircle'
-                                                size={20}
-                                                color='#FF4E45'
-                                            />
-
-                                            <View
-                                                style={
-                                                    ScheduleDetailStyles.warpInfoParticipant
-                                                }>
-                                                <Text
-                                                    style={
-                                                        ScheduleDetailStyles.cancelStaffName
-                                                    }>
-                                                    {itemStaff.name}
-                                                </Text>
-                                                <Text
-                                                    style={
-                                                        ScheduleDetailStyles.taskCancelWhen
-                                                    }>
-                                                    {`Đã hủy lúc ${renderTaskEndIn(
-                                                        itemStaff.canceledTime,
-                                                    )}`}
-                                                </Text>
-                                                <Text
-                                                    style={
-                                                        ScheduleDetailStyles.taskCancelReason
-                                                    }>
-                                                    {`Lý do: ${itemStaff.canceledNote}`}
-                                                </Text>
-                                            </View>
-                                        </>
-                                    </>
-                                ) : itemStaff.workingPercent === 100 ? (
-                                    <>
-                                        {userInfo.userType.level ===
-                                        EOrganization.DEPARTMENT ? (
-                                            <CheckBox
-                                                checkedCheckBoxColor='rgb(255, 166, 33)'
-                                                isChecked={
-                                                    itemStaff.staffComfirmCheck
-                                                }
-                                                onClick={() =>
-                                                    handleToggleStaffCheck(
-                                                        itemChildTask._id,
-                                                        itemStaff.userId,
-                                                    )
-                                                }
-                                            />
-                                        ) : (
-                                            <MaterialIcons
-                                                name='check-circle'
-                                                size={20}
-                                                color='#FF9800'
-                                            />
-                                        )}
-
-                                        <View
-                                            style={
-                                                ScheduleDetailStyles.warpInfoParticipant
-                                            }>
-                                            <Text
-                                                style={
-                                                    ScheduleDetailStyles.staffName
-                                                }>
-                                                {itemStaff.name}
-                                            </Text>
-                                            <Text
-                                                style={
-                                                    ScheduleDetailStyles.taskWaitingBrowse
-                                                }>
-                                                {`Đã xong lúc ${renderTaskEndIn(
-                                                    itemStaff.subCompletedTime,
-                                                )}`}
-                                            </Text>
-                                        </View>
-                                    </>
-                                ) : (
-                                    <>
-                                        <CheckBox
-                                            checkedCheckBoxColor='rgb(255, 166, 33)'
-                                            isChecked={
-                                                itemStaff.staffComfirmCheck
-                                            }
-                                            onClick={() =>
-                                                handleToggleStaffCheck(
-                                                    itemChildTask._id,
-                                                    itemStaff.userId,
-                                                )
-                                            }
-                                            disabled={
-                                                itemCheck.isCurrentStep ===
-                                                false
-                                                    ? true
-                                                    : false
-                                            }
-                                            checkBoxColor={
-                                                itemCheck.isCurrentStep ===
-                                                false
-                                                    ? '#B0B0B0'
-                                                    : '#000'
-                                            }
-                                        />
-                                        <View
-                                            style={
-                                                ScheduleDetailStyles.warpInfoParticipant
-                                            }>
-                                            <Text
-                                                style={
-                                                    ScheduleDetailStyles.staffName
-                                                }>
-                                                {itemStaff.name}
-                                            </Text>
-                                            <Text
-                                                style={
-                                                    ScheduleDetailStyles.taskIsProcessing
-                                                }>
-                                                Tiến độ{' '}
-                                                {itemStaff.workingPercent}%
-                                            </Text>
-                                        </View>
-                                    </>
-                                )}
-                            </View>
-                        ))}
-                    </View>
                 </View>
             </View>
-        );
-    };
 
-    const renderComfirmView = () => {
-        if (radioSelectedType === 1) {
-            return (
-                <View style={ScheduleDetailStyles.comfirmView}>
-                    <Text style={ScheduleDetailStyles.comfirmViewText}>
-                        Chắc chắn muốn xác nhận công việc của nhân sự này?
-                    </Text>
-
-                    <View style={ScheduleDetailStyles.listComfirmBtn}>
-                        <TouchableOpacity
-                            style={ScheduleDetailStyles.cancelBtnBrowseTask}
-                            onPress={() => setRadioSelectedType(0)}>
-                            <Text
-                                style={
-                                    ScheduleDetailStyles.cancelBtnTextBrowseTask
-                                }>
-                                Hủy bỏ
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={handleComfirmSelectedRadio}
-                            style={ScheduleDetailStyles.comfirmBtnBrowseTask}>
-                            <Text
-                                style={
-                                    ScheduleDetailStyles.comfirmBtnTextBrowseTask
-                                }>
-                                Xác nhận
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            );
-        } else if (radioSelectedType === 2) {
-            return (
-                <View style={ScheduleDetailStyles.comfirmView}>
-                    <Text style={ScheduleDetailStyles.comfirmViewText}>
-                        Chắc chắn muốn khởi tạo lại tiến độ công việc của nhân
-                        sự này?
-                    </Text>
-
-                    <View style={ScheduleDetailStyles.listComfirmBtn}>
-                        <TouchableOpacity
-                            style={ScheduleDetailStyles.comfirmBtnBrowseTask}
-                            onPress={() => setRadioSelectedType(0)}>
-                            <Text
-                                style={
-                                    ScheduleDetailStyles.comfirmBtnTextBrowseTask
-                                }>
-                                Hủy bỏ
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={handleComfirmSelectedRadio}
-                            style={ScheduleDetailStyles.comfirmBtnRedoTask}>
-                            <Text
-                                style={
-                                    ScheduleDetailStyles.comfirmBtnTextRedoTask
-                                }>
-                                Xác nhận
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            );
-        } else {
-            return (
-                <View style={ScheduleDetailStyles.comfirmView}>
-                    <Text style={ScheduleDetailStyles.comfirmViewText}>
-                        Chắc chắn muốn huỷ bỏ tiến độ công việc của nhân sự này?
-                    </Text>
-
-                    <TextInput
-                        style={ScheduleDetailStyles.cancelProgressInput}
-                        placeholder='Nhập lý do huỷ...'
-                        placeholderTextColor={'#808080'}
-                        multiline
-                        numberOfLines={5}
-                        onChangeText={setCancelReason}
+            <View style={ScheduleDetailStyles.participant}>
+                <View style={ScheduleDetailStyles.statusTask}>
+                    <MaterialIcons
+                        name='check-circle'
+                        size={20}
+                        color='#FF4E45'
                     />
-
-                    <View style={ScheduleDetailStyles.listComfirmBtn}>
-                        <TouchableOpacity
-                            style={
-                                ScheduleDetailStyles.cancelBtnCanelProgressTask
-                            }
-                            onPress={() => setRadioSelectedType(0)}>
-                            <Text
-                                style={
-                                    ScheduleDetailStyles.cancelBtnTextCanelProgressTask
-                                }>
-                                Hủy bỏ
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={handleComfirmSelectedRadio}
-                            style={
-                                ScheduleDetailStyles.comfirmBtnCanelProgressTask
-                            }>
-                            <Text
-                                style={
-                                    ScheduleDetailStyles.comfirmBtnTextCanelProgressTask
-                                }>
-                                Xác nhận
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
                 </View>
-            );
-        }
-    };
 
-    const renderUpdateProgressTask = () => {
-        return (
-            <View style={ScheduleDetailStyles.comfirmViewMainTask}>
-                <Text style={ScheduleDetailStyles.updateProgressTaskText}>
-                    Cập nhật tiến độ công việc
-                </Text>
+                <View style={ScheduleDetailStyles.warpParticipant}>
+                    <Text style={ScheduleDetailStyles.participantName}>
+                        Hà Hoàng B
+                    </Text>
+                    <Text
+                        style={[
+                            ScheduleDetailStyles.participantStatus,
+                            ScheduleDetailStyles.participantStatus3,
+                        ]}>
+                        (15:37 23/06/2025) Lý do: Sai yêu cầu
+                    </Text>
+                </View>
+            </View>
 
-                <View style={ScheduleDetailStyles.listComfirmBtn}>
-                    <TextInput
-                        style={ScheduleDetailStyles.inputUpdateProgreessTask}
-                        placeholderTextColor={'#000000'}
-                        placeholder='Nhập tiến độ %'
-                        //textAlign={'center'}
-                        value={progressValue}
-                        inputMode='numeric'
-                        onChangeText={setProgressValue}
-                        maxLength={3}
+            <View style={ScheduleDetailStyles.participant}>
+                <View style={ScheduleDetailStyles.statusTask}>
+                    <MaterialIcons
+                        name='check-circle'
+                        size={20}
+                        color='#2196F3'
                     />
-
-                    <TouchableOpacity
-                        style={ScheduleDetailStyles.updateProgressTaskBtn}
-                        onPress={handleUpdateProgressTask}>
-                        <Text
-                            style={
-                                ScheduleDetailStyles.updateProgressTaskBtnText
-                            }>
-                            Xác nhận
-                        </Text>
-                    </TouchableOpacity>
+                </View>
+                <View style={ScheduleDetailStyles.warpParticipant}>
+                    <Text
+                        style={[
+                            ScheduleDetailStyles.participantName,
+                            ScheduleDetailStyles.participantStatus2,
+                        ]}>
+                        Hà Hoàng C
+                    </Text>
+                    <Text
+                        style={[
+                            ScheduleDetailStyles.participantStatus,
+                            ScheduleDetailStyles.participantStatus2,
+                        ]}>
+                        Đã làm 2500/2500 (m2) 15:33 25/05/2025
+                    </Text>
                 </View>
             </View>
-        );
-    };
 
-    const renderComfirmBrowseMainTask = () => {
-        return (
-            <View style={ScheduleDetailStyles.comfirmViewMainTask}>
-                <Text style={ScheduleDetailStyles.comfirmMainTaskText}>
-                    Có chắc chắn hoàn thành công việc con này không?
-                </Text>
-
-                <View>
-                    <View style={ScheduleDetailStyles.listComfirmBtn}>
-                        <TouchableOpacity
-                            style={ScheduleDetailStyles.cancelBtnBrowseTask}
-                            onPress={handleCancelToggleTaskClick}>
-                            <Text
-                                style={
-                                    ScheduleDetailStyles.cancelBtnTextBrowseTask
-                                }>
-                                Hủy bỏ
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={handleCompletedTaskByManagement}
-                            style={ScheduleDetailStyles.comfirmBtnBrowseTask}>
-                            <Text
-                                style={
-                                    ScheduleDetailStyles.comfirmBtnTextBrowseTask
-                                }>
-                                Xác nhận
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
+            <View style={ScheduleDetailStyles.participant}>
+                <View style={ScheduleDetailStyles.statusTask}>
+                    <MaterialIcons
+                        name='check-circle'
+                        size={20}
+                        color='#808080'
+                    />
+                </View>
+                <View style={ScheduleDetailStyles.warpParticipant}>
+                    <Text style={ScheduleDetailStyles.participantName}>
+                        Hà Hoàng D
+                    </Text>
+                    <Text
+                        style={[
+                            ScheduleDetailStyles.participantStatus,
+                            ScheduleDetailStyles.participantStatus1,
+                        ]}>
+                        Đã làm 0/2500 (m2)
+                    </Text>
                 </View>
             </View>
-        );
-    };
-
-    const handleToggleStaffCheck = (taskId: string, userId: string) => {
-        //leader duyệt cv của chính mình (phòng ban giao việc cho leader)
-        if (userInfo._id === userId) {
-            const _isCheckList = isCheckList.map(taskItem => {
-                // Nếu là task đang thao tác
-                if (taskItem.taskId === taskId) {
-                    const updatedStaff = taskItem.staff.map(staffItem => {
-                        if (staffItem.userId === userId) {
-                            return {
-                                ...staffItem,
-                                staffComfirmCheck: !staffItem.staffComfirmCheck,
-                            };
-                        } else if (!staffItem.staffCheck) {
-                            return {
-                                ...staffItem,
-                                staffComfirmCheck: false,
-                            };
-                        }
-
-                        return staffItem;
-                    });
-
-                    return {
-                        ...taskItem,
-                        staff: updatedStaff,
-                    };
-                }
-
-                // các task khác, kiểm tra xem có staff trùng userId và staffComfirmCheck đang check true và staffCheck thì reset về false
-                const updatedStaff = taskItem.staff.map(staffItem => {
-                    if (
-                        staffItem.userId === userId &&
-                        staffItem.staffComfirmCheck &&
-                        staffItem.staffCheck === false
-                    ) {
-                        return {
-                            ...staffItem,
-                            staffComfirmCheck: false,
-                        };
-                    }
-                    return staffItem;
-                });
-
-                return {
-                    ...taskItem,
-                    staff: updatedStaff,
-                };
-            });
-
-            setIsCheckList(_isCheckList);
-            setCurrentSelectedChildTaskUpdateProgress(taskId);
-
-            if (currentSelectedStaff === '') {
-                setCurrentSelectedStaff(userId);
-            }
-
-            if (showListUpdateProgressTask === false) {
-                setShowListUpdateProgressTask(true);
-            }
-        }
-
-        //cán bộ quản lý duyệt
-        else if (
-            userInfo.userType.level === EOrganization.DEPARTMENT &&
-            userInfo._id === scheduleDetail?.followerId
-        ) {
-            const _isCheckList = isCheckList.map(taskItem => {
-                if (taskItem.taskId !== taskId) {
-                    return taskItem;
-                }
-
-                const updatedStaff = taskItem.staff.map(staffItem => {
-                    if (staffItem.userId === userId) {
-                        return {
-                            ...staffItem,
-                            staffComfirmCheck: !staffItem.staffComfirmCheck,
-                        };
-                    } else if (!staffItem.staffCheck) {
-                        return {
-                            ...staffItem,
-                            staffComfirmCheck: false,
-                        };
-                    }
-
-                    return staffItem;
-                });
-
-                return {
-                    ...taskItem,
-                    staff: updatedStaff,
-                };
-            });
-
-            setIsCheckList(_isCheckList);
-
-            setCurrentSelectedChildTaskUpdateProgress(taskId);
-
-            if (currentSelectedStaff === userId) {
-                setCurrentSelectedStaff('');
-                setShowListRadioButton(false);
-                setCurrentSelectedChildTaskUpdateProgress('');
-            } else {
-                setCurrentSelectedStaff(userId);
-                if (showListRadioButton === false) {
-                    setShowListRadioButton(true);
-                }
-            }
-        }
-    };
-
-    const handleToggleTaskClick = (taskId: string) => {
-        const updatedList = isCheckList.map(task => {
-            if (task.taskId === taskId) {
-                return {
-                    ...task,
-                    taskComfirmCheck: !task.taskComfirmCheck,
-                };
-            }
-            return task;
-        });
-
-        setIsCheckList(updatedList);
-
-        if (currentSelectedChildTask === taskId) {
-            setCurrentSelectedChildTask('');
-        } else {
-            setCurrentSelectedChildTask(taskId);
-        }
-    };
-
-    const handleCancelToggleTaskClick = () => {
-        const updatedList = isCheckList.map(task => {
-            if (task.taskId === currentSelectedChildTask) {
-                return {
-                    ...task,
-                    taskComfirmCheck: false,
-                };
-            }
-            return task;
-        });
-
-        setIsCheckList(updatedList);
-        setCurrentSelectedChildTask('');
-    };
-
-    const handleCompletedTaskByManagement = async () => {
-        const result = await completedTaskByManagement(
-            scheduleDetail?._id,
-            currentSelectedChildTask,
-        );
-
-        await handleGetDetailSchedule();
-
-        if (result.status === 200) {
-            setCurrentSelectedChildTask('');
-            setTimeout(() => {
-                Snackbar.show({
-                    text: result.data.message,
-                    duration: Snackbar.LENGTH_SHORT,
-                });
-            }, 100);
-        }
-
-        if (result.status === 400) {
-            setTimeout(() => {
-                Snackbar.show({
-                    text: result.data,
-                    duration: Snackbar.LENGTH_SHORT,
-                });
-            }, 100);
-        }
-    };
-
-    const handleComfirmSelectedRadio = async () => {
-        if (radioSelectedType === 1) {
-            const formBrowseTask = {
-                taskId: currentSelectedChildTaskUpdateProgress,
-                userId: currentSelectedStaff,
-            };
-
-            const result = await browseTaskImplementerByManagement(
-                scheduleDetail?._id,
-                formBrowseTask,
-            );
-
-            await handleGetDetailSchedule();
-
-            if (result.status === 200) {
-                setShowListRadioButton(false);
-                setRadioSelectedType(0);
-                setCurrentSelectedChildTaskUpdateProgress('');
-                setCurrentSelectedStaff('');
-
-                setTimeout(() => {
-                    Snackbar.show({
-                        text: result.data.message,
-                        duration: Snackbar.LENGTH_SHORT,
-                    });
-                }, 100);
-            }
-
-            if (result.status === 400) {
-                setShowListUpdateProgressTask(false);
-                setTimeout(() => {
-                    Snackbar.show({
-                        text: result.data,
-                        duration: Snackbar.LENGTH_SHORT,
-                    });
-                }, 100);
-                setShowListUpdateProgressTask(true);
-            }
-        } else if (radioSelectedType === 2) {
-            //console.log(radioSelectedType, currentSelectedStaff);
-        } else {
-            //console.log(radioSelectedType, currentSelectedStaff, cancelReason);
-        }
-    };
-
-    const checkValidProgressValue = () => {
-        const trimmedProgressValue = progressValue.trim();
-
-        if (trimmedProgressValue === '') {
-            Snackbar.show({
-                text: 'Bạn chưa nhập tiến độ công việc',
-                duration: Snackbar.LENGTH_SHORT,
-            });
-            return false;
-        }
-
-        if (
-            trimmedProgressValue === '' ||
-            isNaN(Number(trimmedProgressValue)) ||
-            trimmedProgressValue.includes('.') ||
-            trimmedProgressValue.includes(',')
-        ) {
-            Snackbar.show({
-                text: 'Tiến độ công việc không hợp lệ',
-                duration: Snackbar.LENGTH_SHORT,
-            });
-
-            return false;
-        }
-
-        const number = Number(trimmedProgressValue);
-
-        if (!Number.isInteger(number) || number > 100) {
-            Snackbar.show({
-                text: 'Tiến độ công việc không lớn hơn 100%',
-                duration: Snackbar.LENGTH_SHORT,
-            });
-            return false;
-        }
-
-        return true;
-    };
-
-    const handleUpdateProgressTask = async () => {
-        const check = checkValidProgressValue();
-
-        if (check) {
-            const progressNumberType = Number(progressValue);
-
-            const formUpdateProgress: IApplyPersonalTask = {
-                percent: progressNumberType,
-                taskId: currentSelectedChildTaskUpdateProgress,
-            };
-            const result = await updateProgressTaskByImplementer(
-                scheduleDetail?._id,
-                formUpdateProgress,
-            );
-
-            //console.log(result);
-
-            if (result.status === 200) {
-                setShowListUpdateProgressTask(false);
-                setProgressValue('');
-                setCurrentSelectedChildTaskUpdateProgress('');
-                setCurrentSelectedStaff('');
-
-                await handleGetDetailSchedule();
-
-                setTimeout(() => {
-                    Snackbar.show({
-                        text: result.data.message,
-                        duration: Snackbar.LENGTH_SHORT,
-                    });
-                }, 100);
-            }
-
-            if (result.status === 400) {
-                setShowListUpdateProgressTask(false);
-                setTimeout(() => {
-                    Snackbar.show({
-                        text: result.data,
-                        duration: Snackbar.LENGTH_SHORT,
-                    });
-                }, 100);
-                setShowListUpdateProgressTask(true);
-            }
-        }
-    };
-
-    const handleGetDetailSchedule = async () => {
-        const resultScheduleDetail = await getDetailWorkSchedule(
-            scheduleDetail?._id,
-        );
-        //console.log(resultScheduleDetail);
-        setScheduleDetail(resultScheduleDetail);
-
-        let hasSetTrue = false;
-        setIsCheckList(() =>
-            resultScheduleDetail.childTasks.tasks.map((taskItem: any) => {
-                // const allStaffCompleted = taskItem.staff.every(
-                //     (staffItem: any) => staffItem.completedTime !== null,
-                // );
-
-                let isCurrentStep = false;
-                if (
-                    !hasSetTrue &&
-                    taskItem.status === EScheduleStatus.PROCESSING
-                ) {
-                    isCurrentStep = true;
-                    hasSetTrue = true;
-                }
-
-                return {
-                    isStepByStep:
-                        route.params.itemWorkSchedule.childTasks.isStepByStep,
-                    taskComfirmCheck:
-                        taskItem.status === EScheduleStatus.COMPLETED
-                            ? true
-                            : false,
-                    taskId: taskItem._id,
-                    name: taskItem.name,
-                    status: taskItem.status,
-                    isCurrentStep: isCurrentStep,
-                    staff: taskItem.staff.map((staffItem: any) => {
-                        const isCompleted =
-                            staffItem.completedTime !== null ||
-                            staffItem.canceledTime !== null;
-                        return {
-                            userId: staffItem.userId,
-                            name: staffItem.name,
-                            status: staffItem.status,
-                            workingPercent: staffItem.workingPercent,
-                            subCompletedTime: staffItem.subCompletedTime,
-                            completedTime: staffItem.completedTime,
-                            canceledTime: staffItem.canceledTime,
-                            canceledNote: staffItem.canceledNote,
-                            staffCheck: isCompleted,
-                            staffComfirmCheck: isCompleted,
-                        };
-                    }),
-                };
-            }),
-        );
-    };
-
-    useEffect(() => {
-        if (route.params.itemWorkSchedule) {
-            setScheduleDetail(route.params.itemWorkSchedule);
-            if (route.params.itemWorkSchedule.status === 'PROCESSING') {
-                let hasSetTrue = false;
-                setIsCheckList(() =>
-                    route.params.itemWorkSchedule.childTasks.tasks.map(
-                        (taskItem: any) => {
-                            let isCurrentStep = false;
-                            if (
-                                !hasSetTrue &&
-                                taskItem.status === EScheduleStatus.PROCESSING
-                            ) {
-                                isCurrentStep = true;
-                                hasSetTrue = true;
-                            }
-                            return {
-                                isStepByStep:
-                                    route.params.itemWorkSchedule.childTasks
-                                        .isStepByStep,
-                                taskComfirmCheck:
-                                    taskItem.status ===
-                                        EScheduleStatus.COMPLETED &&
-                                    taskItem.staff.every(
-                                        (item: any) => item.staffComfirmCheck,
-                                    )
-                                        ? true
-                                        : false,
-                                taskId: taskItem._id,
-                                name: taskItem.name,
-                                status: taskItem.status,
-                                isCurrentStep: isCurrentStep,
-                                staff: taskItem.staff.map((staffItem: any) => {
-                                    const isCompleted =
-                                        staffItem.completedTime !== null ||
-                                        staffItem.canceledTime !== null;
-                                    return {
-                                        userId: staffItem.userId,
-                                        name: staffItem.name,
-                                        status: staffItem.status,
-                                        workingPercent:
-                                            staffItem.workingPercent,
-                                        subCompletedTime:
-                                            staffItem.subCompletedTime,
-                                        completedTime: staffItem.completedTime,
-                                        canceledTime: staffItem.canceledTime,
-                                        canceledNote: staffItem.canceledNote,
-                                        staffCheck: isCompleted,
-                                        staffComfirmCheck: isCompleted,
-                                    };
-                                }),
-                            };
-                        },
-                    ),
-                );
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [route.params.itemWorkSchedule]);
+        </View>
+    );
 
     return (
         <View style={ScheduleDetailStyles.container}>
@@ -1325,30 +285,20 @@ const ScheduleDetail = ({route}: any) => {
 
                 <View style={ScheduleDetailStyles.mainWorkProgressSection}>
                     <View style={ScheduleDetailStyles.warpMainWork}>
-                        <Text
-                            style={ScheduleDetailStyles.mainWorkProgressLabel}>
-                            Tiến độ hoàn thành
+                        <Text style={ScheduleDetailStyles.mainWorkSummary}>
+                            Số CBQL/NLĐ
                         </Text>
-                        <Progress.Circle
-                            size={40}
-                            color={'#2196F3'}
-                            progress={calculateTotalPercent()} // Từ 0.0 đến 1.0
-                            showsText={true}
-                            textStyle={
-                                ScheduleDetailStyles.mainWorkProgressValue
-                            }
-                            unfilledColor={'rgba(211, 211, 211, 1)'}
-                            borderWidth={0}
-                        />
+                        <Text style={ScheduleDetailStyles.statusText}>
+                            {`${scheduleDetail.employees.length}/${scheduleDetail.employees.length}`}
+                        </Text>
                     </View>
 
                     <View style={ScheduleDetailStyles.warpMainWork}>
-                        <Text
-                            style={ScheduleDetailStyles.mainWorkProgressLabel}>
-                            Trạng thái công việc
+                        <Text style={ScheduleDetailStyles.mainWorkSummary}>
+                            Tổng số công việc con
                         </Text>
                         <Text style={ScheduleDetailStyles.statusText}>
-                            {renderStatusText(scheduleDetail?.status || '')}
+                            {scheduleDetail.childTasks.tasks.length}
                         </Text>
                     </View>
                 </View>
@@ -1360,54 +310,102 @@ const ScheduleDetail = ({route}: any) => {
                 </Text>
 
                 <View style={ScheduleDetailStyles.workInfoSection}>
-                    <View style={ScheduleDetailStyles.warpLabelValue}>
-                        <Text style={ScheduleDetailStyles.infoLabel}>
-                            Ngày bắt đầu
+                    <View style={ScheduleDetailStyles.generalInfo}>
+                        <Text style={ScheduleDetailStyles.generalInfoText}>
+                            Thông tin chung
                         </Text>
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Ngày bắt đầu
+                            </Text>
 
-                        <Text style={ScheduleDetailStyles.infoValue}>
-                            {moment(scheduleDetail?.startedDate).format('L')}
-                        </Text>
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                {moment(scheduleDetail?.startedDate).format(
+                                    'L',
+                                )}
+                            </Text>
+                        </View>
+
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Ngày kết thúc
+                            </Text>
+
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                {moment(scheduleDetail?.finishedDate).format(
+                                    'L',
+                                )}
+                            </Text>
+                        </View>
+
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Người tạo việc
+                            </Text>
+
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                Lâm Đình Phú
+                            </Text>
+                        </View>
+
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Khu vườn
+                            </Text>
+
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                Khu vườn cà phê khoán
+                            </Text>
+                        </View>
+
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Sản phẩm
+                            </Text>
+
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                Cà phê khoán
+                            </Text>
+                        </View>
                     </View>
 
-                    <View style={ScheduleDetailStyles.warpLabelValue}>
-                        <Text style={ScheduleDetailStyles.infoLabel}>
-                            Ngày kết thúc
+                    <View style={ScheduleDetailStyles.generalInfo}>
+                        <Text style={ScheduleDetailStyles.generalInfoText}>
+                            Định mức
                         </Text>
 
-                        <Text style={ScheduleDetailStyles.infoValue}>
-                            {moment(scheduleDetail?.finishedDate).format('L')}
-                        </Text>
-                    </View>
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Định mức nhân công
+                            </Text>
 
-                    <View style={ScheduleDetailStyles.warpLabelValue}>
-                        <Text style={ScheduleDetailStyles.infoLabel}>
-                            Người quản lý
-                        </Text>
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                Công:{' '}
+                                {new Intl.NumberFormat('vi-VN', {
+                                    currency: 'VND',
+                                }).format(500000)}
+                            </Text>
+                        </View>
 
-                        <Text style={ScheduleDetailStyles.infoValue}>
-                            {scheduleDetail?.followerName}
-                        </Text>
-                    </View>
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Định mức vật tư
+                            </Text>
 
-                    <View style={ScheduleDetailStyles.warpLabelValue}>
-                        <Text style={ScheduleDetailStyles.infoLabel}>
-                            Đối tượng nhận việc
-                        </Text>
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                Bón phân Kali, phun thuốc trừ sâu
+                            </Text>
+                        </View>
 
-                        <Text style={ScheduleDetailStyles.infoValue}>
-                            {scheduleDetail?.receivedObject}
-                        </Text>
-                    </View>
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Định mức ca máy
+                            </Text>
 
-                    <View style={ScheduleDetailStyles.warpLabelValue}>
-                        <Text style={ScheduleDetailStyles.infoLabel}>
-                            Kế hoạch sản xuất
-                        </Text>
-
-                        <Text style={ScheduleDetailStyles.infoValue}>
-                            {scheduleDetail?.producingPlan}
-                        </Text>
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                Ca phun nước
+                            </Text>
+                        </View>
                     </View>
                 </View>
 
@@ -1438,115 +436,53 @@ const ScheduleDetail = ({route}: any) => {
                     </View>
                 ) : null}
 
-                <View style={ScheduleDetailStyles.staffJoin}>
-                    <Text style={ScheduleDetailStyles.staffQuantity}>
-                        {`Nhân sự tham gia (${scheduleDetail?.employees.length})`}
-                    </Text>
-
-                    <FlatList
-                        scrollEnabled={false}
-                        data={scheduleDetail?.employees as any}
-                        renderItem={({item, index}) => renderStaff(item, index)}
-                        keyExtractor={item => item._id}
-                    />
-                </View>
-
-                <View style={ScheduleDetailStyles.childTask}>
-                    <Text style={ScheduleDetailStyles.childTaskQuantity}>
-                        {`Danh sách công việc con (${scheduleDetail?.childTasks.tasks.length})`}
-                    </Text>
-
-                    <View style={ScheduleDetailStyles.childTaskInfo}>
+                <View style={ScheduleDetailStyles.listAccordion}>
+                    <List.Accordion
+                        titleStyle={ScheduleDetailStyles.titleAccordion1}
+                        title='Cán bộ quản lý'
+                        style={ScheduleDetailStyles.boxAccordion}
+                        id='1'>
                         <FlatList
                             scrollEnabled={false}
-                            data={scheduleDetail?.childTasks.tasks as any}
-                            renderItem={({item}) =>
-                                isCheckList.length !== 0
-                                    ? renderChildTask(item)
-                                    : renderChildTaskJustSeen(item)
+                            data={scheduleDetail?.employees as any}
+                            renderItem={({item, index}) =>
+                                renderStaff(item, index)
                             }
                             keyExtractor={item => item._id}
                         />
-                    </View>
+                    </List.Accordion>
+
+                    <List.Accordion
+                        titleStyle={ScheduleDetailStyles.titleAccordion1}
+                        title={`Người lao động (${scheduleDetail.employees.length})`}
+                        style={ScheduleDetailStyles.boxAccordion}
+                        id='2'>
+                        <FlatList
+                            scrollEnabled={false}
+                            data={scheduleDetail?.employees as any}
+                            renderItem={({item, index}) =>
+                                renderStaff(item, index)
+                            }
+                            keyExtractor={item => item._id}
+                        />
+                    </List.Accordion>
+
+                    <List.Accordion
+                        titleStyle={ScheduleDetailStyles.titleAccordion2}
+                        title={`Danh sách công việc con (${scheduleDetail.childTasks.tasks.length})`}
+                        style={ScheduleDetailStyles.boxAccordion}
+                        id='3'>
+                        <View style={ScheduleDetailStyles.listChildTasks}>
+                            <FlatList
+                                scrollEnabled={false}
+                                data={scheduleDetail?.childTasks.tasks as any}
+                                renderItem={({item}) => renderChildTask(item)}
+                                keyExtractor={item => item._id}
+                            />
+                        </View>
+                    </List.Accordion>
                 </View>
             </ScrollView>
-
-            {showListRadioButton ? (
-                <View style={ScheduleDetailStyles.listRaidoButton}>
-                    <View style={ScheduleDetailStyles.radioBtnSection}>
-                        <TouchableOpacity
-                            style={ScheduleDetailStyles.warpRadioText}
-                            onPress={() => setRadioSelectedType(1)}>
-                            <MaterialIcons
-                                name={
-                                    radioSelectedType === 1
-                                        ? 'radio-button-checked'
-                                        : 'radio-button-off'
-                                }
-                                color={
-                                    radioSelectedType === 1
-                                        ? '#4CAF50'
-                                        : '#49454f'
-                                }
-                                size={20}
-                            />
-                            <Text style={ScheduleDetailStyles.radioBtnText}>
-                                Duyệt
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={ScheduleDetailStyles.warpRadioText}
-                            onPress={() => setRadioSelectedType(2)}>
-                            <MaterialIcons
-                                name={
-                                    radioSelectedType === 2
-                                        ? 'radio-button-checked'
-                                        : 'radio-button-off'
-                                }
-                                color={
-                                    radioSelectedType === 2
-                                        ? '#4CAF50'
-                                        : '#49454f'
-                                }
-                                size={20}
-                            />
-                            <Text style={ScheduleDetailStyles.radioBtnText}>
-                                Làm lại
-                            </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={ScheduleDetailStyles.warpRadioText}
-                            onPress={() => setRadioSelectedType(3)}>
-                            <MaterialIcons
-                                name={
-                                    radioSelectedType === 3
-                                        ? 'radio-button-checked'
-                                        : 'radio-button-off'
-                                }
-                                color={
-                                    radioSelectedType === 3
-                                        ? '#4CAF50'
-                                        : '#49454f'
-                                }
-                                size={20}
-                            />
-                            <Text style={ScheduleDetailStyles.radioBtnText}>
-                                Hủy bỏ
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {radioSelectedType !== 0 ? renderComfirmView() : null}
-                </View>
-            ) : currentSelectedChildTask !== '' ? (
-                renderComfirmBrowseMainTask()
-            ) : showListUpdateProgressTask ? (
-                renderUpdateProgressTask()
-            ) : null}
-
-            <Backdrop open={isLoading} />
         </View>
     );
 };
@@ -1574,24 +510,21 @@ const ScheduleDetailStyles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#ccc',
         borderStyle: 'dashed',
+        justifyContent: 'space-between',
     },
     warpMainWork: {
-        gap: 8,
+        gap: 12,
+        marginBottom: 8,
         alignItems: 'center',
     },
-    mainWorkProgressLabel: {
+    mainWorkSummary: {
         fontSize: 13,
         fontWeight: 400,
         color: '#000000',
     },
-    mainWorkProgressValue: {
-        color: '#000000',
-        fontWeight: 400,
-        fontSize: 11,
-    },
     statusText: {
         fontWeight: 500,
-        fontSize: 14,
+        fontSize: 13,
         color: '#2196F3',
         margin: 'auto',
     },
@@ -1604,8 +537,16 @@ const ScheduleDetailStyles = StyleSheet.create({
         textAlign: 'center',
     },
     workInfoSection: {
-        marginVertical: 15,
-        gap: 4,
+        marginVertical: 10,
+        gap: 20,
+    },
+    generalInfo: {
+        gap: 2,
+    },
+    generalInfoText: {
+        fontWeight: 600,
+        fontSize: 13,
+        marginBottom: 4,
     },
     warpLabelValue: {
         paddingVertical: 12,
@@ -1613,54 +554,41 @@ const ScheduleDetailStyles = StyleSheet.create({
         alignItems: 'flex-start',
         justifyContent: 'space-between',
     },
-
     warpLabel: {
         gap: 10,
         width: '50%',
     },
     infoLabel: {
         fontWeight: 400,
-        fontSize: 14,
+        fontSize: 13,
         color: '#212121',
-        width: '50%',
-    },
-    warpValue: {
-        margin: 'auto',
-        gap: 10,
         width: '50%',
     },
     infoValue: {
         color: '#212121',
         fontWeight: 500,
-        fontSize: 14,
+        fontSize: 13,
         textAlign: 'right',
         width: '50%',
     },
     jobDescription: {
         gap: 10,
-        marginTop: 12,
-        marginBottom: 15,
+        marginVertical: 10,
     },
     description: {
         color: '#212121',
         fontWeight: 500,
-        fontSize: 14,
+        fontSize: 13,
         textAlign: 'center',
     },
     detail: {
         fontWeight: 400,
-        fontSize: 14,
+        fontSize: 13,
         color: '#212121',
     },
     attachedFile: {
         marginVertical: 10,
         gap: 10,
-    },
-    attachedFileText: {
-        color: '#212121',
-        fontWeight: 500,
-        fontSize: 14,
-        textAlign: 'center',
     },
     cardDocument: {
         borderRadius: 8,
@@ -1688,38 +616,37 @@ const ScheduleDetailStyles = StyleSheet.create({
         fontSize: 11,
         color: 'rgba(128, 128, 128, 1)',
     },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+    listAccordion: {
+        marginLeft: -15,
+        marginRight: -30,
+        gap: 10,
+        marginVertical: 15,
     },
-    emptyText: {
-        fontSize: 15,
-        color: 'black',
+    boxAccordion: {
+        paddingVertical: 0,
+        backgroundColor: '#fff',
     },
-    staffJoin: {
-        marginVertical: 10,
-        gap: 12,
-    },
-    staffQuantity: {
-        color: '#212121',
+    titleAccordion1: {
         fontSize: 14,
-        fontWeight: 500,
-        textAlign: 'center',
+        fontWeight: 700,
+    },
+    titleAccordion2: {
+        fontSize: 14,
+        fontWeight: 600,
     },
     listWorkerMargin: {
-        marginVertical: 10,
+        marginVertical: 5,
     },
     workerCard: {
+        marginHorizontal: 15,
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
     },
     leftWorkerCard: {
         flexDirection: 'row',
         gap: 16,
         alignItems: 'center',
-        flex: 1,
+        width: '94%',
     },
     workerAvatar: {
         backgroundColor: 'rgba(211, 211, 211, 1)',
@@ -1735,7 +662,7 @@ const ScheduleDetailStyles = StyleSheet.create({
     },
     workerNameAndUnit: {
         gap: 2,
-        width: '80%',
+        width: '70%',
     },
     workerName: {
         color: 'rgba(76, 175, 80, 1)',
@@ -1752,57 +679,20 @@ const ScheduleDetailStyles = StyleSheet.create({
     workerOrder: {
         color: 'rgba(128, 128, 128, 1)',
         fontWeight: 400,
-        fontSize: 14,
-        textTransform: 'uppercase',
+        fontSize: 13,
     },
-    childTask: {
-        gap: 16,
-        paddingVertical: 12,
-        paddingBottom: 200,
-    },
-    childTaskQuantity: {
-        color: '#212121',
-        fontWeight: 500,
-        fontSize: 14,
+    listChildTasks: {
+        paddingHorizontal: 15,
     },
     childTaskInfo: {
-        gap: 8,
-    },
-    warpChildTask: {
-        marginLeft: 12,
-        flexDirection: 'row',
-        gap: 12,
-        alignItems: 'flex-start',
-        marginBottom: 25,
-    },
-    rightChildTask: {
-        width: '88%',
         gap: 10,
+        justifyContent: 'center',
+        marginVertical: 10,
     },
-    taskTitleNotDone: {
+    taskTitle: {
         color: '#212121',
         fontWeight: 600,
         fontSize: 14,
-    },
-    stepByStepTaskTitleNotDone: {
-        color: '#808080',
-        fontWeight: 600,
-        fontSize: 14,
-    },
-    taskTitleCompleted: {
-        color: '#4CAF50',
-        fontWeight: 600,
-        fontSize: 14,
-    },
-    taskTitleIsDone: {
-        color: '#FF9800',
-        fontWeight: 600,
-        fontSize: 14,
-    },
-    progressTask: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
     },
     taskEndIn: {
         fontSize: 12,
@@ -1811,234 +701,33 @@ const ScheduleDetailStyles = StyleSheet.create({
         flexShrink: 1,
         textAlign: 'right',
     },
-    stepByStepTaskEndIn: {
-        fontSize: 12,
-        fontStyle: 'italic',
-        fontWeight: 400,
-        flexShrink: 1,
-        textAlign: 'right',
-        color: '#808080',
-    },
-    taskParticipant: {
-        marginLeft: 10,
-        marginTop: 5,
-        gap: 12,
+    participant: {
+        flexDirection: 'row',
         alignItems: 'center',
+    },
+    statusTask: {
+        flex: 1,
     },
     warpParticipant: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 15,
-    },
-    warpInfoParticipant: {
-        gap: 4,
-        width: '88%',
-    },
-    staffName: {
-        color: '#000000',
-        fontWeight: 500,
-        fontSize: 13,
-    },
-    taskWaitingBrowse: {
-        fontWeight: 400,
-        fontSize: 13,
-        flexShrink: 1,
-        color: '#FF9800',
-    },
-    taskIsProcessing: {
-        fontWeight: 400,
-        fontSize: 13,
-        flexShrink: 1,
-        color: '#808080',
-    },
-    taskDoneWhen: {
-        fontWeight: 400,
-        fontSize: 13,
-        flexShrink: 1,
-        color: '#4CAF50',
-    },
-    cancelStaffName: {
-        color: '#000000',
-        fontWeight: 500,
-        fontSize: 13,
-        textDecorationLine: 'line-through',
-    },
-    taskCancelWhen: {
-        fontWeight: 400,
-        fontSize: 13,
-        flexShrink: 1,
-        color: '#FF4E45',
-    },
-    taskCancelReason: {
-        fontWeight: 400,
-        fontSize: 12,
-        flexShrink: 1,
-        color: '#FF4E45',
-        fontStyle: 'italic',
-    },
-    listRaidoButton: {
-        width: '100%',
-        flex: 1,
-        position: 'absolute',
-        bottom: 0,
-        padding: 20,
-        backgroundColor: '#F5F5F5',
-        boxShadow: '0 -1.5 1.5 #00000040',
-    },
-    radioBtnSection: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    warpRadioText: {
-        flexDirection: 'row',
+        flex: 8,
         gap: 5,
-        alignItems: 'center',
     },
-    radioBtnText: {
-        fontWeight: 500,
+    participantName: {
         fontSize: 13,
-    },
-    comfirmView: {
-        marginTop: 20,
-        borderTopWidth: 1,
-        borderColor: '#ccc',
-        borderStyle: 'dashed',
-        marginVertical: 10,
-        gap: 10,
-    },
-    comfirmViewText: {
-        color: '#808080',
         fontWeight: 500,
+    },
+    participantStatus: {
         fontSize: 13,
-        marginTop: 15,
-        textAlign: 'center',
+        fontWeight: 400,
     },
-    listComfirmBtn: {
-        flexDirection: 'row',
-        marginTop: 10,
-        justifyContent: 'space-between',
-    },
-    cancelBtnBrowseTask: {
-        borderColor: '#808080',
-        borderWidth: 1,
-        width: '48%',
-        backgroundColor: 'rgb(245, 245, 245)',
-        borderRadius: 20,
-        padding: 10,
-        alignItems: 'center',
-    },
-    cancelBtnTextBrowseTask: {
+    participantStatus1: {
         color: '#808080',
-        fontWeight: 600,
-        fontSize: 14,
     },
-    //dùng chung cho radio duyệt + làm lại
-    comfirmBtnBrowseTask: {
-        width: '48%',
-        backgroundColor: '#4CAF50',
-        borderRadius: 20,
-        padding: 10,
-        alignItems: 'center',
+    participantStatus2: {
+        color: '#2196F3',
     },
-    comfirmBtnTextBrowseTask: {
-        color: '#F5F5F5',
-        fontWeight: 600,
-        fontSize: 14,
-    },
-    comfirmBtnRedoTask: {
-        borderColor: '#4CAF50',
-        borderWidth: 1,
-        width: '48%',
-        backgroundColor: 'rgb(245, 245, 245)',
-        borderRadius: 20,
-        padding: 10,
-        alignItems: 'center',
-    },
-    comfirmBtnTextRedoTask: {
-        color: '#4CAF50',
-        fontWeight: 600,
-        fontSize: 14,
-    },
-    cancelBtnCanelProgressTask: {
-        width: '48%',
-        backgroundColor: '#FF4E45',
-        borderRadius: 20,
-        padding: 10,
-        alignItems: 'center',
-    },
-    cancelBtnTextCanelProgressTask: {
-        color: '#F5F5F5',
-        fontWeight: 600,
-        fontSize: 14,
-    },
-    comfirmBtnCanelProgressTask: {
-        borderColor: '#FF4E45',
-        borderWidth: 1,
-        width: '48%',
-        backgroundColor: 'rgb(245, 245, 245)',
-        borderRadius: 20,
-        padding: 10,
-        alignItems: 'center',
-    },
-    comfirmBtnTextCanelProgressTask: {
+    participantStatus3: {
         color: '#FF4E45',
-        fontWeight: 600,
-        fontSize: 14,
-    },
-    cancelProgressInput: {
-        fontSize: 13,
-        color: '#808080',
-        textAlignVertical: 'top',
-        borderColor: '#FF4E45',
-        borderWidth: 1,
-        borderRadius: 8,
-        backgroundColor: '#FF4E4526',
-        paddingHorizontal: 15,
-        minHeight: 120,
-    },
-    comfirmViewMainTask: {
-        width: '100%',
-        flex: 1,
-        position: 'absolute',
-        bottom: 0,
-        gap: 10,
-        backgroundColor: '#F5F5F5',
-        boxShadow: '0 -1.5 1.5 #00000040',
-        padding: 20,
-    },
-    comfirmMainTaskText: {
-        color: '#808080',
-        fontWeight: 500,
-        fontSize: 13,
-        textAlign: 'center',
-    },
-    updateProgressTaskText: {
-        color: '#000000',
-        fontWeight: 500,
-        fontSize: 13,
-        textAlign: 'center',
-    },
-    inputUpdateProgreessTask: {
-        borderWidth: 1,
-        borderRadius: 8,
-        borderColor: '#808080',
-        width: '60%',
-        height: 48,
-        color: '#000000',
-    },
-    updateProgressTaskBtn: {
-        backgroundColor: '#2196F3',
-        borderRadius: 22,
-        width: '35%',
-        maxHeight: 48,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    updateProgressTaskBtnText: {
-        color: '#F5F5F5',
-        fontWeight: 500,
-        fontSize: 13,
-        textAlign: 'center',
     },
 });
 

@@ -3,12 +3,12 @@ import garden from './garden.png';
 import toDoList from './to-do-list.png';
 import workers from './workers.png';
 import logoCF15 from './LOGO-CF15.png';
-import backgroundLogin from './background_login.png';
+//import backgroundLogin from './loginbg.png';
 import megaphone from './megaphone.png';
 import document from './document.png';
 import gardener from './gardener.png';
 import fileTypeDocument from './file-type-document.png';
-import avatar from './avatar.png';
+//import avatar from './avt.png';
 import pieChart from './pie-chart.png';
 import emptyNotificationList from './empty-notification-list.png';
 import emptyWorkerList from './empty-worker-list.png';
@@ -23,12 +23,12 @@ const images = {
     toDoList: toDoList,
     workers: workers,
     logoCF15: logoCF15,
-    backgroundLogin: backgroundLogin,
+    //backgroundLogin: backgroundLogin,
     megaphone: megaphone,
     document: document,
     gardener: gardener,
     fileTypeDocument: fileTypeDocument,
-    avatar: avatar,
+    //avatar: avatar,
     pieChart: pieChart,
     emptyNotificationList: emptyNotificationList,
     emptyWorkerList: emptyWorkerList,
@@ -37,6 +37,8 @@ const images = {
     emptyHistoryList: emptyHistoryList,
     emptyWorkList: emptyWorkList,
 
+    backgroundLogin: require('./picloginbg.png'),
+    avatar: require('./picavt.png'),
     plant1: require('./plant1.jpg'),
     plant2: require('./plant2.jpg'),
     emptyNews: require('./empty-schedule-list.png'),

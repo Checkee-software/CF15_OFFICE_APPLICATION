@@ -2,7 +2,6 @@ import React from 'react';
 import {StyleSheet, View, TouchableOpacity, Alert} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Work from '../screens/home/Work';
-//import WorkSchedule from '../screens/home/WorkSchedule';
 import CameraScanner from '../screens/global/CameraScanner';
 import History from '../screens/home/History';
 import Profile from '../screens/user/Profile';
@@ -11,12 +10,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
-import {useAuthStore} from '@/stores/authStore';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 const BottomTabsNavigator = ({navigation}: any) => {
-    const {userInfo} = useAuthStore();
-
     const Tab = createBottomTabNavigator();
 
     return (
@@ -32,6 +27,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
                     boxShadow: '-1 2 0 #00000040',
                 },
                 headerShown: false,
+                tabBarHideOnKeyboard: true,
                 animation: 'shift',
                 headerTitleAlign: 'center',
                 headerShadowVisible: false,
@@ -48,7 +44,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
                     headerTitle: 'CF15 OFFICE',
                     headerTitleStyle: style.headerTitle,
                     headerShown: true,
-                    tabBarIcon: ({size, color}) => (
+                    tabBarIcon: ({color}) => (
                         <MaterialIcons
                             name='dashboard'
                             size={26}
@@ -79,30 +75,11 @@ const BottomTabsNavigator = ({navigation}: any) => {
                 name='Công việc'
                 options={{
                     headerShown: true,
-                    headerTitle:
-                        userInfo.userType.level !== EOrganization.WORKER
-                            ? 'CÔNG VIỆC KHU VƯỜN'
-                            : 'CÔNG VIỆC',
+                    headerTitle: 'CÔNG VIỆC KHU VƯỜN',
                     headerTitleStyle: style.headerTitle,
-                    tabBarIcon: ({size, color}) => (
+                    tabBarIcon: ({color}) => (
                         <MaterialIcons name='work' size={26} color={color} />
                     ),
-                    // headerRight: () => (
-                    //     <TouchableOpacity
-                    //         style={style.alertView}
-                    //         onPress={() =>
-                    //             navigation.navigate(
-                    //                 SCREEN_INFO.LISTNOTIFICATION.key,
-                    //             )
-                    //         }>
-                    //         <View style={style.alertDot} />
-                    //         <FontAwesome
-                    //             name='bell'
-                    //             size={26}
-                    //             color={'rgba(76, 175, 80, 1)'}
-                    //         />
-                    //     </TouchableOpacity>
-                    // ),
                 }}
             />
 
@@ -143,36 +120,10 @@ const BottomTabsNavigator = ({navigation}: any) => {
                     headerShown: true,
                     headerTitle: 'LỊCH SỬ HOẠT ĐỘNG',
                     headerTitleStyle: style.headerTitle,
-                    tabBarIcon: ({size, color}) => (
+                    tabBarIcon: ({color}) => (
                         <MaterialIcons name='history' size={26} color={color} />
                     ),
-                    // headerRight: () => (
-                    //     <TouchableOpacity
-                    //         style={style.alertView}
-                    //         onPress={() =>
-                    //             navigation.navigate(
-                    //                 SCREEN_INFO.LISTNOTIFICATION.key,
-                    //             )
-                    //         }>
-                    //         <View style={style.alertDot} />
-                    //         <FontAwesome
-                    //             name='bell'
-                    //             size={26}
-                    //             color={'rgba(76, 175, 80, 1)'}
-                    //         />
-                    //     </TouchableOpacity>
-                    // ),
                 }}
-                // listeners={{
-                //     tabPress: e => {
-                //         e.preventDefault(); // Chặn chuyển tab
-                //         Alert.alert(
-                //             'Thông báo',
-                //             'Chức năng này đang được phát triển, bạn hãy quay lại sau nhé!',
-                //             [{text: 'OK'}],
-                //         );
-                //     },
-                // }}
             />
 
             <Tab.Screen
@@ -182,7 +133,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
                     headerShown: true,
                     headerTitle: 'HỒ SƠ',
                     headerTitleStyle: style.headerTitle,
-                    tabBarIcon: ({size, color}) => (
+                    tabBarIcon: ({color}) => (
                         <FontAwesome name='user' size={26} color={color} />
                     ),
                     headerRight: () => (

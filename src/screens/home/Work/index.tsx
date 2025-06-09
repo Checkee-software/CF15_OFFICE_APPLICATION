@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {
     View,
@@ -28,15 +29,12 @@ const WorkScreen = () => {
     type initialRadioState = listRadioBtn[];
 
     const {
-        listGardenWorkBrowse,
         listGardenWorkBrowseFilter,
         badgeGardenWorkUnBrowse,
         isLoading,
         isLoadingCreate,
         getRequestDataGarden,
         filterByStatus,
-        setBadgeUnBrowse,
-        setBrowsed,
         createRateReportHarvest,
     } = useGardenWorkStore();
 
@@ -65,20 +63,15 @@ const WorkScreen = () => {
         setSelectedStatus(value);
     };
 
-    const renderGardenWork = (itemGardenWork: any, index: number) => (
+    const renderGardenWork = (itemGardenWork: any) => (
         <View
             style={[
                 styles.gardenCard,
-                // eslint-disable-next-line react-native/no-inline-styles
                 {
                     borderColor:
                         itemGardenWork.status === 'DENIED'
                             ? '#FF4E45'
                             : '#000000',
-                    marginBottom:
-                        index + 1 === listGardenWorkBrowseFilter.length
-                            ? 70
-                            : 15,
                 },
             ]}>
             <View style={styles.gardenTitleSection}>
@@ -112,14 +105,14 @@ const WorkScreen = () => {
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
-                    <Text style={styles.label}>Tên vật tư</Text>
+                    <Text style={styles.label}>Bón phân Kali</Text>
                     <Text style={styles.value}>
-                        {itemGardenWork.materialName}
+                        {`${itemGardenWork.materialName} (KG)`}
                     </Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
-                    <Text style={styles.label}>Định mức</Text>
+                    <Text style={styles.label}>Diện tích đã làm</Text>
                     <Text style={styles.value}>{itemGardenWork.amount}</Text>
                 </View>
             </View>
@@ -381,7 +374,7 @@ const WorkScreen = () => {
     return (
         <View style={styles.container}>
             <>
-                {userInfo.userType.level !== EOrganization.WORKER ? (
+                {userInfo.userType.level === EOrganization.LEADER ? (
                     <View style={styles.workScheduleTypeHorizontalScroll}>
                         <FlatList
                             data={statusList}
@@ -413,7 +406,9 @@ const WorkScreen = () => {
                                                     style={
                                                         styles.newBrowseWorkText
                                                     }>
-                                                    {badgeGardenWorkUnBrowse}
+                                                    {badgeGardenWorkUnBrowse > 9
+                                                        ? '9+'
+                                                        : badgeGardenWorkUnBrowse}
                                                 </Text>
                                             </View>
                                         ) : null}
@@ -424,43 +419,44 @@ const WorkScreen = () => {
                     </View>
                 ) : null}
 
-                {userInfo.userType.level !== EOrganization.WORKER ? (
+                {userInfo.userType.level === EOrganization.LEADER ? (
                     <View style={styles.gardenWorkList}>
                         <FlatList
+                            contentContainerStyle={styles.flatListGardenWork}
                             data={listGardenWorkBrowseFilter}
                             keyExtractor={item => item._id}
-                            renderItem={({item, index}) =>
-                                renderGardenWork(item, index)
-                            }
+                            renderItem={({item}) => renderGardenWork(item)}
                             onRefresh={handleGetRequestGardenData}
                             refreshing={isLoading}
                             showsVerticalScrollIndicator={false}
+                            removeClippedSubviews={false}
                             keyboardShouldPersistTaps='handled'
                             ListEmptyComponent={
                                 <View style={styles.emptyContainer}>
-                                    <Image
-                                        source={images.emptyWorkList}
-                                        style={styles.emptyImage}
-                                        //resizeMode='contain'
-                                    />
-                                    <Text style={styles.emptyText}>
-                                        Hiện tại không có công việc để thực
-                                        hiện!
-                                    </Text>
+                                    {selectedStatus === 1 ? (
+                                        <>
+                                            <Image
+                                                source={images.emptyWorkList}
+                                                style={styles.emptyImage}
+                                                resizeMode='contain'
+                                            />
+                                            <Text style={styles.emptyText}>
+                                                Hiện tại không có công việc để
+                                                thực hiện!
+                                            </Text>
+                                        </>
+                                    ) : (
+                                        <Text style={styles.emptyText}>
+                                            Danh sách trống!
+                                        </Text>
+                                    )}
                                 </View>
                             }
                         />
                     </View>
                 ) : (
                     <View style={styles.emptyContainer}>
-                        <Image
-                            source={images.emptyWorkList}
-                            style={styles.emptyImage}
-                            resizeMode='contain'
-                        />
-                        <Text style={styles.emptyText}>
-                            Hiện tại không có công việc để thực hiện!
-                        </Text>
+                        <Text style={styles.emptyText}>Danh sách trống!</Text>
                     </View>
                 )}
 
@@ -476,10 +472,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     gardenWorkList: {
+        flex: 1,
+        height: '100%',
         paddingHorizontal: 20,
         paddingVertical: 20,
-        gap: 12,
-        //marginBottom: 60,
+    },
+    flatListGardenWork: {
+        flexGrow: 1,
     },
     gardenCard: {
         marginBottom: 15,
@@ -594,15 +593,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     emptyContainer: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        gap: 10,
     },
     emptyImage: {
-        height: '30%',
-        minWidth: '100%',
-        aspectRatio: 1,
+        height: 180,
     },
     emptyText: {
         textAlign: 'center',
@@ -671,13 +667,15 @@ const styles = StyleSheet.create({
     newBrowseWork: {
         borderRadius: '50%',
         backgroundColor: '#B3261E',
+        justifyContent: 'center',
+        alignItems: 'center',
         marginLeft: 5,
-        width: 18,
-        height: 18,
+        width: 20,
+        height: 20,
     },
     newBrowseWorkText: {
         fontWeight: 500,
-        fontSize: 12,
+        fontSize: 11,
         color: '#FFFFFF',
         textAlign: 'center',
     },

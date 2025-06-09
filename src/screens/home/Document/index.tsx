@@ -14,7 +14,6 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useDocumentStore} from '../../../stores/documentStore';
 import moment from 'moment';
 import Loading from '@/screens/subscreen/Loading';
-//import images from '../../../assets/images';
 
 const Document = ({navigation}: any) => {
     const {listDocument, getListDocument, isLoading} = useDocumentStore();
@@ -99,17 +98,20 @@ const Document = ({navigation}: any) => {
 
             <View style={DocumentStyles.listDocument}>
                 <FlatList
+                    contentContainerStyle={DocumentStyles.flatListDocument}
                     data={filterDocuments}
                     renderItem={({item}: any) => renderItemDocument(item)}
                     keyExtractor={item => item._id}
                     onRefresh={handleReFetch}
                     refreshing={isLoading}
                     showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps='handled'
                     ListEmptyComponent={
                         <View style={DocumentStyles.documentEmpty}>
                             <Image
                                 source={images.emptyDocumentList}
                                 style={DocumentStyles.emptyDocumentImg}
+                                resizeMode='contain'
                             />
                             <Text style={DocumentStyles.emptyDocumentText}>
                                 {searchTitle !== ''
@@ -151,6 +153,9 @@ const DocumentStyles = StyleSheet.create({
         marginTop: 15,
         gap: 20,
     },
+    flatListDocument: {
+        flexGrow: 1,
+    },
     warpDocumentContentAndIcon: {
         marginBottom: 15,
         flexDirection: 'row',
@@ -190,13 +195,12 @@ const DocumentStyles = StyleSheet.create({
         flexShrink: 1,
     },
     documentEmpty: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
     emptyDocumentImg: {
-        minWidth: '100%',
-        height: '35%',
-        aspectRatio: 1,
+        height: 180,
     },
     emptyDocumentText: {
         textAlign: 'center',

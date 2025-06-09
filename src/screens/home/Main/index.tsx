@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {
     View,
     Text,
@@ -8,9 +8,6 @@ import {
     ScrollView,
 } from 'react-native';
 import images from '../../../assets/images';
-import * as Progress from 'react-native-progress';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import moment from 'moment';
 import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useAuthStore} from '../../../stores/authStore';
@@ -20,8 +17,6 @@ export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
 
     console.log('Token hiện tại:', asyncStorageHelper.token);
-
-    const [isRollCall, setIsRollCall] = useState(false);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -54,14 +49,6 @@ export default function Main({navigation}: any) {
             };
             return valueGreeting;
         }
-    };
-
-    const formatDateWithWeekdayNumber = () => {
-        const mDate = moment();
-        const weekday = mDate.isoWeekday(); // Thứ 2 = 1, Chủ nhật = 7
-        return `${
-            weekday === 7 ? 'Chủ Nhật' : `Thứ ${weekday + 1}`
-        }, ${mDate.format('DD.MM.YYYY')}`;
     };
 
     const menuItems = [
@@ -199,151 +186,7 @@ export default function Main({navigation}: any) {
                     </View>
                 </View>
 
-                {userInfo.userType.level === 'WORKER' ? (
-                    <View
-                        style={[
-                            MainStyles.rollCall,
-                            isRollCall
-                                ? {backgroundColor: 'rgba(76, 175, 80, 0.15)'}
-                                : {backgroundColor: 'rgba(255, 152, 0, 0.15)'},
-                        ]}>
-                        <View style={MainStyles.leftRollCall}>
-                            <Text style={MainStyles.todayDateText}>
-                                {formatDateWithWeekdayNumber()}
-                            </Text>
-                            {isRollCall ? (
-                                <Text style={MainStyles.workingTimeText}>
-                                    Thời gian làm việc: 00:00:00
-                                </Text>
-                            ) : (
-                                <Text style={MainStyles.rollCallRemindText}>
-                                    Hôm nay bạn chưa điểm danh
-                                </Text>
-                            )}
-
-                            <View style={MainStyles.rollCallStreak}>
-                                <MaterialCommunityIcons
-                                    name='check-circle-outline'
-                                    size={20}
-                                    color='green'
-                                />
-
-                                <MaterialCommunityIcons
-                                    name='close-circle'
-                                    size={20}
-                                    color='rgba(255, 78, 69, 1)'
-                                />
-
-                                <MaterialCommunityIcons
-                                    name='check-circle-outline'
-                                    size={20}
-                                    color='green'
-                                />
-
-                                <MaterialCommunityIcons
-                                    name='check-circle-outline'
-                                    size={20}
-                                    color='rgba(255, 152, 0, 1)'
-                                />
-
-                                <MaterialCommunityIcons
-                                    name='check-circle-outline'
-                                    size={20}
-                                    color='gray'
-                                />
-
-                                <MaterialCommunityIcons
-                                    name='check-circle-outline'
-                                    size={20}
-                                    color='gray'
-                                />
-
-                                <MaterialCommunityIcons
-                                    name='check-circle-outline'
-                                    size={20}
-                                    color='gray'
-                                />
-                            </View>
-                        </View>
-
-                        <View style={MainStyles.btnRollCallContainer}>
-                            {isRollCall ? (
-                                <View
-                                    style={
-                                        MainStyles.warpButtonRollCalledAndEndWorking
-                                    }>
-                                    <View style={MainStyles.btnRollCalled}>
-                                        <Text
-                                            style={MainStyles.btnRollCallText}>
-                                            Đã điểm danh
-                                        </Text>
-                                    </View>
-                                    <TouchableOpacity
-                                        style={MainStyles.btnEndWorking}>
-                                        <Text
-                                            style={MainStyles.btnRollCallText}>
-                                            Kết thúc
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            ) : (
-                                <TouchableOpacity
-                                    style={MainStyles.btnRollCall}
-                                    onPress={() => setIsRollCall(true)}>
-                                    <Text style={MainStyles.btnRollCallText}>
-                                        Điểm Danh
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                    </View>
-                ) : null}
-
-                <View style={MainStyles.syntheticJob}>
-                    <View style={MainStyles.sideJob}>
-                        <View style={MainStyles.warpSideJobText}>
-                            <Text style={MainStyles.sideJobDoCurrent}>
-                                Đang thực hiện
-                            </Text>
-                            <Text style={MainStyles.sideJobContentText}>
-                                Nghiên cứu, phân tích giống cây cà phê chồn loại
-                                3.
-                            </Text>
-                            <Text style={MainStyles.sideJobRemaining}>
-                                Còn: 23 ngày, 12:05:32
-                            </Text>
-                        </View>
-
-                        <Progress.Circle
-                            size={80}
-                            progress={0.7} // Từ 0.0 đến 1.0
-                            showsText={true}
-                            textStyle={MainStyles.progressValue}
-                            unfilledColor={'rgba(211, 211, 211, 1)'}
-                            borderWidth={0}
-                        />
-                    </View>
-
-                    <View style={MainStyles.totalJobProgress}>
-                        <View style={MainStyles.onProgress}>
-                            <Text style={MainStyles.onProgressText}>
-                                (12/04) Nghiên cứu giống chồn A
-                            </Text>
-                            <Text style={MainStyles.onProgressValue}>50%</Text>
-                        </View>
-
-                        <Progress.Bar
-                            progress={0.5}
-                            width={null} // 100% theo view cha
-                            height={6}
-                            unfilledColor='#ddd'
-                            borderWidth={0}
-                        />
-                    </View>
-                </View>
-
                 <View style={MainStyles.mainMenu}>
-                    <Text style={MainStyles.mainMenuTitle}>Chức năng</Text>
                     <View style={MainStyles.warpMenuButton}>
                         {menuList.map(item => (
                             <TouchableOpacity
@@ -373,7 +216,7 @@ export default function Main({navigation}: any) {
 const MainStyles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         paddingHorizontal: 10,
     },
     welcomeUser: {
@@ -406,133 +249,8 @@ const MainStyles = StyleSheet.create({
         height: 52,
         borderRadius: 25,
     },
-    rollCall: {
-        marginVertical: 10,
-        borderRadius: 15,
-        padding: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    leftRollCall: {},
-    todayDateText: {
-        fontWeight: '500',
-    },
-    rollCallRemindText: {
-        marginTop: 6,
-        fontSize: 12,
-        fontWeight: 200,
-        fontStyle: 'italic',
-    },
-    workingTimeText: {
-        marginTop: 6,
-        fontSize: 12,
-        color: 'rgba(76, 175, 80, 1)',
-    },
-    rollCallStreak: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginTop: 6,
-        gap: 6,
-        alignItems: 'center',
-    },
-    warpButtonRollCalledAndEndWorking: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    btnRollCallContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    btnRollCalled: {
-        backgroundColor: 'rgba(76, 175, 80, 1)', // cam chính
-        borderRadius: 100,
-        width: 70,
-        height: 70,
-        borderWidth: 6,
-        borderColor: 'rgba(76, 175, 80, 0.15)', // viền ngoài
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    btnEndWorking: {
-        backgroundColor: 'rgba(255, 78, 69, 1)', // cam chính
-        borderRadius: 100,
-        width: 56,
-        height: 56,
-        borderWidth: 6,
-        borderColor: 'rgba(255, 78, 69, 0.15)', // viền ngoài
-        alignItems: 'center',
-        justifyContent: 'center',
-        alignSelf: 'flex-end',
-    },
-    btnRollCall: {
-        backgroundColor: '#ff9800', // cam chính
-        borderRadius: 100,
-        width: 72,
-        height: 72,
-        borderWidth: 6,
-        borderColor: 'rgba(255, 152, 0, 0.3)', // viền ngoài
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    btnRollCallText: {
-        color: '#fff',
-        fontSize: 12,
-        textAlign: 'center',
-        fontWeight: '500',
-    },
-    syntheticJob: {
-        marginTop: 10,
-    },
-    sideJob: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    warpSideJobText: {
-        width: '70%',
-        gap: 14,
-    },
-    sideJobDoCurrent: {
-        fontWeight: 500,
-        color: 'rgba(33, 150, 243, 1)',
-    },
-    sideJobContentText: {
-        fontWeight: 400,
-        fontSize: 14,
-        color: 'rgba(33, 33, 33, 1)',
-    },
-    sideJobRemaining: {
-        color: 'rgba(128, 128, 128, 1)',
-        fontSize: 12,
-        fontStyle: 'italic',
-        fontWeight: 400,
-    },
-    progressValue: {
-        color: 'black',
-        fontWeight: 'bold',
-    },
-    totalJobProgress: {
-        marginTop: 10,
-        width: '100%',
-    },
-    onProgress: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    onProgressText: {
-        fontWeight: 400,
-        marginVertical: 5,
-        fontSize: 12,
-        flexShrink: 1,
-    },
-    onProgressValue: {
-        fontWeight: 400,
-        marginVertical: 5,
-        fontSize: 12,
-    },
     mainMenu: {
-        marginVertical: 15,
+        marginVertical: 5,
     },
     mainMenuTitle: {
         color: 'rgba(128, 128, 128, 1)',

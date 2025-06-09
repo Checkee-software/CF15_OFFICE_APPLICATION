@@ -36,15 +36,15 @@ const WorkSchedule = ({navigation}: any) => {
 
     const renderCircleColor = (status: string) => {
         switch (status) {
-            case 'PROCESSING':
-            case 'ALMOST_EXPIRE':
-            case 'EXPIRED':
+            case EScheduleStatus.PROCESSING:
+            case EScheduleStatus.ALMOST_EXPIRE:
+            case EScheduleStatus.EXPIRED:
                 return '#2196F3';
 
-            case 'COMPELETED':
+            case EScheduleStatus.COMPLETED:
                 return '#4CAF50';
 
-            case 'CANCELED':
+            case EScheduleStatus.CANCELED:
                 return '#FF4E45';
 
             default:
@@ -54,42 +54,42 @@ const WorkSchedule = ({navigation}: any) => {
 
     const renderStatusTitle = (status: string) => {
         switch (status) {
-            case 'PENDING':
+            case EScheduleStatus.PENDING:
                 return (
                     <Text style={WorkScheduleStyles.pendingAndAlmostExpireText}>
                         Đang chờ
                     </Text>
                 );
 
-            case 'PROCESSING':
+            case EScheduleStatus.PROCESSING:
                 return (
                     <Text style={WorkScheduleStyles.processingText}>
                         Đang thực hiện
                     </Text>
                 );
 
-            case 'COMPELETED':
+            case EScheduleStatus.COMPLETED:
                 return (
                     <Text style={WorkScheduleStyles.completedText}>
                         Hoàn thành
                     </Text>
                 );
 
-            case 'ALMOST_EXPIRE':
+            case EScheduleStatus.ALMOST_EXPIRE:
                 return (
                     <Text style={WorkScheduleStyles.pendingAndAlmostExpireText}>
                         Sắp hết hạn
                     </Text>
                 );
 
-            case 'EXPIRED':
+            case EScheduleStatus.EXPIRED:
                 return (
                     <Text style={WorkScheduleStyles.expiredAndCanceledText}>
                         Trễ hạn
                     </Text>
                 );
 
-            case 'CANCELED':
+            case EScheduleStatus.CANCELED:
                 return (
                     <Text style={WorkScheduleStyles.expiredAndCanceledText}>
                         Đã hủy
@@ -101,13 +101,14 @@ const WorkSchedule = ({navigation}: any) => {
         }
     };
 
-    const calculateTotalPercent = taskItem => {
+    const calculateTotalPercent = (taskItem: any) => {
         const tasks = taskItem?.childTasks.tasks;
         const totalTasks = tasks?.length;
 
         const completedTasks = tasks
-            ? tasks.filter(task => task.status === EScheduleStatus.COMPLETED)
-                  .length
+            ? tasks.filter(
+                  (task: any) => task.status === EScheduleStatus.COMPLETED,
+              ).length
             : 0;
 
         const overallProgress = totalTasks
@@ -148,7 +149,7 @@ const WorkSchedule = ({navigation}: any) => {
         const hour = moment(finishedDate).format('LT');
 
         switch (status) {
-            case 'PENDING':
+            case EScheduleStatus.PENDING:
                 return (
                     <View style={WorkScheduleStyles.workScheduleTime}>
                         <FontAwesome6
@@ -163,8 +164,8 @@ const WorkSchedule = ({navigation}: any) => {
                     </View>
                 );
 
-            case 'PROCESSING':
-            case 'ALMOST_EXPIRE':
+            case EScheduleStatus.PROCESSING:
+            case EScheduleStatus.ALMOST_EXPIRE:
                 return (
                     <View style={WorkScheduleStyles.workScheduleTime}>
                         <FontAwesome6
@@ -179,7 +180,7 @@ const WorkSchedule = ({navigation}: any) => {
                     </View>
                 );
 
-            case 'COMPLETED':
+            case EScheduleStatus.COMPLETED:
                 return (
                     <View style={WorkScheduleStyles.workScheduleTime}>
                         <FontAwesome6
@@ -194,7 +195,7 @@ const WorkSchedule = ({navigation}: any) => {
                     </View>
                 );
 
-            case 'EXPIRED':
+            case EScheduleStatus.EXPIRED:
                 return (
                     <View style={WorkScheduleStyles.workScheduleTime}>
                         <FontAwesome6
@@ -210,7 +211,7 @@ const WorkSchedule = ({navigation}: any) => {
                     </View>
                 );
 
-            case 'CANCELED':
+            case EScheduleStatus.CANCELED:
                 return (
                     <View style={WorkScheduleStyles.workScheduleTime}>
                         <FontAwesome6
@@ -387,6 +388,7 @@ const WorkSchedule = ({navigation}: any) => {
                 </View>
 
                 <FlatList
+                    contentContainerStyle={WorkScheduleStyles.flatListSchedule}
                     data={filterSchedule}
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={item => item._id}
@@ -398,14 +400,15 @@ const WorkSchedule = ({navigation}: any) => {
                             <Image
                                 source={images.emptyScheduleList}
                                 style={WorkScheduleStyles.emptyScheduleListImg}
+                                resizeMode='contain'
                             />
                             <Text
                                 style={
                                     WorkScheduleStyles.emptyScheduleListText
                                 }>
                                 {searchSchedule.length !== 0
-                                    ? `Không tìm thấy lịch công việc nào phù hợp với \n“${searchSchedule}"`
-                                    : 'Không tìm thấy lịch công việc nào'}
+                                    ? `Không tìm thấy lịch công việc phù hợp với \n“${searchSchedule}"`
+                                    : 'Không tìm thấy danh sách lịch công việc!'}
                             </Text>
                         </View>
                     }
@@ -459,6 +462,9 @@ const WorkScheduleStyles = StyleSheet.create({
     input: {
         color: 'black',
         width: '92%',
+    },
+    flatListSchedule: {
+        flexGrow: 1,
     },
     workScheduleMargin: {
         marginVertical: 10,
@@ -562,13 +568,12 @@ const WorkScheduleStyles = StyleSheet.create({
         fontStyle: 'italic',
     },
     scheduleListEmpty: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        //width: '100%',
     },
     emptyScheduleListImg: {
-        height: '40%',
-        aspectRatio: 1,
+        height: 200,
     },
     emptyScheduleListText: {
         fontWeight: 400,

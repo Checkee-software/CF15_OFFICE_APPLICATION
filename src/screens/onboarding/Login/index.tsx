@@ -46,17 +46,17 @@ export default function Login() {
             Alert.alert('Thông báo', 'Bạn chưa nhập tài khoản hoặc mật khẩu!', [
                 {text: 'OK'},
             ]);
+        } else {
+            const isPhone = /^[0-9]{9,11}$/.test(userAccount.username);
+
+            const _userAccount = {
+                username: isPhone ? '' : userAccount.username,
+                phoneNumber: isPhone ? userAccount.username : '',
+                password: userAccount.password,
+            };
+
+            login(_userAccount);
         }
-
-        const isPhone = /^[0-9]{9,11}$/.test(userAccount.username);
-
-        const _userAccount = {
-            username: isPhone ? '' : userAccount.username,
-            phoneNumber: isPhone ? userAccount.username : '',
-            password: userAccount.password,
-        };
-
-        login(_userAccount);
     };
 
     return (

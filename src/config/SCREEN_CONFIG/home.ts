@@ -83,7 +83,7 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     UNIT: {
         key: 'UNIT',
-        headerTitle: 'ĐƠN VỊ',
+        headerTitle: 'NGƯỜI LAO ĐỘNG',
         isOpenQRCamera: false,
     } as ScreenInformation,
     STATISTIC: {

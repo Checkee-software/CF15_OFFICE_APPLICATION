@@ -147,6 +147,7 @@ const Woker = ({navigation}: any) => {
             {searchWorker !== '' ? (
                 <View style={WokerStyles.searchListWorker}>
                     <FlatList
+                        contentContainerStyle={WokerStyles.sectionListWorker}
                         data={filterWorkerBySearch}
                         renderItem={({item}) => renderWorkerBySearch(item)}
                         keyExtractor={item => item._id}
@@ -157,6 +158,7 @@ const Woker = ({navigation}: any) => {
                                 <Image
                                     source={images.emptyWorkerList}
                                     style={WokerStyles.emptyWorkerImg}
+                                    resizeMode='contain'
                                 />
                                 <Text style={WokerStyles.emptyWorkerText}>
                                     {`Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`}
@@ -168,6 +170,7 @@ const Woker = ({navigation}: any) => {
             ) : (
                 <View style={WokerStyles.listWorker}>
                     <SectionList
+                        contentContainerStyle={WokerStyles.sectionListWorker}
                         sections={listWorkerFilterByRole}
                         keyExtractor={item => item._id}
                         onRefresh={handleReFetch}
@@ -183,6 +186,7 @@ const Woker = ({navigation}: any) => {
                                 <Image
                                     source={images.emptyWorkerList}
                                     style={WokerStyles.emptyWorkerImg}
+                                    resizeMode='contain'
                                 />
                                 <Text style={WokerStyles.emptyWorkerText}>
                                     Không tìm thấy danh sách nhân sự!
@@ -217,6 +221,9 @@ const WokerStyles = StyleSheet.create({
     listWorker: {
         marginTop: 10,
         flex: 1,
+    },
+    sectionListWorker: {
+        flexGrow: 1,
     },
     workerByRoleSection: {
         gap: 15,
@@ -277,13 +284,12 @@ const WokerStyles = StyleSheet.create({
         textTransform: 'uppercase',
     },
     workerEmpty: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
     emptyWorkerImg: {
-        minWidth: '100%',
-        height: '30%',
-        aspectRatio: 1,
+        height: 200,
     },
     emptyWorkerText: {
         textAlign: 'center',
