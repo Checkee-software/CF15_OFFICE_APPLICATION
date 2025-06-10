@@ -19,7 +19,7 @@ interface workScheduleStore {
 
 const fixAvatarPath = (path: string) => {
     const updatedPath = path.replace(/\\/g, '/');
-    return `http://cf15officeservice.checkee.vn${updatedPath}`;
+    return `http://cf15dev.checkee.vn${updatedPath}`;
 };
 
 export const useWorkScheduleStore = create<workScheduleStore>(set => ({

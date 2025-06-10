@@ -47,6 +47,8 @@ const CollapsibleRow = ({
 const GardenWorker = () => {
     const {userInfo} = useAuthStore();
     const route = useRoute<any>();
+    const code = route.params?.code;
+
     const [showAreaInfo, setShowAreaInfo] = React.useState(false);
     const [showLocationInfo, setShowLocationInfo] = React.useState(false);
     const [showInfo, setShowInfo] = React.useState(false);
@@ -56,14 +58,19 @@ const GardenWorker = () => {
     const {gardens, searchGardens, isLoading, harvestHistory} =
         useGardenStore();
     const [contractExpanded, setContractExpanded] = React.useState(false);
+    useEffect(() => {
+        if (code) {
+            useGardenStore.getState().searchGardens(code);
+        }
+    }, [code]);
 
     useEffect(() => {
-        if (gardens?._id && !harvestHistory) {
+        if (gardens?.code && !harvestHistory) {
             useGardenStore.getState().fetchHarvestCollection(gardens._id);
-        } else if (gardens?._id) {
+        } else if (gardens?.code) {
             useGardenStore.getState().fetchHarvestCollection(gardens._id);
         }
-    }, [gardens._id]);
+    }, [gardens.code]);
 
     if (isLoading || !gardens) {
         return <Loading />;

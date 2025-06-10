@@ -10,7 +10,7 @@ import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/Schedule
 import UserType from '@/shared-types/common/UserType';
 import Address from '@/shared-types/common/Address';
 
-const backendURL = 'http://cf15officeservice.checkee.vn';
+const backendURL = 'http://cf15dev.checkee.vn';
 
 type tasks = {
     compeleted: string;

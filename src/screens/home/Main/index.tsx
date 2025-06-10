@@ -56,7 +56,7 @@ export default function Main({navigation}: any) {
             key: 'gardenForWorker',
             label: 'Khu vườn',
             buttonImage: images.garden,
-            navigateTo: SCREEN_INFO.GARDENCAMERASCAN.key,
+            navigateTo: SCREEN_INFO.GARDENINFOWORKER.key,
             navigateNext: SCREEN_INFO.GARDENWORKER.key,
         },
         {

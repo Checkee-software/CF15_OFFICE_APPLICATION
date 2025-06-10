@@ -38,6 +38,9 @@ import Worker from '../../screens/home/Worker';
 import WorkerInfo from '../../screens/home/Worker/WorkerInfo';
 import ScheduleDetail from '@/screens/home/WorkSchedule/ScheduleDetail';
 import GardenHistory from '@/screens/home/Garden/GardenHistory';
+import GardenInfoWorker from '@/screens/home/Garden/GardenInfoWorker';
+import ActiveMachine from '@/screens/home/Garden/ActiveMachine';
+import GardenHistory1 from '@/screens/home/Garden/GardenHistory1';
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -95,6 +98,20 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
     },
     //khu vườn cho worker
     {
+        name: SCREEN_INFO.ACTIVEMACHINE.key,
+        component: ActiveMachine,
+        options: {
+            title: SCREEN_INFO.ACTIVEMACHINE.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.GARDENINFOWORKER.key,
+        component: GardenInfoWorker,
+        options: {
+            title: SCREEN_INFO.GARDENINFOWORKER.headerTitle,
+        },
+    },
+    {
         name: SCREEN_INFO.GARDENWORKER.key,
         component: GardenWorker,
         options: {
@@ -113,6 +130,13 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: GardenHistory,
         options: {
             title: SCREEN_INFO.GARDENHISTORY.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.GARDENHISTORY1.key,
+        component: GardenHistory1,
+        options: {
+            title: SCREEN_INFO.GARDENHISTORY1.headerTitle,
         },
     },
     {

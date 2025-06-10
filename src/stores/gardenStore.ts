@@ -27,7 +27,7 @@ type GardenState = {
     fetchHarvestCollection: (_id: string) => Promise<void>;
 };
 
-const backendURL = 'http://cf15officeservice.checkee.vn';
+const backendURL = 'http://cf15dev.checkee.vn';
 
 const useGardenStore = create<GardenState>(set => ({
     gardens: null,

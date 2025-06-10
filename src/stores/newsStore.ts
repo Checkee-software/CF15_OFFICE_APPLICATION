@@ -14,7 +14,7 @@ type NewsState = {
     getFullAvatarUrl: (imagePath?: string) => string; 
 };
 
-const backendURL = 'http://cf15officeservice.checkee.vn';
+const backendURL = 'http://cf15dev.checkee.vn';
 
 const useNewsStore = create<NewsState>(set => ({
     news: [],

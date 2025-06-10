@@ -3,7 +3,7 @@ import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {IDocument} from '../shared-types/Response/DocumentResponse/DocumentResponse';
 
-const backendURL = 'http://cf15officeservice.checkee.vn';
+const backendURL = 'http://cf15dev.checkee.vn';
 
 interface DocumentStore {
     isLoading: boolean;

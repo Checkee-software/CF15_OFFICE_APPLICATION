@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, NavigationProp} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import TaskBlock from './TaskBlock';
 import TaskSummary from './TaskSummary';
@@ -21,7 +21,7 @@ const HarvestSection: React.FC<Props> = ({
     setOnlyShowReportButton,
     gardenId,
 }) => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<any>>();
     const [isHarvestDeclared, setIsHarvestDeclared] = React.useState(false);
 
     const handleAddHarvest = (data: any) => {

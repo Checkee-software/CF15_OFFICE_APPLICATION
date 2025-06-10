@@ -10,13 +10,13 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useNavigation} from '@react-navigation/native';
-import TaskBlock from './TaskBlock';
-import TaskSummary from './TaskSummary';
 import ActionButtons from './ActionButtons';
 import HarvestSection from './HarvestSection';
 import {useAuthStore} from '../../../stores/authStore';
 import useGardenStore from '../../../stores/gardenStore';
 import {useRoute} from '@react-navigation/native';
+import MachineShiftSelector from './MachineShiftSelector';
+import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 
 const itemOption = [
     {label: 'Phân khô', value: '1'},
@@ -164,13 +164,12 @@ const GardenDeclare = () => {
     };
 
     const handleExit = () => {
-    if (selectedTask.type !== null) {
-        setShowExitAlert(true);
-    } else {
-        navigation.goBack(); 
-    }
-};
-
+        if (selectedTask.type !== null) {
+            setShowExitAlert(true);
+        } else {
+            navigation.goBack();
+        }
+    };
 
     const handleCloseAlert = () => {
         setShowExitAlert(false);
@@ -201,91 +200,67 @@ const GardenDeclare = () => {
                         onRemoveHarvest={handleRemoveHarvest}
                         setIsHarvestDeclared={setIsHarvestDeclared}
                         setOnlyShowReportButton={setOnlyShowReportButton}
-                        gardenId={gardens?._id} 
+                        gardenId={gardens?._id}
                     />
                 ) : (
                     <>
-                        {/* Bón phân */}
-                        <TaskBlock
-                            title='Bón phân'
+                        <MachineShiftSelector
+                            onStart={machineType => {
+                                console.log('Ca máy được chọn:', machineType);
+                            }}
+                        />
+                        <View style={styles.headerRow}>
+                            <Text style={styles.taskHeader}>Công việc</Text>
+                            <TouchableOpacity
+                                onPress={() =>
+                                    navigation.navigate(
+                                        SCREEN_INFO.GARDENHISTORY1.key as never,
+                                    )
+                                }>
+                                <Text style={styles.linkText}>
+                                    Lịch sử khai báo
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                        <CollapsibleTaskBlock
+                            title='Canh tác khu vườn'
                             itemOptions={itemOption}
                             typeOptions={typeOption}
                             valueOptions={valueOptions}
+                            dataList={fertilizerList}
                             onDeclare={handleAddFertilizer}
+                            onRemove={handleRemoveFertilizer}
                         />
-                        {fertilizerList.map((item, index) => (
-                            <TaskSummary
-                                key={index}
-                                title='Bón phân'
-                                data={item}
-                                index={index}
-                                onRemove={handleRemoveFertilizer}
-                                itemMap={Object.fromEntries(
-                                    itemOption.map(o => [o.value, o.label]),
-                                )}
-                                typeMap={Object.fromEntries(
-                                    typeOption.map(o => [o.value, o.label]),
-                                )}
-                            />
-                        ))}
 
-                        {/* Phun thuốc */}
-                        <TaskBlock
-                            title='Phun thuốc'
+                        <CollapsibleTaskBlock
+                            title='Cải tạo đất khu vườn'
                             itemOptions={itemOption}
                             typeOptions={typeOption}
                             valueOptions={valueOptions}
+                            dataList={sprayList}
                             onDeclare={handleAddSpray}
+                            onRemove={handleRemoveSpray}
                         />
-                        {sprayList.map((item, index) => (
-                            <TaskSummary
-                                key={index}
-                                title='Phun thuốc'
-                                data={item}
-                                index={index}
-                                onRemove={handleRemoveSpray}
-                                itemMap={Object.fromEntries(
-                                    itemOption.map(o => [o.value, o.label]),
-                                )}
-                                typeMap={Object.fromEntries(
-                                    typeOption.map(o => [o.value, o.label]),
-                                )}
-                            />
-                        ))}
 
-                        {/* Tưới tiêu */}
-                        <TaskBlock
-                            title='Tưới tiêu'
+                        <CollapsibleTaskBlock
+                            title='Bón phân cho khu vườn'
                             itemOptions={itemOption}
                             typeOptions={typeOption}
                             valueOptions={valueOptions}
+                            dataList={wateringList}
                             onDeclare={handleAddWatering}
+                            onRemove={handleRemoveWatering}
                         />
-                        {wateringList.map((item, index) => (
-                            <TaskSummary
-                                key={index}
-                                title='Tưới tiêu'
-                                data={item}
-                                index={index}
-                                onRemove={handleRemoveWatering}
-                                itemMap={Object.fromEntries(
-                                    itemOption.map(o => [o.value, o.label]),
-                                )}
-                                typeMap={Object.fromEntries(
-                                    typeOption.map(o => [o.value, o.label]),
-                                )}
-                            />
-                        ))}
                     </>
                 )}
-
-
             </ScrollView>
             <View style={styles.footer}>
-            <TouchableOpacity style={styles.exitButton1} onPress={handleExit}>
-                <Text style={styles.exitText1}>Thoát ra</Text>
-            </TouchableOpacity>
-        </View>
+                <TouchableOpacity
+                    style={styles.exitButton1}
+                    onPress={handleExit}>
+                    <Text style={styles.exitText1}>Thoát ra</Text>
+                </TouchableOpacity>
+            </View>
 
             <ActionButtons
                 visible={hasDeclarations}
@@ -354,7 +329,7 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     linkText: {
-        color: 'blue',
+        color: '#2196F3',
         textDecorationLine: 'underline',
     },
 
@@ -375,11 +350,15 @@ const styles = StyleSheet.create({
         color: 'red',
     },
     footer: {
-    padding: 12,
-    backgroundColor: '#fff',
-    borderColor: '#ccc',
-},
-
+        padding: 12,
+        backgroundColor: '#fff',
+        borderColor: '#ccc',
+    },
+    title: {
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 8,
+    },
 });
 
 export default GardenDeclare;

@@ -57,9 +57,8 @@ export default function FeedbackScreen({navigation}: any) {
                             {item.fullName || 'Không rõ tên'}
                         </Text>
                         <Text style={styles.role}>
-                            {userInfo?.userType?.level === 'DEPARTMENT'
-                                ? item.role
-                                : item.unit}
+                            {item.role || 'Không rõ vai trò'}{' '}
+                            {item.unit ? `(${item.unit})` : ''}
                         </Text>
                     </View>
                 </View>

@@ -4,7 +4,7 @@ import Snackbar from 'react-native-snackbar';
 import {IGardenData} from '@/shared-types/Response/GardenDataResponse/GardenDataResponse';
 import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
 
-const backendURL = 'http://cf15officeservice.checkee.vn';
+const backendURL = 'http://cf15dev.checkee.vn';
 
 interface gardenWorkStore {
     isLoading: boolean;

@@ -3,10 +3,20 @@ import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {useAuthStore} from './authStore';
 import {ICreate as ICreateFormData} from '../shared-types/form-data/FeedbackFormData/FeedbackFormData';
+import { IFeedback } from '../shared-types/Response/FeedbackResponse/FeedbackResponse';
 
-const backendURL = 'http://cf15officeservice.checkee.vn';
+interface FeedbackStore {
+  feedbacks: IFeedback[];
+  isLoading: boolean;
+  getFullAvatarUrl: (avatarPath?: string) => string;
+  submitFeedback: (data: Pick<ICreateFormData, 'title' | 'content'>) => Promise<void>;
+  fetchFeedbacks: () => Promise<void>;
+}
 
-const useFeedbackStore = create(set => ({
+
+const backendURL = 'http://cf15dev.checkee.vn';
+
+const useFeedbackStore = create<FeedbackStore>(set => ({
     feedbacks: [],
     isLoading: false,
 
@@ -32,7 +42,6 @@ const useFeedbackStore = create(set => ({
 
         const formData: ICreateFormData = {
             ...data,
-            departmentCode,
         };
 
         try {
@@ -77,7 +86,7 @@ const useFeedbackStore = create(set => ({
         set({isLoading: true});
         try {
             const res = await axiosClient.get(
-                `${backendURL}/resources/feedbacks/collection`,
+                `${backendURL}/resources/feedbacks/collection?code=&createdAt=-1&from=1748710800000&to=4115817600000`,
             );
             console.log('FETCH_FEEDBACKS_RESPONSE:', res.data);
             set({feedbacks: res.data?.data || []});

@@ -41,6 +41,11 @@ const HOME_SCREENS = {
         headerTitle: 'THÔNG TIN KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
+     GARDENINFOWORKER: {
+        key: 'GARDENINFOWORKER',
+        headerTitle: 'DANH SÁCH KHU VƯỜN',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     GARDENDECLAREWORKER: {
         key: 'GARDENDECLAREWORKER',
         headerTitle: 'KHAI BÁO KHU VƯỜN',
@@ -48,7 +53,12 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     GARDENHISTORY: {
         key: 'GARDENHISTORY',
-        headerTitle: 'Lịch sử',
+        headerTitle: 'Lịch sử thu hoạch',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENHISTORY1: {
+        key: 'GARDENHISTORY1',
+        headerTitle: 'Lịch sử khai báo',
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENCAMERASCAN: {
@@ -59,6 +69,11 @@ const HOME_SCREENS = {
     GARDENINFO1: {
         key: 'GARDENINFO1',
         headerTitle: 'CHI TIẾT KHU VƯỜN',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    ACTIVEMACHINE: {
+        key: 'ACTIVEMACHINE',
+        headerTitle: 'CA MÁY ĐANG HOẠT ĐỘNG',
         isOpenQRCamera: false,
     } as ScreenInformation,
     WORKER: {
