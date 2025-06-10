@@ -617,20 +617,22 @@ const ScheduleDetailStyles = StyleSheet.create({
         color: 'rgba(128, 128, 128, 1)',
     },
     listAccordion: {
-        marginLeft: -15,
-        marginRight: -30,
         gap: 10,
+        marginHorizontal: -12,
         marginVertical: 15,
     },
     boxAccordion: {
+        paddingRight: 6,
         paddingVertical: 0,
         backgroundColor: '#fff',
     },
     titleAccordion1: {
+        marginLeft: -4,
         fontSize: 14,
         fontWeight: 700,
     },
     titleAccordion2: {
+        marginLeft: -4,
         fontSize: 14,
         fontWeight: 600,
     },
@@ -646,7 +648,7 @@ const ScheduleDetailStyles = StyleSheet.create({
         flexDirection: 'row',
         gap: 16,
         alignItems: 'center',
-        width: '94%',
+        width: '98%',
     },
     workerAvatar: {
         backgroundColor: 'rgba(211, 211, 211, 1)',
@@ -709,8 +711,8 @@ const ScheduleDetailStyles = StyleSheet.create({
         flex: 1,
     },
     warpParticipant: {
-        flex: 8,
-        gap: 5,
+        flex: 9,
+        gap: 4,
     },
     participantName: {
         fontSize: 13,
