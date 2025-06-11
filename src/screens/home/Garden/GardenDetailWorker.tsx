@@ -12,6 +12,7 @@ import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useAuthStore} from '../../../stores/authStore';
+import moment from 'moment';
 
 const CollapsibleRow = ({
     label,
@@ -217,15 +218,23 @@ const GardenWorker = () => {
                             }}>
                             <Row
                                 label='Ngày bắt đầu'
-                                value={new Date(
-                                    harvestItem?.createdAt,
-                                ).toLocaleString('vi-VN')}
+                                value={
+                                    harvestItem?.createdAt
+                                        ? moment(harvestItem.createdAt).format(
+                                              'DD/MM/YYYY HH:mm',
+                                          )
+                                        : ''
+                                }
                             />
                             <Row
                                 label='Ngày kết thúc'
-                                value={new Date(
-                                    harvestItem?.endAt,
-                                ).toLocaleString('vi-VN')}
+                                value={
+                                    harvestItem?.endAt
+                                        ? moment(harvestItem.endAt).format(
+                                              'DD/MM/YYYY HH:mm',
+                                          )
+                                        : ''
+                                }
                             />
 
                             {harvestItem?.data?.map(entry => (

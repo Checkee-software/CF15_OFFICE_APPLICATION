@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {useRoute, RouteProp} from '@react-navigation/native';
 import useGardenStore from '../../../stores/gardenStore';
+import moment from 'moment';
 
 const STATUS_COLORS = {
     VERIFIED: '#4CAF50',
@@ -98,7 +99,9 @@ const GardenHistory = () => {
                             <View style={styles.row}>
                                 <Text style={styles.label}>Thực hiện lúc</Text>
                                 <Text style={styles.value}>
-                                    {new Date(item.createdAt).toLocaleString()}
+                                    {moment(item.createdAt).format(
+                                        'DD/MM/YYYY HH:mm',
+                                    )}
                                 </Text>
                             </View>
                             <View style={styles.row}>
