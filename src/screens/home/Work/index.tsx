@@ -363,7 +363,9 @@ const WorkScreen = () => {
     };
 
     useEffect(() => {
-        handleGetRequestGardenData();
+        if (userInfo.userType.level === EOrganization.LEADER) {
+            handleGetRequestGardenData();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

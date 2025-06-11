@@ -29,9 +29,11 @@ const WorkerInfo = ({route}: any) => {
     };
 
     const renderLevelUser = (level: string) => {
-        const levelUser = organizations.find(item => item.code === level);
+        const levelUser = organizations.find(items => items.code === level);
         return levelUser?.label;
     };
+
+    console.log(item);
 
     return (
         <View style={WorkerInfoStyles.container}>
