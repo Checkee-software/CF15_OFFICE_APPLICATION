@@ -224,12 +224,10 @@ const GardenDeclare = () => {
                         </View>
                         <CollapsibleTaskBlock
                             title='Canh tác khu vườn'
-                            itemOptions={itemOption}
-                            typeOptions={typeOption}
-                            valueOptions={valueOptions}
                             dataList={fertilizerList}
                             onDeclare={handleAddFertilizer}
                             onRemove={handleRemoveFertilizer}
+                            isDropdown={false}
                         />
 
                         <CollapsibleTaskBlock

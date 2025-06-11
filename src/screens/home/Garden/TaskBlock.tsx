@@ -29,6 +29,7 @@ const TaskBlock = ({
     const [item, setItem] = React.useState<string | null>(null);
     const [value, setValue] = React.useState<string | null>('');
 
+
     const handleDeclare = () => {
         if (value) {
             const numericValue = parseFloat(value);
@@ -44,12 +45,16 @@ const TaskBlock = ({
 
     const isButtonDisabled = showWarning || (isDropdown ? !item || !type || !value : !value);
 
+    const getInputBackgroundColor = () => {
+        if (title === 'Canh tác khu vườn') return styles.taskBlockCultivate;
+        return styles.taskBlockInput;
+    };
 
     return (
         <View
             style={[
                 styles.taskBlock,
-                isDropdown ? styles.taskBlockDropdown : styles.taskBlockInput,
+                isDropdown ? styles.taskBlockDropdown : getInputBackgroundColor(),
             ]}>
             <Text style={styles.taskTitle}>{title}</Text>
 
@@ -61,9 +66,9 @@ const TaskBlock = ({
                     <Dropdown
                         style={styles.dropdown}
                         data={itemOptions || []}
-                        labelField='label'
-                        valueField='value'
-                        placeholder='Chọn'
+                        labelField="label"
+                        valueField="value"
+                        placeholder="Chọn"
                         value={item}
                         onChange={item => setItem(item.value)}
                     />
@@ -73,37 +78,42 @@ const TaskBlock = ({
                     <Dropdown
                         style={styles.dropdown}
                         data={typeOptions || []}
-                        labelField='label'
-                        valueField='value'
-                        placeholder='Chọn'
+                        labelField="label"
+                        valueField="value"
+                        placeholder="Chọn"
                         value={type}
                         onChange={item => setType(item.value)}
                     />
                     <Text style={styles.label}>
-                        Giá trị định mức{' '}
-                        <Text style={styles.requiredMark}>*</Text>
+                        Giá trị định mức <Text style={styles.requiredMark}>*</Text>
                     </Text>
                     <Dropdown
                         style={styles.dropdown}
                         data={valueOptions || []}
-                        labelField='label'
-                        valueField='value'
-                        placeholder='Chọn'
+                        labelField="label"
+                        valueField="value"
+                        placeholder="Chọn"
                         value={value}
                         onChange={item => setValue(item.value)}
                     />
                 </>
             ) : (
-                <TextInput
-                    style={styles.input}
-                    value={value ?? ''}
-                    onChangeText={text => {
-                        const numericText = text.replace(/[^0-9.]/g, '');
-                        setValue(numericText);
-                    }}
-                    placeholder='Nhập khối lượng'
-                    keyboardType='numeric'
-                />
+                <>
+                    <Text style={styles.label}>
+                        {title === 'Canh tác khu vườn' ? 'Diện tích đã làm (m2)' : 'Khối lượng'}
+                        <Text style={styles.requiredMark}> *</Text>
+                    </Text>
+                    <TextInput
+                        style={styles.input}
+                        value={value ?? ''}
+                        onChangeText={text => {
+                            const numericText = text.replace(/[^0-9.]/g, '');
+                            setValue(numericText);
+                        }}
+                        placeholder={title === 'Canh tác khu vườn' ? 'Nhập diện tích' : 'Nhập khối lượng'}
+                        keyboardType="numeric"
+                    />
+                </>
             )}
 
             {showWarning && (
@@ -151,7 +161,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#4CAF5026',
     },
     taskBlockInput: {
-        backgroundColor: '#E6F0FF',
+        backgroundColor: '#E6F0FF', 
+    },
+    taskBlockCultivate: {
+        backgroundColor: '#E7F5E9', 
     },
     taskTitle: {
         fontWeight: 'bold',

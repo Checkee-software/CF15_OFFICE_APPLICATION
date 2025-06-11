@@ -6,12 +6,13 @@ import TaskSummary from './TaskSummary';
 
 type Props = {
     title: string;
-    itemOptions: any[];
-    typeOptions: any[];
-    valueOptions: any[];
+    itemOptions?: any[];
+    typeOptions?: any[];
+    valueOptions?: any[];
     dataList: any[];
     onDeclare: (data: any) => void;
     onRemove: (index: number) => void;
+    isDropdown?: boolean;
 };
 
 const CollapsibleTaskBlock = ({
@@ -22,15 +23,18 @@ const CollapsibleTaskBlock = ({
     dataList,
     onDeclare,
     onRemove,
+    isDropdown = true,
+
 }: Props) => {
     const [expanded, setExpanded] = React.useState(false);
 
     const itemMap = Object.fromEntries(
-        itemOptions.map(o => [o.value, o.label]),
-    );
-    const typeMap = Object.fromEntries(
-        typeOptions.map(o => [o.value, o.label]),
-    );
+    (itemOptions ?? []).map(o => [o.value, o.label]),
+);
+const typeMap = Object.fromEntries(
+    (typeOptions ?? []).map(o => [o.value, o.label]),
+);
+
 
     return (
         <View style={styles.container}>
@@ -47,7 +51,9 @@ const CollapsibleTaskBlock = ({
                         typeOptions={typeOptions}
                         valueOptions={valueOptions}
                         onDeclare={onDeclare}
+                        isDropdown={isDropdown}
                     />
+
                     {dataList.map((item, index) => (
                         <TaskSummary
                             key={index}
