@@ -27,19 +27,25 @@ const TaskSummary = ({
         return `${h}:${m} ${day}/${month}/${year}`;
     };
 
-    const renderHarvestDetails = (data: any) => {
+    const renderDetails = (data: any) => {
         if (title === 'Thu hoạch') {
             return (
-                <>
-                    <View style={styles.summaryRow}>
-                        <Text style={styles.label}>Khối lượng (KG)</Text>
-                        <Text style={styles.value}>
-                            {data.value} 
-                        </Text>
-                    </View>
-                </>
+                <View style={styles.summaryRow}>
+                    <Text style={styles.label}>Khối lượng (KG)</Text>
+                    <Text style={styles.value}>{data.value}</Text>
+                </View>
             );
         }
+
+        if (title === 'Canh tác khu vườn') {
+            return (
+                <View style={styles.summaryRow}>
+                    <Text style={styles.label}>Diện tích (m²)</Text>
+                    <Text style={styles.value}>{data.value}</Text>
+                </View>
+            );
+        }
+
         return (
             <>
                 <View style={styles.summaryRow}>
@@ -77,7 +83,7 @@ const TaskSummary = ({
                 <Text style={styles.label}>Thực hiện lúc</Text>
                 <Text style={styles.value}>{formatTime(data.time)}</Text>
             </View>
-            {renderHarvestDetails(data)}
+            {renderDetails(data)}
         </View>
     );
 };
