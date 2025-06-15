@@ -255,6 +255,8 @@ const WorkSchedule = ({navigation}: any) => {
         setSelectedStatus(value);
     };
 
+    console.log(listWorkScheduleFilter);
+
     const renderItemWorkSchedule = (itemWorkSchedule: any) => (
         <View style={WorkScheduleStyles.workScheduleMargin}>
             <TouchableOpacity
@@ -293,16 +295,17 @@ const WorkSchedule = ({navigation}: any) => {
                                 size={20}
                             />
 
-                            <Text style={WorkScheduleStyles.value}>
-                                {`${itemWorkSchedule.childTasks.tasks.reduce(
-                                    (count: number, task: any) => {
-                                        return task.completedPercent === 100
+                            {/* <Text style={WorkScheduleStyles.value}>
+                                {`${itemWorkSchedule.childTasks.reduce(
+                                    (count: number, staffItem: any) => {
+                                        return staffItem.status ===
+                                            EScheduleStatus.COMPLETED
                                             ? count + 1
                                             : count;
                                     },
                                     0,
                                 )}/${itemWorkSchedule.childTasks.tasks.length}`}
-                            </Text>
+                            </Text> */}
                         </View>
 
                         <View style={WorkScheduleStyles.warpIconAndValueStaff}>

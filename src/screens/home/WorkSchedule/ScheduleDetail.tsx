@@ -16,6 +16,7 @@ import RNFS from 'react-native-fs';
 import Snackbar from 'react-native-snackbar';
 import {List} from 'react-native-paper';
 import moment from 'moment';
+import {ETaskStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
 
 const ScheduleDetail = ({route}: any) => {
     type AttachedFiles = {
@@ -29,9 +30,160 @@ const ScheduleDetail = ({route}: any) => {
         size: number;
     };
 
-    const scheduleDetail = route.params.itemWorkSchedule;
+    const scheduleDetail = {
+        _id: '684863f852da593599693e50',
+        status: 'PENDING',
+        title: 'Kế hoạch cải tại khu  vườn cà phê khoán lần 1',
+        description:
+            'Lập kế hoạch và phân công công việc cải tạo khu vườn để thực hiện sự kiện',
+        startedDate: '2025-06-10T17:00:00.000Z',
+        finishedDate: '2025-06-19T17:00:00.000Z',
+        canceledMessage: '',
+        files: [
+            {
+                fieldname: 'files',
+                originalname: 'Invoice_inv_postman_8FELDHPJ6YPBEHW8.pdf',
+                filename: 'files-a98c1282-1d42-4b14-ad00-97767a4cbf5e.pdf',
+                destination: '/uploads/files',
+                encoding: '7bit',
+                path: '/uploads/files/files-a98c1282-1d42-4b14-ad00-97767a4cbf5e.pdf',
+                mimetype: 'application/pdf',
+                size: 461162,
+            },
+        ],
+        childTasks: [
+            {
+                status: 'WAITING',
+                name: 'Canh tác khu vườn',
+                finishedTime: '2025-06-12T17:00:00.000Z',
+                staff: [
+                    {
+                        userId: '68471fb6421fd1ae91522a72',
+                        name: 'Nguyễn Lao Động',
+                        status: 'WAITING',
+                        processingRate: 0,
+                        completedTime: null,
+                        canceledTime: null,
+                        canceledNote: '',
+                    },
+                    {
+                        userId: '68471fb6421fd1ae91522a73',
+                        name: 'Nguyễn Lao Lực',
+                        status: 'WAITING',
+                        processingRate: 0,
+                        completedTime: null,
+                        canceledTime: null,
+                        canceledNote: '',
+                    },
+                    {
+                        userId: '68471fb6421fd1ae91522a74',
+                        name: 'Nguyễn Lao Tâm',
+                        status: 'WAITING',
+                        processingRate: 0,
+                        completedTime: null,
+                        canceledTime: null,
+                        canceledNote: '',
+                    },
+                ],
+                isDelete: false,
+                modificationDetails: [],
+                _id: '684863f852da593599693e53',
+                createdAt: '2025-06-11T04:56:06.091Z',
+                updatedAt: '2025-06-11T04:56:06.091Z',
+            },
+            {
+                status: 'WAITING',
+                name: 'Cải tại đất khu vườn',
+                finishedTime: '2025-06-15T17:00:00.000Z',
+                staff: [
+                    {
+                        userId: '68471fb6421fd1ae91522a72',
+                        name: 'Nguyễn Lao Động',
+                        status: 'WAITING',
+                        processingRate: 0,
+                        completedTime: null,
+                        canceledTime: null,
+                        canceledNote: '',
+                    },
+                    {
+                        userId: '68471fb6421fd1ae91522a73',
+                        name: 'Nguyễn Lao Lực',
+                        status: 'WAITING',
+                        processingRate: 0,
+                        completedTime: null,
+                        canceledTime: null,
+                        canceledNote: '',
+                    },
+                    {
+                        userId: '68471fb6421fd1ae91522a74',
+                        name: 'Nguyễn Lao Tâm',
+                        status: 'WAITING',
+                        processingRate: 0,
+                        completedTime: null,
+                        canceledTime: null,
+                        canceledNote: '',
+                    },
+                ],
+                isDelete: false,
+                modificationDetails: [],
+                _id: '684863f852da593599693e54',
+                createdAt: '2025-06-11T04:56:06.091Z',
+                updatedAt: '2025-06-11T04:56:06.091Z',
+            },
+            {
+                status: 'WAITING',
+                name: 'Bón phân cho khu vườn',
+                finishedTime: '2025-06-18T17:00:00.000Z',
+                staff: [
+                    {
+                        userId: '68471fb6421fd1ae91522a72',
+                        name: 'Nguyễn Lao Động',
+                        status: 'WAITING',
+                        processingRate: 0,
+                        completedTime: null,
+                        canceledTime: null,
+                        canceledNote: '',
+                    },
+                    {
+                        userId: '68471fb6421fd1ae91522a73',
+                        name: 'Nguyễn Lao Lực',
+                        status: 'WAITING',
+                        processingRate: 0,
+                        completedTime: null,
+                        canceledTime: null,
+                        canceledNote: '',
+                    },
+                    {
+                        userId: '68471fb6421fd1ae91522a74',
+                        name: 'Nguyễn Lao Tâm',
+                        status: 'WAITING',
+                        processingRate: 0,
+                        completedTime: null,
+                        canceledTime: null,
+                        canceledNote: '',
+                    },
+                ],
+                isDelete: false,
+                modificationDetails: [],
+                _id: '684863f852da593599693e55',
+                createdAt: '2025-06-11T04:56:06.091Z',
+                updatedAt: '2025-06-11T04:56:06.091Z',
+            },
+        ],
+        followerId: null,
+        receivedObject: 'Không xác định',
+        producingPlan: '',
+        employees: [],
+        followers: [],
+        labour: {
+            name: 'Công',
+            cost: 500000,
+        },
+        materials: [{name: 'Phan kali'}],
+    };
+    //const scheduleDetail = route.params.itemWorkSchedule;
 
-    console.log(route.params.itemWorkSchedule);
+    //console.log(route.params.itemWorkSchedule);
 
     const formatFileSize = (size: number) => {
         if (size >= 1024 * 1024) {
@@ -116,7 +268,7 @@ const ScheduleDetail = ({route}: any) => {
                         {itemAttachedFiles.originalname}
                     </Text>
                     <Text style={ScheduleDetailStyles.infoDocumentSizeText}>
-                        {formatFileSize(itemAttachedFiles.size)}
+                        Kích cỡ: {formatFileSize(itemAttachedFiles.size)}
                     </Text>
                 </View>
             </View>
@@ -155,8 +307,7 @@ const ScheduleDetail = ({route}: any) => {
                             {itemStaff.fullName}
                         </Text>
                         <Text style={ScheduleDetailStyles.workerUnit}>
-                            {/* {itemStaff.userType.unit} */}
-                            Đội sản xuất phía Tây
+                            {itemStaff.group}
                         </Text>
                     </View>
                 </View>
@@ -180,98 +331,66 @@ const ScheduleDetail = ({route}: any) => {
                 {`Kết thúc vào ${renderTaskEndIn(itemChildTask.finishedTime)}`}
             </Text>
 
-            <View style={ScheduleDetailStyles.participant}>
-                <View style={ScheduleDetailStyles.statusTask}>
-                    <MaterialIcons
-                        name='check-circle'
-                        size={20}
-                        color='#4CAF50'
-                    />
-                </View>
-                <View style={ScheduleDetailStyles.warpParticipant}>
-                    <Text style={ScheduleDetailStyles.participantName}>
-                        Hà Hoàng A
-                    </Text>
-                    <Text
-                        style={[
-                            ScheduleDetailStyles.participantStatus,
-                            ScheduleDetailStyles.participantStatus2,
-                        ]}>
-                        Đã làm 800/2500 (m2) 15:33 25/05/2025
-                    </Text>
-                </View>
-            </View>
-
-            <View style={ScheduleDetailStyles.participant}>
-                <View style={ScheduleDetailStyles.statusTask}>
-                    <MaterialIcons
-                        name='check-circle'
-                        size={20}
-                        color='#FF4E45'
-                    />
-                </View>
-
-                <View style={ScheduleDetailStyles.warpParticipant}>
-                    <Text style={ScheduleDetailStyles.participantName}>
-                        Hà Hoàng B
-                    </Text>
-                    <Text
-                        style={[
-                            ScheduleDetailStyles.participantStatus,
-                            ScheduleDetailStyles.participantStatus3,
-                        ]}>
-                        (15:37 23/06/2025) Lý do: Sai yêu cầu
-                    </Text>
-                </View>
-            </View>
-
-            <View style={ScheduleDetailStyles.participant}>
-                <View style={ScheduleDetailStyles.statusTask}>
-                    <MaterialIcons
-                        name='check-circle'
-                        size={20}
-                        color='#2196F3'
-                    />
-                </View>
-                <View style={ScheduleDetailStyles.warpParticipant}>
-                    <Text
-                        style={[
-                            ScheduleDetailStyles.participantName,
-                            ScheduleDetailStyles.participantStatus2,
-                        ]}>
-                        Hà Hoàng C
-                    </Text>
-                    <Text
-                        style={[
-                            ScheduleDetailStyles.participantStatus,
-                            ScheduleDetailStyles.participantStatus2,
-                        ]}>
-                        Đã làm 2500/2500 (m2) 15:33 25/05/2025
-                    </Text>
-                </View>
-            </View>
-
-            <View style={ScheduleDetailStyles.participant}>
-                <View style={ScheduleDetailStyles.statusTask}>
-                    <MaterialIcons
-                        name='check-circle'
-                        size={20}
-                        color='#808080'
-                    />
-                </View>
-                <View style={ScheduleDetailStyles.warpParticipant}>
-                    <Text style={ScheduleDetailStyles.participantName}>
-                        Hà Hoàng D
-                    </Text>
-                    <Text
-                        style={[
-                            ScheduleDetailStyles.participantStatus,
-                            ScheduleDetailStyles.participantStatus1,
-                        ]}>
-                        Đã làm 0/2500 (m2)
-                    </Text>
-                </View>
-            </View>
+            <FlatList
+                scrollEnabled={false}
+                data={itemChildTask.staff}
+                keyExtractor={item => item.userId}
+                renderItem={(itemStaff: any) => (
+                    <View style={ScheduleDetailStyles.participant}>
+                        <View style={ScheduleDetailStyles.statusTask}>
+                            <MaterialIcons
+                                name='check-circle'
+                                size={20}
+                                color={
+                                    itemStaff.item.status ===
+                                    ETaskStatus.WAITING
+                                        ? '#808080'
+                                        : itemStaff.item.status ===
+                                          ETaskStatus.PROCESSING
+                                        ? '#2196F3'
+                                        : itemStaff.item.status ===
+                                          ETaskStatus.COMPLETED
+                                        ? '#4CAF50'
+                                        : '#FF4E45'
+                                }
+                            />
+                        </View>
+                        <View style={ScheduleDetailStyles.warpParticipant}>
+                            <Text style={ScheduleDetailStyles.participantName}>
+                                {itemStaff.item.name}
+                            </Text>
+                            <Text
+                                style={[
+                                    ScheduleDetailStyles.participantStatus,
+                                    itemStaff.item.status ===
+                                    ETaskStatus.WAITING
+                                        ? ScheduleDetailStyles.participantStatus1
+                                        : itemStaff.item.status ===
+                                          ETaskStatus.CANCELED
+                                        ? ScheduleDetailStyles.participantStatus3
+                                        : ScheduleDetailStyles.participantStatus2,
+                                ]}>
+                                {itemStaff.item.status === ETaskStatus.CANCELED
+                                    ? `(${moment(
+                                          itemStaff.item.completedTime,
+                                      ).format('L')}) Lý do: ${
+                                          itemStaff.item.canceledNote
+                                      }`
+                                    : `Đã làm ${
+                                          itemStaff.item.processingRate
+                                      }/2500 (m2) ${
+                                          itemStaff.item.completedTime === null
+                                              ? ''
+                                              : moment(
+                                                    itemStaff.item
+                                                        .completedTime,
+                                                ).format('L')
+                                      }`}
+                            </Text>
+                        </View>
+                    </View>
+                )}
+            />
         </View>
     );
 
@@ -289,7 +408,7 @@ const ScheduleDetail = ({route}: any) => {
                             Số CBQL/NLĐ
                         </Text>
                         <Text style={ScheduleDetailStyles.statusText}>
-                            {`${scheduleDetail.employees.length}/${scheduleDetail.employees.length}`}
+                            {`${scheduleDetail.employees.length}/${scheduleDetail.followers.length}`}
                         </Text>
                     </View>
 
@@ -298,7 +417,7 @@ const ScheduleDetail = ({route}: any) => {
                             Tổng số công việc con
                         </Text>
                         <Text style={ScheduleDetailStyles.statusText}>
-                            {scheduleDetail.childTasks.tasks.length}
+                            {scheduleDetail.childTasks.length}
                         </Text>
                     </View>
                 </View>
@@ -354,7 +473,7 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                Khu vườn cà phê khoán
+                                {scheduleDetail.gardenName}
                             </Text>
                         </View>
 
@@ -364,7 +483,7 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                Cà phê khoán
+                                {scheduleDetail.productName}
                             </Text>
                         </View>
                     </View>
@@ -380,10 +499,11 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                Công:{' '}
-                                {new Intl.NumberFormat('vi-VN', {
+                                {`${
+                                    scheduleDetail.labour.name
+                                }: ${new Intl.NumberFormat('vi-VN', {
                                     currency: 'VND',
-                                }).format(500000)}
+                                }).format(scheduleDetail.labour.cost)}`}
                             </Text>
                         </View>
 
@@ -393,7 +513,21 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                Bón phân Kali, phun thuốc trừ sâu
+                                {scheduleDetail.materials.map(
+                                    (
+                                        itemMaterials: any,
+                                        indexMaterials: number,
+                                    ) => (
+                                        <React.Fragment key={indexMaterials}>
+                                            {itemMaterials.name}
+                                            {/* kiểm tra nếu không phải phần tử cuối thì thêm dấu , */}
+                                            {indexMaterials <
+                                                scheduleDetail.materials
+                                                    .length -
+                                                    1 && ', '}
+                                        </React.Fragment>
+                                    ),
+                                )}
                             </Text>
                         </View>
 
@@ -439,12 +573,12 @@ const ScheduleDetail = ({route}: any) => {
                 <View style={ScheduleDetailStyles.listAccordion}>
                     <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion1}
-                        title='Cán bộ quản lý'
+                        title={`Cán bộ quản lý (${scheduleDetail.followers.length})`}
                         style={ScheduleDetailStyles.boxAccordion}
                         id='1'>
                         <FlatList
                             scrollEnabled={false}
-                            data={scheduleDetail?.employees as any}
+                            data={scheduleDetail?.followers as any}
                             renderItem={({item, index}) =>
                                 renderStaff(item, index)
                             }
@@ -469,13 +603,13 @@ const ScheduleDetail = ({route}: any) => {
 
                     <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion2}
-                        title={`Danh sách công việc con (${scheduleDetail.childTasks.tasks.length})`}
+                        title={`Danh sách công việc con (${scheduleDetail.childTasks.length})`}
                         style={ScheduleDetailStyles.boxAccordion}
                         id='3'>
                         <View style={ScheduleDetailStyles.listChildTasks}>
                             <FlatList
                                 scrollEnabled={false}
-                                data={scheduleDetail?.childTasks.tasks as any}
+                                data={scheduleDetail?.childTasks as any}
                                 renderItem={({item}) => renderChildTask(item)}
                                 keyExtractor={item => item._id}
                             />
@@ -637,7 +771,7 @@ const ScheduleDetailStyles = StyleSheet.create({
         fontWeight: 600,
     },
     listWorkerMargin: {
-        marginVertical: 5,
+        marginVertical: 8,
     },
     workerCard: {
         marginHorizontal: 15,
@@ -687,7 +821,7 @@ const ScheduleDetailStyles = StyleSheet.create({
         paddingHorizontal: 15,
     },
     childTaskInfo: {
-        gap: 10,
+        gap: 12,
         justifyContent: 'center',
         marginVertical: 10,
     },
@@ -706,13 +840,15 @@ const ScheduleDetailStyles = StyleSheet.create({
     participant: {
         flexDirection: 'row',
         alignItems: 'center',
+        paddingLeft: 10,
     },
     statusTask: {
         flex: 1,
     },
     warpParticipant: {
-        flex: 9,
-        gap: 4,
+        flex: 8,
+        gap: 5,
+        marginVertical: 5,
     },
     participantName: {
         fontSize: 13,

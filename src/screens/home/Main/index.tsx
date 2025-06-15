@@ -12,6 +12,7 @@ import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useAuthStore} from '../../../stores/authStore';
 import asyncStorageHelper from '../../../utils/localStorageHelper/index';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
@@ -117,7 +118,7 @@ export default function Main({navigation}: any) {
     ];
 
     const filterMenuByRole = (role: string) => {
-        if (role === 'DEPARTMENT') {
+        if (role === EOrganization.DEPARTMENT) {
             return menuItems.filter(
                 item =>
                     item.key !== 'gardenForWorker' &&
@@ -126,7 +127,7 @@ export default function Main({navigation}: any) {
             );
         }
 
-        if (role === 'LEADER') {
+        if (role === EOrganization.LEADER) {
             return menuItems.filter(
                 item =>
                     item.key !== 'gardenForWorker' &&
@@ -135,7 +136,7 @@ export default function Main({navigation}: any) {
             );
         }
 
-        if (role === 'WORKER') {
+        if (role === EOrganization.WORKER) {
             return menuItems.filter(
                 item =>
                     item.key !== 'unit' &&
