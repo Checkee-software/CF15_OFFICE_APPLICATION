@@ -16,6 +16,7 @@ import {IGarden} from '@/shared-types/Response/GardenResponse/GardenResponse';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useAuthStore} from '../../../stores/authStore';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useRoute} from '@react-navigation/native';
 
 const GardenInfoWorker = () => {
     const navigation = useNavigation() as any;
@@ -24,6 +25,9 @@ const GardenInfoWorker = () => {
     const [searchText, setSearchText] = useState('');
     const [filteredGardens, setFilteredGardens] = useState<IGarden[]>([]);
     const {userInfo} = useAuthStore();
+    const route = useRoute<any>();
+    const navigateNext =
+        route.params?.navigateNext ?? SCREEN_INFO.GARDENWORKER.key;
 
     useEffect(() => {
         fetchGardens();
@@ -56,7 +60,7 @@ const GardenInfoWorker = () => {
         <TouchableOpacity
             style={styles.card}
             onPress={() =>
-                navigation.navigate(SCREEN_INFO.GARDENWORKER.key, {
+                navigation.navigate(navigateNext, {
                     code: item.code,
                 })
             }>
@@ -123,8 +127,7 @@ const GardenInfoWorker = () => {
                                 navigation.navigate(
                                     SCREEN_INFO.GARDENCAMERASCAN.key,
                                     {
-                                        navigateNext:
-                                            SCREEN_INFO.GARDENWORKER.key,
+                                        navigateNext: navigateNext,
                                     },
                                 )
                             }>

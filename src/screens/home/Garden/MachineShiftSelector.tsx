@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     box: {
-        backgroundColor: '#E5F1FB',
+        backgroundColor: '#80808026',
         padding: 14,
         borderRadius: 10,
         marginTop: 8,

@@ -49,7 +49,6 @@ const HarvestSection: React.FC<Props> = ({
             <TaskBlock
                 title='Khối lượng thu hoạch (kg)'
                 onDeclare={handleAddHarvest}
-                isDropdown={false}
                 showWarning={hasUnDeclaredHarvest || harvestList.length > 0}
             />
 
