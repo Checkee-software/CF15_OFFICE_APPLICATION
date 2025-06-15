@@ -1,93 +1,48 @@
-import React from 'react';
-import {View, StyleSheet} from 'react-native';
-import {List} from 'react-native-paper';
-import TaskBlock from './TaskBlock';
-import TaskSummary from './TaskSummary';
-
-type Props = {
-    title: string;
-    itemOptions?: any[];
-    typeOptions?: any[];
-    valueOptions?: any[];
-    dataList: any[];
-    onDeclare: (data: any) => void;
-    onRemove: (index: number) => void;
-    isDropdown?: boolean;
-};
+import React, {useState} from 'react';
+import {View, Text, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const CollapsibleTaskBlock = ({
     title,
-    itemOptions,
-    typeOptions,
-    valueOptions,
-    dataList,
-    onDeclare,
-    onRemove,
-    isDropdown = true,
-
-}: Props) => {
-    const [expanded, setExpanded] = React.useState(false);
-
-    const itemMap = Object.fromEntries(
-    (itemOptions ?? []).map(o => [o.value, o.label]),
-);
-const typeMap = Object.fromEntries(
-    (typeOptions ?? []).map(o => [o.value, o.label]),
-);
-
+    children,
+}: {
+    title: string;
+    children: React.ReactNode;
+}) => {
+    const [collapsed, setCollapsed] = useState(true);
 
     return (
-        <View style={styles.container}>
-            <List.Accordion
-                title={title}
-                expanded={expanded}
-                onPress={() => setExpanded(!expanded)}
-                titleStyle={styles.title}
-                style={styles.accordion}>
-                <View style={styles.content}>
-                    <TaskBlock
-                        title={title}
-                        itemOptions={itemOptions}
-                        typeOptions={typeOptions}
-                        valueOptions={valueOptions}
-                        onDeclare={onDeclare}
-                        isDropdown={isDropdown}
-                    />
-
-                    {dataList.map((item, index) => (
-                        <TaskSummary
-                            key={index}
-                            title={title}
-                            data={item}
-                            index={index}
-                            onRemove={onRemove}
-                            itemMap={itemMap}
-                            typeMap={typeMap}
-                        />
-                    ))}
-                </View>
-            </List.Accordion>
+        <View style={styles.wrapper}>
+            <TouchableOpacity
+                style={styles.header}
+                onPress={() => setCollapsed(!collapsed)}>
+                <Text style={styles.title}>{title}</Text>
+                <Icon name={collapsed ? 'keyboard-arrow-down' : 'keyboard-arrow-up'} size={24} />
+            </TouchableOpacity>
+            {!collapsed && <View style={styles.body}>{children}</View>}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#E5F1FB',
-        borderRadius: 8,
-        marginVertical: 8,
-        overflow: 'hidden',
+    wrapper: {
+        backgroundColor: '#e6f3ff',
+        borderRadius: 12,
+        marginBottom: 8,
+        padding: 12,
     },
-    accordion: {
-        backgroundColor: '#E5F1FB',
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
     },
     title: {
-        fontWeight: 400,
-        color: 'black',
+        fontWeight: 600,
+        fontSize: 16,
     },
-    content: {
-        paddingTop: 8,
-        backgroundColor: 'white',
+    body: {
+        gap: 12,
     },
 });
 
