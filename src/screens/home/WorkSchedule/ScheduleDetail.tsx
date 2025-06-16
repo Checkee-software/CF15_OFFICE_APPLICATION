@@ -30,160 +30,9 @@ const ScheduleDetail = ({route}: any) => {
         size: number;
     };
 
-    const scheduleDetail = {
-        _id: '684863f852da593599693e50',
-        status: 'PENDING',
-        title: 'Kế hoạch cải tại khu  vườn cà phê khoán lần 1',
-        description:
-            'Lập kế hoạch và phân công công việc cải tạo khu vườn để thực hiện sự kiện',
-        startedDate: '2025-06-10T17:00:00.000Z',
-        finishedDate: '2025-06-19T17:00:00.000Z',
-        canceledMessage: '',
-        files: [
-            {
-                fieldname: 'files',
-                originalname: 'Invoice_inv_postman_8FELDHPJ6YPBEHW8.pdf',
-                filename: 'files-a98c1282-1d42-4b14-ad00-97767a4cbf5e.pdf',
-                destination: '/uploads/files',
-                encoding: '7bit',
-                path: '/uploads/files/files-a98c1282-1d42-4b14-ad00-97767a4cbf5e.pdf',
-                mimetype: 'application/pdf',
-                size: 461162,
-            },
-        ],
-        childTasks: [
-            {
-                status: 'WAITING',
-                name: 'Canh tác khu vườn',
-                finishedTime: '2025-06-12T17:00:00.000Z',
-                staff: [
-                    {
-                        userId: '68471fb6421fd1ae91522a72',
-                        name: 'Nguyễn Lao Động',
-                        status: 'WAITING',
-                        processingRate: 0,
-                        completedTime: null,
-                        canceledTime: null,
-                        canceledNote: '',
-                    },
-                    {
-                        userId: '68471fb6421fd1ae91522a73',
-                        name: 'Nguyễn Lao Lực',
-                        status: 'WAITING',
-                        processingRate: 0,
-                        completedTime: null,
-                        canceledTime: null,
-                        canceledNote: '',
-                    },
-                    {
-                        userId: '68471fb6421fd1ae91522a74',
-                        name: 'Nguyễn Lao Tâm',
-                        status: 'WAITING',
-                        processingRate: 0,
-                        completedTime: null,
-                        canceledTime: null,
-                        canceledNote: '',
-                    },
-                ],
-                isDelete: false,
-                modificationDetails: [],
-                _id: '684863f852da593599693e53',
-                createdAt: '2025-06-11T04:56:06.091Z',
-                updatedAt: '2025-06-11T04:56:06.091Z',
-            },
-            {
-                status: 'WAITING',
-                name: 'Cải tại đất khu vườn',
-                finishedTime: '2025-06-15T17:00:00.000Z',
-                staff: [
-                    {
-                        userId: '68471fb6421fd1ae91522a72',
-                        name: 'Nguyễn Lao Động',
-                        status: 'WAITING',
-                        processingRate: 0,
-                        completedTime: null,
-                        canceledTime: null,
-                        canceledNote: '',
-                    },
-                    {
-                        userId: '68471fb6421fd1ae91522a73',
-                        name: 'Nguyễn Lao Lực',
-                        status: 'WAITING',
-                        processingRate: 0,
-                        completedTime: null,
-                        canceledTime: null,
-                        canceledNote: '',
-                    },
-                    {
-                        userId: '68471fb6421fd1ae91522a74',
-                        name: 'Nguyễn Lao Tâm',
-                        status: 'WAITING',
-                        processingRate: 0,
-                        completedTime: null,
-                        canceledTime: null,
-                        canceledNote: '',
-                    },
-                ],
-                isDelete: false,
-                modificationDetails: [],
-                _id: '684863f852da593599693e54',
-                createdAt: '2025-06-11T04:56:06.091Z',
-                updatedAt: '2025-06-11T04:56:06.091Z',
-            },
-            {
-                status: 'WAITING',
-                name: 'Bón phân cho khu vườn',
-                finishedTime: '2025-06-18T17:00:00.000Z',
-                staff: [
-                    {
-                        userId: '68471fb6421fd1ae91522a72',
-                        name: 'Nguyễn Lao Động',
-                        status: 'WAITING',
-                        processingRate: 0,
-                        completedTime: null,
-                        canceledTime: null,
-                        canceledNote: '',
-                    },
-                    {
-                        userId: '68471fb6421fd1ae91522a73',
-                        name: 'Nguyễn Lao Lực',
-                        status: 'WAITING',
-                        processingRate: 0,
-                        completedTime: null,
-                        canceledTime: null,
-                        canceledNote: '',
-                    },
-                    {
-                        userId: '68471fb6421fd1ae91522a74',
-                        name: 'Nguyễn Lao Tâm',
-                        status: 'WAITING',
-                        processingRate: 0,
-                        completedTime: null,
-                        canceledTime: null,
-                        canceledNote: '',
-                    },
-                ],
-                isDelete: false,
-                modificationDetails: [],
-                _id: '684863f852da593599693e55',
-                createdAt: '2025-06-11T04:56:06.091Z',
-                updatedAt: '2025-06-11T04:56:06.091Z',
-            },
-        ],
-        followerId: null,
-        receivedObject: 'Không xác định',
-        producingPlan: '',
-        employees: [],
-        followers: [],
-        labour: {
-            name: 'Công',
-            cost: 500000,
-        },
-        materials: [{name: 'Phan kali'}],
-    };
-    //const scheduleDetail = route.params.itemWorkSchedule;
+    const scheduleDetail = route.params.itemWorkSchedule;
 
-    //console.log(route.params.itemWorkSchedule);
+    console.log(scheduleDetail);
 
     const formatFileSize = (size: number) => {
         if (size >= 1024 * 1024) {
@@ -378,7 +227,7 @@ const ScheduleDetail = ({route}: any) => {
                                       }`
                                     : `Đã làm ${
                                           itemStaff.item.processingRate
-                                      }/2500 (m2) ${
+                                      } ${
                                           itemStaff.item.completedTime === null
                                               ? ''
                                               : moment(

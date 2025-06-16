@@ -255,8 +255,6 @@ const WorkSchedule = ({navigation}: any) => {
         setSelectedStatus(value);
     };
 
-    console.log(listWorkScheduleFilter);
-
     const renderItemWorkSchedule = (itemWorkSchedule: any) => (
         <View style={WorkScheduleStyles.workScheduleMargin}>
             <TouchableOpacity
@@ -295,7 +293,7 @@ const WorkSchedule = ({navigation}: any) => {
                                 size={20}
                             />
 
-                            {/* <Text style={WorkScheduleStyles.value}>
+                            <Text style={WorkScheduleStyles.value}>
                                 {`${itemWorkSchedule.childTasks.reduce(
                                     (count: number, staffItem: any) => {
                                         return staffItem.status ===
@@ -304,8 +302,8 @@ const WorkSchedule = ({navigation}: any) => {
                                             : count;
                                     },
                                     0,
-                                )}/${itemWorkSchedule.childTasks.tasks.length}`}
-                            </Text> */}
+                                )}/${itemWorkSchedule.childTasks.length}`}
+                            </Text>
                         </View>
 
                         <View style={WorkScheduleStyles.warpIconAndValueStaff}>

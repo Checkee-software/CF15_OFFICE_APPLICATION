@@ -3,6 +3,7 @@ import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {IGardenData} from '@/shared-types/Response/GardenDataResponse/GardenDataResponse';
 import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
+import {EStatus} from '@/shared-types/Response/ScheduleRequestResponse/ScheduleRequestResponse';
 
 const backendURL = 'http://cf15dev.checkee.vn';
 
@@ -34,18 +35,20 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.get<any>(
-                `${backendURL}/resources/gardens/request-data`,
+                `${backendURL}/resources/schedule-requests/collection`,
             );
 
             set({
                 listGardenWorkBrowse: response.data?.data || [],
                 listGardenWorkBrowseFilter:
                     response.data?.data.filter(
-                        (item: {status: any}) => item.status === 'NONE',
+                        (item: {status: any}) =>
+                            item.status === EStatus.REQUEST,
                     ) || [],
                 badgeGardenWorkUnBrowse:
                     response.data?.data.filter(
-                        (item: {status: any}) => item.status === 'NONE',
+                        (item: {status: any}) =>
+                            item.status === EStatus.REQUEST,
                     ).length || 0,
             });
 
@@ -80,7 +83,7 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
         set({isLoadingCreate: true});
         try {
             const response = await axiosClient.post(
-                `${backendURL}/resources/gardens/harvest/rate-report/${harvestReportId}`,
+                `${backendURL}/resources/schedule-requests/verify/${harvestReportId}`,
                 formRateReport,
             );
 
@@ -130,7 +133,7 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
     setBadgeUnBrowse: () =>
         set(state => ({
             badgeGardenWorkUnBrowse: state.listGardenWorkBrowse.filter(
-                item => item.status === 'NONE',
+                item => item.status === EStatus.REQUEST,
             ).length,
         })),
 

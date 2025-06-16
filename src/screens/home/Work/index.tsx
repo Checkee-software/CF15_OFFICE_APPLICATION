@@ -18,7 +18,7 @@ import Backdrop from '@/screens/subscreen/Loading/index2';
 import Loading from '@/screens/subscreen/Loading';
 import moment from 'moment';
 import Snackbar from 'react-native-snackbar';
-import {EStatusData} from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
+import {EStatus} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
 
 const WorkScreen = () => {
     interface listRadioBtn {
@@ -54,14 +54,16 @@ const WorkScreen = () => {
     const selectBrowseType = (value: number) => {
         if (value === 1) {
             //resetData();
-            filterByStatus('NONE');
+            filterByStatus(EStatus.REQUEST);
         } else if (value === 2) {
-            filterByStatus('VERIFIED');
+            filterByStatus(EStatus.CONFIRMED);
         } else if (value === 3) {
-            filterByStatus('DENIED');
+            filterByStatus(EStatus.DENIDED);
         }
         setSelectedStatus(value);
     };
+
+    console.log(listGardenWorkBrowseFilter);
 
     const renderGardenWork = (itemGardenWork: any) => (
         <View
@@ -69,7 +71,7 @@ const WorkScreen = () => {
                 styles.gardenCard,
                 {
                     borderColor:
-                        itemGardenWork.status === 'DENIED'
+                        itemGardenWork.status === EStatus.DENIDED
                             ? '#FF4E45'
                             : '#000000',
                 },
@@ -86,38 +88,45 @@ const WorkScreen = () => {
                     <Text style={styles.label}>Thực hiện lúc</Text>
 
                     <Text style={styles.value}>
-                        {moment(itemGardenWork.createdAt).format(
+                        {itemGardenWork.createdAt}
+                        {/* {moment(itemGardenWork.createdAt).format(
                             'HH:mm DD/MM/YYYY',
-                        )}
+                        )} */}
                     </Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Người thực hiện</Text>
-                    <Text style={styles.value}>{itemGardenWork.doingBy}</Text>
+                    <Text style={styles.value}>{itemGardenWork.worker}</Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Công việc</Text>
                     <Text style={styles.workValue}>
-                        {itemGardenWork.workName}
+                        {itemGardenWork.taskName}
                     </Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
-                    <Text style={styles.label}>Bón phân Kali</Text>
+                    <Text style={styles.label}>
+                        {itemGardenWork.processName}
+                    </Text>
                     <Text style={styles.value}>
-                        {`${itemGardenWork.materialName} (KG)`}
+                        {`${itemGardenWork.value} (${itemGardenWork.specification})`}
                     </Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Diện tích đã làm</Text>
-                    <Text style={styles.value}>{itemGardenWork.amount}</Text>
+                    <Text style={styles.value}>{`${itemGardenWork.area} ${
+                        itemGardenWork.gardenAreaType
+                    } (còn: ${
+                        itemGardenWork.gardenArea - itemGardenWork.area
+                    })`}</Text>
                 </View>
             </View>
 
-            {itemGardenWork.status === 'NONE' ? (
+            {itemGardenWork.status === EStatus.REQUEST ? (
                 <View style={styles.comfirmView}>
                     {showComfirmView.map((itemComfirm: any) =>
                         itemComfirm._id === itemGardenWork._id ? (
@@ -237,21 +246,44 @@ const WorkScreen = () => {
                                                     Hủy bỏ
                                                 </Text>
                                             </TouchableOpacity>
-                                            <TouchableOpacity
-                                                style={styles.approveRequestBtn}
-                                                onPress={() =>
-                                                    comfirmBrowse(
-                                                        itemComfirm._id,
-                                                        itemComfirm.radioSelectedType,
-                                                    )
-                                                }>
-                                                <Text
+
+                                            {itemComfirm.completeRequest ? (
+                                                <TouchableOpacity
                                                     style={
-                                                        styles.approveRequestText
+                                                        styles.completeRequestBtn
+                                                    }
+                                                    onPress={() =>
+                                                        comfirmBrowse(
+                                                            itemComfirm._id,
+                                                            itemComfirm.radioSelectedType,
+                                                        )
                                                     }>
-                                                    Duyệt yêu cầu
-                                                </Text>
-                                            </TouchableOpacity>
+                                                    <Text
+                                                        style={
+                                                            styles.approveRequestText
+                                                        }>
+                                                        Hoàn thành
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            ) : (
+                                                <TouchableOpacity
+                                                    style={
+                                                        styles.approveRequestBtn
+                                                    }
+                                                    onPress={() =>
+                                                        comfirmBrowse(
+                                                            itemComfirm._id,
+                                                            itemComfirm.radioSelectedType,
+                                                        )
+                                                    }>
+                                                    <Text
+                                                        style={
+                                                            styles.approveRequestText
+                                                        }>
+                                                        Duyệt
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            )}
                                         </View>
                                     </View>
                                 ) : null}
@@ -312,12 +344,15 @@ const WorkScreen = () => {
     const handleGetRequestGardenData = async () => {
         const responseData = await getRequestDataGarden();
 
-        filterByStatus('NONE');
+        filterByStatus(EStatus.REQUEST);
 
-        const initialRadioState = responseData.map((item: {_id: string}) => ({
-            _id: item._id,
-            radioSelectedType: 1,
-        }));
+        const initialRadioState = responseData.map(
+            (item: {_id: string; gardenArea: any; area: any}) => ({
+                _id: item._id,
+                radioSelectedType: 1,
+                completeRequest: item.gardenArea === item.area ? true : false,
+            }),
+        );
 
         setSelectedStatus(1);
         setShowComfirmView(initialRadioState);
@@ -326,8 +361,7 @@ const WorkScreen = () => {
     const comfirmBrowse = async (id: string, radioType: number) => {
         if (radioType === 2) {
             const formRateReport: any = {
-                status: EStatusData.VERIFIED,
-                verifier: '1',
+                status: EStatus.CONFIRMED,
                 message: '',
             };
 
@@ -344,8 +378,7 @@ const WorkScreen = () => {
                 });
             } else {
                 const formRateReport: any = {
-                    status: EStatusData.DENIED,
-                    verifier: '1',
+                    status: EStatus.DENIDED,
                     message: reasonCancel,
                 };
 
@@ -353,6 +386,8 @@ const WorkScreen = () => {
                     id,
                     formRateReport,
                 );
+
+                console.log(result);
 
                 if (result) {
                     setReasonCancel('');
@@ -571,6 +606,12 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     approveRequestBtn: {
+        backgroundColor: '#2196F3',
+        padding: 12,
+        borderRadius: 4,
+        width: '48%',
+    },
+    completeRequestBtn: {
         backgroundColor: '#4CAF50',
         padding: 12,
         borderRadius: 4,

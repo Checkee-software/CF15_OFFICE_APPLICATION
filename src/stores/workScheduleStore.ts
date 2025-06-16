@@ -114,7 +114,6 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 formBrowseTask,
             );
 
-            console.log(response);
             set({isLoading: false});
             return response;
         } catch (error: any) {
