@@ -41,6 +41,7 @@ import GardenHistory from '@/screens/home/Garden/GardenHistory';
 import GardenInfoWorker from '@/screens/home/Garden/GardenInfoWorker';
 import ActiveMachine from '@/screens/home/Garden/ActiveMachine';
 import GardenHistory1 from '@/screens/home/Garden/GardenHistory1';
+import GardenInfoWorker1 from '@/screens/home/Garden/GardenInfoWorker1';
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -109,6 +110,13 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: GardenInfoWorker,
         options: {
             title: SCREEN_INFO.GARDENINFOWORKER.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.GARDENINFOWORKER1.key,
+        component: GardenInfoWorker1,
+        options: {
+            title: SCREEN_INFO.GARDENINFOWORKER1.headerTitle,
         },
     },
     {

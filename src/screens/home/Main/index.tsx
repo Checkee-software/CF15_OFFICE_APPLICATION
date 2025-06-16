@@ -62,9 +62,9 @@ export default function Main({navigation}: any) {
         },
         {
             key: 'gardenDeclareForWorker',
-            label: 'Khai báo khu vườn',
+            label: 'Khai báo công việc',
             buttonImage: images.gardener,
-            navigateTo: SCREEN_INFO.GARDENINFOWORKER.key,
+            navigateTo: SCREEN_INFO.GARDENINFOWORKER1.key,
             navigateNext: SCREEN_INFO.GARDENDECLAREWORKER.key,
         },
         {

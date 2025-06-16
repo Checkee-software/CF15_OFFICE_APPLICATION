@@ -41,9 +41,14 @@ const HOME_SCREENS = {
         headerTitle: 'THÔNG TIN KHU VƯỜN',
         isOpenQRCamera: false,
     } as ScreenInformation,
-     GARDENINFOWORKER: {
+    GARDENINFOWORKER: {
         key: 'GARDENINFOWORKER',
         headerTitle: 'DANH SÁCH KHU VƯỜN',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENINFOWORKER1: {
+        key: 'GARDENINFOWORKER1',
+        headerTitle: 'KHAI BÁO CÔNG VIỆC',
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENDECLAREWORKER: {

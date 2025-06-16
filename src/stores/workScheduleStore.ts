@@ -1,7 +1,9 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import {IList} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
+import {
+    IList,
+} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {ISchedule} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {IApplyPersonalTask} from '@/shared-types/form-data/ScheduleFormData/ScheduleFormData';
 
@@ -11,10 +13,13 @@ interface workScheduleStore {
     isLoading: boolean;
     listWorkSchedule: IList[];
     listWorkScheduleFilter: IList[];
+    listJobs: IList[];
+    getListJobs: () => Promise<void>;
     detailWorkSchedule: ISchedule | null;
     getListWorkSchedule: () => Promise<void>;
     filterByStatus: (status: string) => void;
     resetData: () => void;
+    getDetailWorkSchedule: (id: string) => Promise<void>;
 }
 
 const fixAvatarPath = (path: string) => {
@@ -27,6 +32,63 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     listWorkSchedule: [],
     listWorkScheduleFilter: [],
     detailWorkSchedule: null,
+    listJobs: [],
+
+    getDetailWorkSchedule: async (id: string) => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.get(
+                `${backendURL}/resources/schedules/detail-with-schedule/${id}`,
+            );
+
+            if (response?.data?.data) {
+                const schedule: ISchedule = response.data.data;
+
+                if (schedule?.employees?.length) {
+                    schedule.employees = schedule.employees.map((emp: any) => {
+                        if (emp.avatar) {
+                            emp.avatar = fixAvatarPath(emp.avatar);
+                        }
+                        return emp;
+                    });
+                }
+
+                set({detailWorkSchedule: schedule});
+            } else {
+                set({detailWorkSchedule: null});
+            }
+        } catch (error: any) {
+            Snackbar.show({
+                text: 'Không thể tải chi tiết công việc',
+                duration: Snackbar.LENGTH_LONG,
+            });
+            set({detailWorkSchedule: null});
+        } finally {
+            set({isLoading: false});
+        }
+    },
+
+    getListJobs: async () => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.get(
+                `${backendURL}/resources/schedules/jobs`,
+            );
+
+            if (response?.data?.data) {
+                set({listJobs: response.data.data});
+            } else {
+                set({listJobs: []});
+            }
+        } catch (error: any) {
+            Snackbar.show({
+                text: 'Không thể tải danh sách công việc khu vườn',
+                duration: Snackbar.LENGTH_LONG,
+            });
+        } finally {
+            set({isLoading: false});
+        }
+    },
 
     getListWorkSchedule: async () => {
         set({isLoading: true});
