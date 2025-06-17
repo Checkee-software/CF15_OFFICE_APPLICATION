@@ -1,11 +1,10 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import {
-    IList,
-} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
+import {IList} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {ISchedule} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {IApplyPersonalTask} from '@/shared-types/form-data/ScheduleFormData/ScheduleFormData';
+import {IRequest} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
 
 const backendURL = 'http://cf15dev.checkee.vn';
 
@@ -20,6 +19,11 @@ interface workScheduleStore {
     filterByStatus: (status: string) => void;
     resetData: () => void;
     getDetailWorkSchedule: (id: string) => Promise<void>;
+    requestPersonalTask: (
+        scheduleId: string,
+        childTaskId: string,
+        data: Omit<IRequest, 'scheduleId' | 'childTaskId'>,
+    ) => Promise<void>;
 }
 
 const fixAvatarPath = (path: string) => {
@@ -34,12 +38,40 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     detailWorkSchedule: null,
     listJobs: [],
 
+    requestPersonalTask: async (
+        scheduleId: string,
+        childTaskId: string,
+        data: Omit<IRequest, 'scheduleId' | 'childTaskId'>,
+    ) => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.post(
+                `${backendURL}/resources/schedule-requests/request/${scheduleId}/${childTaskId}`,
+                data,
+            );
+            Snackbar.show({
+                text: 'Gửi yêu cầu thành công!',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+        } catch (error: any) {
+            console.error('❌ Error sending request:', error);
+            Snackbar.show({
+                text: 'Gửi yêu cầu thất bại!',
+                duration: Snackbar.LENGTH_LONG,
+            });
+        } finally {
+            set({isLoading: false});
+        }
+    },
+
     getDetailWorkSchedule: async (id: string) => {
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
                 `${backendURL}/resources/schedules/detail-with-schedule/${id}`,
             );
+
+            console.log('📦 Response schedule:', response?.data);
 
             if (response?.data?.data) {
                 const schedule: ISchedule = response.data.data;

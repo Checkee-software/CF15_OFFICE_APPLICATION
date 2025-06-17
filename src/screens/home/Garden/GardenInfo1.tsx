@@ -92,78 +92,6 @@ const GardenDetailScreen = () => {
                 <QRCode value={selectedGarden.code || 'No Code'} size={372} />
             </View>
 
-            <View style={styles.harvestRow}>
-                {userInfo?.userType?.level === 'LEADER' ? (
-                    selectedGarden?.isHarvest ? (
-                        <View
-                            style={[
-                                styles.harvestButton,
-                                {backgroundColor: '#4CAF5026', width: '90%'},
-                            ]}>
-                            <Text
-                                style={[styles.buttonText, {color: '#4CAF50'}]}>
-                                Đang thu hoạch
-                            </Text>
-                        </View>
-                    ) : null
-                ) : selectedGarden?.isHarvest &&
-                  selectedGarden?.currentHarvestId ? (
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            width: '100%',
-                        }}>
-                        <View
-                            style={[
-                                styles.halfButton,
-                                {backgroundColor: '#4CAF5026'},
-                            ]}>
-                            <Text
-                                style={[styles.buttonText, {color: '#4CAF50'}]}>
-                                Đang thu hoạch
-                            </Text>
-                        </View>
-                        <TouchableOpacity
-                            style={[
-                                styles.halfButton,
-                                {backgroundColor: '#FF0000'},
-                            ]}
-                            onPress={async () => {
-                                try {
-                                    await postHarvestStatus(
-                                        selectedGarden._id,
-                                        '0',
-                                        selectedGarden.currentHarvestId,
-                                    );
-
-                                    await fetchGardenDetail(selectedGarden._id);
-                                } catch (err) {
-                                    console.error('Failed to end harvest', err);
-                                }
-                            }}>
-                            <Text style={styles.buttonText}>Kết thúc</Text>
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    <TouchableOpacity
-                        style={[styles.harvestButton, styles.startButton]}
-                        onPress={async () => {
-                            try {
-                                await postHarvestStatus(
-                                    selectedGarden._id,
-                                    '1',
-                                );
-                                await fetchGardenDetail(selectedGarden._id);
-                            } catch (err) {
-                                console.error('Failed to start harvest', err);
-                            }
-                        }}>
-                        <Text style={styles.buttonText}>Bắt đầu thu hoạch</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
-
             <Section title='Thông tin khu vườn'>
                 <Row label='Tên khu vườn' value={selectedGarden.name} />
                 <View style={styles.row}>
@@ -204,12 +132,12 @@ const GardenDetailScreen = () => {
 
                 <CollapsibleRow
                     label='Người quản lý'
-                    value={selectedGarden.manager}
+                    value={(selectedGarden as any).manager}
                     expanded={showInfo}
                     onToggle={() => setShowInfo(!showInfo)}>
                     <Row
                         label='Đơn vị'
-                        value={selectedGarden.unit || 'Không xác định'}
+                        value={(selectedGarden as any).unit || 'Không xác định'}
                     />
                     {userInfo?.userType?.level !== 'LEADER' && (
                         <CollapsibleRow
@@ -272,7 +200,7 @@ const GardenDetailScreen = () => {
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Tên giống</Text>
                     <Text style={styles.infoValue}>
-                        {selectedGarden.productName}
+                        {(selectedGarden as any).productName}
                     </Text>
                 </View>
                 <View style={styles.infoRow}>
@@ -332,69 +260,6 @@ const GardenDetailScreen = () => {
                     ))}
                 </Section>
             )}
-
-            <Section title={`Lịch sử thu hoạch (${harvestHistory.length})`}>
-                {harvestHistory.length === 0 ? (
-                    <Text>Chưa có lịch sử thu hoạch nào!</Text>
-                ) : (
-                    harvestHistory?.map(harvestItem => (
-                        <View
-                            key={harvestItem?._id}
-                            style={{
-                                marginBottom: 10,
-                                paddingBottom: 10,
-                                borderBottomWidth: 1,
-                                borderBottomColor: '#ccc',
-                            }}>
-                            <Row
-                                label='Ngày bắt đầu'
-                                value={new Date(
-                                    harvestItem.createdAt,
-                                ).toLocaleString('vi-VN')}
-                            />
-                            <Row
-                                label='Ngày kết thúc'
-                                value={new Date(
-                                    harvestItem.endAt,
-                                ).toLocaleString('vi-VN')}
-                            />
-
-                            {harvestItem?.data?.map(entry => (
-                                <View
-                                    key={entry._id}
-                                    style={{
-                                        marginTop: 10,
-                                        padding: 8,
-
-     
-                                    }}>
-                                    <Row
-                                        label='Khối lượng (kg)'
-                                        value={
-                                            entry.amount != null
-                                                ? entry.amount.toString()
-                                                : '---'
-                                        }
-                                    />
-                                    <Row
-                                        label='Nhân sự'
-                                        value={entry.userFullName}
-                                    />
-
-                                    {/* <Row
-                                        label='Người xác nhận'
-                                        value={entry.verifier || '---'}
-                                    />
-                                    <Row
-                                        label='Trạng thái'
-                                        value={entry.status}
-                                    /> */}
-                                </View>
-                            ))}
-                        </View>
-                    ))
-                )}
-            </Section>
         </ScrollView>
     );
 };

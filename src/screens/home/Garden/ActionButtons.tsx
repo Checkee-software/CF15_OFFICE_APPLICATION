@@ -58,7 +58,7 @@ const ActionButtons = ({
                     <View style={styles.alertInSnackbar}>
                         <Icon name='warning' size={20} color='#F59E0B' />
                         <Text style={styles.alertText}>
-                            {alertMessage || 'Vui lòng báo cáo các công việc hoặc thoát.'}
+                            {alertMessage || 'Vui lòng nhập thông tin đầy đủ các công việc hoặc thoát.'}
                         </Text>
                         {onCloseAlert && (
                             <TouchableOpacity

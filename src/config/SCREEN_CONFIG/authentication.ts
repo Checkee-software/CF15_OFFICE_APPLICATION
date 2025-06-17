@@ -37,10 +37,8 @@ import GardenInfo1 from '../../screens/home/Garden/GardenInfo1';
 import Worker from '../../screens/home/Worker';
 import WorkerInfo from '../../screens/home/Worker/WorkerInfo';
 import ScheduleDetail from '@/screens/home/WorkSchedule/ScheduleDetail';
-import GardenHistory from '@/screens/home/Garden/GardenHistory';
 import GardenInfoWorker from '@/screens/home/Garden/GardenInfoWorker';
 import ActiveMachine from '@/screens/home/Garden/ActiveMachine';
-import GardenHistory1 from '@/screens/home/Garden/GardenHistory1';
 import GardenInfoWorker1 from '@/screens/home/Garden/GardenInfoWorker1';
 /**
  * Declare user's screens before signing in
@@ -131,20 +129,6 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: GardenDeclareWorker,
         options: {
             title: SCREEN_INFO.GARDENDECLAREWORKER.headerTitle,
-        },
-    },
-    {
-        name: SCREEN_INFO.GARDENHISTORY.key,
-        component: GardenHistory,
-        options: {
-            title: SCREEN_INFO.GARDENHISTORY.headerTitle,
-        },
-    },
-    {
-        name: SCREEN_INFO.GARDENHISTORY1.key,
-        component: GardenHistory1,
-        options: {
-            title: SCREEN_INFO.GARDENHISTORY1.headerTitle,
         },
     },
     {

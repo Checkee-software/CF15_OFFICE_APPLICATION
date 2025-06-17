@@ -63,12 +63,33 @@ const JobListWorker = () => {
         return `${formatDate(start)} → ${formatDate(end)}`;
     };
 
+    const formatRemainingTime = (endDateStr: string) => {
+        const now = new Date();
+        const end = new Date(endDateStr);
+        const diffMs = end.getTime() - now.getTime();
+
+        if (diffMs <= 0) return 'Đã kết thúc';
+
+        const totalMinutes = Math.floor(diffMs / (1000 * 60));
+        const days = Math.floor(totalMinutes / (60 * 24));
+        const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+        const minutes = totalMinutes % 60;
+
+        let result = 'Còn ';
+        if (days > 0) result += `${days} ngày `;
+        if (hours > 0) result += `${hours} giờ `;
+        result += `${minutes} phút`;
+
+        return result.trim();
+    };
+
     const renderItem = ({item}: {item: IJob}) => (
         <TouchableOpacity
             style={styles.card}
             onPress={() =>
                 navigation.navigate(navigateNext, {
                     jobId: item._id,
+                    id: item._id,
                 })
             }>
             <Image
@@ -92,19 +113,16 @@ const JobListWorker = () => {
                             color='#555'
                         />
                         <Text style={{fontSize: 12, marginLeft: 4}}>
-                            {item.totalChildTask} nhiệm vụ
+                            {item.totalChildTask}
                         </Text>
                         <MaterialCommunityIcons
-                            name='calendar'
+                            name='clock'
                             size={16}
                             color='#555'
                             style={{marginLeft: 16}}
                         />
-                        <Text style={{fontSize: 12, marginLeft: 4}}>
-                            {formatDateRange(
-                                item.startedDate,
-                                item.finishedDate,
-                            )}
+                        <Text style={{fontSize: 12, marginLeft: 4, fontStyle: 'italic'}}>
+                            {formatRemainingTime(item.finishedDate)}
                         </Text>
                     </View>
                 </View>
