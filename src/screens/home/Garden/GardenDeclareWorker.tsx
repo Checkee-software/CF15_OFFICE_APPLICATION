@@ -107,9 +107,9 @@ const GardenDeclare = () => {
     const handleConfirmReport = async () => {
         setShowReportConfirmation(false);
         if (!detailWorkSchedule || !detailWorkSchedule._id) return;
+
         try {
             const requests = taskInputs.filter(isTaskValid);
-
             for (const task of requests) {
                 const selectedMaterial = getMaterialById(
                     task.selectedMaterialId,
@@ -117,7 +117,7 @@ const GardenDeclare = () => {
 
                 await requestPersonalTask(detailWorkSchedule._id, task.taskId, {
                     specification: selectedMaterial?.specification || '',
-                    processName: task.taskName,
+                    processName: selectedMaterial?.name ?? '',
                     area: parseFloat(task.area),
                     value: parseFloat(task.value),
                 });
