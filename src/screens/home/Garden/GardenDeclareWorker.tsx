@@ -8,32 +8,46 @@ import {
     TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useNavigation, useRoute} from '@react-navigation/native';
+import {Picker} from '@react-native-picker/picker';
+import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import ActionButtons from './ActionButtons';
 import MachineShiftSelector from './MachineShiftSelector';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 import {useAuthStore} from '../../../stores/authStore';
 import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
-import {Picker} from '@react-native-picker/picker';
+
+type TaskInput = {
+    taskId: string;
+    taskName: string;
+    selectedMaterialId: string;
+    processType: 'material' | 'machine' | 'labour' | '';
+    value: string;
+    area: string;
+};
+
+type ProcessOption = {
+    id: string;
+    name: string;
+    specification: string;
+    type: 'material' | 'machine' | 'labour';
+};
 
 const GardenDeclare = () => {
     const [taskInputs, setTaskInputs] = useState<TaskInput[]>([]);
-
     const {userInfo} = useAuthStore();
-    const {detailWorkSchedule, getDetailWorkSchedule} = useWorkScheduleStore();
+    const {detailWorkSchedule, getDetailWorkSchedule, requestPersonalTask} =
+        useWorkScheduleStore();
 
     const route = useRoute<any>();
     const id = route.params?.id as string;
 
     const navigation = useNavigation();
-
+    const hasLogged = useRef(false);
     const [showExitAlert, setShowExitAlert] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const [onlyShowReportButton, setOnlyShowReportButton] = useState(false);
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
-
-    const hasLogged = useRef(false);
 
     useEffect(() => {
         if (id) getDetailWorkSchedule(id);
@@ -46,20 +60,13 @@ const GardenDeclare = () => {
         }
     }, [detailWorkSchedule]);
 
-    type TaskInput = {
-        taskId: string;
-        taskName: string;
-        selectedMaterialId: string;
-        value: string;
-        area: string;
-    };
-
     useEffect(() => {
         if (detailWorkSchedule?.childTasks?.length) {
             const inputs = detailWorkSchedule.childTasks.map((task: any) => ({
                 taskId: task._id,
                 taskName: task.name,
                 selectedMaterialId: '',
+                processType: '' as '' | 'material' | 'machine' | 'labour',
                 value: '',
                 area: '',
             }));
@@ -67,9 +74,106 @@ const GardenDeclare = () => {
         }
     }, [detailWorkSchedule]);
 
+    const getAllProcesses = (): ProcessOption[] => {
+        const result: ProcessOption[] = [];
+
+        if (detailWorkSchedule?.materials) {
+            result.push(
+                ...detailWorkSchedule.materials.map((m: any) => ({
+                    id: m._id,
+                    name: m.name,
+                    specification: m.specification,
+                    type: 'material' as const,
+                })),
+            );
+        }
+
+        if (detailWorkSchedule?.machines) {
+            result.push(
+                ...detailWorkSchedule.machines.map((m: any) => ({
+                    id: m._id,
+                    name: m.name,
+                    specification: m.specification,
+                    type: 'machine' as const,
+                })),
+            );
+        }
+
+        if (detailWorkSchedule?.labour) {
+            result.push({
+                id: detailWorkSchedule.labour._id,
+                name: detailWorkSchedule.labour.name,
+                specification: detailWorkSchedule.labour.specification,
+                type: 'labour' as const,
+            });
+        }
+
+        return result;
+    };
+
+    const getProcessById = (
+        id: string,
+        type: 'material' | 'machine' | 'labour',
+    ): ProcessOption | undefined => {
+        switch (type) {
+            case 'material': {
+                const found = detailWorkSchedule?.materials?.find(
+                    (m: any) => m._id === id,
+                );
+                return found
+                    ? {
+                          id: found._id,
+                          name: found.name,
+                          specification: found.specification,
+                          type: 'material',
+                      }
+                    : undefined;
+            }
+
+            case 'machine': {
+                const found = detailWorkSchedule?.machines?.find(
+                    (m: any) => m._id === id,
+                );
+                return found
+                    ? {
+                          id: found._id,
+                          name: found.name,
+                          specification: found.specification,
+                          type: 'machine',
+                      }
+                    : undefined;
+            }
+
+            case 'labour': {
+                const labour = detailWorkSchedule?.labour;
+                return labour?._id === id
+                    ? {
+                          id: labour._id,
+                          name: labour.name,
+                          specification: labour.specification,
+                          type: 'labour',
+                      }
+                    : undefined;
+            }
+        }
+    };
+
+    const handleProcessChange = (
+        index: number,
+        selectedId: string,
+        processType: 'material' | 'machine' | 'labour',
+    ) => {
+        setTaskInputs(prev => {
+            const updated = [...prev];
+            updated[index].selectedMaterialId = selectedId;
+            updated[index].processType = processType;
+            return updated;
+        });
+    };
+
     const handleInputChange = (
         index: number,
-        field: 'selectedMaterialId' | 'value' | 'area',
+        field: 'value' | 'area',
         value: string,
     ) => {
         setTaskInputs(prev => {
@@ -79,18 +183,17 @@ const GardenDeclare = () => {
         });
     };
 
-    const getMaterialById = (id: string) => {
-        return detailWorkSchedule?.materials?.find((m: any) => m._id === id);
-    };
-
     const handleExit = () => navigation.goBack();
+
     const isTaskValid = (task: TaskInput) => {
         return (
             task.selectedMaterialId.trim() !== '' &&
+            task.processType !== '' &&
             task.value.trim() !== '' &&
             task.area.trim() !== ''
         );
     };
+
     const handleReport = () => {
         const allValid = taskInputs.every(isTaskValid);
         if (allValid) {
@@ -101,23 +204,27 @@ const GardenDeclare = () => {
     };
 
     const handleCancelReport = () => setShowReportConfirmation(false);
-    const {requestPersonalTask} = useWorkScheduleStore();
+
     const hasDeclarations = taskInputs.some(isTaskValid);
 
     const handleConfirmReport = async () => {
         setShowReportConfirmation(false);
         if (!detailWorkSchedule || !detailWorkSchedule._id) return;
+
         try {
             const requests = taskInputs.filter(isTaskValid);
-
             for (const task of requests) {
-                const selectedMaterial = getMaterialById(
+                if (task.processType === '') continue;
+
+                const selected = getProcessById(
                     task.selectedMaterialId,
+                    task.processType,
                 );
+                if (!selected) continue;
 
                 await requestPersonalTask(detailWorkSchedule._id, task.taskId, {
-                    specification: selectedMaterial?.specification || '',
-                    processName: task.taskName,
+                    specification: selected.specification,
+                    processName: selected.name,
                     area: parseFloat(task.area),
                     value: parseFloat(task.value),
                 });
@@ -129,6 +236,11 @@ const GardenDeclare = () => {
                         taskId: task._id,
                         taskName: task.name,
                         selectedMaterialId: '',
+                        processType: '' as
+                            | ''
+                            | 'material'
+                            | 'machine'
+                            | 'labour',
                         value: '',
                         area: '',
                     }),
@@ -156,10 +268,10 @@ const GardenDeclare = () => {
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.infoContainer}>
                     <Text style={styles.gardenName}>
-                        {detailWorkSchedule?.gardenName}
+                        {detailWorkSchedule.gardenName}
                     </Text>
                     <Text style={styles.gardenCode}>
-                        {(detailWorkSchedule as any)?.gardenCode}
+                        {(detailWorkSchedule as any).gardenCode}
                     </Text>
                     <View style={styles.productBox}>
                         <Text style={styles.productLabel}>
@@ -168,16 +280,16 @@ const GardenDeclare = () => {
                         <View style={styles.productRow}>
                             <Icon name='add-circle' color='green' size={20} />
                             <Text style={styles.productText}>
-                                {detailWorkSchedule?.productName}
+                                {detailWorkSchedule.productName}
                             </Text>
                         </View>
                     </View>
                 </View>
 
                 <MachineShiftSelector
-                    onStart={machineType => {
-                        console.log('Ca máy được chọn:', machineType);
-                    }}
+                    onStart={machineType =>
+                        console.log('Ca máy được chọn:', machineType)
+                    }
                 />
 
                 <CollapsibleTaskBlock
@@ -185,48 +297,55 @@ const GardenDeclare = () => {
                         detailWorkSchedule?.childTasks?.length || 0
                     })`}>
                     {taskInputs.map((task, index) => {
-                        const selectedMaterial = getMaterialById(
-                            task?.selectedMaterialId,
-                        );
+                        const selected =
+                            task.processType !== ''
+                                ? getProcessById(
+                                      task.selectedMaterialId,
+                                      task.processType,
+                                  )
+                                : undefined;
 
                         return (
                             <CollapsibleTaskBlock
                                 key={task.taskId}
-                                title={task?.taskName}
+                                title={task.taskName}
                                 backgroundColor='#e6f3ff'>
                                 <Text style={styles.label}>Loại quy trình</Text>
                                 <View style={styles.pickerWrapper}>
                                     <Picker
-                                        selectedValue={task?.selectedMaterialId}
-                                        onValueChange={itemValue =>
-                                            handleInputChange(
-                                                index,
-                                                'selectedMaterialId',
-                                                itemValue,
-                                            )
-                                        }
+                                        selectedValue={task.selectedMaterialId}
+                                        onValueChange={itemValue => {
+                                            const selected =
+                                                getAllProcesses().find(
+                                                    p => p.id === itemValue,
+                                                );
+                                            if (selected) {
+                                                handleProcessChange(
+                                                    index,
+                                                    selected.id,
+                                                    selected.type,
+                                                );
+                                            }
+                                        }}
                                         style={styles.picker}
                                         dropdownIconColor='#000'>
                                         <Picker.Item label='Chọn' value='' />
-                                        {detailWorkSchedule?.materials.map(
-                                            material => (
-                                                <Picker.Item
-                                                    key={material._id}
-                                                    label={material.name}
-                                                    value={material._id}
-                                                />
-                                            ),
-                                        )}
+                                        {getAllProcesses().map(process => (
+                                            <Picker.Item
+                                                key={process.id}
+                                                label={`${process.name} (${process.type})`}
+                                                value={process.id}
+                                            />
+                                        ))}
                                     </Picker>
                                 </View>
 
-                                {task?.selectedMaterialId ? (
+                                {selected && (
                                     <>
                                         <Text style={styles.label}>
-                                            {selectedMaterial?.name} (
-                                            {selectedMaterial?.specification})
+                                            {selected.name} (
+                                            {selected.specification}){' '}
                                             <Text style={{color: 'red'}}>
-                                                {' '}
                                                 *
                                             </Text>
                                         </Text>
@@ -235,7 +354,7 @@ const GardenDeclare = () => {
                                             style={styles.input}
                                             keyboardType='numeric'
                                             placeholder='Nhập khối lượng'
-                                            value={task?.value}
+                                            value={task.value}
                                             onChangeText={text =>
                                                 handleInputChange(
                                                     index,
@@ -245,18 +364,18 @@ const GardenDeclare = () => {
                                             }
                                         />
                                     </>
-                                ) : null}
+                                )}
 
                                 <Text style={styles.label}>
-                                    Diện tích đã làm (m²)
-                                    <Text style={{color: 'red'}}> *</Text>
+                                    Diện tích đã làm (m²){' '}
+                                    <Text style={{color: 'red'}}>*</Text>
                                 </Text>
 
                                 <TextInput
                                     style={styles.input}
                                     keyboardType='numeric'
                                     placeholder='Nhập diện tích'
-                                    value={task?.area}
+                                    value={task.area}
                                     onChangeText={text =>
                                         handleInputChange(index, 'area', text)
                                     }
@@ -289,6 +408,7 @@ const GardenDeclare = () => {
         </View>
     );
 };
+
 const styles = StyleSheet.create({
     container: {padding: 16, backgroundColor: 'white'},
     centered: {flex: 1, justifyContent: 'center', alignItems: 'center'},
