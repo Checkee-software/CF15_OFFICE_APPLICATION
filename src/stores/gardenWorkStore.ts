@@ -87,25 +87,24 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
                 formRateReport,
             );
 
+            set({isLoadingCreate: false});
+
+            console.log(response.data);
+
             if (response.data?.data) {
                 setTimeout(() => {
-                    if (response.data?.data) {
-                        Snackbar.show({
-                            text: `${response.data.message}`,
-                            duration: Snackbar.LENGTH_LONG,
-                        });
-                    }
-                }, 100);
+                    Snackbar.show({
+                        text: `${response.data.message}`,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }, 200);
             }
 
-            set({isLoadingCreate: false});
             return response.data;
         } catch (error: any) {
             set({isLoadingCreate: false});
 
             const _error = error;
-
-            console.log(_error);
 
             setTimeout(() => {
                 if (_error?.response?.data) {

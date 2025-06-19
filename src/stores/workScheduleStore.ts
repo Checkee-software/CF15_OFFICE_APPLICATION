@@ -3,7 +3,6 @@ import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {IList} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {ISchedule} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
-import {IApplyPersonalTask} from '@/shared-types/form-data/ScheduleFormData/ScheduleFormData';
 import {IRequest} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
 
 const backendURL = 'http://cf15dev.checkee.vn';
@@ -129,6 +128,8 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 `${backendURL}/resources/schedules/collection`,
             );
 
+            console.log(response.data.data);
+
             if (response) {
                 const updateImgPathListSchedule = response.data.data.map(
                     (item: any) => {
@@ -173,68 +174,6 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                     });
                 }
             }, 100);
-        }
-    },
-
-    updateProgressTaskByImplementer: async (
-        mainTaskId: string,
-        formUpdateProgress: IApplyPersonalTask,
-    ) => {
-        set({isLoading: true});
-        try {
-            const response = await axiosClient.post(
-                `${backendURL}/resources/schedules/sub-tasks/apply-personal-task/${mainTaskId}`,
-                formUpdateProgress,
-            );
-            set({isLoading: false});
-            return response;
-        } catch (error: any) {
-            set({isLoading: false});
-
-            const _error = error;
-
-            return _error.response;
-        }
-    },
-
-    browseTaskImplementerByManagement: async (
-        mainTaskId: string,
-        formBrowseTask: IApplyPersonalTask,
-    ) => {
-        set({isLoading: true});
-        try {
-            const response = await axiosClient.post(
-                `${backendURL}/resources/schedules/sub-tasks/submit-personal-task/${mainTaskId}`,
-                formBrowseTask,
-            );
-
-            set({isLoading: false});
-            return response;
-        } catch (error: any) {
-            set({isLoading: false});
-
-            const _error = error;
-
-            return _error.response;
-        }
-    },
-
-    completedTaskByManagement: async (mainTaskId: string, taskId: string) => {
-        set({isLoading: true});
-        try {
-            const response = await axiosClient.post(
-                `${backendURL}/resources/schedules/sub-tasks/confirm-task/${mainTaskId}/${taskId}`,
-            );
-
-            console.log(response);
-            set({isLoading: false});
-            return response;
-        } catch (error: any) {
-            set({isLoading: false});
-
-            const _error = error;
-
-            return _error.response;
         }
     },
 

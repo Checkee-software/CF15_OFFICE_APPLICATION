@@ -208,8 +208,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 `${backendURL}/resources/schedules/collection`,
             );
 
-            console.log(response);
-
             if (response.data.data) {
                 const findTaskCompeleted = response.data.data.filter(
                     (item: any) => item.status === EScheduleStatus.COMPLETED,

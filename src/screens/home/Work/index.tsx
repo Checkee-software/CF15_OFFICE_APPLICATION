@@ -63,8 +63,6 @@ const WorkScreen = () => {
         setSelectedStatus(value);
     };
 
-    console.log(listGardenWorkBrowseFilter);
-
     const renderGardenWork = (itemGardenWork: any) => (
         <View
             style={[
@@ -135,31 +133,6 @@ const WorkScreen = () => {
                                     <TouchableOpacity
                                         style={styles.warpRadioText}
                                         onPress={() =>
-                                            selectRadioType(itemComfirm._id, 1)
-                                        }>
-                                        <MaterialIcons
-                                            name={
-                                                itemComfirm.radioSelectedType ===
-                                                1
-                                                    ? 'radio-button-checked'
-                                                    : 'radio-button-off'
-                                            }
-                                            color={
-                                                itemComfirm.radioSelectedType ===
-                                                1
-                                                    ? '#2196F3'
-                                                    : '#49454f'
-                                            }
-                                            size={20}
-                                        />
-                                        <Text style={styles.radioBtnText}>
-                                            Không
-                                        </Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                        style={styles.warpRadioText}
-                                        onPress={() =>
                                             selectRadioType(itemComfirm._id, 2)
                                         }>
                                         <MaterialIcons
@@ -178,7 +151,7 @@ const WorkScreen = () => {
                                             size={20}
                                         />
                                         <Text style={styles.radioBtnText}>
-                                            Duyệt
+                                            Phê duyệt
                                         </Text>
                                     </TouchableOpacity>
 
@@ -203,7 +176,7 @@ const WorkScreen = () => {
                                             size={20}
                                         />
                                         <Text style={styles.radioBtnText}>
-                                            Hủy bỏ
+                                            Từ chối
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
@@ -582,8 +555,9 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         paddingHorizontal: 10,
         marginBottom: 10,
+        gap: 25,
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
     },
     warpRadioText: {
         flexDirection: 'row',

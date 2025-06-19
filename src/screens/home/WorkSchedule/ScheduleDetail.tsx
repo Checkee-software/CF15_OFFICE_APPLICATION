@@ -16,9 +16,14 @@ import RNFS from 'react-native-fs';
 import Snackbar from 'react-native-snackbar';
 import {List} from 'react-native-paper';
 import moment from 'moment';
+import {useAuthStore} from '../../../stores/authStore';
 import {ETaskStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import images from '../../../assets/images';
 
 const ScheduleDetail = ({route}: any) => {
+    const {userInfo} = useAuthStore();
+
     type AttachedFiles = {
         destination: string;
         encoding: string;
@@ -32,7 +37,45 @@ const ScheduleDetail = ({route}: any) => {
 
     const scheduleDetail = route.params.itemWorkSchedule;
 
-    console.log(scheduleDetail);
+    if (userInfo.userType.level === EOrganization.LEADER) {
+        // chỉ hiển thị thông tin của cán bộ quản lý đang thuộc tổ của người quản lý đó
+        scheduleDetail.followers = scheduleDetail.followers.filter(
+            (follower: any) => follower.group === userInfo.userType.unit,
+        );
+        // chỉ hiển thị thông tin của người lao động thuộc tổ của người quản lý đó
+        scheduleDetail.employees = scheduleDetail.employees.filter(
+            (employee: any) => employee.group === userInfo.userType.unit,
+        );
+        //chỉ hiển thị thông tin công việc con của người lao động thuộc tổ của người quản lý đó
+        scheduleDetail.childTasks = scheduleDetail.childTasks.filter(
+            (childTask: any) =>
+                childTask.staff.some(
+                    (staff: any) => staff.group === userInfo.userType.unit,
+                ),
+        );
+    } else if (userInfo.userType.level === EOrganization.WORKER) {
+        // chỉ hiển thị thông tin của cán bộ quản lý đang thuộc tổ của người lao động đó
+        scheduleDetail.followers = scheduleDetail.followers.filter(
+            (follower: any) => follower.group === userInfo.userType.unit,
+        );
+        // chỉ hiển thị thông tin của người lao động đó
+        scheduleDetail.employees = scheduleDetail.employees.filter(
+            (employee: any) => employee._id === userInfo._id,
+        );
+        //chỉ hiển thị thông tin công việc con của người lao động đó
+        scheduleDetail.childTasks = scheduleDetail.childTasks
+            .filter((childTask: any) =>
+                childTask.staff.some(
+                    (staff: any) => staff.userId === userInfo._id,
+                ),
+            )
+            .map((task: any) => ({
+                ...task,
+                staff: task.staff.filter(
+                    (staff: any) => staff.userId === userInfo._id,
+                ),
+            }));
+    }
 
     const formatFileSize = (size: number) => {
         if (size >= 1024 * 1024) {
@@ -144,9 +187,13 @@ const ScheduleDetail = ({route}: any) => {
                 <View style={ScheduleDetailStyles.leftWorkerCard}>
                     <View style={ScheduleDetailStyles.workerAvatar}>
                         <Image
-                            source={{
-                                uri: itemStaff.avatar,
-                            }}
+                            source={
+                                itemStaff.avatar
+                                    ? {
+                                          uri: itemStaff.avatar,
+                                      }
+                                    : images.avatar
+                            }
                             style={ScheduleDetailStyles.avatar}
                         />
                     </View>
@@ -351,6 +398,7 @@ const ScheduleDetail = ({route}: any) => {
                                 {`${
                                     scheduleDetail.labour.name
                                 }: ${new Intl.NumberFormat('vi-VN', {
+                                    style: 'currency',
                                     currency: 'VND',
                                 }).format(scheduleDetail.labour.cost)}`}
                             </Text>
