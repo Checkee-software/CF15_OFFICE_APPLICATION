@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "73474361830",
+    "project_id": "cf15-542f6",
+    "storage_bucket": "cf15-542f6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:73474361830:android:5f184a6313173f7a28ae27",
+        "android_client_info": {
+          "package_name": "com.cf15_office_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLU0Gz6WKuLgt2_o2kLRK74OveDHypNYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
