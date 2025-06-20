@@ -3,7 +3,7 @@ import {ScreenRegistry} from './types';
 
 /* screens */
 import Main from '../../screens/home/Main';
-import Unit from '@/screens/home/Unit';
+import Unit from '../../screens/home/Unit';
 import Profile from '../../screens/user/Profile';
 import Document from '../../screens/home/Document';
 import WorkSchedule from '../../screens/home/WorkSchedule';
