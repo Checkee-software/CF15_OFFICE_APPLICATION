@@ -4,7 +4,6 @@ import {ScreenRegistry} from './types';
 /* screens */
 import Login from '../../screens/onboarding/Login';
 import AutomaticTracing from '../../screens/onboarding/AutomaticTracing';
-
 /**
  * Declare user's screens before signing in
  * For handling route only

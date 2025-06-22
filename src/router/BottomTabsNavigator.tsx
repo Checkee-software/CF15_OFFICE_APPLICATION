@@ -5,7 +5,7 @@ import React, {useEffect} from 'react';
 import {StyleSheet, View, TouchableOpacity, Alert} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Work from '../screens/home/Work';
-import CameraScanner from '../screens/global/CameraScanner';
+import AutomaticTracing from '../screens/onboarding/AutomaticTracing';
 import History from '../screens/home/History';
 import Profile from '../screens/user/Profile';
 import Main from '../screens/home/Main';
@@ -105,7 +105,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
             />
 
             <Tab.Screen
-                component={CameraScanner}
+                component={AutomaticTracing}
                 name='ScanScreen'
                 options={{
                     headerShown: true,
