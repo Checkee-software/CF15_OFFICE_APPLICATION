@@ -3,42 +3,30 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-
-const machineOptions = [
-    {label: 'Chọn ca máy', value: ''},
-    {label: 'Ca phun nước', value: 'spray'},
-    {label: 'Ca tưới tiêu', value: 'watering'},
-    {label: 'Ca bón phân', value: 'fertilizer'},
-];
-
-const fakeShifts = [
-    {
-        operator: 'Nguyễn Văn A',
-        isCurrentUser: false,
-        type: 'Ca phun nước',
-        duration: '06:00 - 12:00',
-    },
-    {
-        operator: 'Trần Thị B',
-        isCurrentUser: true,
-        type: 'Ca tưới tiêu',
-        duration: '12:00 - 18:00',
-    },
-];
+import {INorm} from '../../../shared-types/Response/ScheduleResponse/ScheduleResponse';
 
 interface MachineShiftSelectorProps {
     onStart: (machineType: string) => void;
     onStop?: () => void;
+    machines: INorm[];
 }
 
 const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
     onStart,
     onStop,
+    machines,
 }) => {
     const [selectedMachine, setSelectedMachine] = useState('');
     const [isRunning, setIsRunning] = useState(false);
     const [seconds, setSeconds] = useState(0);
     const navigation = useNavigation<NavigationProp<any>>();
+
+    const machineOptions = [{label: 'Chọn ca máy', value: ''}].concat(
+        machines.map(machine => ({
+            label: machine.name,
+            value: machine._id,
+        })),
+    );
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
@@ -81,6 +69,13 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
     const runningLabel =
         machineOptions.find(opt => opt.value === selectedMachine)?.label || '';
 
+    const shifts = machines.map(machine => ({
+        operator: 'Chưa rõ',
+        isCurrentUser: false,
+        type: machine.name,
+        duration: `${machine.value} ${machine.specification || ''}`,
+    }));
+
     return (
         <View style={styles.container}>
             <View style={styles.headerRow}>
@@ -94,7 +89,7 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
                 <TouchableOpacity
                     onPress={() =>
                         navigation.navigate(SCREEN_INFO.ACTIVEMACHINE.key, {
-                            activeShifts: fakeShifts,
+                            activeShifts: shifts,
                         })
                     }>
                     <Text style={styles.activeLink}>
@@ -198,7 +193,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
     },
     picker: {
-        height: 50,
+        height: 55,
         padding: 10,
     },
     shiftRow: {
