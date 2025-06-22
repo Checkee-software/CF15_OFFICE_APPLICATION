@@ -40,11 +40,13 @@ const GardenInfoWorker = () => {
     );
 
     useEffect(() => {
+        const gardenList = gardens ?? [];
+
         if (searchText === '') {
-            setFilteredGardens(gardens);
+            setFilteredGardens(gardenList as IGarden[]);
         } else {
-            const filtered = gardens.filter(
-                garden =>
+            const filtered = (gardenList as IGarden[]).filter(
+                (garden: IGarden) =>
                     garden.name
                         .toLowerCase()
                         .includes(searchText.toLowerCase()) ||
