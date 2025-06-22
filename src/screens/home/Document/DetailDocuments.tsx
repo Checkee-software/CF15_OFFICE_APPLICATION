@@ -14,6 +14,7 @@ import RNFS from 'react-native-fs';
 import Snackbar from 'react-native-snackbar';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import AutoHeightWebView from 'react-native-autoheight-webview';
+import ENV from '@/config/ENV';
 
 const DetailDocuments = ({route}: any) => {
     const [loadingDownload, setLoadingDownload] = useState(false);
@@ -64,7 +65,7 @@ const DetailDocuments = ({route}: any) => {
 
     const fixFilePath = (path: string) => {
         const updatedPath = path.replace(/\\/g, '/');
-        return `http://cf15officeservice.checkee.vn${updatedPath}`;
+        return `${ENV.BACKEND_URL}${updatedPath}`;
     };
 
     const downloadFile = async (fileUrl: string, fileName: string) => {

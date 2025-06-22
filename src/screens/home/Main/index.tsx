@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import {
     View,
@@ -109,12 +110,12 @@ export default function Main({navigation}: any) {
             buttonImage: images.document,
             navigateTo: SCREEN_INFO.DOCUMENT.key,
         },
-        {
-            key: 'statistic',
-            label: 'Báo cáo thống kê',
-            buttonImage: images.pieChart,
-            navigateTo: SCREEN_INFO.STATISTIC.key,
-        },
+        // {
+        //     key: 'statistic',
+        //     label: 'Báo cáo thống kê',
+        //     buttonImage: images.pieChart,
+        //     navigateTo: SCREEN_INFO.STATISTIC.key,
+        // },
     ];
 
     const filterMenuByRole = (role: string) => {

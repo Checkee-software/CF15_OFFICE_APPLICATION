@@ -1,5 +1,5 @@
 namespace ENV {
-    export const BASE_URL: string = '';
+    export const BACKEND_URL: string = 'http://cf15dev.checkee.vn';
 }
 
 export default ENV;

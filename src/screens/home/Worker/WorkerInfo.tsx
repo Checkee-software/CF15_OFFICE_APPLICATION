@@ -33,8 +33,6 @@ const WorkerInfo = ({route}: any) => {
         return levelUser?.label;
     };
 
-    console.log(item);
-
     return (
         <View style={WorkerInfoStyles.container}>
             <View style={WorkerInfoStyles.workerNameSection}>

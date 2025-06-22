@@ -2,6 +2,7 @@ import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {INews} from '../shared-types/Response/NewsResponse/NewsResponse';
+import ENV from '@/config/ENV';
 
 type NewsItem = INews;
 
@@ -11,10 +12,8 @@ type NewsState = {
     isLoading: boolean;
     fetchNews: () => Promise<void>;
     fetchNewsDetail: (id: string) => Promise<void>;
-    getFullAvatarUrl: (imagePath?: string) => string; 
+    getFullAvatarUrl: (imagePath?: string) => string;
 };
-
-const backendURL = 'http://cf15dev.checkee.vn';
 
 const useNewsStore = create<NewsState>(set => ({
     news: [],
@@ -22,21 +21,21 @@ const useNewsStore = create<NewsState>(set => ({
     isLoading: false,
     getFullAvatarUrl: (imagePath?: string): string => {
         if (!imagePath) {
-            return ''; 
+            return '';
         }
 
         if (imagePath.startsWith('http')) {
             return imagePath;
         }
 
-        return `${backendURL}${imagePath.replace(/\\/g, '/')}`;
+        return `${ENV.BACKEND_URL}${imagePath.replace(/\\/g, '/')}`;
     },
 
     fetchNews: async () => {
         set({isLoading: true});
         try {
             const res = await axiosClient.get(
-                `${backendURL}/resources/news/collection`,
+                `${ENV.BACKEND_URL}/resources/news/collection`,
             );
             const newsData = res.data?.data || [];
             set({news: newsData});
@@ -58,7 +57,7 @@ const useNewsStore = create<NewsState>(set => ({
         set({isLoading: true});
         try {
             const res = await axiosClient.get(
-                `${backendURL}/resources/news/detail/${id}`,
+                `${ENV.BACKEND_URL}/resources/news/detail/${id}`,
             );
             set({selectedNews: res.data?.data || null});
         } catch (error: any) {

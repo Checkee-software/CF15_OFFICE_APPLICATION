@@ -3,18 +3,18 @@ import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {useAuthStore} from './authStore';
 import {ICreate as ICreateFormData} from '../shared-types/form-data/FeedbackFormData/FeedbackFormData';
-import { IFeedback } from '../shared-types/Response/FeedbackResponse/FeedbackResponse';
+import {IFeedback} from '../shared-types/Response/FeedbackResponse/FeedbackResponse';
+import ENV from '@/config/ENV';
 
 interface FeedbackStore {
-  feedbacks: IFeedback[];
-  isLoading: boolean;
-  getFullAvatarUrl: (avatarPath?: string) => string;
-  submitFeedback: (data: Pick<ICreateFormData, 'title' | 'content'>) => Promise<void>;
-  fetchFeedbacks: () => Promise<void>;
+    feedbacks: IFeedback[];
+    isLoading: boolean;
+    getFullAvatarUrl: (avatarPath?: string) => string;
+    submitFeedback: (
+        data: Pick<ICreateFormData, 'title' | 'content'>,
+    ) => Promise<void>;
+    fetchFeedbacks: () => Promise<void>;
 }
-
-
-const backendURL = 'http://cf15dev.checkee.vn';
 
 const useFeedbackStore = create<FeedbackStore>(set => ({
     feedbacks: [],
@@ -29,7 +29,7 @@ const useFeedbackStore = create<FeedbackStore>(set => ({
             return avatarPath;
         }
 
-        return `${backendURL}${avatarPath.replace(/\\/g, '/')}`;
+        return `${ENV.BACKEND_URL}${avatarPath.replace(/\\/g, '/')}`;
     },
 
     submitFeedback: async (
@@ -46,7 +46,7 @@ const useFeedbackStore = create<FeedbackStore>(set => ({
 
         try {
             const response = await axiosClient.post(
-                `${backendURL}/resources/feedbacks`,
+                `${ENV.BACKEND_URL}/resources/feedbacks`,
                 formData,
             );
 
@@ -86,7 +86,7 @@ const useFeedbackStore = create<FeedbackStore>(set => ({
         set({isLoading: true});
         try {
             const res = await axiosClient.get(
-                `${backendURL}/resources/feedbacks/collection?code=&createdAt=-1&from=1748710800000&to=4115817600000`,
+                `${ENV.BACKEND_URL}/resources/feedbacks/collection?code=&createdAt=-1&from=1748710800000&to=4115817600000`,
             );
             console.log('FETCH_FEEDBACKS_RESPONSE:', res.data);
             set({feedbacks: res.data?.data || []});

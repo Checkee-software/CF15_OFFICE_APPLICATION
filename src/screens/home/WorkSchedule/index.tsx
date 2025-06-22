@@ -261,7 +261,7 @@ const WorkSchedule = ({navigation}: any) => {
                 style={WorkScheduleStyles.workCard}
                 onPress={() =>
                     navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
-                        itemWorkSchedule,
+                        _id: itemWorkSchedule._id,
                     })
                 }>
                 <Progress.Circle

@@ -13,6 +13,7 @@ import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useAuthStore} from '../../../stores/authStore';
+import ENV from '@/config/ENV';
 
 const CollapsibleRow = ({
     label,
@@ -153,7 +154,9 @@ const GardenDetailScreen = () => {
                                             key={index}
                                             onPress={() =>
                                                 Linking.openURL(
-                                                    `http://cf15officeservice.checkee.vn${file.path.replace(
+                                                    `${
+                                                        ENV.BACKEND_URL
+                                                    }${file.path.replace(
                                                         /\\/g,
                                                         '/',
                                                     )}`,
