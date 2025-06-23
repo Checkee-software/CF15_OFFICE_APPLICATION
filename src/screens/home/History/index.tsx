@@ -72,7 +72,7 @@ const History = () => {
 
     return (
         <View style={styles.container}>
-            {userInfo.userType.level === EOrganization.LEADER ? (
+            {userInfo.userType.level !== EOrganization.WORKER ? (
                 <FlatList
                     contentContainerStyle={styles.flatListHistory}
                     data={fakeHistory}
