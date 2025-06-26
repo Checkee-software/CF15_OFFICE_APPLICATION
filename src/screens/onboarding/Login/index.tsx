@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -10,6 +10,8 @@ import {
     Alert,
     ImageBackground,
     Platform,
+    // PermissionsAndroid,
+    // ToastAndroid,
 } from 'react-native';
 import images from '../../../assets/images';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -18,6 +20,8 @@ import Feather from 'react-native-vector-icons/Feather';
 import {useAuthStore} from '../../../stores/authStore';
 import {Dimensions} from 'react-native';
 import Backdrop from '../../subscreen/Loading/index2';
+// import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import colors from '@/assets/colors';
 
 const {width} = Dimensions.get('window');
 
@@ -26,12 +30,43 @@ export default function Login() {
 
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-
     const [userAccount, setUserAccount] = useState({
         username: '', //cf15office lamphucf15
         phoneNumber: '',
         password: '', //CF15@FFICE2025 123456789A@
     });
+
+    useEffect(() => {
+        // getNotificationPermission();
+    }, []);
+
+    // const getNotificationPermission = async () => {
+    //     if (Platform.OS === 'android' && Platform.Version >= 33) {
+    //         const status = await PermissionsAndroid.request(
+    //             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    //         );
+
+    //         if (status === RESULTS.GRANTED) {
+    //             console.log('✅ Đã được cấp quyền thông báo');
+    //         } else if (status === RESULTS.DENIED) {
+    //             const requestStatus = await PermissionsAndroid.request(
+    //                 PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+    //             );
+    //             if (requestStatus === RESULTS.GRANTED) {
+    //                 console.log('✅ Cấp quyền sau khi request thành công');
+    //             } else {
+    //                 console.log('❌ Người dùng từ chối quyền thông báo');
+    //             }
+    //         } else {
+    //             ToastAndroid.show(
+    //                 'Thông báo bị từ chối, vui lòng truy cập ứng dụng để bật thủ công!',
+    //                 3000,
+    //             );
+    //             setManualNotification(true);
+    //         }
+    //     } else if (Platform.OS === 'ios') {
+    //     }
+    // };
 
     const onChangeUserName = (value: string) => {
         setUserAccount({...userAccount, username: value});
@@ -350,5 +385,12 @@ const LoginStyles = StyleSheet.create({
     hidePasswordIcon: {
         position: 'absolute',
         right: 10,
+    },
+    manual: {
+        // flex: 1,
+        marginTop: 24,
+        textAlign: 'center',
+        color: colors.background,
+        textDecorationLine: 'underline',
     },
 });

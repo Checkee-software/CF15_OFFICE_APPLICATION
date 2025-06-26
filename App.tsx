@@ -6,7 +6,7 @@ import {useAuthStore} from './src/stores/authStore';
 
 /* packages */
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {OneSignal, LogLevel} from 'react-native-onesignal';
+import { OneSignal, LogLevel } from 'react-native-onesignal';
 
 /* screens */
 import Router from './src/router';
@@ -19,19 +19,19 @@ const InitApp = () => {
 
     useEffect(() => {
         const init = async () => {
+            OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+            OneSignal.initialize('69a6acdf-b649-4589-a9b8-88aaa525fa45');
+
+            OneSignal.Notifications.requestPermission(true);
+
             const token = asyncStorageHelper.token;
             if (typeof token === 'string' && token !== '') {
                 await autoLogin();
 
-                OneSignal.Debug.setLogLevel(LogLevel.Verbose);
-                OneSignal.initialize('64fd0b66-e4fe-431f-b95f-1ef857e1adfd');
-
-                //YÊU CẦU QUYỀN gửi thông báo từ người dùng
-                OneSignal.Notifications.requestPermission(true);
-
                 OneSignal.login(token);
+                console.log('ID: ', await OneSignal.User.getOnesignalId());
             } else {
-                OneSignal.logout(); // nếu không có token thì onesignal sẽ không gửi thông báo
+                // OneSignal.logout(); // nếu không có token thì onesignal sẽ không gửi thông báo
             }
             setIsReady(true);
         };

@@ -1,7 +1,7 @@
 const colors = {
-    white: '#F5F5F5',
+    white: '#FFFFFF',
     black: '#212121',
-    background: '#FFFFFF',
+    background: '#F5F5F5',
     primary: '#4CAF50',
     primary_oppacity_15: 'rgba()',
     primary_oppacity_30: 'rgba()',

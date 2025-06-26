@@ -22,7 +22,7 @@ type GardenState = {
     ) => Promise<void>;
     postHarvestReport: (_id: string, amount: number) => Promise<void>;
     harvestHistory: IHavestHistory[];
-    
+
     fetchHarvestHistory: (_id: string) => Promise<void>;
     fetchHarvestCollection: (_id: string) => Promise<void>;
 };

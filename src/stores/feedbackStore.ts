@@ -3,16 +3,17 @@ import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {useAuthStore} from './authStore';
 import {ICreate as ICreateFormData} from '../shared-types/form-data/FeedbackFormData/FeedbackFormData';
-import { IFeedback } from '../shared-types/Response/FeedbackResponse/FeedbackResponse';
+import {IFeedback} from '../shared-types/Response/FeedbackResponse/FeedbackResponse';
 
 interface FeedbackStore {
-  feedbacks: IFeedback[];
-  isLoading: boolean;
-  getFullAvatarUrl: (avatarPath?: string) => string;
-  submitFeedback: (data: Pick<ICreateFormData, 'title' | 'content'>) => Promise<void>;
-  fetchFeedbacks: () => Promise<void>;
+    feedbacks: IFeedback[];
+    isLoading: boolean;
+    getFullAvatarUrl: (avatarPath?: string) => string;
+    submitFeedback: (
+        data: Pick<ICreateFormData, 'title' | 'content'>,
+    ) => Promise<void>;
+    fetchFeedbacks: () => Promise<void>;
 }
-
 
 const backendURL = 'http://cf15dev.checkee.vn';
 

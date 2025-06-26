@@ -4,13 +4,14 @@ import React, {useEffect, useState} from 'react';
 import {TouchableOpacity} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import * as Progress from 'react-native-progress';
+// import * as Progress from 'react-native-progress';
 import moment from 'moment';
 import images from '../../../assets/images';
 import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
 import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
 import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
 import Loading from '@/screens/subscreen/Loading';
+import colors from '@/assets/colors';
 
 const WorkSchedule = ({navigation}: any) => {
     const {
@@ -34,66 +35,56 @@ const WorkSchedule = ({navigation}: any) => {
     const [selectedStatus, setSelectedStatus] = useState(1);
     const [searchSchedule, setSearchSchedule] = useState('');
 
-    const renderCircleColor = (status: string) => {
-        switch (status) {
-            case EScheduleStatus.PROCESSING:
-            case EScheduleStatus.ALMOST_EXPIRE:
-            case EScheduleStatus.EXPIRED:
-                return '#2196F3';
+    // const renderCircleColor = (status: string) => {
+    //     switch (status) {
+    //         case EScheduleStatus.PROCESSING:
+    //         case EScheduleStatus.ALMOST_EXPIRE:
+    //         case EScheduleStatus.EXPIRED:
+    //             return '#2196F3';
 
-            case EScheduleStatus.COMPLETED:
-                return '#4CAF50';
+    //         case EScheduleStatus.COMPLETED:
+    //             return '#4CAF50';
 
-            case EScheduleStatus.CANCELED:
-                return '#FF4E45';
+    //         case EScheduleStatus.CANCELED:
+    //             return '#FF4E45';
 
-            default:
-                return undefined;
-        }
-    };
+    //         default:
+    //             return undefined;
+    //     }
+    // };
 
     const renderStatusTitle = (status: string) => {
         switch (status) {
             case EScheduleStatus.PENDING:
                 return (
-                    <Text style={WorkScheduleStyles.pendingAndAlmostExpireText}>
+                    <Text style={styles.pendingAndAlmostExpireText}>
                         Đang chờ
                     </Text>
                 );
 
             case EScheduleStatus.PROCESSING:
                 return (
-                    <Text style={WorkScheduleStyles.processingText}>
-                        Đang thực hiện
-                    </Text>
+                    <Text style={styles.processingText}>Đang thực hiện</Text>
                 );
 
             case EScheduleStatus.COMPLETED:
-                return (
-                    <Text style={WorkScheduleStyles.completedText}>
-                        Hoàn thành
-                    </Text>
-                );
+                return <Text style={styles.completedText}>Hoàn thành</Text>;
 
             case EScheduleStatus.ALMOST_EXPIRE:
                 return (
-                    <Text style={WorkScheduleStyles.pendingAndAlmostExpireText}>
+                    <Text style={styles.pendingAndAlmostExpireText}>
                         Sắp hết hạn
                     </Text>
                 );
 
             case EScheduleStatus.EXPIRED:
                 return (
-                    <Text style={WorkScheduleStyles.expiredAndCanceledText}>
-                        Trễ hạn
-                    </Text>
+                    <Text style={styles.expiredAndCanceledText}>Trễ hạn</Text>
                 );
 
             case EScheduleStatus.CANCELED:
                 return (
-                    <Text style={WorkScheduleStyles.expiredAndCanceledText}>
-                        Đã hủy
-                    </Text>
+                    <Text style={styles.expiredAndCanceledText}>Đã hủy</Text>
                 );
 
             default:
@@ -101,24 +92,24 @@ const WorkSchedule = ({navigation}: any) => {
         }
     };
 
-    const calculateTotalPercent = (taskItem: any) => {
-        const tasks = taskItem?.childTasks.tasks;
-        const totalTasks = tasks?.length;
+    // const calculateTotalPercent = (taskItem: any) => {
+    //     const tasks = taskItem?.childTasks.tasks;
+    //     const totalTasks = tasks?.length;
 
-        const completedTasks = tasks
-            ? tasks.filter(
-                  (task: any) => task.status === EScheduleStatus.COMPLETED,
-              ).length
-            : 0;
+    //     const completedTasks = tasks
+    //         ? tasks.filter(
+    //               (task: any) => task.status === EScheduleStatus.COMPLETED,
+    //           ).length
+    //         : 0;
 
-        const overallProgress = totalTasks
-            ? (completedTasks / totalTasks) * 100
-            : 0;
+    //     const overallProgress = totalTasks
+    //         ? (completedTasks / totalTasks) * 100
+    //         : 0;
 
-        const overallProgressFormat = overallProgress / 100;
+    //     const overallProgressFormat = overallProgress / 100;
 
-        return overallProgressFormat;
-    };
+    //     return overallProgressFormat;
+    // };
 
     const renderWorkSchedule = (status: string, finishedDate: string) => {
         const targetTime = moment(finishedDate);
@@ -132,7 +123,7 @@ const WorkSchedule = ({navigation}: any) => {
             return (
                 <Text
                     style={[
-                        WorkScheduleStyles.expiredAndCancelTextTime,
+                        styles.expiredAndCancelTextTime,
                         {textAlign: 'right'},
                     ]}>
                     Hết hạn
@@ -151,14 +142,14 @@ const WorkSchedule = ({navigation}: any) => {
         switch (status) {
             case EScheduleStatus.PENDING:
                 return (
-                    <View style={WorkScheduleStyles.workScheduleTime}>
+                    <View style={styles.workScheduleTime}>
                         <FontAwesome6
                             name='clock'
                             size={16}
                             color={'#FF9800'}
                         />
 
-                        <Text style={WorkScheduleStyles.startInText}>
+                        <Text style={styles.startInText}>
                             {`Bắt đầu sau ${days} ngày, ${hours} giờ ${minutes} phút`}
                         </Text>
                     </View>
@@ -167,14 +158,14 @@ const WorkSchedule = ({navigation}: any) => {
             case EScheduleStatus.PROCESSING:
             case EScheduleStatus.ALMOST_EXPIRE:
                 return (
-                    <View style={WorkScheduleStyles.workScheduleTime}>
+                    <View style={styles.workScheduleTime}>
                         <FontAwesome6
                             name='clock'
                             size={16}
                             color={'#808080'}
                         />
 
-                        <Text style={WorkScheduleStyles.remainingText}>
+                        <Text style={styles.remainingText}>
                             {`Còn ${days} ngày, ${hours} giờ ${minutes} phút`}
                         </Text>
                     </View>
@@ -182,14 +173,14 @@ const WorkSchedule = ({navigation}: any) => {
 
             case EScheduleStatus.COMPLETED:
                 return (
-                    <View style={WorkScheduleStyles.workScheduleTime}>
+                    <View style={styles.workScheduleTime}>
                         <FontAwesome6
                             name='clock'
                             size={16}
                             color={'#808080'}
                         />
 
-                        <Text style={WorkScheduleStyles.completedTextTime}>
+                        <Text style={styles.completedTextTime}>
                             {`Hoàn thành lúc ${hour}, ${day}`}
                         </Text>
                     </View>
@@ -197,15 +188,14 @@ const WorkSchedule = ({navigation}: any) => {
 
             case EScheduleStatus.EXPIRED:
                 return (
-                    <View style={WorkScheduleStyles.workScheduleTime}>
+                    <View style={styles.workScheduleTime}>
                         <FontAwesome6
                             name='clock'
                             size={16}
                             color={'#FF4E45'}
                         />
 
-                        <Text
-                            style={WorkScheduleStyles.expiredAndCancelTextTime}>
+                        <Text style={styles.expiredAndCancelTextTime}>
                             {`Hơn ${hours} giờ ${minutes} phút`}
                         </Text>
                     </View>
@@ -213,15 +203,14 @@ const WorkSchedule = ({navigation}: any) => {
 
             case EScheduleStatus.CANCELED:
                 return (
-                    <View style={WorkScheduleStyles.workScheduleTime}>
+                    <View style={styles.workScheduleTime}>
                         <FontAwesome6
                             name='clock'
                             size={16}
                             color={'#FF4E45'}
                         />
 
-                        <Text
-                            style={WorkScheduleStyles.expiredAndCancelTextTime}>
+                        <Text style={styles.expiredAndCancelTextTime}>
                             {`Đã hủy lúc ${hour}, ${day}`}
                         </Text>
                     </View>
@@ -256,15 +245,14 @@ const WorkSchedule = ({navigation}: any) => {
     };
 
     const renderItemWorkSchedule = (itemWorkSchedule: any) => (
-        <View style={WorkScheduleStyles.workScheduleMargin}>
-            <TouchableOpacity
-                style={WorkScheduleStyles.workCard}
-                onPress={() =>
-                    navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
-                        itemWorkSchedule,
-                    })
-                }>
-                <Progress.Circle
+        <TouchableOpacity
+            style={styles.workCard}
+            onPress={() =>
+                navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
+                    itemWorkSchedule,
+                })
+            }>
+            {/* <Progress.Circle
                     size={40}
                     color={renderCircleColor(itemWorkSchedule.status)}
                     progress={calculateTotalPercent(itemWorkSchedule)} // Từ 0.0 đến 1.0
@@ -274,58 +262,58 @@ const WorkSchedule = ({navigation}: any) => {
                         )}%`
                     }
                     showsText={true}
-                    textStyle={WorkScheduleStyles.progressValue}
+                    textStyle={styles.progressValue}
                     unfilledColor={'rgba(211, 211, 211, 1)'}
                     borderWidth={0}
-                />
+                /> */}
 
-                <View style={WorkScheduleStyles.warpInfoWork}>
-                    {renderStatusTitle(itemWorkSchedule.status)}
-                    <Text style={WorkScheduleStyles.mainWorkTitle}>
-                        {itemWorkSchedule.title}
-                    </Text>
+            <View style={styles.warpInfoWork}>
+                {renderStatusTitle(itemWorkSchedule.status)}
 
-                    <View style={WorkScheduleStyles.warpChildTasksAndStaffs}>
-                        <View style={WorkScheduleStyles.warpIconAndValue}>
-                            <MaterialIcons
-                                name='checklist-rtl'
-                                color={'#808080'}
-                                size={20}
-                            />
+                <Text style={styles.mainWorkTitle}>
+                    {itemWorkSchedule.title}
+                </Text>
 
-                            <Text style={WorkScheduleStyles.value}>
-                                {`${itemWorkSchedule.childTasks.reduce(
-                                    (count: number, staffItem: any) => {
-                                        return staffItem.status ===
-                                            EScheduleStatus.COMPLETED
-                                            ? count + 1
-                                            : count;
-                                    },
-                                    0,
-                                )}/${itemWorkSchedule.childTasks.length}`}
-                            </Text>
-                        </View>
+                <View style={styles.warpChildTasksAndStaffs}>
+                    <View style={styles.warpIconAndValue}>
+                        <MaterialIcons
+                            name='checklist-rtl'
+                            color={'#808080'}
+                            size={20}
+                        />
 
-                        <View style={WorkScheduleStyles.warpIconAndValueStaff}>
-                            <FontAwesome6
-                                name='user-group'
-                                color={'#808080'}
-                                size={14}
-                            />
-
-                            <Text style={WorkScheduleStyles.value}>
-                                {itemWorkSchedule.employees.length}
-                            </Text>
-                        </View>
+                        <Text style={styles.value}>
+                            {`${itemWorkSchedule.childTasks.reduce(
+                                (count: number, staffItem: any) => {
+                                    return staffItem.status ===
+                                        EScheduleStatus.COMPLETED
+                                        ? count + 1
+                                        : count;
+                                },
+                                0,
+                            )}/${itemWorkSchedule.childTasks.length}`}
+                        </Text>
                     </View>
 
-                    {renderWorkSchedule(
-                        itemWorkSchedule.status,
-                        itemWorkSchedule.finishedDate,
-                    )}
+                    <View style={styles.warpIconAndValueStaff}>
+                        <FontAwesome6
+                            name='user-group'
+                            color={'#808080'}
+                            size={14}
+                        />
+
+                        <Text style={styles.value}>
+                            {itemWorkSchedule.employees.length}
+                        </Text>
+                    </View>
                 </View>
-            </TouchableOpacity>
-        </View>
+
+                {renderWorkSchedule(
+                    itemWorkSchedule.status,
+                    itemWorkSchedule.finishedDate,
+                )}
+            </View>
+        </TouchableOpacity>
     );
 
     const handleGetListWorkSchedule = async () => {
@@ -345,8 +333,8 @@ const WorkSchedule = ({navigation}: any) => {
     if (isLoading) return <Loading />;
 
     return (
-        <View style={WorkScheduleStyles.container}>
-            <View style={WorkScheduleStyles.workScheduleTypeHorizontalScroll}>
+        <View style={styles.container}>
+            <View style={styles.workScheduleTypeHorizontalScroll}>
                 <FlatList
                     data={statusList}
                     horizontal
@@ -356,15 +344,15 @@ const WorkSchedule = ({navigation}: any) => {
                         <TouchableOpacity
                             onPress={() => selectScheduleType(item.value)}
                             style={[
-                                WorkScheduleStyles.statusBtn,
+                                styles.statusBtn,
                                 selectedStatus === item.value &&
-                                    WorkScheduleStyles.selectedStatusBtn,
+                                    styles.selectedStatusBtn,
                             ]}>
                             <Text
                                 style={[
-                                    WorkScheduleStyles.statusBtnText,
+                                    styles.statusBtnText,
                                     selectedStatus === item.value &&
-                                        WorkScheduleStyles.selectedStatusBtnText,
+                                        styles.selectedStatusBtnText,
                                 ]}>
                                 {item.label}
                             </Text>
@@ -373,8 +361,8 @@ const WorkSchedule = ({navigation}: any) => {
                 />
             </View>
 
-            <View style={WorkScheduleStyles.listWorkSchedule}>
-                <View style={WorkScheduleStyles.searchInput}>
+            <View style={styles.listWorkSchedule}>
+                <View style={styles.searchInput}>
                     <MaterialIcons
                         name='search'
                         color={'rgba(128, 128, 128, 1)'}
@@ -382,31 +370,28 @@ const WorkSchedule = ({navigation}: any) => {
                     />
                     <TextInput
                         placeholder='Tìm kiếm công việc'
-                        placeholderTextColor={'rgba(128, 128, 128, 1)'}
-                        style={WorkScheduleStyles.input}
+                        placeholderTextColor={colors.gray}
+                        style={styles.input}
                         onChangeText={setSearchSchedule}
                     />
                 </View>
 
                 <FlatList
-                    contentContainerStyle={WorkScheduleStyles.flatListSchedule}
+                    contentContainerStyle={styles.flatListSchedule}
                     data={filterSchedule}
-                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
                     keyExtractor={item => item._id}
                     renderItem={({item}) => renderItemWorkSchedule(item)}
                     onRefresh={handleGetListWorkSchedule}
                     refreshing={isLoading}
                     ListEmptyComponent={
-                        <View style={WorkScheduleStyles.scheduleListEmpty}>
+                        <View style={styles.scheduleListEmpty}>
                             <Image
                                 source={images.emptyScheduleList}
-                                style={WorkScheduleStyles.emptyScheduleListImg}
+                                style={styles.emptyScheduleListImg}
                                 resizeMode='contain'
                             />
-                            <Text
-                                style={
-                                    WorkScheduleStyles.emptyScheduleListText
-                                }>
+                            <Text style={styles.emptyScheduleListText}>
                                 {searchSchedule.length !== 0
                                     ? `Không tìm thấy lịch công việc phù hợp với \n“${searchSchedule}"`
                                     : 'Không tìm thấy danh sách lịch công việc!'}
@@ -419,13 +404,13 @@ const WorkSchedule = ({navigation}: any) => {
     );
 };
 
-const WorkScheduleStyles = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: colors.background,
     },
     workScheduleTypeHorizontalScroll: {
-        backgroundColor: '#F5F5F5',
+        backgroundColor: colors.white,
     },
     statusBtn: {
         width: 128,
@@ -446,36 +431,36 @@ const WorkScheduleStyles = StyleSheet.create({
         fontWeight: 500,
     },
     listWorkSchedule: {
-        paddingVertical: 15,
-        paddingHorizontal: 20,
         flex: 1,
+        gap: 20,
+        padding: 20,
     },
     searchInput: {
+        maxHeight: 44,
         borderRadius: 22,
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        gap: 4,
-        backgroundColor: '#80808026',
+        gap: 12,
+        backgroundColor: colors.white,
+        borderColor: colors.light_gray,
+        borderWidth: 0.5,
         paddingHorizontal: 12,
-        marginBottom: 8,
     },
     input: {
-        color: 'black',
-        width: '92%',
+        color: colors.black,
+        width: '100%',
     },
     flatListSchedule: {
-        flexGrow: 1,
-    },
-    workScheduleMargin: {
-        marginVertical: 10,
+        gap: 12,
     },
     workCard: {
+        gap: 12,
         padding: 12,
         borderRadius: 8,
-        gap: 8,
-        boxShadow: '0 1 3 0 #00000040',
         flexDirection: 'row',
+        backgroundColor: colors.white,
+        boxShadow: '0 1 2 0 #00000040',
     },
     progressValue: {
         color: 'black',
@@ -483,8 +468,8 @@ const WorkScheduleStyles = StyleSheet.create({
         fontSize: 10,
     },
     warpInfoWork: {
-        gap: 8,
-        width: '84%',
+        gap: 12,
+        width: '100%',
     },
     pendingAndAlmostExpireText: {
         color: '#FF9800',
@@ -512,22 +497,21 @@ const WorkScheduleStyles = StyleSheet.create({
         fontSize: 14,
     },
     warpChildTasksAndStaffs: {
-        marginTop: 6,
+        width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        width: '70%',
     },
     warpIconAndValue: {
+        flex: 1,
         flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'stretch',
-        gap: 5,
+        alignItems: 'center',
+        gap: 4,
     },
     warpIconAndValueStaff: {
+        flex: 1,
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
-        gap: 5,
+        gap: 4,
     },
     value: {
         color: '#808080',
@@ -535,10 +519,10 @@ const WorkScheduleStyles = StyleSheet.create({
         fontWeight: 500,
     },
     workScheduleTime: {
-        marginTop: 6,
+        gap: 4,
         flexDirection: 'row',
-        justifyContent: 'flex-end',
         alignItems: 'center',
+        justifyContent: 'flex-end',
     },
     startInText: {
         marginLeft: 5,
@@ -555,17 +539,16 @@ const WorkScheduleStyles = StyleSheet.create({
         fontStyle: 'italic',
     },
     completedTextTime: {
-        marginLeft: 5,
+        // marginLeft: 5,
         color: '#808080',
         fontWeight: 500,
-        fontSize: 11,
+        fontSize: 12,
         fontStyle: 'italic',
     },
     expiredAndCancelTextTime: {
-        marginLeft: 5,
         color: '#FF4E45',
+        fontSize: 12,
         fontWeight: 500,
-        fontSize: 11,
         fontStyle: 'italic',
     },
     scheduleListEmpty: {
