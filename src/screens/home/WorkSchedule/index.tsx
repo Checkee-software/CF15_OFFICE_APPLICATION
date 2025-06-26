@@ -249,10 +249,11 @@ const WorkSchedule = ({navigation}: any) => {
             style={styles.workCard}
             onPress={() =>
                 navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
-                    itemWorkSchedule,
+                    _id: itemWorkSchedule._id,
                 })
             }>
-            {/* <Progress.Circle
+            <View style={styles.workScheduleMargin}>
+                {/* <Progress.Circle
                     size={40}
                     color={renderCircleColor(itemWorkSchedule.status)}
                     progress={calculateTotalPercent(itemWorkSchedule)} // Từ 0.0 đến 1.0
@@ -267,51 +268,52 @@ const WorkSchedule = ({navigation}: any) => {
                     borderWidth={0}
                 /> */}
 
-            <View style={styles.warpInfoWork}>
-                {renderStatusTitle(itemWorkSchedule.status)}
+                <View style={styles.warpInfoWork}>
+                    {renderStatusTitle(itemWorkSchedule.status)}
 
-                <Text style={styles.mainWorkTitle}>
-                    {itemWorkSchedule.title}
-                </Text>
+                    <Text style={styles.mainWorkTitle}>
+                        {itemWorkSchedule.title}
+                    </Text>
 
-                <View style={styles.warpChildTasksAndStaffs}>
-                    <View style={styles.warpIconAndValue}>
-                        <MaterialIcons
-                            name='checklist-rtl'
-                            color={'#808080'}
-                            size={20}
-                        />
+                    <View style={styles.warpChildTasksAndStaffs}>
+                        <View style={styles.warpIconAndValue}>
+                            <MaterialIcons
+                                name='checklist-rtl'
+                                color={'#808080'}
+                                size={20}
+                            />
 
-                        <Text style={styles.value}>
-                            {`${itemWorkSchedule.childTasks.reduce(
-                                (count: number, staffItem: any) => {
-                                    return staffItem.status ===
-                                        EScheduleStatus.COMPLETED
-                                        ? count + 1
-                                        : count;
-                                },
-                                0,
-                            )}/${itemWorkSchedule.childTasks.length}`}
-                        </Text>
+                            <Text style={styles.value}>
+                                {`${itemWorkSchedule.childTasks.reduce(
+                                    (count: number, staffItem: any) => {
+                                        return staffItem.status ===
+                                            EScheduleStatus.COMPLETED
+                                            ? count + 1
+                                            : count;
+                                    },
+                                    0,
+                                )}/${itemWorkSchedule.childTasks.length}`}
+                            </Text>
+                        </View>
+
+                        <View style={styles.warpIconAndValueStaff}>
+                            <FontAwesome6
+                                name='user-group'
+                                color={'#808080'}
+                                size={14}
+                            />
+
+                            <Text style={styles.value}>
+                                {itemWorkSchedule.employees.length}
+                            </Text>
+                        </View>
                     </View>
 
-                    <View style={styles.warpIconAndValueStaff}>
-                        <FontAwesome6
-                            name='user-group'
-                            color={'#808080'}
-                            size={14}
-                        />
-
-                        <Text style={styles.value}>
-                            {itemWorkSchedule.employees.length}
-                        </Text>
-                    </View>
+                    {renderWorkSchedule(
+                        itemWorkSchedule.status,
+                        itemWorkSchedule.finishedDate,
+                    )}
                 </View>
-
-                {renderWorkSchedule(
-                    itemWorkSchedule.status,
-                    itemWorkSchedule.finishedDate,
-                )}
             </View>
         </TouchableOpacity>
     );
@@ -461,6 +463,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: colors.white,
         boxShadow: '0 1 2 0 #00000040',
+    },
+    workScheduleMargin: {
+
     },
     progressValue: {
         color: 'black',

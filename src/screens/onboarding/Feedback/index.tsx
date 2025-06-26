@@ -13,10 +13,10 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useFeedbackStore from '../../../stores/feedbackStore';
 import dayjs from 'dayjs';
 import images from '../../../assets/images';
-import {useAuthStore} from '../../../stores/authStore';
+// import {useAuthStore} from '../../../stores/authStore';
 
 export default function FeedbackScreen({navigation}: any) {
-    const {userInfo} = useAuthStore();
+    // const {userInfo} = useAuthStore();
 
     const {feedbacks, fetchFeedbacks, isLoading, getFullAvatarUrl} =
         useFeedbackStore();

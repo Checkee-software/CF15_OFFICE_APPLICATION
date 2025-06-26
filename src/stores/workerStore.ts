@@ -2,8 +2,7 @@ import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {IUser} from '../shared-types/Response/UserResponse/UserResponse';
-
-const backendURL = 'http://cf15dev.checkee.vn';
+import ENV from '@/config/ENV';
 
 interface listWorkerFilterByRole {
     title: string;
@@ -35,7 +34,7 @@ interface DocumentStore {
 
 const fixAvatarPath = (path: string) => {
     const updatedPath = path.replace(/\\/g, '/');
-    return `http://cf15officeservice.checkee.vn${updatedPath}`;
+    return `${ENV.BACKEND_URL}${updatedPath}`;
 };
 
 export const useWorkerStore = create<DocumentStore>(set => ({
@@ -48,7 +47,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
         //await new Promise(resolve => setTimeout(resolve, 1 * 10000));
         try {
             const response = await axiosClient.get(
-                `${backendURL}/resources/users/collection`,
+                `${ENV.BACKEND_URL}/resources/users/collection`,
             );
 
             if (response) {
@@ -124,7 +123,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
-                `${backendURL}/resources/users/collection`,
+                `${ENV.BACKEND_URL}/resources/users/collection`,
             );
 
             if (response) {

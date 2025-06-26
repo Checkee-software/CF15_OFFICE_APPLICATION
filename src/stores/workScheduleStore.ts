@@ -4,17 +4,19 @@ import Snackbar from 'react-native-snackbar';
 import {IList} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {ISchedule} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {IRequest} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
-
-const backendURL = 'http://cf15dev.checkee.vn';
+import ENV from '@/config/ENV';
 
 interface workScheduleStore {
     isLoading: boolean;
+    isLoadingGet: boolean;
     listWorkSchedule: IList[];
     listWorkScheduleFilter: IList[];
     listJobs: IList[];
     getListJobs: () => Promise<void>;
     detailWorkSchedule: ISchedule | null;
+    scheduleDetail: ISchedule | null;
     getListWorkSchedule: () => Promise<void>;
+    getScheduleDetail: (id: string) => Promise<void>;
     filterByStatus: (status: string) => void;
     resetData: () => void;
     getDetailWorkSchedule: (id: string) => Promise<void>;
@@ -27,14 +29,16 @@ interface workScheduleStore {
 
 const fixAvatarPath = (path: string) => {
     const updatedPath = path.replace(/\\/g, '/');
-    return `http://cf15dev.checkee.vn${updatedPath}`;
+    return `${ENV.BACKEND_URL}${updatedPath}`;
 };
 
 export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     isLoading: false,
+    isLoadingGet: false,
     listWorkSchedule: [],
     listWorkScheduleFilter: [],
     detailWorkSchedule: null,
+    scheduleDetail: null,
     listJobs: [],
 
     requestPersonalTask: async (
@@ -45,7 +49,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.post(
-                `${backendURL}/resources/schedule-requests/request/${scheduleId}/${childTaskId}`,
+                `${ENV.BACKEND_URL}/resources/schedule-requests/request/${scheduleId}/${childTaskId}`,
                 data,
             );
             Snackbar.show({
@@ -67,7 +71,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
-                `${backendURL}/resources/schedules/detail-with-schedule/${id}`,
+                `${ENV.BACKEND_URL}/resources/schedules/detail-with-schedule/${id}`,
             );
 
             console.log('📦 Response schedule:', response?.data);
@@ -103,7 +107,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
-                `${backendURL}/resources/schedules/jobs`,
+                `${ENV.BACKEND_URL}/resources/schedules/jobs`,
             );
 
             if (response?.data?.data) {
@@ -125,10 +129,8 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
-                `${backendURL}/resources/schedules/collection`,
+                `${ENV.BACKEND_URL}/resources/schedules/collection`,
             );
-
-            console.log(response.data.data);
 
             if (response) {
                 const updateImgPathListSchedule = response.data.data.map(
@@ -163,6 +165,55 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             set({isLoading: false});
         } catch (error: any) {
             set({isLoading: false});
+
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error.response.status === 500) {
+                    Snackbar.show({
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    getScheduleDetail: async (id: string) => {
+        set({isLoadingGet: true});
+        try {
+            const response = await axiosClient.get(
+                `${ENV.BACKEND_URL}/resources/schedules/detail/${id}`,
+            );
+
+            if (response.data.data) {
+                const dataDetailSchedule = {...response.data.data};
+                if (dataDetailSchedule.employees?.length) {
+                    dataDetailSchedule.employees =
+                        dataDetailSchedule.employees.map((employees: any) => {
+                            if (employees.avatar) {
+                                employees.avatar = fixAvatarPath(
+                                    employees.avatar,
+                                );
+                            }
+                            return employees;
+                        });
+                }
+
+                set({
+                    scheduleDetail: dataDetailSchedule,
+                });
+            } else {
+                set({
+                    scheduleDetail: null,
+                });
+            }
+
+            setTimeout(() => {
+                set({isLoadingGet: false});
+            }, 200);
+        } catch (error: any) {
+            set({isLoadingGet: false});
 
             const _error = error;
 

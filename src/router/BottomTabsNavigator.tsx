@@ -1,8 +1,11 @@
-import React from 'react';
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable jsx-quotes */
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useEffect} from 'react';
 import {StyleSheet, View, TouchableOpacity, Alert} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Work from '../screens/home/Work';
-import CameraScanner from '../screens/global/CameraScanner';
+import AutomaticTracing from '../screens/onboarding/AutomaticTracing';
 import History from '../screens/home/History';
 import Profile from '../screens/user/Profile';
 import Main from '../screens/home/Main';
@@ -10,11 +13,29 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
+import Backdrop from '@/screens/subscreen/Loading/index2';
+import {useAuthStore} from '@/stores/authStore';
 
 const BottomTabsNavigator = ({navigation}: any) => {
+    const {redirectData, clearRedirectData} = useAuthStore();
+
     const Tab = createBottomTabNavigator();
 
-    return (
+    useEffect(() => {
+        if (redirectData) {
+            navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
+                _id: redirectData,
+            });
+
+            setTimeout(() => {
+                clearRedirectData();
+            }, 1000);
+        }
+    }, [redirectData]);
+
+    return redirectData ? (
+        <Backdrop open />
+    ) : (
         <Tab.Navigator
             screenOptions={{
                 headerStyle: {
@@ -84,7 +105,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
             />
 
             <Tab.Screen
-                component={CameraScanner}
+                component={AutomaticTracing}
                 name='ScanScreen'
                 options={{
                     headerShown: true,

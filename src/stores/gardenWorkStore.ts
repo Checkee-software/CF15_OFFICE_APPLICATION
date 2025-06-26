@@ -4,8 +4,7 @@ import Snackbar from 'react-native-snackbar';
 import {IGardenData} from '@/shared-types/Response/GardenDataResponse/GardenDataResponse';
 import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
 import {EStatus} from '@/shared-types/Response/ScheduleRequestResponse/ScheduleRequestResponse';
-
-const backendURL = 'http://cf15dev.checkee.vn';
+import ENV from '@/config/ENV';
 
 interface gardenWorkStore {
     isLoading: boolean;
@@ -20,7 +19,6 @@ interface gardenWorkStore {
     ) => Promise<void | undefined>;
     filterByStatus: (status: string) => void;
     resetData: () => void;
-    setBrowsed: (newList: any) => void;
     setBadgeUnBrowse: () => void;
 }
 
@@ -35,8 +33,10 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.get<any>(
-                `${backendURL}/resources/schedule-requests/collection`,
+                `${ENV.BACKEND_URL}/resources/schedule-requests/collection`,
             );
+
+            console.log(response);
 
             set({
                 listGardenWorkBrowse: response.data?.data || [],
@@ -83,13 +83,11 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
         set({isLoadingCreate: true});
         try {
             const response = await axiosClient.post(
-                `${backendURL}/resources/schedule-requests/verify/${harvestReportId}`,
+                `${ENV.BACKEND_URL}/resources/schedule-requests/verify/${harvestReportId}`,
                 formRateReport,
             );
 
             set({isLoadingCreate: false});
-
-            console.log(response.data);
 
             if (response.data?.data) {
                 setTimeout(() => {
@@ -122,26 +120,25 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
         }
     },
 
-    filterByStatus: status =>
+    filterByStatus: status => {
+        set({isLoadingCreate: true});
+
+        // sử dụng setTimeout để fake async (nếu data quá dài filter có thể bị delay)
         set(state => ({
             listGardenWorkBrowseFilter: state.listGardenWorkBrowse.filter(
                 item => item.status === status,
             ),
-        })),
+        }));
+
+        setTimeout(() => {
+            set({isLoadingCreate: false});
+        }, 1000);
+    },
 
     setBadgeUnBrowse: () =>
         set(state => ({
             badgeGardenWorkUnBrowse: state.listGardenWorkBrowse.filter(
                 item => item.status === EStatus.REQUEST,
-            ).length,
-        })),
-
-    setBrowsed: (newList: any) =>
-        set(() => ({
-            listGardenWorkFilter: newList,
-            listGardenWork: newList,
-            badgeGardenWorkUnBrowse: newList.filter(
-                (item: {status: string}) => item.status === 'NONE',
             ).length,
         })),
 

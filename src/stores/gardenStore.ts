@@ -7,6 +7,7 @@ import {
     TCollection,
     IHavestHistory,
 } from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
+import ENV from '@/config/ENV';
 
 type GardenState = {
     gardens: IGarden | null;
@@ -27,8 +28,6 @@ type GardenState = {
     fetchHarvestCollection: (_id: string) => Promise<void>;
 };
 
-const backendURL = 'http://cf15dev.checkee.vn';
-
 const useGardenStore = create<GardenState>(set => ({
     gardens: null,
     selectedGarden: null,
@@ -39,7 +38,7 @@ const useGardenStore = create<GardenState>(set => ({
         set({isLoading: true});
         try {
             const res = await axiosClient.get(
-                `${backendURL}/resources/gardens/collection`,
+                `${ENV.BACKEND_URL}/resources/gardens/collection`,
             );
             set({gardens: res.data?.data || []});
         } catch (error: any) {
@@ -60,7 +59,7 @@ const useGardenStore = create<GardenState>(set => ({
         set({isLoading: true});
         try {
             const res = await axiosClient.get(
-                `${backendURL}/resources/gardens/detail/${id}`,
+                `${ENV.BACKEND_URL}/resources/gardens/detail/${id}`,
             );
             set({selectedGarden: res.data?.data || null});
         } catch (error: any) {
@@ -81,7 +80,7 @@ const useGardenStore = create<GardenState>(set => ({
         set({isLoading: true});
         try {
             const res = await axiosClient.get(
-                `${backendURL}/resources/gardens/find?code=${code}`,
+                `${ENV.BACKEND_URL}/resources/gardens/find?code=${code}`,
             );
             set({gardens: res.data?.data || null});
         } catch (error: any) {
@@ -106,7 +105,7 @@ const useGardenStore = create<GardenState>(set => ({
     ) => {
         set({isLoading: true});
         try {
-            let url = `${backendURL}/resources/gardens/harvest?_id=${_id}&status=${status}`;
+            let url = `${ENV.BACKEND_URL}/resources/gardens/harvest?_id=${_id}&status=${status}`;
             if (status === '0' && harvestId) {
                 url += `&harvestId=${harvestId}`;
             }
@@ -133,7 +132,7 @@ const useGardenStore = create<GardenState>(set => ({
     postHarvestReport: async (_id: string, amount: number) => {
         set({isLoading: true});
         try {
-            const url = `${backendURL}/resources/gardens/harvest/report/${_id}/${amount}`;
+            const url = `${ENV.BACKEND_URL}/resources/gardens/harvest/report/${_id}/${amount}`;
             const res = await axiosClient.post(url);
 
             Snackbar.show({
@@ -158,7 +157,7 @@ const useGardenStore = create<GardenState>(set => ({
         set({isLoading: true});
         try {
             const res = await axiosClient.get<THarvestHistory>(
-                `${backendURL}/resources/gardens/harvest/history?_id=${_id}`,
+                `${ENV.BACKEND_URL}/resources/gardens/harvest/history?_id=${_id}`,
             );
             set({harvestHistory: res.data?.data || []});
         } catch (error: any) {
@@ -179,7 +178,7 @@ const useGardenStore = create<GardenState>(set => ({
         set({isLoading: true});
         try {
             const res = await axiosClient.get<TCollection>(
-                `${backendURL}/resources/gardens/harvest/collection?_id=${_id}`,
+                `${ENV.BACKEND_URL}/resources/gardens/harvest/collection?_id=${_id}`,
             );
             set({harvestHistory: res.data?.data || []});
         } catch (error: any) {

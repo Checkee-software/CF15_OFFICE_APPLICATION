@@ -1,4 +1,4 @@
-import { ScreenInformation } from './types';
+import {ScreenInformation} from './types';
 
 const GLOBAL_SCREENS = {
     CAMERA_SCANNER: {
@@ -12,16 +12,6 @@ const GLOBAL_SCREENS = {
         headerTitle: 'TRA CỨU THỦ CÔNG',
         isOpenQRCamera: false,
     } as ScreenInformation,
-    GAS_TANK_DETAIL: {
-        key: 'GAS_TANK_DETAIL',
-        headerTitle: 'THÔNG TIN SẢN PHẨM',
-        isOpenQRCamera: false,
-    } as ScreenInformation,
-    SCANNED_GAS_TANK: {
-        key: 'SCANNED_GAS_TANK',
-        headerTitle: 'CÁC MÃ ĐÃ THAO TÁC',
-        isOpenQRCamera: false,
-    } as ScreenInformation,
-}
+};
 
 export default GLOBAL_SCREENS;

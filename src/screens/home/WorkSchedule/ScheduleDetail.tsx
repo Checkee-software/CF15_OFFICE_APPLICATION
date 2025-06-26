@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {
     View,
@@ -8,7 +9,7 @@ import {
     FlatList,
     Image,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -16,13 +17,15 @@ import RNFS from 'react-native-fs';
 import Snackbar from 'react-native-snackbar';
 import {List} from 'react-native-paper';
 import moment from 'moment';
-import {useAuthStore} from '../../../stores/authStore';
 import {ETaskStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import images from '../../../assets/images';
+import {useWorkScheduleStore} from '@/stores/workScheduleStore';
+import Loading from '@/screens/subscreen/Loading';
+import ENV from '@/config/ENV';
 
 const ScheduleDetail = ({route}: any) => {
-    const {userInfo} = useAuthStore();
+    const {isLoadingGet, scheduleDetail, getScheduleDetail} =
+        useWorkScheduleStore();
 
     type AttachedFiles = {
         destination: string;
@@ -34,48 +37,6 @@ const ScheduleDetail = ({route}: any) => {
         path: string;
         size: number;
     };
-
-    const scheduleDetail = route.params.itemWorkSchedule;
-
-    if (userInfo.userType.level === EOrganization.LEADER) {
-        // chỉ hiển thị thông tin của cán bộ quản lý đang thuộc tổ của người quản lý đó
-        scheduleDetail.followers = scheduleDetail.followers.filter(
-            (follower: any) => follower.group === userInfo.userType.unit,
-        );
-        // chỉ hiển thị thông tin của người lao động thuộc tổ của người quản lý đó
-        scheduleDetail.employees = scheduleDetail.employees.filter(
-            (employee: any) => employee.group === userInfo.userType.unit,
-        );
-        //chỉ hiển thị thông tin công việc con của người lao động thuộc tổ của người quản lý đó
-        scheduleDetail.childTasks = scheduleDetail.childTasks.filter(
-            (childTask: any) =>
-                childTask.staff.some(
-                    (staff: any) => staff.group === userInfo.userType.unit,
-                ),
-        );
-    } else if (userInfo.userType.level === EOrganization.WORKER) {
-        // chỉ hiển thị thông tin của cán bộ quản lý đang thuộc tổ của người lao động đó
-        scheduleDetail.followers = scheduleDetail.followers.filter(
-            (follower: any) => follower.group === userInfo.userType.unit,
-        );
-        // chỉ hiển thị thông tin của người lao động đó
-        scheduleDetail.employees = scheduleDetail.employees.filter(
-            (employee: any) => employee._id === userInfo._id,
-        );
-        //chỉ hiển thị thông tin công việc con của người lao động đó
-        scheduleDetail.childTasks = scheduleDetail.childTasks
-            .filter((childTask: any) =>
-                childTask.staff.some(
-                    (staff: any) => staff.userId === userInfo._id,
-                ),
-            )
-            .map((task: any) => ({
-                ...task,
-                staff: task.staff.filter(
-                    (staff: any) => staff.userId === userInfo._id,
-                ),
-            }));
-    }
 
     const formatFileSize = (size: number) => {
         if (size >= 1024 * 1024) {
@@ -117,7 +78,7 @@ const ScheduleDetail = ({route}: any) => {
 
     const fixFilePath = (path: string) => {
         const updatedPath = path.replace(/\\/g, '/');
-        return `http://cf15officeservice.checkee.vn${updatedPath}`;
+        return `${ENV.BACKEND_URL}${updatedPath}`;
     };
 
     const renderScheduleRemain = (finishedDate: string) => {
@@ -290,6 +251,12 @@ const ScheduleDetail = ({route}: any) => {
         </View>
     );
 
+    useEffect(() => {
+        getScheduleDetail(route.params._id);
+    }, []);
+
+    if (isLoadingGet) return <Loading />;
+
     return (
         <View style={ScheduleDetailStyles.container}>
             <ScrollView
@@ -304,7 +271,9 @@ const ScheduleDetail = ({route}: any) => {
                             Số CBQL/NLĐ
                         </Text>
                         <Text style={ScheduleDetailStyles.statusText}>
-                            {`${scheduleDetail.employees.length}/${scheduleDetail.followers.length}`}
+                            {`${scheduleDetail?.followers?.length ?? 0}/${
+                                scheduleDetail?.employees?.length ?? 0
+                            }`}
                         </Text>
                     </View>
 
@@ -313,7 +282,7 @@ const ScheduleDetail = ({route}: any) => {
                             Tổng số công việc con
                         </Text>
                         <Text style={ScheduleDetailStyles.statusText}>
-                            {scheduleDetail.childTasks.length}
+                            {scheduleDetail?.childTasks.length}
                         </Text>
                     </View>
                 </View>
@@ -359,7 +328,7 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                Lâm Đình Phú
+                                {scheduleDetail?.createdUser}
                             </Text>
                         </View>
 
@@ -369,7 +338,7 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail.gardenName}
+                                {scheduleDetail?.gardenName}
                             </Text>
                         </View>
 
@@ -379,7 +348,7 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail.productName}
+                                {scheduleDetail?.productName}
                             </Text>
                         </View>
                     </View>
@@ -396,11 +365,11 @@ const ScheduleDetail = ({route}: any) => {
 
                             <Text style={ScheduleDetailStyles.infoValue}>
                                 {`${
-                                    scheduleDetail.labour.name
+                                    scheduleDetail?.labour.name
                                 }: ${new Intl.NumberFormat('vi-VN', {
                                     style: 'currency',
                                     currency: 'VND',
-                                }).format(scheduleDetail.labour.cost)}`}
+                                }).format(scheduleDetail?.labour?.cost ?? 0)}`}
                             </Text>
                         </View>
 
@@ -410,7 +379,7 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail.materials.map(
+                                {scheduleDetail?.materials.map(
                                     (
                                         itemMaterials: any,
                                         indexMaterials: number,
@@ -470,7 +439,7 @@ const ScheduleDetail = ({route}: any) => {
                 <View style={ScheduleDetailStyles.listAccordion}>
                     <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion1}
-                        title={`Cán bộ quản lý (${scheduleDetail.followers.length})`}
+                        title={`Cán bộ quản lý (${scheduleDetail?.followers?.length})`}
                         style={ScheduleDetailStyles.boxAccordion}
                         id='1'>
                         <FlatList
@@ -485,7 +454,7 @@ const ScheduleDetail = ({route}: any) => {
 
                     <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion1}
-                        title={`Người lao động (${scheduleDetail.employees.length})`}
+                        title={`Người lao động (${scheduleDetail?.employees?.length})`}
                         style={ScheduleDetailStyles.boxAccordion}
                         id='2'>
                         <FlatList
@@ -500,7 +469,7 @@ const ScheduleDetail = ({route}: any) => {
 
                     <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion2}
-                        title={`Danh sách công việc con (${scheduleDetail.childTasks.length})`}
+                        title={`Danh sách công việc con (${scheduleDetail?.childTasks.length})`}
                         style={ScheduleDetailStyles.boxAccordion}
                         id='3'>
                         <View style={ScheduleDetailStyles.listChildTasks}>

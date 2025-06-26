@@ -54,7 +54,7 @@ const JobListWorker = () => {
         }
     }, [searchText, listJobs]);
 
-    const formatDate = (dateStr: string) => {
+    const formatDate = (dateStr: string | Date) => {
         const date = new Date(dateStr);
         return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
     };
@@ -63,7 +63,7 @@ const JobListWorker = () => {
         return `${formatDate(start)} → ${formatDate(end)}`;
     };
 
-    const formatRemainingTime = (endDateStr: string) => {
+    const formatRemainingTime = (endDateStr: string | Date) => {
         const now = new Date();
         const end = new Date(endDateStr);
         const diffMs = end.getTime() - now.getTime();
@@ -121,7 +121,12 @@ const JobListWorker = () => {
                             color='#555'
                             style={{marginLeft: 16}}
                         />
-                        <Text style={{fontSize: 12, marginLeft: 4, fontStyle: 'italic'}}>
+                        <Text
+                            style={{
+                                fontSize: 12,
+                                marginLeft: 4,
+                                fontStyle: 'italic',
+                            }}>
                             {formatRemainingTime(item.finishedDate)}
                         </Text>
                     </View>

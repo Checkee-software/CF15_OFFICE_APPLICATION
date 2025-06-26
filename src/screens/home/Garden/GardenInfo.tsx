@@ -27,11 +27,13 @@ const GardenInfo = () => {
     }, []);
 
     useEffect(() => {
+        const gardenList = gardens ?? [];
+
         if (searchText === '') {
-            setFilteredGardens(gardens);
+            setFilteredGardens(gardenList as IGarden[]);
         } else {
-            const filtered = gardens.filter(
-                garden =>
+            const filtered = (gardenList as IGarden[]).filter(
+                (garden: IGarden) =>
                     garden.name
                         .toLowerCase()
                         .includes(searchText.toLowerCase()) ||
@@ -59,13 +61,6 @@ const GardenInfo = () => {
                     <Text style={styles.cardTitle}>{item.name}</Text>
                     <Text style={styles.cardSubtitle}>{item.code}</Text>
                 </View>
-                {item.isHarvest && (
-                    <MaterialCommunityIcons
-                        name='cart-outline'
-                        size={24}
-                        style={styles.harvestIcon}
-                    />
-                )}
             </View>
         </TouchableOpacity>
     );

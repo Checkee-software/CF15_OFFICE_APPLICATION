@@ -14,6 +14,7 @@ import {useAuthStore} from '../../../stores/authStore';
 import {useWorkerStore} from '@/stores/workerStore';
 import moment from 'moment';
 import images from '../../../assets/images';
+import {OneSignal} from 'react-native-onesignal';
 
 export default function Profile({navigation}: any) {
     const {userInfo, logout} = useAuthStore();
@@ -159,7 +160,7 @@ export default function Profile({navigation}: any) {
                                 style={styles.modalButton}
                                 onPress={async () => {
                                     resetStateWhenLogout();
-
+                                    OneSignal.logout();
                                     await logout();
                                     setShowLogoutModal(false);
                                     // TODO: Handle logout logic here

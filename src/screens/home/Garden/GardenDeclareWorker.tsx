@@ -76,34 +76,39 @@ const GardenDeclare = () => {
 
     const getAllProcesses = (): ProcessOption[] => {
         const result: ProcessOption[] = [];
-
-        if (detailWorkSchedule?.materials) {
+        if (detailWorkSchedule?.materials?.length) {
             result.push(
-                ...detailWorkSchedule.materials.map((m: any) => ({
-                    id: m._id,
-                    name: m.name,
-                    specification: m.specification,
-                    type: 'material' as const,
-                })),
+                ...detailWorkSchedule.materials
+                    .filter((m: any) => m.name && m._id)
+                    .map((m: any) => ({
+                        id: m._id,
+                        name: m.name,
+                        specification: m.specification || '',
+                        type: 'material' as const,
+                    })),
             );
         }
-
-        if (detailWorkSchedule?.machines) {
+        if (detailWorkSchedule?.machines?.length) {
             result.push(
-                ...detailWorkSchedule.machines.map((m: any) => ({
-                    id: m._id,
-                    name: m.name,
-                    specification: m.specification,
-                    type: 'machine' as const,
-                })),
+                ...detailWorkSchedule.machines
+                    .filter((m: any) => m.name && m._id)
+                    .map((m: any) => ({
+                        id: m._id,
+                        name: m.name,
+                        specification: m.specification || '',
+                        type: 'machine' as const,
+                    })),
             );
         }
-
-        if (detailWorkSchedule?.labour) {
+        if (
+            detailWorkSchedule?.labour &&
+            detailWorkSchedule.labour.name &&
+            detailWorkSchedule.labour._id
+        ) {
             result.push({
                 id: detailWorkSchedule.labour._id,
                 name: detailWorkSchedule.labour.name,
-                specification: detailWorkSchedule.labour.specification,
+                specification: detailWorkSchedule.labour.specification || '',
                 type: 'labour' as const,
             });
         }
@@ -290,6 +295,7 @@ const GardenDeclare = () => {
                     onStart={machineType =>
                         console.log('Ca máy được chọn:', machineType)
                     }
+                    machines={detailWorkSchedule?.machines || []}
                 />
 
                 <CollapsibleTaskBlock
@@ -333,7 +339,7 @@ const GardenDeclare = () => {
                                         {getAllProcesses().map(process => (
                                             <Picker.Item
                                                 key={process.id}
-                                                label={`${process.name} (${process.type})`}
+                                                label={`${process.name}`}
                                                 value={process.id}
                                             />
                                         ))}

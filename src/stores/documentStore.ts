@@ -2,8 +2,7 @@ import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {IDocument} from '../shared-types/Response/DocumentResponse/DocumentResponse';
-
-const backendURL = 'http://cf15dev.checkee.vn';
+import ENV from '@/config/ENV';
 
 interface DocumentStore {
     isLoading: boolean;
@@ -19,7 +18,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
-                `${backendURL}/resources/documents/collection`,
+                `${ENV.BACKEND_URL}/resources/documents/collection`,
             );
 
             set({listDocument: response.data?.data || []});

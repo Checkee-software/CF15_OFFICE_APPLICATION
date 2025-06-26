@@ -9,8 +9,9 @@ import {
 import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
 import UserType from '@/shared-types/common/UserType';
 import Address from '@/shared-types/common/Address';
-
-const backendURL = 'http://cf15dev.checkee.vn';
+import {OneSignal} from 'react-native-onesignal';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import ENV from '@/config/ENV';
 
 type tasks = {
     compeleted: string;
@@ -44,6 +45,7 @@ type AuthStore = {
     userPasswordUpdate: IUpdatePassword;
     isLoading: boolean;
     isLogin: boolean;
+    redirectData: string | null;
     login: (userAccount: ILogin) => Promise<void>;
     autoLogin: () => Promise<void>;
     getScheduleCollection: () => Promise<
@@ -56,6 +58,9 @@ type AuthStore = {
         | undefined
     >;
     logout: () => Promise<void>;
+    updatePassword: (userPasswordUpdate: IUpdatePassword) => Promise<any>;
+    setRedirectData: (data: string) => void;
+    clearRedirectData: () => void;
 };
 
 const fixAvatarPath = (path: string) => {
@@ -67,6 +72,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     userInfo: {} as IUser,
     userLogin: {} as ILogin,
     userPasswordUpdate: {} as IUpdatePassword,
+    redirectData: null,
     isLoading: false,
     isLogin: false,
 
@@ -74,7 +80,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.post(
-                `${backendURL}/login/sign-in`,
+                `${ENV.BACKEND_URL}/login/sign-in`,
                 userAccount,
             );
 
@@ -84,7 +90,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 };
 
                 if (response.data.data.avatar) {
-                    userData.avatar = `${backendURL}${fixAvatarPath(
+                    userData.avatar = `${ENV.BACKEND_URL}${fixAvatarPath(
                         response.data.data.avatar.path
                             ? response.data.data.avatar.path
                             : response.data.data.avatar,
@@ -96,6 +102,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 const getTasks = await get().getScheduleCollection();
                 userData.tasks = getTasks;
 
+                if (
+                    response.data.data.userType.level ===
+                        EOrganization.LEADER ||
+                    response.data.data.userType.level === EOrganization.WORKER
+                ) {
+                    OneSignal.login(response.data.data._id);
+                    OneSignal.User.pushSubscription.optIn();
+                }
                 set({userInfo: userData, isLogin: true});
                 set({isLoading: false});
             }
@@ -124,7 +138,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         set({isLoading: true});
         try {
             const response = await axiosClient.patch(
-                `${backendURL}/resources/update-password`,
+                `${ENV.BACKEND_URL}/resources/update-password`,
                 userPasswordUpdate,
             );
 
@@ -160,7 +174,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     autoLogin: async () => {
         try {
             const response = await axiosClient.get(
-                `${backendURL}/resources/check-access`,
+                `${ENV.BACKEND_URL}/resources/check-access`,
             );
 
             if (response.data.data) {
@@ -169,7 +183,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 };
 
                 if (response.data.data.avatar) {
-                    userData.avatar = `${backendURL}${fixAvatarPath(
+                    userData.avatar = `${ENV.BACKEND_URL}${fixAvatarPath(
                         response.data.data.avatar.path
                             ? response.data.data.avatar.path
                             : response.data.data.avatar,
@@ -205,7 +219,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     getScheduleCollection: async () => {
         try {
             const response = await axiosClient.get(
-                `${backendURL}/resources/schedules/collection`,
+                `${ENV.BACKEND_URL}/resources/schedules/collection`,
             );
 
             if (response.data.data) {
@@ -233,8 +247,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         }
     },
 
+    setRedirectData: (data: string) => set({redirectData: data}),
+    clearRedirectData: () => set({redirectData: null}),
+
     logout: async () => {
         await asyncStorageHelper.clearToken();
+        const checkLevel = get().userInfo.userType.level;
+        if (
+            checkLevel === EOrganization.LEADER ||
+            checkLevel === EOrganization.WORKER
+        ) {
+            OneSignal.User.pushSubscription.optOut();
+            OneSignal.logout();
+        }
         set({userInfo: undefined, isLogin: false});
     },
 }));

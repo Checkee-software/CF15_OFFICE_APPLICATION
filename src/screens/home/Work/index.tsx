@@ -267,15 +267,26 @@ const WorkScreen = () => {
             ) : (
                 <View style={styles.statusBrowse}>
                     <View style={styles.browseInfo}>
-                        {itemGardenWork.status === 'VERIFIED' ? (
-                            <View style={styles.warpLabelAndValue}>
-                                <Text style={styles.label}>Duyệt lúc</Text>
+                        {itemGardenWork.status === EStatus.CONFIRMED ? (
+                            <View style={styles.warpComfirmedView}>
+                                <View style={styles.warpValueComfirmed}>
+                                    <Text style={styles.label}>Duyệt lúc</Text>
 
-                                <Text style={styles.value}>
-                                    {moment(itemGardenWork.updatedAt).format(
-                                        'HH:mm DD/MM/YYYY',
-                                    )}
-                                </Text>
+                                    <Text style={styles.value}>
+                                        {moment(
+                                            itemGardenWork.updatedAt,
+                                        ).format('HH:mm DD/MM/YYYY')}
+                                    </Text>
+                                </View>
+
+                                <View style={styles.warpValueComfirmed}>
+                                    <Text style={styles.label}>
+                                        Người duyệt
+                                    </Text>
+                                    <Text style={styles.value}>
+                                        {itemGardenWork.requesterName}
+                                    </Text>
+                                </View>
                             </View>
                         ) : (
                             <>
@@ -359,8 +370,6 @@ const WorkScreen = () => {
                     id,
                     formRateReport,
                 );
-
-                console.log(result);
 
                 if (result) {
                     setReasonCancel('');
@@ -516,6 +525,13 @@ const styles = StyleSheet.create({
         lineHeight: 24,
     },
     warpLabelAndValue: {
+        flexDirection: 'row',
+    },
+    warpComfirmedView: {
+        flexDirection: 'column',
+        gap: 4,
+    },
+    warpValueComfirmed: {
         flexDirection: 'row',
     },
     label: {

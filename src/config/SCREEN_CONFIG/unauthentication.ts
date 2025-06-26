@@ -3,10 +3,7 @@ import {ScreenRegistry} from './types';
 
 /* screens */
 import Login from '../../screens/onboarding/Login';
-import Splash from '../../screens/onboarding/Splash';
-import CameraScanner from '../../screens/global/CameraScanner';
 import AutomaticTracing from '../../screens/onboarding/AutomaticTracing';
-
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -18,20 +15,6 @@ export const UNAUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: Login,
         options: {
             headerShown: false,
-        },
-    },
-    {
-        name: SCREEN_INFO.INDEX.key,
-        component: Splash,
-        options: {
-            headerShown: false,
-        },
-    },
-    {
-        name: SCREEN_INFO.CAMERA_SCANNER.key,
-        component: CameraScanner,
-        options: {
-            title: SCREEN_INFO.CAMERA_SCANNER.headerTitle,
         },
     },
     {
