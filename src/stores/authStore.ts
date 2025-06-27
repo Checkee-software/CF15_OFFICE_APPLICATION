@@ -89,6 +89,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     ...response.data.data,
                 };
 
+                OneSignal.User.addAlias('userId', userData._id);
+
                 if (response.data.data.avatar) {
                     userData.avatar = `${ENV.BACKEND_URL}${fixAvatarPath(
                         response.data.data.avatar.path
