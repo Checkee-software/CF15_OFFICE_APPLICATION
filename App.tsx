@@ -54,6 +54,7 @@ const InitApp = () => {
 
             if (token !== '') {
                 await autoLogin();
+                // OneSignal.User.addAlias()
 
                 // OneSignal.login(token);
                 // console.log('ID: ', await OneSignal.User.getOnesignalId());
