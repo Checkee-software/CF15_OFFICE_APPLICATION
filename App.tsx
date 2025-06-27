@@ -7,7 +7,8 @@ import {useAuthStore} from './src/stores/authStore';
 
 /* packages */
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {OneSignal} from 'react-native-onesignal';
+import { OneSignal, LogLevel } from 'react-native-onesignal';
+
 
 /* screens */
 import Router from './src/router';
@@ -24,7 +25,7 @@ const InitApp = () => {
             const data = event.notification.additionalData;
 
             if (data?._id !== '') {
-                setRedirectData(data._id);
+                setRedirectData(data?._id);
             }
         };
 
@@ -44,10 +45,20 @@ const InitApp = () => {
 
     useEffect(() => {
         const init = async () => {
+            OneSignal.Debug.setLogLevel(LogLevel.Verbose);
+            OneSignal.initialize('69a6acdf-b649-4589-a9b8-88aaa525fa45');
+
+            OneSignal.Notifications.requestPermission(true);
+
             const token = asyncStorageHelper.token;
 
             if (token !== '') {
                 await autoLogin();
+
+                // OneSignal.login(token);
+                // console.log('ID: ', await OneSignal.User.getOnesignalId());
+            } else {
+                // OneSignal.logout(); // nếu không có token thì onesignal sẽ không gửi thông báo
             }
 
             setIsReady(true);
