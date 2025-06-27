@@ -7,8 +7,7 @@ import {useAuthStore} from './src/stores/authStore';
 
 /* packages */
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import { OneSignal, LogLevel } from 'react-native-onesignal';
-
+import {OneSignal, LogLevel} from 'react-native-onesignal';
 
 /* screens */
 import Router from './src/router';
@@ -21,26 +20,29 @@ const InitApp = () => {
 
     useEffect(() => {
         // gắn sự kiện khi người dùng nhấn vào thông báo
-        const handleNotificationClick = (event: any) => {
-            const data = event.notification.additionalData;
+        const token = asyncStorageHelper.token;
+        if (token) {
+            const handleNotificationClick = (event: any) => {
+                const data = event.notification.additionalData;
 
-            if (data?._id !== '') {
-                setRedirectData(data?._id);
-            }
-        };
+                if (data?._id !== '') {
+                    setRedirectData(data?._id);
+                }
+            };
 
-        OneSignal.Notifications.addEventListener(
-            'click',
-            handleNotificationClick,
-        );
-
-        // clean khi component unmount
-        return () => {
-            OneSignal.Notifications.removeEventListener(
+            OneSignal.Notifications.addEventListener(
                 'click',
                 handleNotificationClick,
             );
-        };
+
+            // clean khi component unmount
+            return () => {
+                OneSignal.Notifications.removeEventListener(
+                    'click',
+                    handleNotificationClick,
+                );
+            };
+        }
     }, []);
 
     useEffect(() => {
