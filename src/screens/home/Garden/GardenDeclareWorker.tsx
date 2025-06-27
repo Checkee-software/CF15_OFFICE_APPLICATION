@@ -199,8 +199,8 @@ const GardenDeclare = () => {
     };
 
     const handleReport = () => {
-        const allValid = taskInputs.every(isTaskValid);
-        if (allValid) {
+        const someValid = taskInputs.some(isTaskValid);
+        if (someValid) {
             setShowReportConfirmation(true);
         } else {
             setShowExitAlert(true);
