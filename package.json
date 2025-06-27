@@ -11,7 +11,7 @@
         "sharetype": "cd src/shared-types&git checkout home&git reset --hard&git pull origin home&cd ../../",
         "prettier:fix": "prettier -w src/**/*.{js,ts,tsx,json}",
         "prettier:check": "prettier -c src/**/*.{js,ts,tsx,json}",
-        "apk": "cd android && gradlew.bat assembleRelease && cd ..",
+        "apk": "cd android && ./gradlew assembleRelease && cd ..",
         "aab": "cd android && ./gradlew bundleRelease && cd ..",
         "android-clean": "cd android && ./gradlew clean && cd .."
     },
