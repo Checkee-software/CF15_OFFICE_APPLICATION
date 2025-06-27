@@ -27,6 +27,8 @@ const ScheduleDetail = ({route}: any) => {
     const {isLoadingGet, scheduleDetail, getScheduleDetail} =
         useWorkScheduleStore();
 
+    //console.log(scheduleDetail);
+
     type AttachedFiles = {
         destination: string;
         encoding: string;
@@ -229,7 +231,7 @@ const ScheduleDetail = ({route}: any) => {
                                 ]}>
                                 {itemStaff.item.status === ETaskStatus.CANCELED
                                     ? `(${moment(
-                                          itemStaff.item.completedTime,
+                                          itemStaff.item.canceledTime,
                                       ).format('L')}) Lý do: ${
                                           itemStaff.item.canceledNote
                                       }`

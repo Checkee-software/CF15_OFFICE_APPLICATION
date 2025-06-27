@@ -1,85 +1,72 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
 import images from '../../../assets/images';
 import {useAuthStore} from '@/stores/authStore';
+import {useHistoryRecordsStore} from '@/stores/historyRecordsStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import Loading from '@/screens/subscreen/Loading';
+import moment from 'moment';
+import {useIsFocused} from '@react-navigation/native';
 
 const History = () => {
+    const isFocused = useIsFocused();
+
     const {userInfo} = useAuthStore();
-    const fakeHistory = [
-        {
-            _id: '1',
-            title: 'Lịch làm việc',
-            content: 'Bạn đã duyệt công việc của cán bộ Trần Văn Bờm.',
-            time: '5 phút trước',
-        },
-        {
-            _id: '2',
-            title: 'Lịch làm việc',
-            content:
-                'Bạn đã thiết lập lại tiến độ công việc của cán bộ Trần Văn Hán.',
-            time: '25 phút trước',
-        },
-        {
-            _id: '3',
-            title: 'Lịch làm việc',
-            content: 'Bạn đã huỷ bỏ công việc của Dương Văn Diệu.',
-            time: '1 tiếng trước',
-        },
-        {
-            _id: '4',
-            title: 'Lịch làm việc',
-            content: 'Bạn đã phê duyệt công việc của Hà Hoàng A',
-            time: '6 tiếng trước',
-        },
-        {
-            _id: '5',
-            title: 'Tài liệu',
-            content: 'Bạn đã tạo tài liệu mới cho cán bộ quản lý.',
-            time: '4 ngày trước',
-        },
-        {
-            _id: '6',
-            title: 'Vật tư',
-            content: 'Bạn đã thêm mới một vật tư.',
-            time: '3 ngày trước',
-        },
-        {
-            _id: '7',
-            title: 'Nhà cung cấp',
-            content: 'Bạn đã cập nhật nhà cung cấp.',
-            time: '20 ngày trước',
-        },
-        {
-            _id: '8',
-            title: 'Nhà cung cấp',
-            content: 'Bạn đã cập nhật nhà cung cấp.',
-            time: '20 ngày trước',
-        },
-    ];
+    const {isLoading, listHistoryRecords, getListHistoryRecord} =
+        useHistoryRecordsStore();
+
+    const handleGetHistoryRecord = async () => {
+        await getListHistoryRecord();
+    };
+
+    const formatTime = (time: Date) => {
+        const relativeTime = moment(time).fromNow();
+        return relativeTime;
+    };
+
+    const renderMessage = (message: string, value: string) => {
+        // nếu message có @ thay bằng value
+        if (message.includes('@')) {
+            return message.replace('@', value);
+        }
+
+        // nếu không có @ thì nối thêm value vào cuối
+        return `${message} ${value}`;
+    };
 
     const renderItemHistory = (item: any) => (
         <View style={styles.historyItemContainer}>
             <View style={styles.historyItem}>
                 <View style={styles.historyHeader}>
                     <Text style={styles.historyItemTitle}>{item.title}</Text>
-                    <Text style={styles.historyItemTime}>{item.time}</Text>
+                    <Text style={styles.historyItemTime}>
+                        {formatTime(item.createdAt)}
+                    </Text>
                 </View>
-                <Text style={styles.historyItemContent}>{item.content}</Text>
+                <Text style={styles.historyItemContent}>
+                    {renderMessage(item.message, item.value)}
+                </Text>
             </View>
         </View>
     );
+
+    useEffect(() => {
+        handleGetHistoryRecord();
+    }, [isFocused]);
+
+    if (isLoading) return <Loading />;
 
     return (
         <View style={styles.container}>
             {userInfo.userType.level !== EOrganization.WORKER ? (
                 <FlatList
                     contentContainerStyle={styles.flatListHistory}
-                    data={fakeHistory}
+                    data={listHistoryRecords}
                     renderItem={({item}: any) => renderItemHistory(item)}
                     keyExtractor={item => item._id}
-                    //onRefresh={handleReFetch}
-                    //refreshing={isLoading}
+                    onRefresh={handleGetHistoryRecord}
+                    refreshing={isLoading}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>

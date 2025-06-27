@@ -195,6 +195,7 @@ const styles = StyleSheet.create({
     picker: {
         height: 55,
         padding: 10,
+        color: 'black',
     },
     shiftRow: {
         flexDirection: 'row',

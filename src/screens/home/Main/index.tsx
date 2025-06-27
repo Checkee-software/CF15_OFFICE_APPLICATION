@@ -11,13 +11,10 @@ import images from '../../../assets/images';
 import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useAuthStore} from '../../../stores/authStore';
-import asyncStorageHelper from '../../../utils/localStorageHelper/index';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
-
-    console.log('Token hiện tại:', asyncStorageHelper.token);
 
     const getGreeting = () => {
         const hour = new Date().getHours();

@@ -116,11 +116,15 @@ const WorkScreen = () => {
 
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Diện tích đã làm</Text>
-                    <Text style={styles.value}>{`${itemGardenWork.area} ${
-                        itemGardenWork.gardenAreaType
-                    } (còn: ${
-                        itemGardenWork.gardenArea - itemGardenWork.area
-                    })`}</Text>
+                    <Text style={styles.value}>
+                        {`${itemGardenWork.area} ${itemGardenWork.gardenAreaType} \n`}
+
+                        <Text style={styles.valueRemaining}>
+                            {`(còn: ${
+                                itemGardenWork.gardenArea - itemGardenWork.area
+                            })`}
+                        </Text>
+                    </Text>
                 </View>
             </View>
 
@@ -546,6 +550,12 @@ const styles = StyleSheet.create({
         fontWeight: 500,
         fontSize: 14,
         textAlign: 'right',
+    },
+    valueRemaining: {
+        marginTop: 4,
+        fontWeight: 400,
+        fontStyle: 'italic',
+        color: 'rgba(128, 128, 128, 1)',
     },
     reasonValue: {
         width: '50%',

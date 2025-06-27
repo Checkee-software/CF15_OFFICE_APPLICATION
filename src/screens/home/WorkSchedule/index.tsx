@@ -350,6 +350,7 @@ const WorkSchedule = ({navigation}: any) => {
                 <FlatList
                     data={statusList}
                     horizontal
+                    keyboardShouldPersistTaps='handled'
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={item => item.label}
                     renderItem={({item}) => (

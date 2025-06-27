@@ -10,7 +10,6 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {Picker} from '@react-native-picker/picker';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import ActionButtons from './ActionButtons';
 import MachineShiftSelector from './MachineShiftSelector';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
@@ -360,6 +359,7 @@ const GardenDeclare = () => {
                                             style={styles.input}
                                             keyboardType='numeric'
                                             placeholder='Nhập khối lượng'
+                                            placeholderTextColor={'black'}
                                             value={task.value}
                                             onChangeText={text =>
                                                 handleInputChange(
@@ -381,6 +381,7 @@ const GardenDeclare = () => {
                                     style={styles.input}
                                     keyboardType='numeric'
                                     placeholder='Nhập diện tích'
+                                    placeholderTextColor={'black'}
                                     value={task.area}
                                     onChangeText={text =>
                                         handleInputChange(index, 'area', text)
@@ -441,6 +442,7 @@ const styles = StyleSheet.create({
         padding: 8,
         marginBottom: 8,
         height: 50,
+        color: 'black',
     },
     footer: {padding: 16, borderTopWidth: 1, borderColor: '#eee'},
     exitButton1: {
