@@ -23,6 +23,7 @@ type TaskInput = {
     processType: 'material' | 'machine' | 'labour' | '';
     value: string;
     area: string;
+    disabled?: boolean;
 };
 
 type ProcessOption = {
@@ -60,18 +61,26 @@ const GardenDeclare = () => {
     }, [detailWorkSchedule]);
 
     useEffect(() => {
-        if (detailWorkSchedule?.childTasks?.length) {
-            const inputs = detailWorkSchedule.childTasks.map((task: any) => ({
-                taskId: task._id,
-                taskName: task.name,
-                selectedMaterialId: '',
-                processType: '' as '' | 'material' | 'machine' | 'labour',
-                value: '',
-                area: '',
-            }));
+        if (detailWorkSchedule?.childTasks?.length && userInfo?._id) {
+            const inputs = detailWorkSchedule.childTasks.map((task: any) => {
+                const userInTask = task.staff?.find(
+                    (s: any) => s.userId === userInfo._id,
+                );
+                const isCanceled = userInTask?.status === 'CANCELED';
+
+                return {
+                    taskId: task._id,
+                    taskName: task.name,
+                    selectedMaterialId: '',
+                    processType: '' as '' | 'material' | 'machine' | 'labour',
+                    value: '',
+                    area: '',
+                    disabled: isCanceled,
+                };
+            });
             setTaskInputs(inputs);
         }
-    }, [detailWorkSchedule]);
+    }, [detailWorkSchedule, userInfo]);
 
     const getAllProcesses = (): ProcessOption[] => {
         const result: ProcessOption[] = [];
@@ -191,6 +200,7 @@ const GardenDeclare = () => {
 
     const isTaskValid = (task: TaskInput) => {
         return (
+            !task.disabled &&
             task.selectedMaterialId.trim() !== '' &&
             task.processType !== '' &&
             task.value.trim() !== '' &&
@@ -213,13 +223,12 @@ const GardenDeclare = () => {
 
     const handleConfirmReport = async () => {
         setShowReportConfirmation(false);
-        if (!detailWorkSchedule || !detailWorkSchedule._id) return;
+        if (!detailWorkSchedule?._id) return;
 
         try {
             const requests = taskInputs.filter(isTaskValid);
             for (const task of requests) {
                 if (task.processType === '') continue;
-
                 const selected = getProcessById(
                     task.selectedMaterialId,
                     task.processType,
@@ -234,26 +243,17 @@ const GardenDeclare = () => {
                 });
             }
 
-            if (detailWorkSchedule?.childTasks?.length) {
-                const resetInputs = detailWorkSchedule.childTasks.map(
-                    (task: any) => ({
-                        taskId: task._id,
-                        taskName: task.name,
-                        selectedMaterialId: '',
-                        processType: '' as
-                            | ''
-                            | 'material'
-                            | 'machine'
-                            | 'labour',
-                        value: '',
-                        area: '',
-                    }),
-                );
-                setTaskInputs(resetInputs);
-            }
-
             setIsSaved(true);
-            setTimeout(() => setIsSaved(false), 3000);
+            setTimeout(() => setIsSaved(false), 1000);
+            setTaskInputs(prev =>
+                prev.map(task => ({
+                    ...task,
+                    selectedMaterialId: '',
+                    processType: '',
+                    value: '',
+                    area: '',
+                })),
+            );
         } catch (err) {
             console.error('❌ Lỗi khi gửi báo cáo:', err);
         }
@@ -298,26 +298,36 @@ const GardenDeclare = () => {
                 />
 
                 <CollapsibleTaskBlock
-                    title={`Công việc (${
-                        detailWorkSchedule?.childTasks?.length || 0
-                    })`}>
+                    title={`Công việc (${taskInputs.length})`}>
                     {taskInputs.map((task, index) => {
-                        const selected =
-                            task.processType !== ''
-                                ? getProcessById(
-                                      task.selectedMaterialId,
-                                      task.processType,
-                                  )
-                                : undefined;
+                        const selected = task.processType
+                            ? getProcessById(
+                                  task.selectedMaterialId,
+                                  task.processType,
+                              )
+                            : undefined;
 
                         return (
                             <CollapsibleTaskBlock
                                 key={task.taskId}
                                 title={task.taskName}
                                 backgroundColor='#e6f3ff'>
+                                {task.disabled && (
+                                    <Text
+                                        style={{
+                                            color: 'red',
+                                            fontStyle: 'italic',
+                                            marginBottom: 8,
+                                        }}>
+                                        Công việc này đã bị huỷ, bạn không thể
+                                        chỉnh sửa.
+                                    </Text>
+                                )}
+
                                 <Text style={styles.label}>Loại quy trình</Text>
                                 <View style={styles.pickerWrapper}>
                                     <Picker
+                                        enabled={!task.disabled}
                                         selectedValue={task.selectedMaterialId}
                                         onValueChange={itemValue => {
                                             const selected =
@@ -338,7 +348,7 @@ const GardenDeclare = () => {
                                         {getAllProcesses().map(process => (
                                             <Picker.Item
                                                 key={process.id}
-                                                label={`${process.name}`}
+                                                label={process.name}
                                                 value={process.id}
                                             />
                                         ))}
@@ -354,12 +364,11 @@ const GardenDeclare = () => {
                                                 *
                                             </Text>
                                         </Text>
-
                                         <TextInput
                                             style={styles.input}
                                             keyboardType='numeric'
                                             placeholder='Nhập khối lượng'
-                                            placeholderTextColor={'black'}
+                                            placeholderTextColor='black'
                                             value={task.value}
                                             onChangeText={text =>
                                                 handleInputChange(
@@ -368,6 +377,7 @@ const GardenDeclare = () => {
                                                     text,
                                                 )
                                             }
+                                            editable={!task.disabled}
                                         />
                                     </>
                                 )}
@@ -376,16 +386,16 @@ const GardenDeclare = () => {
                                     Diện tích đã làm (m²){' '}
                                     <Text style={{color: 'red'}}>*</Text>
                                 </Text>
-
                                 <TextInput
                                     style={styles.input}
                                     keyboardType='numeric'
                                     placeholder='Nhập diện tích'
-                                    placeholderTextColor={'black'}
+                                    placeholderTextColor='black'
                                     value={task.area}
                                     onChangeText={text =>
                                         handleInputChange(index, 'area', text)
                                     }
+                                    editable={!task.disabled}
                                 />
                             </CollapsibleTaskBlock>
                         );
