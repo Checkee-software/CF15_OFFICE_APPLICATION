@@ -36,8 +36,6 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
                 `${ENV.BACKEND_URL}/resources/schedule-requests/collection`,
             );
 
-            console.log(response);
-
             set({
                 listGardenWorkBrowse: response.data?.data || [],
                 listGardenWorkBrowseFilter:

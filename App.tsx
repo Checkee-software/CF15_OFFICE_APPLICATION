@@ -19,33 +19,6 @@ const InitApp = () => {
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
-        // gắn sự kiện khi người dùng nhấn vào thông báo
-        const token = asyncStorageHelper.token;
-        if (token) {
-            const handleNotificationClick = (event: any) => {
-                const data = event.notification.additionalData;
-
-                if (data?._id !== '') {
-                    setRedirectData(data?._id);
-                }
-            };
-
-            OneSignal.Notifications.addEventListener(
-                'click',
-                handleNotificationClick,
-            );
-
-            // clean khi component unmount
-            return () => {
-                OneSignal.Notifications.removeEventListener(
-                    'click',
-                    handleNotificationClick,
-                );
-            };
-        }
-    }, []);
-
-    useEffect(() => {
         const init = async () => {
             OneSignal.Debug.setLogLevel(LogLevel.Verbose);
             OneSignal.initialize('69a6acdf-b649-4589-a9b8-88aaa525fa45');
@@ -56,18 +29,36 @@ const InitApp = () => {
 
             if (token !== '') {
                 await autoLogin();
-                // OneSignal.User.addAlias()
-
-                // OneSignal.login(token);
-                // console.log('ID: ', await OneSignal.User.getOnesignalId());
-            } else {
-                // OneSignal.logout(); // nếu không có token thì onesignal sẽ không gửi thông báo
             }
 
             setIsReady(true);
         };
 
         init();
+    }, []);
+
+    useEffect(() => {
+        // gắn sự kiện khi người dùng nhấn vào thông báo
+        const handleNotificationClick = (event: any) => {
+            const data = event.notification.additionalData;
+
+            if (data?._id !== '') {
+                setRedirectData(data?._id);
+            }
+        };
+
+        OneSignal.Notifications.addEventListener(
+            'click',
+            handleNotificationClick,
+        );
+
+        // clean khi component unmount
+        return () => {
+            OneSignal.Notifications.removeEventListener(
+                'click',
+                handleNotificationClick,
+            );
+        };
     }, []);
 
     if (!isReady) {

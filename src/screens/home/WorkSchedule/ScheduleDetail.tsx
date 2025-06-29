@@ -27,7 +27,10 @@ const ScheduleDetail = ({route}: any) => {
     const {isLoadingGet, scheduleDetail, getScheduleDetail} =
         useWorkScheduleStore();
 
-    //console.log(scheduleDetail);
+    const formattedGardenArea =
+        Number(scheduleDetail?.gardenArea) % 1 === 0
+            ? scheduleDetail?.gardenArea.toString() // số nguyên -> không làm tròn
+            : Number(scheduleDetail?.gardenArea).toFixed(5); // số thực -> làm tròn
 
     type AttachedFiles = {
         destination: string;
@@ -235,16 +238,18 @@ const ScheduleDetail = ({route}: any) => {
                                       ).format('L')}) Lý do: ${
                                           itemStaff.item.canceledNote
                                       }`
-                                    : `Đã làm ${
-                                          itemStaff.item.processingRate
-                                      } ${
-                                          itemStaff.item.completedTime === null
-                                              ? ''
-                                              : moment(
-                                                    itemStaff.item
-                                                        .completedTime,
-                                                ).format('L')
-                                      }`}
+                                    : 'Đã làm ' +
+                                      itemStaff.item.processingRate +
+                                      '/' +
+                                      formattedGardenArea +
+                                      ' (' +
+                                      scheduleDetail?.gardenAreaType +
+                                      ') ' +
+                                      (itemStaff.item.completedTime === null
+                                          ? ''
+                                          : moment(
+                                                itemStaff.item.completedTime,
+                                            ).format('L'))}
                             </Text>
                         </View>
                     </View>
