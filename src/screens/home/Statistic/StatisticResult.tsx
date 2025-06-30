@@ -16,89 +16,114 @@ const StatisticResult = () => {
             location: 'Khu vườn cà phê khoán',
             check1: '12',
             check2: '3/8',
-            dateRange: '01/01/2025 - 24/02/2025'
+            dateRange: '01/01/2025 - 24/02/2025',
         },
         {
             title: 'Thu hoạch cà phê 2',
             location: 'Khu vườn cà phê năm ba',
             check1: '12',
             check2: '3/8',
-            dateRange: '01/01/2025 - 24/02/2025'
+            dateRange: '01/01/2025 - 24/02/2025',
         },
         {
             title: 'Tổng công tác khu vườn',
             location: 'Khu vườn cà phê năm ba',
             check1: '12',
             check2: '3/8',
-            dateRange: '01/01/2025 - 24/02/2025'
+            dateRange: '01/01/2025 - 24/02/2025',
         },
         {
             title: 'Thu hoạch cà phê 1',
             location: 'Khu vườn CF-023',
             check1: '12',
             check2: '3/8',
-            dateRange: '01/01/2025 - 24/02/2025'
+            dateRange: '01/01/2025 - 24/02/2025',
         },
     ];
 
     return (
-        <ScrollView contentContainerStyle={{paddingHorizontal: 5, paddingVertical: 8}}>
+        <ScrollView
+            contentContainerStyle={{paddingHorizontal: 5, paddingVertical: 8}}>
             <View style={{paddingHorizontal: 16}}>
-            <View style={styles.card}>
-                <View style={styles.statBoxContainer}>
-                    {stats.map((item, index) => (
-                        <View style={styles.statBox} key={index}>
-                            <Text style={styles.statBoxLabel}>
-                                {item.label}
+                <View style={styles.card}>
+                    <View style={styles.statBoxContainer}>
+                        {stats.map((item, index) => (
+                            <View style={styles.statBox} key={index}>
+                                <Text style={styles.statBoxLabel}>
+                                    {item.label}
+                                </Text>
+                                <Text style={styles.statBoxValue}>
+                                    {item.value}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+
+                <View style={{marginVertical: 16}}>
+                    <Text style={{fontWeight: 'bold'}}>
+                        Biểu đồ quy trình sử dụng
+                    </Text>
+                    <Text style={{fontSize: 24, fontWeight: 'bold'}}>
+                        57.588.045
+                    </Text>
+                    <Text style={{fontSize: 12, color: '#888'}}>vnd</Text>
+                </View>
+
+                <View style={styles.chart}>
+                    <Text style={{color: '#888'}}>
+                        [Fake] Biểu đồ sử dụng 123
+                    </Text>
+                </View>
+
+                <View style={styles.taskListContainer}>
+                    {tasks.map((task, index) => (
+                        <View key={index} style={styles.taskItem}>
+                            <Text style={styles.taskTitle}>{task.title}</Text>
+                            <Text style={styles.taskLocation}>
+                                {task.location}
                             </Text>
-                            <Text style={styles.statBoxValue}>
-                                {item.value}
-                            </Text>
+
+                            <View style={styles.taskStatusRow}>
+                                <View style={styles.statusItem}>
+                                    <MaterialIcons
+                                        name='people'
+                                        size={16}
+                                        color='#666'
+                                    />
+                                    <Text style={styles.taskStatusText}>
+                                        {' '}
+                                        {task.check1}
+                                    </Text>
+                                </View>
+                                <View style={styles.statusItem}>
+                                    <MaterialIcons
+                                        name='checklist'
+                                        size={16}
+                                        color='#666'
+                                    />
+                                    <Text style={styles.taskStatusText}>
+                                        {' '}
+                                        {task.check2}
+                                    </Text>
+                                </View>
+                                <View style={styles.statusItem}>
+                                    <AntDesign
+                                        name='clockcircle'
+                                        size={14}
+                                        color='#666'
+                                    />
+                                    <Text style={styles.taskDateText}>
+                                        {' '}
+                                        {task.dateRange}
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
                     ))}
                 </View>
             </View>
-
-            <View style={{marginVertical: 16}}>
-                <Text style={{fontWeight: 'bold'}}>
-                    Biểu đồ quy trình sử dụng
-                </Text>
-                <Text style={{fontSize: 24, fontWeight: 'bold'}}>
-                    57.588.045
-                </Text>
-                <Text style={{fontSize: 12, color: '#888'}}>vnd</Text>
-            </View>
-
-            <View style={styles.chart}>
-                <Text style={{color: '#888'}}>[Fake] Biểu đồ sử dụng 123</Text>
-            </View>
-
-            <View style={styles.taskListContainer}>
-                {tasks.map((task, index) => (
-                    <View key={index} style={styles.taskItem}>
-                        <Text style={styles.taskTitle}>{task.title}</Text>
-                        <Text style={styles.taskLocation}>{task.location}</Text>
-                        
-                        <View style={styles.taskStatusRow}>
-                            <View style={styles.statusItem}>
-                                <MaterialIcons name="people" size={16} color="#666" />
-                                <Text style={styles.taskStatusText}> {task.check1}</Text>
-                            </View>
-                            <View style={styles.statusItem}>
-                                <MaterialIcons name="checklist" size={16} color="#666" />
-                                <Text style={styles.taskStatusText}> {task.check2}</Text>
-                            </View>
-                            <View style={styles.statusItem}>
-                                <AntDesign name="clockcircle" size={14} color="#666" />
-                                <Text style={styles.taskDateText}> {task.dateRange}</Text>
-                            </View>
-                        </View>
-                    </View>
-                ))}
-            </View>
-        </View>
         </ScrollView>
-        
     );
 };
 
@@ -189,7 +214,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         elevation: 2,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
         shadowRadius: 2,
     },

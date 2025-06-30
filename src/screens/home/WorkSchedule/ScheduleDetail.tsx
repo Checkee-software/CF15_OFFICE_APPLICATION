@@ -410,7 +410,20 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                Ca phun nước
+                                {scheduleDetail?.machines.map(
+                                    (
+                                        itemMachines: any,
+                                        indexMachines: number,
+                                    ) => (
+                                        <React.Fragment key={indexMachines}>
+                                            {itemMachines.name}
+                                            {/* kiểm tra nếu không phải phần tử cuối thì thêm dấu , */}
+                                            {indexMachines <
+                                                scheduleDetail.machines.length -
+                                                    1 && ', '}
+                                        </React.Fragment>
+                                    ),
+                                )}
                             </Text>
                         </View>
                     </View>
