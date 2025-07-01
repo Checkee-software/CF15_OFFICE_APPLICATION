@@ -15,6 +15,7 @@ import MachineShiftSelector from './MachineShiftSelector';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 import {useAuthStore} from '../../../stores/authStore';
 import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
+import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/ProcessesFormData';
 
 type TaskInput = {
     taskId: string;
@@ -48,6 +49,20 @@ const GardenDeclare = () => {
     const [isSaved, setIsSaved] = useState(false);
     const [onlyShowReportButton, setOnlyShowReportButton] = useState(false);
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
+    const convertToEProcessType = (
+        type: 'material' | 'machine' | 'labour',
+    ): EProcessesType => {
+        switch (type) {
+            case 'material':
+                return EProcessesType.VAT_TU;
+            case 'machine':
+                return EProcessesType.CA_MAY;
+            case 'labour':
+                return EProcessesType.NHAN_CONG;
+            default:
+                throw new Error('Loại quy trình không hợp lệ');
+        }
+    };
 
     useEffect(() => {
         if (id) getDetailWorkSchedule(id);
@@ -235,12 +250,25 @@ const GardenDeclare = () => {
                 );
                 if (!selected) continue;
 
-                await requestPersonalTask(detailWorkSchedule._id, task.taskId, {
+                const payload = {
                     specification: selected.specification,
                     processName: selected.name,
                     area: parseFloat(task.area),
                     value: parseFloat(task.value),
+                    type: convertToEProcessType(selected.type),
+                };
+
+                console.log('📤 Dữ liệu gửi đi:', {
+                    scheduleId: detailWorkSchedule._id,
+                    childTaskId: task.taskId,
+                    ...payload,
                 });
+
+                await requestPersonalTask(
+                    detailWorkSchedule._id,
+                    task.taskId,
+                    payload,
+                );
             }
 
             setIsSaved(true);
