@@ -2,6 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import UsageBarChart from './UsageBarChart';
 const StatisticResult = () => {
     const stats = [
         {label: 'Số lượng đội sản xuất', value: '3'},
@@ -71,9 +72,7 @@ const StatisticResult = () => {
                 </View>
 
                 <View style={styles.chart}>
-                    <Text style={{color: '#888'}}>
-                        [Fake] Biểu đồ sử dụng 123
-                    </Text>
+                    <UsageBarChart />
                 </View>
 
                 <View style={styles.taskListContainer}>
@@ -129,7 +128,7 @@ const StatisticResult = () => {
 
 const styles = StyleSheet.create({
     chart: {
-        height: 200,
+        height: 300,
         backgroundColor: '#f0f0f0',
         borderRadius: 10,
         justifyContent: 'center',
