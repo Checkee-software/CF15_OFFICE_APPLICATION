@@ -4,17 +4,22 @@ import {Picker} from '@react-native-picker/picker';
 import {useNavigation, NavigationProp} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {INorm} from '../../../shared-types/Response/ScheduleResponse/ScheduleResponse';
+import {useMachineStore} from '@/stores/machineStore';
 
 interface MachineShiftSelectorProps {
     onStart: (machineType: string) => void;
-    onStop?: () => void;
+    onStop?: (machineId: string) => void;
     machines: INorm[];
+    scheduleId: string;
+    currentUserName?: string;
 }
 
 const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
     onStart,
     onStop,
     machines,
+    scheduleId,
+    currentUserName,
 }) => {
     const [selectedMachine, setSelectedMachine] = useState('');
     const [isRunning, setIsRunning] = useState(false);
@@ -43,7 +48,7 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
             onStart(selectedMachine);
             setIsRunning(true);
         } else {
-            onStop?.();
+            onStop?.(selectedMachine);
             setIsRunning(false);
             setSeconds(0);
         }
@@ -69,13 +74,6 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
     const runningLabel =
         machineOptions.find(opt => opt.value === selectedMachine)?.label || '';
 
-    const shifts = machines.map(machine => ({
-        operator: 'Chưa rõ',
-        isCurrentUser: false,
-        type: machine.name,
-        duration: `${machine.value} ${machine.specification || ''}`,
-    }));
-
     return (
         <View style={styles.container}>
             <View style={styles.headerRow}>
@@ -87,11 +85,14 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
 
             {isRunning && (
                 <TouchableOpacity
-                    onPress={() =>
+                    onPress={async () => {
+                        const {getActiveMachine} = useMachineStore.getState();
+                        const data = await getActiveMachine(scheduleId);
+
                         navigation.navigate(SCREEN_INFO.ACTIVEMACHINE.key, {
-                            activeShifts: shifts,
-                        })
-                    }>
+                            scheduleId,
+                        });
+                    }}>
                     <Text style={styles.activeLink}>
                         Xem ca máy đang hoạt động
                     </Text>

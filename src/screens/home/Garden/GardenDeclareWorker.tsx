@@ -5,23 +5,22 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
-    TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import {Picker} from '@react-native-picker/picker';
 import ActionButtons from './ActionButtons';
 import MachineShiftSelector from './MachineShiftSelector';
-import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 import {useAuthStore} from '../../../stores/authStore';
 import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
 import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/ProcessesFormData';
+import TaskListSection from './TaskListSection';
+import {useMachineStore} from '@/stores/machineStore';
 
 type TaskInput = {
     taskId: string;
     taskName: string;
     selectedMaterialId: string;
-    processType: 'material' | 'machine' | 'labour' | '';
+    processType: 'material' | 'labour' | '';
     value: string;
     area: string;
     disabled?: boolean;
@@ -31,10 +30,13 @@ type ProcessOption = {
     id: string;
     name: string;
     specification: string;
-    type: 'material' | 'machine' | 'labour';
+    type: 'material' | 'labour';
 };
 
 const GardenDeclare = () => {
+    const [runningMachineId, setRunningMachineId] = useState<string | null>(
+        null,
+    );
     const [taskInputs, setTaskInputs] = useState<TaskInput[]>([]);
     const {userInfo} = useAuthStore();
     const {detailWorkSchedule, getDetailWorkSchedule, requestPersonalTask} =
@@ -50,13 +52,11 @@ const GardenDeclare = () => {
     const [onlyShowReportButton, setOnlyShowReportButton] = useState(false);
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
     const convertToEProcessType = (
-        type: 'material' | 'machine' | 'labour',
+        type: 'material' | 'labour',
     ): EProcessesType => {
         switch (type) {
             case 'material':
                 return EProcessesType.VAT_TU;
-            case 'machine':
-                return EProcessesType.CA_MAY;
             case 'labour':
                 return EProcessesType.NHAN_CONG;
             default:
@@ -87,7 +87,7 @@ const GardenDeclare = () => {
                     taskId: task._id,
                     taskName: task.name,
                     selectedMaterialId: '',
-                    processType: '' as '' | 'material' | 'machine' | 'labour',
+                    processType: '' as '' | 'material' | 'labour',
                     value: '',
                     area: '',
                     disabled: isCanceled,
@@ -111,18 +111,7 @@ const GardenDeclare = () => {
                     })),
             );
         }
-        if (detailWorkSchedule?.machines?.length) {
-            result.push(
-                ...detailWorkSchedule.machines
-                    .filter((m: any) => m.name && m._id)
-                    .map((m: any) => ({
-                        id: m._id,
-                        name: m.name,
-                        specification: m.specification || '',
-                        type: 'machine' as const,
-                    })),
-            );
-        }
+
         if (
             detailWorkSchedule?.labour &&
             detailWorkSchedule.labour.name &&
@@ -141,7 +130,7 @@ const GardenDeclare = () => {
 
     const getProcessById = (
         id: string,
-        type: 'material' | 'machine' | 'labour',
+        type: 'material' | 'labour',
     ): ProcessOption | undefined => {
         switch (type) {
             case 'material': {
@@ -154,20 +143,6 @@ const GardenDeclare = () => {
                           name: found.name,
                           specification: found.specification,
                           type: 'material',
-                      }
-                    : undefined;
-            }
-
-            case 'machine': {
-                const found = detailWorkSchedule?.machines?.find(
-                    (m: any) => m._id === id,
-                );
-                return found
-                    ? {
-                          id: found._id,
-                          name: found.name,
-                          specification: found.specification,
-                          type: 'machine',
                       }
                     : undefined;
             }
@@ -189,7 +164,7 @@ const GardenDeclare = () => {
     const handleProcessChange = (
         index: number,
         selectedId: string,
-        processType: 'material' | 'machine' | 'labour',
+        processType: 'material' | 'labour',
     ) => {
         setTaskInputs(prev => {
             const updated = [...prev];
@@ -310,7 +285,7 @@ const GardenDeclare = () => {
                             Sản phẩm/cây trồng
                         </Text>
                         <View style={styles.productRow}>
-                            <Icon name='add-circle' color='green' size={20} />
+                            <Icon name='group-work' color='green' size={20} />
                             <Text style={styles.productText}>
                                 {detailWorkSchedule.productName}
                             </Text>
@@ -319,116 +294,45 @@ const GardenDeclare = () => {
                 </View>
 
                 <MachineShiftSelector
-                    onStart={machineType =>
-                        console.log('Ca máy được chọn:', machineType)
-                    }
                     machines={detailWorkSchedule?.machines || []}
+                    scheduleId={detailWorkSchedule?._id || ''}
+                    onStart={async (machineId: string) => {
+                        const {startMachine} = useMachineStore.getState();
+                        const scheduleId = detailWorkSchedule?._id;
+                        if (!scheduleId || !machineId) return;
+
+                        await startMachine({
+                            scheduleId,
+                            machineId,
+                            startAt: new Date(),
+                        });
+
+                        setRunningMachineId(machineId);
+                    }}
+                    onStop={async () => {
+                        const {stopMachine} = useMachineStore.getState();
+                        const scheduleId = detailWorkSchedule?._id;
+                        if (!scheduleId || !runningMachineId) return;
+
+                        await stopMachine({
+                            scheduleId,
+                            machineId: runningMachineId,
+                            endAt: new Date(),
+                        });
+
+                        setRunningMachineId(null);
+                    }}
                 />
 
-                <CollapsibleTaskBlock
-                    title={`Công việc (${taskInputs.length})`}>
-                    {taskInputs.map((task, index) => {
-                        const selected = task.processType
-                            ? getProcessById(
-                                  task.selectedMaterialId,
-                                  task.processType,
-                              )
-                            : undefined;
-
-                        return (
-                            <CollapsibleTaskBlock
-                                key={task.taskId}
-                                title={task.taskName}
-                                backgroundColor='#e6f3ff'>
-                                {task.disabled && (
-                                    <Text
-                                        style={{
-                                            color: 'red',
-                                            fontStyle: 'italic',
-                                            marginBottom: 8,
-                                        }}>
-                                        Công việc này đã bị huỷ, bạn không thể
-                                        chỉnh sửa.
-                                    </Text>
-                                )}
-
-                                <Text style={styles.label}>Loại quy trình</Text>
-                                <View style={styles.pickerWrapper}>
-                                    <Picker
-                                        enabled={!task.disabled}
-                                        selectedValue={task.selectedMaterialId}
-                                        onValueChange={itemValue => {
-                                            const selected =
-                                                getAllProcesses().find(
-                                                    p => p.id === itemValue,
-                                                );
-                                            if (selected) {
-                                                handleProcessChange(
-                                                    index,
-                                                    selected.id,
-                                                    selected.type,
-                                                );
-                                            }
-                                        }}
-                                        style={styles.picker}
-                                        dropdownIconColor='#000'>
-                                        <Picker.Item label='Chọn' value='' />
-                                        {getAllProcesses().map(process => (
-                                            <Picker.Item
-                                                key={process.id}
-                                                label={process.name}
-                                                value={process.id}
-                                            />
-                                        ))}
-                                    </Picker>
-                                </View>
-
-                                {selected && (
-                                    <>
-                                        <Text style={styles.label}>
-                                            {selected.name} (
-                                            {selected.specification}){' '}
-                                            <Text style={{color: 'red'}}>
-                                                *
-                                            </Text>
-                                        </Text>
-                                        <TextInput
-                                            style={styles.input}
-                                            keyboardType='numeric'
-                                            placeholder='Nhập khối lượng'
-                                            placeholderTextColor='black'
-                                            value={task.value}
-                                            onChangeText={text =>
-                                                handleInputChange(
-                                                    index,
-                                                    'value',
-                                                    text,
-                                                )
-                                            }
-                                            editable={!task.disabled}
-                                        />
-                                    </>
-                                )}
-
-                                <Text style={styles.label}>
-                                    Diện tích đã làm (m²){' '}
-                                    <Text style={{color: 'red'}}>*</Text>
-                                </Text>
-                                <TextInput
-                                    style={styles.input}
-                                    keyboardType='numeric'
-                                    placeholder='Nhập diện tích'
-                                    placeholderTextColor='black'
-                                    value={task.area}
-                                    onChangeText={text =>
-                                        handleInputChange(index, 'area', text)
-                                    }
-                                    editable={!task.disabled}
-                                />
-                            </CollapsibleTaskBlock>
-                        );
-                    })}
-                </CollapsibleTaskBlock>
+                <TaskListSection
+                    taskInputs={taskInputs}
+                    getAllProcesses={getAllProcesses}
+                    getProcessById={getProcessById}
+                    handleProcessChange={handleProcessChange}
+                    handleInputChange={handleInputChange}
+                    styles={styles}
+                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
+                />
             </ScrollView>
 
             <View style={styles.footer}>
