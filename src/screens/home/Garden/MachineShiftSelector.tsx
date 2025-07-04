@@ -44,25 +44,33 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
     }, [isRunning]);
 
     useEffect(() => {
-        const runningMachine = machines.find(machine =>
-            machine.history?.some(h => h.isActive),
-        );
+    const runningMachine = machines.find(machine =>
+        machine.history?.some(h => h.isActive),
+    );
 
-        if (runningMachine) {
-            const activeHistory = runningMachine.history.find(h => h.isActive);
-            setSelectedMachine(runningMachine._id);
-            setIsRunning(true);
-            setActiveMachineId(runningMachine._id);
+    if (runningMachine) {
+        const activeHistory = runningMachine.history.find(h => h.isActive);
+        setSelectedMachine(runningMachine._id);
+        setIsRunning(true);
+        setActiveMachineId(runningMachine._id);
 
-            if (activeHistory?.startAt) {
+        if (activeHistory?.startAt) {
+            const startTimestamp = new Date(activeHistory.startAt).getTime();
+
+            setSeconds(Math.floor((Date.now() - startTimestamp) / 1000));
+
+            const interval = setInterval(() => {
                 const elapsed = Math.floor(
-                    (Date.now() - new Date(activeHistory.startAt).getTime()) /
-                        1000,
+                    (Date.now() - startTimestamp) / 1000,
                 );
                 setSeconds(elapsed);
-            }
+            }, 1000);
+
+            return () => clearInterval(interval);
         }
-    }, [machines]);
+    }
+}, [machines]);
+
 
     const handlePress = async () => {
         if (!isRunning) {

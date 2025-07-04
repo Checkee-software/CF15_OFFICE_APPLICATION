@@ -49,7 +49,7 @@ const ActiveMachine = () => {
                         <View style={styles.row}>
                             <Text style={styles.label}>Thời gian</Text>
                             <Text style={styles.value}>
-                                {shift.totalTime} phút
+                                {shift.totalTime} giờ
                             </Text>
                         </View>
                     </View>
