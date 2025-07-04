@@ -296,32 +296,6 @@ const GardenDeclare = () => {
                 <MachineShiftSelector
                     machines={detailWorkSchedule?.machines || []}
                     scheduleId={detailWorkSchedule?._id || ''}
-                    onStart={async (machineId: string) => {
-                        const {startMachine} = useMachineStore.getState();
-                        const scheduleId = detailWorkSchedule?._id;
-                        if (!scheduleId || !machineId) return;
-
-                        await startMachine({
-                            scheduleId,
-                            machineId,
-                            startAt: new Date(),
-                        });
-
-                        setRunningMachineId(machineId);
-                    }}
-                    onStop={async () => {
-                        const {stopMachine} = useMachineStore.getState();
-                        const scheduleId = detailWorkSchedule?._id;
-                        if (!scheduleId || !runningMachineId) return;
-
-                        await stopMachine({
-                            scheduleId,
-                            machineId: runningMachineId,
-                            endAt: new Date(),
-                        });
-
-                        setRunningMachineId(null);
-                    }}
                 />
 
                 <TaskListSection

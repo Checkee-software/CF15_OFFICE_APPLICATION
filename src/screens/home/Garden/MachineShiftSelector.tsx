@@ -5,18 +5,15 @@ import {useNavigation, NavigationProp} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {INorm} from '../../../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {useMachineStore} from '@/stores/machineStore';
+import {useWorkScheduleStore} from '@/stores/workScheduleStore';
 
 interface MachineShiftSelectorProps {
-    onStart: (machineType: string) => void;
-    onStop?: (machineId: string) => void;
     machines: INorm[];
     scheduleId: string;
     currentUserName?: string;
 }
 
 const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
-    onStart,
-    onStop,
     machines,
     scheduleId,
     currentUserName,
@@ -24,7 +21,10 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
     const [selectedMachine, setSelectedMachine] = useState('');
     const [isRunning, setIsRunning] = useState(false);
     const [seconds, setSeconds] = useState(0);
+    const [activeMachineId, setActiveMachineId] = useState<string | null>(null);
     const navigation = useNavigation<NavigationProp<any>>();
+
+    const {startMachine, stopMachine, getActiveMachine} = useMachineStore();
 
     const machineOptions = [{label: 'Chọn ca máy', value: ''}].concat(
         machines.map(machine => ({
@@ -43,14 +43,59 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
         return () => clearInterval(timer);
     }, [isRunning]);
 
-    const handlePress = () => {
-        if (!isRunning) {
-            onStart(selectedMachine);
+    useEffect(() => {
+        const runningMachine = machines.find(machine =>
+            machine.history?.some(h => h.isActive),
+        );
+
+        if (runningMachine) {
+            const activeHistory = runningMachine.history.find(h => h.isActive);
+            setSelectedMachine(runningMachine._id);
             setIsRunning(true);
+            setActiveMachineId(runningMachine._id);
+
+            if (activeHistory?.startAt) {
+                const elapsed = Math.floor(
+                    (Date.now() - new Date(activeHistory.startAt).getTime()) /
+                        1000,
+                );
+                setSeconds(elapsed);
+            }
+        }
+    }, [machines]);
+
+    const handlePress = async () => {
+        if (!isRunning) {
+            if (!selectedMachine) return;
+
+            await startMachine({
+                scheduleId,
+                machineId: selectedMachine,
+                startAt: new Date(),
+            });
+
+            setIsRunning(true);
+            setActiveMachineId(selectedMachine);
         } else {
-            onStop?.(selectedMachine);
+            if (!activeMachineId) {
+                console.warn(
+                    'Không tìm thấy ca máy đang hoạt động để kết thúc',
+                );
+                return;
+            }
+
+            await stopMachine({
+                scheduleId,
+                machineId: activeMachineId,
+                endAt: new Date(),
+            });
+
             setIsRunning(false);
             setSeconds(0);
+            setActiveMachineId(null);
+
+            const {getDetailWorkSchedule} = useWorkScheduleStore.getState();
+            await getDetailWorkSchedule(scheduleId);
         }
     };
 
@@ -61,7 +106,7 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
         return `${h}:${m}:${s}`;
     };
 
-    const isDisabled = selectedMachine === '';
+    const isDisabled = !selectedMachine;
 
     const getButtonStyle = () => {
         if (isDisabled) return [styles.button, styles.buttonDisabled];
@@ -86,9 +131,7 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
             {isRunning && (
                 <TouchableOpacity
                     onPress={async () => {
-                        const {getActiveMachine} = useMachineStore.getState();
-                        const data = await getActiveMachine(scheduleId);
-
+                        await getActiveMachine(scheduleId);
                         navigation.navigate(SCREEN_INFO.ACTIVEMACHINE.key, {
                             scheduleId,
                         });
