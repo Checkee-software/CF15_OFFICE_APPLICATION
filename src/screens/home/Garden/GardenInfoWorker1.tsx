@@ -44,10 +44,14 @@ const JobListWorker = () => {
     );
 
     useEffect(() => {
+        const processingJobs = listJobs.filter(
+            job => job.status === 'PROCESSING',
+        );
+
         if (searchText === '') {
-            setFilteredJobs(listJobs);
+            setFilteredJobs(processingJobs);
         } else {
-            const filtered = listJobs.filter(job =>
+            const filtered = processingJobs.filter(job =>
                 job.title.toLowerCase().includes(searchText.toLowerCase()),
             );
             setFilteredJobs(filtered);
