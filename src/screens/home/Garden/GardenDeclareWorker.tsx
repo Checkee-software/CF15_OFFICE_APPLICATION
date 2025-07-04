@@ -313,7 +313,15 @@ const GardenDeclare = () => {
                 <TouchableOpacity
                     style={styles.exitButton1}
                     onPress={handleExit}>
-                    <Text style={styles.exitText1}>Thoát ra</Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Icon
+                            name='arrow-circle-left'
+                            size={22}
+                            color='white'
+                            style={{marginRight: 10}}
+                        />
+                        <Text style={styles.exitText1}>Thoát ra</Text>
+                    </View>
                 </TouchableOpacity>
             </View>
 
@@ -364,7 +372,7 @@ const styles = StyleSheet.create({
     exitButton1: {
         padding: 12,
         backgroundColor: 'red',
-        borderRadius: 6,
+        borderRadius: 26,
         alignItems: 'center',
     },
     exitText1: {color: 'white', fontWeight: '600', fontSize: 16},
