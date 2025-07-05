@@ -14,13 +14,12 @@ import {useAuthStore} from '../../../stores/authStore';
 import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
 import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/ProcessesFormData';
 import TaskListSection from './TaskListSection';
-import {useMachineStore} from '@/stores/machineStore';
 
 type TaskInput = {
     taskId: string;
     taskName: string;
     selectedMaterialId: string;
-    processType: 'material' | 'labour' | '';
+    processType: 'material' | '';
     value: string;
     area: string;
     disabled?: boolean;
@@ -30,7 +29,7 @@ type ProcessOption = {
     id: string;
     name: string;
     specification: string;
-    type: 'material' | 'labour';
+    type: 'material';
 };
 
 const GardenDeclare = () => {
@@ -51,14 +50,10 @@ const GardenDeclare = () => {
     const [isSaved, setIsSaved] = useState(false);
     const [onlyShowReportButton, setOnlyShowReportButton] = useState(false);
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
-    const convertToEProcessType = (
-        type: 'material' | 'labour',
-    ): EProcessesType => {
+    const convertToEProcessType = (type: 'material'): EProcessesType => {
         switch (type) {
             case 'material':
                 return EProcessesType.VAT_TU;
-            case 'labour':
-                return EProcessesType.NHAN_CONG;
             default:
                 throw new Error('Loại quy trình không hợp lệ');
         }
@@ -87,7 +82,7 @@ const GardenDeclare = () => {
                     taskId: task._id,
                     taskName: task.name,
                     selectedMaterialId: '',
-                    processType: '' as '' | 'material' | 'labour',
+                    processType: '' as '' | 'material',
                     value: '',
                     area: '',
                     disabled: isCanceled,
@@ -112,25 +107,12 @@ const GardenDeclare = () => {
             );
         }
 
-        if (
-            detailWorkSchedule?.labour &&
-            detailWorkSchedule.labour.name &&
-            detailWorkSchedule.labour._id
-        ) {
-            result.push({
-                id: detailWorkSchedule.labour._id,
-                name: detailWorkSchedule.labour.name,
-                specification: detailWorkSchedule.labour.specification || '',
-                type: 'labour' as const,
-            });
-        }
-
         return result;
     };
 
     const getProcessById = (
         id: string,
-        type: 'material' | 'labour',
+        type: 'material',
     ): ProcessOption | undefined => {
         switch (type) {
             case 'material': {
@@ -146,25 +128,13 @@ const GardenDeclare = () => {
                       }
                     : undefined;
             }
-
-            case 'labour': {
-                const labour = detailWorkSchedule?.labour;
-                return labour?._id === id
-                    ? {
-                          id: labour._id,
-                          name: labour.name,
-                          specification: labour.specification,
-                          type: 'labour',
-                      }
-                    : undefined;
-            }
         }
     };
 
     const handleProcessChange = (
         index: number,
         selectedId: string,
-        processType: 'material' | 'labour',
+        processType: 'material',
     ) => {
         setTaskInputs(prev => {
             const updated = [...prev];

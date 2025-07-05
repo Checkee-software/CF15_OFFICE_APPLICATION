@@ -7,7 +7,7 @@ type TaskInput = {
     taskId: string;
     taskName: string;
     selectedMaterialId: string;
-    processType: 'material' | 'labour' | '';
+    processType: 'material' | '';
     value: string;
     area: string;
     disabled?: boolean;
@@ -17,20 +17,17 @@ type ProcessOption = {
     id: string;
     name: string;
     specification: string;
-    type: 'material' | 'labour';
+    type: 'material';
 };
 
 type Props = {
     taskInputs: TaskInput[];
     getAllProcesses: () => ProcessOption[];
-    getProcessById: (
-        id: string,
-        type: 'material' | 'labour',
-    ) => ProcessOption | undefined;
+    getProcessById: (id: string, type: 'material') => ProcessOption | undefined;
     handleProcessChange: (
         index: number,
         selectedId: string,
-        processType: 'material' | 'labour',
+        processType: 'material',
     ) => void;
     handleInputChange: (
         index: number,
