@@ -22,8 +22,9 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
     const [isRunning, setIsRunning] = useState(false);
     const [seconds, setSeconds] = useState(0);
     const [activeMachineId, setActiveMachineId] = useState<string | null>(null);
-    const navigation = useNavigation<NavigationProp<any>>();
+    const [activeCount, setActiveCount] = useState(0);
 
+    const navigation = useNavigation<NavigationProp<any>>();
     const {startMachine, stopMachine, getActiveMachine} = useMachineStore();
 
     const machineOptions = [{label: 'Chọn ca máy', value: ''}].concat(
@@ -44,33 +45,35 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
     }, [isRunning]);
 
     useEffect(() => {
-    const runningMachine = machines.find(machine =>
-        machine.history?.some(h => h.isActive),
-    );
+        const runningMachines = machines.filter(machine =>
+            machine.history?.some(h => h.isActive),
+        );
 
-    if (runningMachine) {
-        const activeHistory = runningMachine.history.find(h => h.isActive);
-        setSelectedMachine(runningMachine._id);
-        setIsRunning(true);
-        setActiveMachineId(runningMachine._id);
+        setActiveCount(runningMachines.length);
 
-        if (activeHistory?.startAt) {
-            const startTimestamp = new Date(activeHistory.startAt).getTime();
+        const runningMachine = runningMachines[0]; 
+        if (runningMachine) {
+            const activeHistory = runningMachine.history.find(h => h.isActive);
+            setSelectedMachine(runningMachine._id);
+            setIsRunning(true);
+            setActiveMachineId(runningMachine._id);
 
-            setSeconds(Math.floor((Date.now() - startTimestamp) / 1000));
+            if (activeHistory?.startAt) {
+                const startTimestamp = new Date(activeHistory.startAt).getTime();
 
-            const interval = setInterval(() => {
-                const elapsed = Math.floor(
-                    (Date.now() - startTimestamp) / 1000,
-                );
-                setSeconds(elapsed);
-            }, 1000);
+                setSeconds(Math.floor((Date.now() - startTimestamp) / 1000));
 
-            return () => clearInterval(interval);
+                const interval = setInterval(() => {
+                    const elapsed = Math.floor(
+                        (Date.now() - startTimestamp) / 1000,
+                    );
+                    setSeconds(elapsed);
+                }, 1000);
+
+                return () => clearInterval(interval);
+            }
         }
-    }
-}, [machines]);
-
+    }, [machines]);
 
     const handlePress = async () => {
         if (!isRunning) {
@@ -131,12 +134,14 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
         <View style={styles.container}>
             <View style={styles.headerRow}>
                 <Text style={styles.title}>Ca máy</Text>
-                {isRunning && (
-                    <Text style={styles.activeCount}>(đang hoạt động: 1)</Text>
+                {activeCount > 0 && (
+                    <Text style={styles.activeCount}>
+                        (đang hoạt động: {activeCount})
+                    </Text>
                 )}
             </View>
 
-            {isRunning && (
+            {activeCount > 0 && (
                 <TouchableOpacity
                     onPress={async () => {
                         await getActiveMachine(scheduleId);

@@ -13,6 +13,7 @@ import {
 import Backdrop from '../../subscreen/Loading/index2';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useAuthStore} from '../../../stores/authStore';
+import Snackbar from 'react-native-snackbar';
 
 export default function UpdatePassword() {
     const [currentPassword, setCurrentPassword] = React.useState('');
@@ -58,12 +59,12 @@ export default function UpdatePassword() {
             setShowNewPassword(false);
             setShowConfirmPassword(false);
 
-            setShowSuccess(true);
-            Animated.timing(successAnimation, {
-                toValue: 1,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
+            Snackbar.show({
+                text: 'Đổi mật khẩu thành công!',
+                duration: Snackbar.LENGTH_SHORT,
+                backgroundColor: '#4CAF50',
+                textColor: '#fff',
+            });
 
             setTimeout(() => {
                 Animated.timing(successAnimation, {

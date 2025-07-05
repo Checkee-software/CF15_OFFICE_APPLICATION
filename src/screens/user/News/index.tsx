@@ -115,7 +115,7 @@ export default function News({navigation}: {navigation: any}) {
                 <Text style={styles.category}>{(item as any).newsType}</Text>
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.description}>
-                    {item.content?.slice(0, 100)}...
+                    {item.content?.slice(0, 25)}...
                 </Text>
                 <Text style={styles.author}>
                     Tác giả:{' '}

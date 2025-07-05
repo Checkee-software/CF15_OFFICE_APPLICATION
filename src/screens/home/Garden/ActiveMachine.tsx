@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import {useMachineStore} from '@/stores/machineStore';
+import {useAuthStore} from '@/stores/authStore';
 
 interface MachineShift {
     _id: string;
@@ -12,6 +13,7 @@ interface MachineShift {
 }
 
 const ActiveMachine = () => {
+    const {userInfo} = useAuthStore();
     const route = useRoute();
     const {getActiveMachine} = useMachineStore();
 
@@ -38,7 +40,16 @@ const ActiveMachine = () => {
 
                         <View style={styles.row}>
                             <Text style={styles.label}>Người thực hiện</Text>
-                            <Text style={styles.value}>{shift.createdBy}</Text>
+                            <Text
+                                style={[
+                                    styles.value,
+                                    shift.createdBy === userInfo?.fullName &&
+                                        styles.you,
+                                ]}>
+                                {shift.createdBy === userInfo?.fullName
+                                    ? 'Bạn'
+                                    : shift.createdBy}
+                            </Text>
                         </View>
 
                         <View style={styles.row}>
@@ -60,6 +71,10 @@ const ActiveMachine = () => {
 };
 
 const styles = StyleSheet.create({
+    you: {
+        color: '#007AFF',
+        fontWeight: 'bold',
+    },
     container: {
         padding: 16,
         backgroundColor: 'white',
