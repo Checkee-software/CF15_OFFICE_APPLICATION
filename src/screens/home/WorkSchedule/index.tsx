@@ -410,10 +410,10 @@ const WorkSchedule = ({navigation}: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: '#fff',
     },
     workScheduleTypeHorizontalScroll: {
-        backgroundColor: colors.white,
+        backgroundColor: '#F5F5F5',
     },
     statusBtn: {
         width: 128,
@@ -455,6 +455,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     flatListSchedule: {
+        flexGrow: 1,
         gap: 12,
     },
     workCard: {
@@ -462,12 +463,10 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 8,
         flexDirection: 'row',
-        backgroundColor: colors.white,
+        backgroundColor: '#F5F5F5',
         boxShadow: '0 1 2 0 #00000040',
     },
-    workScheduleMargin: {
-
-    },
+    workScheduleMargin: {},
     progressValue: {
         color: 'black',
         fontWeight: '400',

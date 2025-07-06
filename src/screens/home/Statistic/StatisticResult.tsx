@@ -1,142 +1,199 @@
+/* eslint-disable react-native/no-inline-styles */
+import {useStatisticStore} from '@/stores/statisticStore';
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import UsageBarChart from './UsageBarChart';
-const StatisticResult = () => {
-    const stats = [
-        {label: 'Số lượng đội sản xuất', value: '3'},
-        {label: 'Số lượng thành viên', value: '65'},
-        {label: 'Số lượng khu vườn', value: '3'},
-        {label: 'Số lượng công việc', value: '4/23'},
-    ];
+import {BarChart} from 'react-native-gifted-charts';
 
-    const tasks = [
-        {
-            title: 'Triển khai hệ thống CF15 OFFICE với cà phê khoán',
-            location: 'Khu vườn cà phê khoán',
-            check1: '12',
-            check2: '3/8',
-            dateRange: '01/01/2025 - 24/02/2025',
-        },
-        {
-            title: 'Thu hoạch cà phê 2',
-            location: 'Khu vườn cà phê năm ba',
-            check1: '12',
-            check2: '3/8',
-            dateRange: '01/01/2025 - 24/02/2025',
-        },
-        {
-            title: 'Tổng công tác khu vườn',
-            location: 'Khu vườn cà phê năm ba',
-            check1: '12',
-            check2: '3/8',
-            dateRange: '01/01/2025 - 24/02/2025',
-        },
-        {
-            title: 'Thu hoạch cà phê 1',
-            location: 'Khu vườn CF-023',
-            check1: '12',
-            check2: '3/8',
-            dateRange: '01/01/2025 - 24/02/2025',
-        },
-    ];
+const StatisticResult = () => {
+    const {statisticData} = useStatisticStore();
+
+    // const maxValue = Math.max(
+    //     ...(statisticData?.chart?.map(d => d.value) ?? []),
+    // );
+    // const yAxisLabelWidth = `${maxValue}`.length * 8 + 10;
+
+    const formatVND = (value: number) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            maximumFractionDigits: 0, // không hiển thị số lẻ
+        }).format(value);
+    };
+
+    console.log(statisticData);
 
     return (
-        <ScrollView
-            contentContainerStyle={{paddingHorizontal: 5, paddingVertical: 8}}>
-            <View style={{paddingHorizontal: 16}}>
+        <View style={styles.container}>
+            <View style={styles.listCard}>
                 <View style={styles.card}>
                     <View style={styles.statBoxContainer}>
-                        {stats.map((item, index) => (
-                            <View style={styles.statBox} key={index}>
-                                <Text style={styles.statBoxLabel}>
-                                    {item.label}
-                                </Text>
-                                <Text style={styles.statBoxValue}>
-                                    {item.value}
-                                </Text>
-                            </View>
-                        ))}
+                        <View style={styles.statBox}>
+                            <Text style={styles.statBoxLabel}>
+                                Số lượng đội sản xuất
+                            </Text>
+                            <Text style={styles.statBoxValue}>
+                                {statisticData?.totalGroup}
+                            </Text>
+                        </View>
+                        <View style={styles.statBox}>
+                            <Text style={styles.statBoxLabel}>
+                                Số lượng thành viên
+                            </Text>
+                            <Text style={styles.statBoxValue}>
+                                {statisticData?.totalMember}
+                            </Text>
+                        </View>
+                        <View style={styles.statBox}>
+                            <Text style={styles.statBoxLabel}>
+                                Số lượng khu vườn
+                            </Text>
+                            <Text style={styles.statBoxValue}>
+                                {statisticData?.totalGarden}
+                            </Text>
+                        </View>
+                        <View style={styles.statBox}>
+                            <Text style={styles.statBoxLabel}>
+                                Số lượng công việc
+                            </Text>
+                            <Text style={styles.statBoxValue}>
+                                {statisticData?.totalWork}
+                            </Text>
+                        </View>
                     </View>
                 </View>
+            </View>
 
-                <View style={{marginVertical: 16}}>
-                    <Text style={{fontWeight: 'bold'}}>
-                        Biểu đồ quy trình sử dụng
-                    </Text>
-                    <Text style={{fontSize: 24, fontWeight: 'bold'}}>
-                        57.588.045
-                    </Text>
-                    <Text style={{fontSize: 12, color: '#888'}}>vnd</Text>
-                </View>
+            <View style={styles.chartSection}>
+                {/* <Text style={styles.chartLabel}>Biểu đồ quy trình sử dụng</Text>
+                <Text style={styles.chartValue}>57.588.045</Text>
+                <Text style={styles.currency}>vnđ</Text> */}
 
                 <View style={styles.chart}>
-                    <UsageBarChart />
-                </View>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}>
+                        <BarChart
+                            data={statisticData?.chart}
+                            barWidth={14}
+                            spacing={10}
+                            labelWidth={120}
+                            // maxValue={
+                            //     Math.max(
+                            //         ...(statisticData?.chart?.map(
+                            //             d => d._realValue ?? d.value,
+                            //         ) ?? []),
+                            //     ) * 1.1
+                            // }
+                            maxValue={100}
+                            initialSpacing={15}
+                            yAxisLabelTexts={['0', '25%', '50%', '75%', '100%']}
+                            noOfSections={4}
+                            yAxisThickness={1}
+                            xAxisLabelTextStyle={{
+                                fontSize: 11,
+                                textAlign: 'left',
+                            }}
+                            width={(statisticData?.chart?.length ?? 0) * 100}
+                            //hideYAxisText
+                            yAxisLabelWidth={45}
+                            //yAxisLabelWidth={yAxisLabelWidth}
+                            yAxisExtraHeight={40}
+                            renderTooltip={(item: any) => (
+                                <View style={styles.chartTooltip}>
+                                    <Text style={styles.tooltipText}>
+                                        {formatVND(
+                                            item._realValue ?? item.value,
+                                        )}
+                                    </Text>
+                                </View>
+                            )}
+                        />
+                    </ScrollView>
 
-                <View style={styles.taskListContainer}>
-                    {tasks.map((task, index) => (
-                        <View key={index} style={styles.taskItem}>
-                            <Text style={styles.taskTitle}>{task.title}</Text>
-                            <Text style={styles.taskLocation}>
-                                {task.location}
-                            </Text>
-
-                            <View style={styles.taskStatusRow}>
-                                <View style={styles.statusItem}>
-                                    <MaterialIcons
-                                        name='people'
-                                        size={16}
-                                        color='#666'
-                                    />
-                                    <Text style={styles.taskStatusText}>
-                                        {' '}
-                                        {task.check1}
-                                    </Text>
-                                </View>
-                                <View style={styles.statusItem}>
-                                    <MaterialIcons
-                                        name='checklist'
-                                        size={16}
-                                        color='#666'
-                                    />
-                                    <Text style={styles.taskStatusText}>
-                                        {' '}
-                                        {task.check2}
-                                    </Text>
-                                </View>
-                                <View style={styles.statusItem}>
-                                    <AntDesign
-                                        name='clockcircle'
-                                        size={14}
-                                        color='#666'
-                                    />
-                                    <Text style={styles.taskDateText}>
-                                        {' '}
-                                        {task.dateRange}
-                                    </Text>
-                                </View>
-                            </View>
+                    <View style={styles.legendRow}>
+                        <View style={styles.legendItem}>
+                            <View
+                                style={[
+                                    styles.legendDot,
+                                    {backgroundColor: '#FF4C4C'},
+                                ]}
+                            />
+                            <Text style={styles.legendText}>Nhân công</Text>
                         </View>
-                    ))}
+                        <View style={styles.legendItem}>
+                            <View
+                                style={[
+                                    styles.legendDot,
+                                    {backgroundColor: '#4CAF50'},
+                                ]}
+                            />
+                            <Text style={styles.legendText}>Vật tư</Text>
+                        </View>
+                        <View style={styles.legendItem}>
+                            <View
+                                style={[
+                                    styles.legendDot,
+                                    {backgroundColor: '#2196F3'},
+                                ]}
+                            />
+                            <Text style={styles.legendText}>Ca máy</Text>
+                        </View>
+                    </View>
                 </View>
             </View>
-        </ScrollView>
+
+            <View style={styles.taskListContainer}>
+                {statisticData?.list.map((task, index) => (
+                    <View key={index} style={styles.taskItem}>
+                        <Text style={styles.taskTitle}>{task.title}</Text>
+                        <Text style={styles.taskLocation}>
+                            {task.gardenName}
+                        </Text>
+
+                        <View style={styles.taskCosts}>
+                            <Text style={styles.costText}>
+                                Chi phí nhân công: {''}
+                                <Text style={styles.costValue}>
+                                    {new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                    }).format(task?.labourCost ?? 0)}
+                                </Text>
+                            </Text>
+                            <Text style={styles.costText}>
+                                Chi phí vật tư: {''}
+                                <Text style={styles.costValue}>
+                                    {new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                    }).format(task?.materialCost ?? 0)}
+                                </Text>
+                            </Text>
+                            <Text style={styles.costText}>
+                                Chi phí ca máy: {''}
+                                <Text style={styles.costValue}>
+                                    {new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                    }).format(task?.machineCost ?? 0)}
+                                </Text>
+                            </Text>
+                        </View>
+                    </View>
+                ))}
+            </View>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    chart: {
-        height: 300,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
+    container: {},
+    listCard: {
+        marginVertical: 15,
+        gap: 10,
     },
     card: {
         backgroundColor: '#fff',
-        marginTop: 8,
     },
     statBoxContainer: {
         flexDirection: 'row',
@@ -172,42 +229,61 @@ const styles = StyleSheet.create({
         color: '#4CAF50',
         textAlign: 'center',
     },
-    taskCard: {
-        backgroundColor: '#fff',
+    chartSection: {
+        marginVertical: 10,
+    },
+    chartLabel: {
+        fontSize: 15,
+        fontWeight: 500,
+    },
+    chartValue: {
+        fontSize: 24,
+        fontWeight: 600,
+    },
+    currency: {
+        color: '#4F4F4F',
+        fontSize: 12,
+        fontWeight: 400,
+    },
+    chart: {
+        marginTop: 10,
+        height: 310,
+    },
+    chartTooltip: {
+        padding: 6,
+        backgroundColor: '#5A5A5B',
         borderRadius: 8,
-        padding: 12,
-        marginBottom: 12,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 1},
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
     },
-    taskStatusContainer: {
+    tooltipText: {
+        color: '#fff',
+        fontWeight: 500,
+        fontSize: 13,
+    },
+    legendRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
+    },
+    legendItem: {
+        flexDirection: 'row',
         alignItems: 'center',
+        marginHorizontal: 8,
     },
-    taskCheck: {
-        backgroundColor: '#f0f0f0',
-        borderRadius: 4,
-        paddingVertical: 4,
-        paddingHorizontal: 8,
+    legendDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        marginRight: 4,
     },
-    taskCheckText: {
-        fontSize: 14,
-    },
-    taskDate: {
-        backgroundColor: '#f0f0f0',
-        borderRadius: 4,
-        paddingVertical: 4,
-        paddingHorizontal: 8,
+    legendText: {
+        fontSize: 12,
+        color: '#333',
     },
     taskListContainer: {
-        marginTop: 20,
+        marginVertical: 10,
+        gap: 5,
     },
     taskItem: {
-        backgroundColor: '#fff',
+        backgroundColor: '#F5F5F5',
         borderRadius: 8,
         padding: 16,
         marginBottom: 12,
@@ -227,26 +303,17 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: 'green',
         fontStyle: 'italic',
-        marginBottom: 12,
     },
-    taskStatusRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+    taskCosts: {
+        marginVertical: 5,
     },
-    statusItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    costText: {
+        fontSize: 13,
+        fontWeight: 500,
+        color: '#808080',
     },
-    taskStatusText: {
-        fontSize: 14,
-        color: '#000',
-        marginLeft: 4,
-    },
-    taskDateText: {
-        fontSize: 12,
-        color: '#666',
-        marginLeft: 4,
+    costValue: {
+        color: 'black',
     },
 });
 

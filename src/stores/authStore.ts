@@ -37,6 +37,7 @@ type IUser = {
     address: Address.IAddresses;
     managedGardens: string[];
     tasks: tasks;
+    groupId: string;
 };
 
 type AuthStore = {

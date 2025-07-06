@@ -1,10 +1,28 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import {IGardenData} from '@/shared-types/Response/GardenDataResponse/GardenDataResponse';
 import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
 import {EStatus} from '@/shared-types/Response/ScheduleRequestResponse/ScheduleRequestResponse';
 import ENV from '@/config/ENV';
+
+type IGardenData = {
+    _id: string;
+    gardenId: string;
+    type: string;
+    name: string; // Tên định mức
+    amount: number; // Khối lượng thu hoạch hoặc đinh mức
+    status: string;
+    verifier: string;
+    message: string;
+    currentLifeParent: number;
+    gardenName?: string;
+    gardenCode?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+    childTaskId: string;
+    requesterId: string;
+    firstRequested: boolean;
+};
 
 interface gardenWorkStore {
     isLoading: boolean;
@@ -22,7 +40,7 @@ interface gardenWorkStore {
     setBadgeUnBrowse: () => void;
 }
 
-export const useGardenWorkStore = create<gardenWorkStore>(set => ({
+export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
     isLoading: false,
     isLoadingCreate: false,
     badgeGardenWorkUnBrowse: 0,
@@ -119,14 +137,39 @@ export const useGardenWorkStore = create<gardenWorkStore>(set => ({
     },
 
     filterByStatus: status => {
+        const {listGardenWorkBrowse} = get();
         set({isLoadingCreate: true});
 
         // sử dụng setTimeout để fake async (nếu data quá dài filter có thể bị delay)
-        set(state => ({
-            listGardenWorkBrowseFilter: state.listGardenWorkBrowse.filter(
-                item => item.status === status,
-            ),
-        }));
+        if (status !== EStatus.REQUEST) {
+            const dataFiltered = listGardenWorkBrowse.filter(
+                (item: any) => item.status === status,
+            );
+
+            const groupMap = new Map();
+
+            dataFiltered.forEach((item, index) => {
+                const key = `${item.childTaskId}-${item.requesterId}`;
+                if (!groupMap.has(key)) groupMap.set(key, []);
+                groupMap.get(key).push(index);
+            });
+
+            groupMap.forEach(indexes => {
+                if (indexes.length > 1) {
+                    dataFiltered[indexes[0]].firstRequested = true;
+                }
+            });
+
+            set({
+                listGardenWorkBrowseFilter: dataFiltered,
+            });
+        } else {
+            set(state => ({
+                listGardenWorkBrowseFilter: state.listGardenWorkBrowse.filter(
+                    item => item.status === status,
+                ),
+            }));
+        }
 
         setTimeout(() => {
             set({isLoadingCreate: false});

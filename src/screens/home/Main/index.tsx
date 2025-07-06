@@ -125,12 +125,17 @@ export default function Main({navigation}: any) {
         }
 
         if (role === EOrganization.LEADER) {
-            return menuItems.filter(
-                item =>
+            return menuItems.filter(item => {
+                const excludeForLeader =
                     item.key !== 'gardenForWorker' &&
                     item.key !== 'gardenDeclareForWorker' &&
-                    item.key !== 'employee',
-            );
+                    item.key !== 'employee';
+
+                const excludeStatistic =
+                    userInfo.groupId === '' ? item.key !== 'statistic' : true;
+
+                return excludeForLeader && excludeStatistic;
+            });
         }
 
         if (role === EOrganization.WORKER) {
@@ -138,7 +143,8 @@ export default function Main({navigation}: any) {
                 item =>
                     item.key !== 'unit' &&
                     item.key !== 'employee' &&
-                    item.key !== 'gardenInfo',
+                    item.key !== 'gardenInfo' &&
+                    item.key !== 'statistic',
             );
         }
 

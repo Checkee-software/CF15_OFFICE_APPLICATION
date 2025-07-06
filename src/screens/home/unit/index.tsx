@@ -58,7 +58,7 @@ const Unit = ({navigation}: any) => {
                             {itemListWorker.fullName}
                         </Text>
                         <Text style={UnitStyles.workerUnit}>
-                            {itemListWorker.userType.role}
+                            {itemListWorker.userType.unit}
                         </Text>
                     </View>
                 </View>

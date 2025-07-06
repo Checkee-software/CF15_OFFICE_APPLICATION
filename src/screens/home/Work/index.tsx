@@ -120,9 +120,26 @@ const WorkScreen = () => {
                         {`${itemGardenWork.area} ${itemGardenWork.gardenAreaType} \n`}
 
                         <Text style={styles.valueRemaining}>
-                            {`(còn: ${
-                                itemGardenWork.gardenArea - itemGardenWork.area
-                            })`}
+                            {selectedStatus !== 1
+                                ? itemGardenWork.firstRequested
+                                    ? `(còn: ${Math.max(
+                                          itemGardenWork.gardenArea -
+                                              itemGardenWork.area,
+                                      )})`
+                                    : `(còn: ${Math.max(
+                                          itemGardenWork.gardenArea -
+                                              itemGardenWork.processingRate,
+                                      )})`
+                                : itemGardenWork.processingRate !== 0
+                                ? `(còn: ${Math.max(
+                                      itemGardenWork.gardenArea -
+                                          (itemGardenWork.processingRate +
+                                              itemGardenWork.area),
+                                  )})`
+                                : `(còn: ${Math.max(
+                                      itemGardenWork.gardenArea -
+                                          itemGardenWork.area,
+                                  )})`}
                         </Text>
                     </Text>
                 </View>
@@ -502,6 +519,7 @@ const styles = StyleSheet.create({
     },
     flatListGardenWork: {
         flexGrow: 1,
+        gap: 12,
     },
     gardenCard: {
         marginBottom: 15,

@@ -15,6 +15,7 @@ import {useWorkerStore} from '@/stores/workerStore';
 import moment from 'moment';
 import images from '../../../assets/images';
 import {OneSignal} from 'react-native-onesignal';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 export default function Profile({navigation}: any) {
     const {userInfo, logout} = useAuthStore();
@@ -42,12 +43,13 @@ export default function Profile({navigation}: any) {
                     </View>
 
                     <Text style={styles.name}>{userInfo.fullName}</Text>
-                    <Text style={styles.email}>robertambercf15.com</Text>
+                    <Text style={styles.email}>{userInfo.username}</Text>
 
                     <View style={styles.card}>
-                        <Text style={styles.dateLabel}>Ngày làm việc</Text>
                         <Text style={styles.dateValue}>
-                            {moment(userInfo.recruimentDate).format('L')}
+                            {moment().format(
+                                'ddd, [ngày] D [tháng] M [năm] YYYY',
+                            )}
                         </Text>
 
                         <View style={styles.divider} />
@@ -99,10 +101,19 @@ export default function Profile({navigation}: any) {
                                         'Phòng ban',
                                         `${userInfo.departmentName}`,
                                     )}
-                                    {renderInfoRow(
-                                        'Tổ',
-                                        `${userInfo.userType.unit}`,
-                                    )}
+                                    {userInfo.userType.level !==
+                                    EOrganization.DEPARTMENT
+                                        ? renderInfoRow(
+                                              'Tổ',
+                                              //{userInfo.userType.unit}
+                                              `${
+                                                  userInfo.userType.unit === ''
+                                                      ? 'Chưa cập nhật'
+                                                      : userInfo.userType.unit
+                                              }`,
+                                          )
+                                        : null}
+
                                     {renderInfoRow(
                                         'Ngày sinh',
                                         `${moment(userInfo.dateOfBirth).format(
@@ -114,6 +125,12 @@ export default function Profile({navigation}: any) {
                                         `${userInfo.phoneNumber}`,
                                     )}
                                     {renderInfoRow('CCCD', `${userInfo.ID}`)}
+                                    {renderInfoRow(
+                                        'Ngày tuyển dụng',
+                                        `${moment(
+                                            userInfo.recruimentDate,
+                                        ).format('L')}`,
+                                    )}
                                     {renderInfoRow(
                                         'Loại hợp đồng',
                                         `${userInfo.contract}`,

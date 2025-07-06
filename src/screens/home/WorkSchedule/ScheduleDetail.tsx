@@ -183,6 +183,44 @@ const ScheduleDetail = ({route}: any) => {
         </View>
     );
 
+    const renderMachinesHistory = (itemMachinesHistory: any) => (
+        <View style={ScheduleDetailStyles.historyInfo}>
+            <Text style={ScheduleDetailStyles.historyInfoLabel}>
+                {itemMachinesHistory.name}
+            </Text>
+
+            {itemMachinesHistory.history ? (
+                <View>
+                    {itemMachinesHistory.history.map((item: any) => (
+                        <View key={item._id} style={{marginBottom: 4}}>
+                            <Text style={ScheduleDetailStyles.historyInfoValue}>
+                                Bắt đầu:{' '}
+                                {moment(item.startAt).format(
+                                    'HH:mm DD/MM/YYYY',
+                                )}
+                            </Text>
+                            {item.endAt && (
+                                <Text
+                                    style={
+                                        ScheduleDetailStyles.historyInfoValue
+                                    }>
+                                    Kết thúc:{' '}
+                                    {moment(item.endAt).format(
+                                        'HH:mm DD/MM/YYYY',
+                                    )}
+                                </Text>
+                            )}
+                        </View>
+                    ))}
+                </View>
+            ) : (
+                <Text style={ScheduleDetailStyles.historyInfoValue}>
+                    Không có lịch sử hoạt động
+                </Text>
+            )}
+        </View>
+    );
+
     const renderChildTask = (itemChildTask: any) => (
         <View style={ScheduleDetailStyles.childTaskInfo}>
             <Text style={ScheduleDetailStyles.taskTitle}>
@@ -489,9 +527,26 @@ const ScheduleDetail = ({route}: any) => {
 
                     <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion2}
-                        title={`Danh sách công việc con (${scheduleDetail?.childTasks.length})`}
+                        title={`Lịch sử ca máy (${scheduleDetail?.machines.length})`}
                         style={ScheduleDetailStyles.boxAccordion}
                         id='3'>
+                        <View style={ScheduleDetailStyles.listChildTasks}>
+                            <FlatList
+                                scrollEnabled={false}
+                                data={scheduleDetail?.machines as any}
+                                renderItem={({item}) =>
+                                    renderMachinesHistory(item)
+                                }
+                                keyExtractor={item => item._id}
+                            />
+                        </View>
+                    </List.Accordion>
+
+                    <List.Accordion
+                        titleStyle={ScheduleDetailStyles.titleAccordion2}
+                        title={`Danh sách công việc con (${scheduleDetail?.childTasks.length})`}
+                        style={ScheduleDetailStyles.boxAccordion}
+                        id='4'>
                         <View style={ScheduleDetailStyles.listChildTasks}>
                             <FlatList
                                 scrollEnabled={false}
@@ -705,6 +760,25 @@ const ScheduleDetailStyles = StyleSheet.create({
     },
     listChildTasks: {
         paddingHorizontal: 15,
+    },
+    historyInfo: {
+        flexDirection: 'row',
+        marginVertical: 5,
+        width: '100%',
+    },
+    historyInfoLabel: {
+        fontWeight: 400,
+        fontSize: 13,
+        color: '#212121',
+        width: '40%',
+    },
+    historyInfoValue: {
+        color: '#212121',
+        fontWeight: 600,
+        fontSize: 14,
+        width: '90%',
+        textAlign: 'right',
+        flexShrink: 1,
     },
     childTaskInfo: {
         gap: 12,
