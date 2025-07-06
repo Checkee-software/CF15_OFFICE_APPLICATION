@@ -35,58 +35,95 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
     );
 
     useEffect(() => {
+        setSelectedMachine('');
+        setIsRunning(false);
+        setSeconds(0);
+        setActiveMachineId(null);
+
         let timer: NodeJS.Timeout;
-        if (isRunning) {
-            timer = setInterval(() => {
-                setSeconds(prev => prev + 1);
-            }, 1000);
-        }
-        return () => clearInterval(timer);
-    }, [isRunning]);
+        const updateActiveMachines = () => {
+            const runningMachines = machines.filter(machine => {
+                if (!machine.history || machine.history.length === 0)
+                    return false;
+                const sortedHistory = [...(machine.history ?? [])].sort(
+                    (a, b) =>
+                        new Date(b.startAt).getTime() -
+                        new Date(a.startAt).getTime(),
+                );
 
-    useEffect(() => {
-        const runningMachines = machines.filter(machine =>
-            machine.history?.some(h => h.isActive),
-        );
+                return sortedHistory[0].isActive;
+            });
 
-        setActiveCount(runningMachines.length);
+            setActiveCount(runningMachines.length);
 
-        const runningMachine = runningMachines[0]; 
-        if (runningMachine) {
-            const activeHistory = runningMachine.history.find(h => h.isActive);
-            setSelectedMachine(runningMachine._id);
-            setIsRunning(true);
-            setActiveMachineId(runningMachine._id);
+            if (runningMachines.length > 0) {
+                const firstActive = runningMachines[0];
+                const sortedHistory = [...(firstActive.history ?? [])].sort(
+                    (a, b) =>
+                        new Date(b.startAt).getTime() -
+                        new Date(a.startAt).getTime(),
+                );
 
-            if (activeHistory?.startAt) {
-                const startTimestamp = new Date(activeHistory.startAt).getTime();
+                const activeHistory = sortedHistory[0];
 
-                setSeconds(Math.floor((Date.now() - startTimestamp) / 1000));
-
-                const interval = setInterval(() => {
+                if (activeHistory?.startAt) {
+                    const startTimestamp = new Date(
+                        activeHistory.startAt,
+                    ).getTime();
                     const elapsed = Math.floor(
                         (Date.now() - startTimestamp) / 1000,
                     );
-                    setSeconds(elapsed);
-                }, 1000);
 
-                return () => clearInterval(interval);
+                    setSelectedMachine(firstActive._id);
+                    setIsRunning(true);
+                    setActiveMachineId(firstActive._id);
+                    setSeconds(elapsed);
+
+                    timer = setInterval(() => {
+                        setSeconds(
+                            Math.floor((Date.now() - startTimestamp) / 1000),
+                        );
+                    }, 1000);
+                }
             }
-        }
+        };
+
+        updateActiveMachines();
+        return () => {
+            if (timer) clearInterval(timer);
+        };
     }, [machines]);
+
+    const isDisabled =
+        !selectedMachine || !machines.some(m => m._id === selectedMachine);
 
     const handlePress = async () => {
         if (!isRunning) {
             if (!selectedMachine) return;
 
-            await startMachine({
-                scheduleId,
-                machineId: selectedMachine,
-                startAt: new Date(),
-            });
+            try {
+                await startMachine({
+                    scheduleId,
+                    machineId: selectedMachine,
+                    startAt: new Date(),
+                });
 
-            setIsRunning(true);
-            setActiveMachineId(selectedMachine);
+                setIsRunning(true);
+                setActiveMachineId(selectedMachine);
+                setSeconds(0);
+                setActiveCount(1);
+
+                const startTimestamp = Date.now();
+                const timer = setInterval(() => {
+                    const elapsed = Math.floor(
+                        (Date.now() - startTimestamp) / 1000,
+                    );
+                    setSeconds(elapsed);
+                }, 1000);
+                return () => clearInterval(timer);
+            } catch (error) {
+                console.error('Không thể dừng ca máy:', error);
+            }
         } else {
             if (!activeMachineId) {
                 console.warn(
@@ -95,18 +132,22 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
                 return;
             }
 
-            await stopMachine({
-                scheduleId,
-                machineId: activeMachineId,
-                endAt: new Date(),
-            });
+            try {
+                await stopMachine({
+                    scheduleId,
+                    machineId: activeMachineId,
+                    endAt: new Date(),
+                });
 
-            setIsRunning(false);
-            setSeconds(0);
-            setActiveMachineId(null);
+                setIsRunning(false);
+                setSeconds(0);
+                setActiveMachineId(null);
 
-            const {getDetailWorkSchedule} = useWorkScheduleStore.getState();
-            await getDetailWorkSchedule(scheduleId);
+                const workScheduleStore = useWorkScheduleStore.getState();
+                await workScheduleStore.getDetailWorkSchedule(scheduleId);
+            } catch (error) {
+                console.error('Failed to stop machine:', error);
+            }
         }
     };
 
@@ -116,8 +157,6 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
         const s = String(sec % 60).padStart(2, '0');
         return `${h}:${m}:${s}`;
     };
-
-    const isDisabled = !selectedMachine;
 
     const getButtonStyle = () => {
         if (isDisabled) return [styles.button, styles.buttonDisabled];
@@ -194,7 +233,7 @@ const MachineShiftSelector: React.FC<MachineShiftSelectorProps> = ({
                 <TouchableOpacity
                     style={getButtonStyle()}
                     onPress={handlePress}
-                    disabled={isDisabled}>
+                    disabled={isDisabled || (isRunning && !activeMachineId)}>
                     <Text style={styles.buttonText}>
                         {isRunning ? 'Kết thúc' : 'Bắt đầu ngay'}
                     </Text>
