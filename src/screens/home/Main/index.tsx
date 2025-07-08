@@ -84,7 +84,7 @@ export default function Main({navigation}: any) {
         },
         {
             key: 'workschedule',
-            label: 'Lịch làm việc',
+            label: 'Quy trình',
             buttonImage: images.toDoList,
             navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
         },
@@ -115,6 +115,10 @@ export default function Main({navigation}: any) {
     ];
 
     const filterMenuByRole = (role: string) => {
+        if (role === EOrganization.ADMIN || role === EOrganization.MANAGEMENT) {
+            return menuItems.filter(item => item.key === 'statistic');
+        }
+
         if (role === EOrganization.DEPARTMENT) {
             return menuItems.filter(
                 item =>
@@ -143,8 +147,7 @@ export default function Main({navigation}: any) {
                 item =>
                     item.key !== 'unit' &&
                     item.key !== 'employee' &&
-                    item.key !== 'gardenInfo' &&
-                    item.key !== 'statistic',
+                    item.key !== 'gardenInfo',
             );
         }
 

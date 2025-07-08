@@ -112,6 +112,10 @@ const WorkSchedule = ({navigation}: any) => {
     // };
 
     const renderWorkSchedule = (status: string, finishedDate: string) => {
+        // if(status === EScheduleStatus.COMPLETED){
+        //     return
+        // }
+
         const targetTime = moment(finishedDate);
         const now = moment();
 
@@ -119,7 +123,10 @@ const WorkSchedule = ({navigation}: any) => {
         const duration = moment.duration(targetTime.diff(now));
 
         // Nếu thời gian đã trễ
-        if (duration.asMilliseconds() < 0) {
+        if (
+            duration.asMilliseconds() < 0 &&
+            status !== EScheduleStatus.COMPLETED
+        ) {
             return (
                 <Text
                     style={[

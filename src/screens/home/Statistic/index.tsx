@@ -66,17 +66,26 @@ const Statistic = () => {
         } else if (selectedTimeOption === 'year') {
             return 'Theo năm';
         } else {
-            return `${moment(startDate).format('DD/MM/YYYY')} - ${moment(
-                endDate,
-            ).format('DD/MM/YYYY')}`;
+            return `${moment(startDate).format('DD/MM/YYYY')} - ${moment
+                .utc(endDate)
+                .format('DD/MM/YYYY')}`;
         }
     };
 
     const onChangeSelectedType = async (value: EType) => {
-        setSelectedType(value);
-        await getListSelection(value);
-        setSelectedTarget('');
-        setSelectedTargetName('');
+        if (
+            value === 'GROUP' &&
+            userInfo.userType.level === EOrganization.LEADER
+        ) {
+            setSelectedType('GROUP' as EType);
+            await getGroupName(userInfo.groupId);
+            setSelectedTarget(userInfo.groupId);
+        } else {
+            setSelectedType(value);
+            await getListSelection(value);
+            setSelectedTarget('');
+            setSelectedTargetName('');
+        }
     };
 
     const onChangeSelectedTarget = (value: any) => {
@@ -170,21 +179,22 @@ const Statistic = () => {
         }
 
         const fetchData = async () => {
-            if (userInfo.userType.level === EOrganization.DEPARTMENT) {
+            if (userInfo.userType.level === EOrganization.LEADER) {
                 setListStatisticType(
                     listStatisticTypeDefault.filter(
-                        (item: any) => item._id !== 'GROUP',
+                        (item: any) => item._id !== 'PRODUCT',
                     ),
                 );
+            } else if (userInfo.userType.level === EOrganization.WORKER) {
+                setListStatisticType(
+                    listStatisticTypeDefault.filter(
+                        (item: any) => item._id === 'WORK',
+                    ),
+                );
+                setSelectedType('WORK' as EType);
+                await getListSelection('WORK');
             } else {
-                await getGroupName(userInfo.groupId);
-                setListStatisticType(
-                    listStatisticTypeDefault.filter(
-                        (item: any) => item._id === 'GROUP',
-                    ),
-                );
-                setSelectedType('GROUP' as EType);
-                setSelectedTarget(userInfo.groupId);
+                setListStatisticType(listStatisticTypeDefault);
             }
         };
 
@@ -272,10 +282,9 @@ const Statistic = () => {
                         <Text style={styles.text1}>Thống kê</Text>
                         <Dropdown
                             disable={
-                                userInfo.userType.level ===
-                                EOrganization.DEPARTMENT
-                                    ? false
-                                    : true
+                                userInfo.userType.level === EOrganization.WORKER
+                                    ? true
+                                    : false
                             }
                             style={styles.dropdown}
                             placeholderStyle={styles.placeholderStyle}
@@ -295,11 +304,10 @@ const Statistic = () => {
                         <Dropdown
                             disable={
                                 userInfo.userType.level ===
-                                EOrganization.DEPARTMENT
-                                    ? listSelection.length !== 0
-                                        ? false
-                                        : true
-                                    : true
+                                    EOrganization.LEADER &&
+                                selectedType === 'GROUP'
+                                    ? true
+                                    : false
                             }
                             style={[
                                 styles.dropdown,

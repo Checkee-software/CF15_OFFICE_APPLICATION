@@ -63,6 +63,10 @@ const WorkScreen = () => {
         setSelectedStatus(value);
     };
 
+    const formatNumber = (num: number) => {
+        return new Intl.NumberFormat('vi-VN').format(num);
+    };
+
     const renderGardenWork = (itemGardenWork: any) => (
         <View
             style={[
@@ -106,15 +110,6 @@ const WorkScreen = () => {
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
-                    <Text style={styles.label}>
-                        {itemGardenWork.processName}
-                    </Text>
-                    <Text style={styles.value}>
-                        {`${itemGardenWork.value} (${itemGardenWork.specification})`}
-                    </Text>
-                </View>
-
-                <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Diện tích đã làm</Text>
                     <Text style={styles.value}>
                         {`${itemGardenWork.area} ${itemGardenWork.gardenAreaType} \n`}
@@ -122,23 +117,35 @@ const WorkScreen = () => {
                         <Text style={styles.valueRemaining}>
                             {selectedStatus !== 1
                                 ? itemGardenWork.firstRequested
-                                    ? `(còn: ${Math.max(
-                                          itemGardenWork.gardenArea -
-                                              itemGardenWork.area,
+                                    ? `(còn: ${formatNumber(
+                                          Math.max(
+                                              itemGardenWork.gardenArea -
+                                                  itemGardenWork.area,
+                                              0,
+                                          ),
                                       )})`
-                                    : `(còn: ${Math.max(
-                                          itemGardenWork.gardenArea -
-                                              itemGardenWork.processingRate,
+                                    : `(còn: ${formatNumber(
+                                          Math.max(
+                                              itemGardenWork.gardenArea -
+                                                  itemGardenWork.processingRate,
+                                              0,
+                                          ),
                                       )})`
                                 : itemGardenWork.processingRate !== 0
-                                ? `(còn: ${Math.max(
-                                      itemGardenWork.gardenArea -
-                                          (itemGardenWork.processingRate +
-                                              itemGardenWork.area),
+                                ? `(còn: ${formatNumber(
+                                      Math.max(
+                                          itemGardenWork.gardenArea -
+                                              (itemGardenWork.processingRate +
+                                                  itemGardenWork.area),
+                                          0,
+                                      ),
                                   )})`
-                                : `(còn: ${Math.max(
-                                      itemGardenWork.gardenArea -
-                                          itemGardenWork.area,
+                                : `(còn: ${formatNumber(
+                                      Math.max(
+                                          itemGardenWork.gardenArea -
+                                              itemGardenWork.area,
+                                          0,
+                                      ),
                                   )})`}
                         </Text>
                     </Text>

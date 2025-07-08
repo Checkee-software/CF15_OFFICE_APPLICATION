@@ -106,12 +106,17 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
             set({isLoadingCreate: false});
 
             if (response.data?.data) {
+                // ToastAndroid.show(
+                //     `${response.data.message}`,
+                //     ToastAndroid.SHORT,
+                // );
+
                 setTimeout(() => {
                     Snackbar.show({
                         text: `${response.data.message}`,
                         duration: Snackbar.LENGTH_LONG,
                     });
-                }, 200);
+                }, 500);
             }
 
             return response.data;

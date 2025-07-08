@@ -147,10 +147,14 @@ export const useStatisticStore = create<StatisticStore>(set => ({
             const response =
                 selection === 'WORK'
                     ? await axiosClient.get(
-                          `${ENV.BACKEND_URL}/resources/schedules/selection`,
+                          `${ENV.BACKEND_URL}/resources/schedules/selection-schedule`,
+                      )
+                    : selection === 'PRODUCT'
+                    ? await axiosClient.get(
+                          `${ENV.BACKEND_URL}/resources/products/selection`,
                       )
                     : await axiosClient.get(
-                          `${ENV.BACKEND_URL}/resources/products/selection`,
+                          `${ENV.BACKEND_URL}/resources/units/selection`,
                       );
 
             if (response.data.data) {
