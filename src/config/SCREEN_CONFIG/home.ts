@@ -43,12 +43,12 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     GARDENINFOWORKER1: {
         key: 'GARDENINFOWORKER1',
-        headerTitle: 'KHAI BÁO CÔNG VIỆC',
+        headerTitle: 'KHAI BÁO QUY TRÌNH',
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENDECLAREWORKER: {
         key: 'GARDENDECLAREWORKER',
-        headerTitle: 'KHAI BÁO KHU VƯỜN',
+        headerTitle: 'CHI TIẾT QUY TRÌNH',
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENCAMERASCAN: {

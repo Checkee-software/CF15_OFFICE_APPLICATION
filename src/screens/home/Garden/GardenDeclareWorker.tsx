@@ -5,59 +5,53 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {Picker} from '@react-native-picker/picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import ActionButtons from './ActionButtons';
-import MachineShiftSelector from './MachineShiftSelector';
 import {useAuthStore} from '../../../stores/authStore';
 import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
-import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/ProcessesFormData';
 import TaskListSection from './TaskListSection';
+import Snackbar from 'react-native-snackbar';
 
 type TaskInput = {
     taskId: string;
     taskName: string;
-    selectedMaterialId: string;
-    processType: 'material' | '';
-    value: string;
     area: string;
     disabled?: boolean;
+    taskStatus?: string;
 };
 
-type ProcessOption = {
-    id: string;
+type AdditionalSupply = {
     name: string;
-    specification: string;
-    type: 'material';
+    value: string;
+    childTaskId: string;
 };
 
 const GardenDeclare = () => {
-    const [runningMachineId, setRunningMachineId] = useState<string | null>(
-        null,
-    );
     const [taskInputs, setTaskInputs] = useState<TaskInput[]>([]);
+    const [additionalSupplies, setAdditionalSupplies] = useState<
+        AdditionalSupply[]
+    >([{name: '', value: '', childTaskId: ''}]);
+
     const {userInfo} = useAuthStore();
-    const {detailWorkSchedule, getDetailWorkSchedule, requestPersonalTask} =
-        useWorkScheduleStore();
+    const {
+        detailWorkSchedule,
+        getDetailWorkSchedule,
+        requestPersonalTask,
+        requestAdditionalMaterial,
+    } = useWorkScheduleStore();
 
     const route = useRoute<any>();
     const id = route.params?.id as string;
-
     const navigation = useNavigation();
     const hasLogged = useRef(false);
     const [showExitAlert, setShowExitAlert] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const [onlyShowReportButton, setOnlyShowReportButton] = useState(false);
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
-    const convertToEProcessType = (type: 'material'): EProcessesType => {
-        switch (type) {
-            case 'material':
-                return EProcessesType.VAT_TU;
-            default:
-                throw new Error('Loại quy trình không hợp lệ');
-        }
-    };
 
     useEffect(() => {
         if (id) getDetailWorkSchedule(id);
@@ -81,74 +75,16 @@ const GardenDeclare = () => {
                 return {
                     taskId: task._id,
                     taskName: task.name,
-                    selectedMaterialId: '',
-                    processType: '' as '' | 'material',
-                    value: '',
                     area: '',
                     disabled: isCanceled,
+                    taskStatus: task.status,
                 };
             });
             setTaskInputs(inputs);
         }
     }, [detailWorkSchedule, userInfo]);
 
-    const getAllProcesses = (): ProcessOption[] => {
-        const result: ProcessOption[] = [];
-        if (detailWorkSchedule?.materials?.length) {
-            result.push(
-                ...detailWorkSchedule.materials
-                    .filter((m: any) => m.name && m._id)
-                    .map((m: any) => ({
-                        id: m._id,
-                        name: m.name,
-                        specification: m.specification || '',
-                        type: 'material' as const,
-                    })),
-            );
-        }
-
-        return result;
-    };
-
-    const getProcessById = (
-        id: string,
-        type: 'material',
-    ): ProcessOption | undefined => {
-        switch (type) {
-            case 'material': {
-                const found = detailWorkSchedule?.materials?.find(
-                    (m: any) => m._id === id,
-                );
-                return found
-                    ? {
-                          id: found._id,
-                          name: found.name,
-                          specification: found.specification,
-                          type: 'material',
-                      }
-                    : undefined;
-            }
-        }
-    };
-
-    const handleProcessChange = (
-        index: number,
-        selectedId: string,
-        processType: 'material',
-    ) => {
-        setTaskInputs(prev => {
-            const updated = [...prev];
-            updated[index].selectedMaterialId = selectedId;
-            updated[index].processType = processType;
-            return updated;
-        });
-    };
-
-    const handleInputChange = (
-        index: number,
-        field: 'value' | 'area',
-        value: string,
-    ) => {
+    const handleInputChange = (index: number, field: 'area', value: string) => {
         setTaskInputs(prev => {
             const updated = [...prev];
             updated[index][field] = value;
@@ -159,13 +95,7 @@ const GardenDeclare = () => {
     const handleExit = () => navigation.goBack();
 
     const isTaskValid = (task: TaskInput) => {
-        return (
-            !task.disabled &&
-            task.selectedMaterialId.trim() !== '' &&
-            task.processType !== '' &&
-            task.value.trim() !== '' &&
-            task.area.trim() !== ''
-        );
+        return !task.disabled && task.area.trim() !== '';
     };
 
     const handleReport = () => {
@@ -188,26 +118,9 @@ const GardenDeclare = () => {
         try {
             const requests = taskInputs.filter(isTaskValid);
             for (const task of requests) {
-                if (task.processType === '') continue;
-                const selected = getProcessById(
-                    task.selectedMaterialId,
-                    task.processType,
-                );
-                if (!selected) continue;
-
                 const payload = {
-                    specification: selected.specification,
-                    processName: selected.name,
                     area: parseFloat(task.area),
-                    value: parseFloat(task.value),
-                    type: convertToEProcessType(selected.type),
                 };
-
-                console.log('📤 Dữ liệu gửi đi:', {
-                    scheduleId: detailWorkSchedule._id,
-                    childTaskId: task.taskId,
-                    ...payload,
-                });
 
                 await requestPersonalTask(
                     detailWorkSchedule._id,
@@ -221,15 +134,31 @@ const GardenDeclare = () => {
             setTaskInputs(prev =>
                 prev.map(task => ({
                     ...task,
-                    selectedMaterialId: '',
-                    processType: '',
-                    value: '',
                     area: '',
                 })),
             );
         } catch (err) {
             console.error('❌ Lỗi khi gửi báo cáo:', err);
         }
+    };
+
+    const handleAddSupply = () => {
+        setAdditionalSupplies(prev => [
+            ...prev,
+            {name: '', value: '', childTaskId: ''},
+        ]);
+    };
+
+    const handleChangeSupplyField = (
+        index: number,
+        field: keyof AdditionalSupply,
+        value: string,
+    ) => {
+        setAdditionalSupplies(prev => {
+            const updated = [...prev];
+            updated[index] = {...updated[index], [field]: value};
+            return updated;
+        });
     };
 
     if (!detailWorkSchedule) {
@@ -263,20 +192,125 @@ const GardenDeclare = () => {
                     </View>
                 </View>
 
-                <MachineShiftSelector
-                    machines={detailWorkSchedule?.machines || []}
-                    scheduleId={detailWorkSchedule?._id || ''}
-                />
-
                 <TaskListSection
                     taskInputs={taskInputs}
-                    getAllProcesses={getAllProcesses}
-                    getProcessById={getProcessById}
-                    handleProcessChange={handleProcessChange}
                     handleInputChange={handleInputChange}
                     styles={styles}
                     gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
                 />
+
+                <View style={{marginTop: 16}}>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: 12,
+                        }}>
+                        <Text
+                            style={{
+                                fontSize: 16,
+                                fontWeight: '600',
+                                marginBottom: 12,
+                            }}>
+                            Nguồn cung thêm
+                        </Text>
+                        <TouchableOpacity onPress={handleAddSupply}>
+                            <Icon name='add' size={20} color='blue' />
+                        </TouchableOpacity>
+                    </View>
+
+                    {additionalSupplies.map((item, index) => (
+                        <View key={index} style={{marginBottom: 28}}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder='Tên vật tư'
+                                value={item.name}
+                                onChangeText={text =>
+                                    handleChangeSupplyField(index, 'name', text)
+                                }
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder='Giá trị (kg)'
+                                keyboardType='numeric'
+                                value={item.value}
+                                onChangeText={text =>
+                                    handleChangeSupplyField(
+                                        index,
+                                        'value',
+                                        text,
+                                    )
+                                }
+                            />
+                            <View style={styles.dropdownContainer}>
+                                <Picker
+                                    selectedValue={item.childTaskId}
+                                    onValueChange={value =>
+                                        handleChangeSupplyField(
+                                            index,
+                                            'childTaskId',
+                                            value,
+                                        )
+                                    }>
+                                    <Picker.Item
+                                        label='Chọn công việc'
+                                        value=''
+                                    />
+                                    {detailWorkSchedule.childTasks.map(
+                                        (task: any) => (
+                                            <Picker.Item
+                                                key={task._id}
+                                                label={task.name}
+                                                value={task._id}
+                                            />
+                                        ),
+                                    )}
+                                </Picker>
+                            </View>
+                        </View>
+                    ))}
+
+                    <TouchableOpacity
+                        style={[
+                            styles.saveButton,
+                            additionalSupplies.every(
+                                s => s.name && s.value && s.childTaskId,
+                            )
+                                ? null
+                                : {backgroundColor: '#ccc'},
+                        ]}
+                        disabled={
+                            !additionalSupplies.every(
+                                s => s.name && s.value && s.childTaskId,
+                            )
+                        }
+                        onPress={async () => {
+                            if (!detailWorkSchedule?._id) return;
+                            try {
+                                for (const supply of additionalSupplies) {
+                                    await requestAdditionalMaterial(
+                                        detailWorkSchedule._id,
+                                        supply.childTaskId,
+                                        {
+                                            name: supply.name,
+                                            value: Number(supply.value),
+                                        },
+                                    );
+                                }
+                                setAdditionalSupplies([
+                                    {name: '', value: '', childTaskId: ''},
+                                ]);
+                            } catch (err) {
+                                console.error(
+                                    '❌ Lỗi khi gửi vật tư thêm:',
+                                    err,
+                                );
+                            }
+                        }}>
+                        <Text style={styles.saveButtonText}>Lưu</Text>
+                    </TouchableOpacity>
+                </View>
             </ScrollView>
 
             <View style={styles.footer}>
@@ -311,31 +345,34 @@ const GardenDeclare = () => {
 };
 
 const styles = StyleSheet.create({
+    dropdownContainer: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 6,
+        backgroundColor: '#fff',
+    },
     container: {padding: 16, backgroundColor: 'white'},
     centered: {flex: 1, justifyContent: 'center', alignItems: 'center'},
     infoContainer: {marginBottom: 16},
     gardenName: {fontSize: 20, fontWeight: 'bold'},
     gardenCode: {fontSize: 16, color: 'green', fontWeight: 'bold'},
-    productBox: {marginTop: 12},
+    productBox: {
+        marginTop: 12,
+        backgroundColor: '#4CAF5026',
+        padding: 10,
+        borderRadius: 8,
+    },
     productLabel: {fontSize: 14, color: 'black'},
     productRow: {flexDirection: 'row', alignItems: 'center', marginTop: 4},
     productText: {marginLeft: 8, fontSize: 16},
-    taskBox: {
-        marginTop: 16,
-        padding: 12,
-        backgroundColor: '#f4f4f4',
-        borderRadius: 8,
-    },
-    taskTitle: {fontSize: 16, fontWeight: 'bold', marginBottom: 8},
-    materialBox: {marginBottom: 12},
-    label: {fontSize: 14, marginBottom: 4},
+    label: {fontWeight: '500', marginBottom: 4},
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 6,
         padding: 8,
         marginBottom: 8,
-        height: 50,
+        height: 55,
         color: 'black',
     },
     footer: {padding: 16, borderTopWidth: 1, borderColor: '#eee'},
@@ -347,29 +384,22 @@ const styles = StyleSheet.create({
     },
     exitText1: {color: 'white', fontWeight: '600', fontSize: 16},
     sectionTitle: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: '600',
         marginBottom: 12,
     },
-    card: {
-        backgroundColor: '#e8f0ff',
-        padding: 16,
-        borderRadius: 12,
-        marginBottom: 16,
-    },
 
-    pickerWrapper: {
-        backgroundColor: '#e8f0ff',
-        borderRadius: 8,
-        height: 50,
-        justifyContent: 'center',
-        marginVertical: 8,
-        borderColor: '#ccc',
-        borderWidth: 1,
+    saveButton: {
+        backgroundColor: '#4CAF50',
+        borderRadius: 24,
+        paddingVertical: 12,
+        alignItems: 'center',
+        marginTop: 10,
     },
-    picker: {
-        height: 55,
-        color: '#333',
+    saveButtonText: {
+        color: 'white',
+        fontWeight: '600',
+        fontSize: 16,
     },
 });
 

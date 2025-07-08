@@ -1,52 +1,37 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import {useRoute} from '@react-navigation/native';
-import {useMachineStore} from '@/stores/machineStore';
-import {useAuthStore} from '@/stores/authStore';
+import React from 'react';
+import {View, Text, StyleSheet} from 'react-native';
+import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 
 interface MachineShift {
     _id: string;
-    name: string;
-    createdBy: string;
     title: string;
+    createdBy: string;
+    name: string;
     totalTime: number;
 }
 
-const ActiveMachine = () => {
-    const {userInfo} = useAuthStore();
-    const route = useRoute();
-    const {getActiveMachine} = useMachineStore();
+interface Props {
+    shifts: MachineShift[];
+    currentUserName: string;
+}
 
-    const {scheduleId} = route.params as {scheduleId: string};
-
-    const [activeShifts, setActiveShifts] = useState<MachineShift[]>([]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!scheduleId) return;
-            const data = await getActiveMachine(scheduleId);
-            setActiveShifts(data);
-        };
-
-        fetchData();
-    }, [scheduleId]);
-
+const MachineShiftHistorySection = ({shifts, currentUserName}: Props) => {
     return (
-        <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                {activeShifts.map((shift, index) => (
-                    <View key={shift._id} style={styles.shiftCard}>
-                        <Text style={styles.value1}>{shift.title}</Text>
+        <CollapsibleTaskBlock title={`Lịch sử ca máy (${shifts.length})`}>
+            <View style={styles.container}>
+                {shifts.map(shift => (
+                    <View key={shift._id} style={styles.card}>
+                        <Text style={styles.taskName}>{shift.title}</Text>
 
                         <View style={styles.row}>
                             <Text style={styles.label}>Người thực hiện</Text>
                             <Text
                                 style={[
                                     styles.value,
-                                    shift.createdBy === userInfo?.fullName &&
+                                    shift.createdBy === currentUserName &&
                                         styles.you,
                                 ]}>
-                                {shift.createdBy === userInfo?.fullName
+                                {shift.createdBy === currentUserName
                                     ? 'Bạn'
                                     : shift.createdBy}
                             </Text>
@@ -65,33 +50,27 @@ const ActiveMachine = () => {
                         </View>
                     </View>
                 ))}
-            </ScrollView>
-        </View>
+            </View>
+        </CollapsibleTaskBlock>
     );
 };
 
 const styles = StyleSheet.create({
-    you: {
-        color: '#007AFF',
-        fontWeight: 'bold',
-    },
     container: {
-        padding: 16,
-        backgroundColor: 'white',
-        flex: 1,
+        marginBottom: 16,
     },
-    scrollContainer: {
-        gap: 12,
-    },
-    shiftCard: {
+    card: {
         backgroundColor: '#EAF6FF',
         borderRadius: 8,
         padding: 12,
+        marginBottom: 12,
         gap: 10,
     },
-    shiftTitle: {
+    taskName: {
         fontWeight: '600',
         marginBottom: 8,
+        fontSize: 14,
+        color: '#333',
     },
     row: {
         flexDirection: 'row',
@@ -106,11 +85,10 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#333',
     },
-    value1: {
-        fontSize: 14,
-        color: '#333',
+    you: {
+        color: '#007AFF',
         fontWeight: 'bold',
     },
 });
 
-export default ActiveMachine;
+export default MachineShiftHistorySection;

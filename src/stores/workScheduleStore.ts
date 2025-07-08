@@ -3,7 +3,10 @@ import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
 import {IList} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {ISchedule} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
-import {IRequest} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
+import {
+    IRequest,
+    IRequestMaterial,
+} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
 import ENV from '@/config/ENV';
 
 interface workScheduleStore {
@@ -24,6 +27,12 @@ interface workScheduleStore {
         scheduleId: string,
         childTaskId: string,
         data: Omit<IRequest, 'scheduleId' | 'childTaskId'>,
+    ) => Promise<void>;
+
+    requestAdditionalMaterial: (
+        scheduleId: string,
+        childTaskId: string,
+        data: Omit<IRequestMaterial, 'scheduleId' | 'childTaskId'>,
     ) => Promise<void>;
 }
 
@@ -60,6 +69,31 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             console.error('❌ Error sending request:', error);
             Snackbar.show({
                 text: 'Gửi yêu cầu thất bại!',
+                duration: Snackbar.LENGTH_LONG,
+            });
+        } finally {
+            set({isLoading: false});
+        }
+    },
+
+    requestAdditionalMaterial: async (scheduleId, childTaskId, data) => {
+        set({isLoading: true});
+        try {
+            await axiosClient.post(
+                `${ENV.BACKEND_URL}/resources/schedules/add-marterials-by-staff/${scheduleId}/${childTaskId}`,
+                data,
+            );
+            Snackbar.show({
+                text: 'Gửi yêu cầu cung ứng vật tư thành công!',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+        } catch (error: any) {
+            console.error(
+                '❌ Error sending additional material request:',
+                error,
+            );
+            Snackbar.show({
+                text: 'Gửi yêu cầu cung ứng vật tư thất bại!',
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
