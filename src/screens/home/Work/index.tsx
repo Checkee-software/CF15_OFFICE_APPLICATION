@@ -111,6 +111,15 @@ const WorkScreen = () => {
                     </Text>
                 </View>
 
+                {itemGardenWork.type === 'CA_MAY' && (
+                    <View style={styles.warpLabelAndValue}>
+                        <Text style={styles.label}>Ca máy</Text>
+                        <Text style={styles.workValue}>
+                            {itemGardenWork.machineName}
+                        </Text>
+                    </View>
+                )}
+
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Diện tích đã làm</Text>
                     <Text style={styles.value}>

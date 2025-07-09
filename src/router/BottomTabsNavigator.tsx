@@ -34,7 +34,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
                 clearRedirectData();
             }, 1000);
         }
-    }, [redirectData, redirectDataRequestSchedule]);
+    }, [redirectData]);
 
     return redirectData ? (
         <Backdrop open />
