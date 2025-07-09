@@ -15,6 +15,7 @@ type Props = {
     handleInputChange: (index: number, field: 'area', value: string) => void;
     styles: any;
     gardenAreaType: string;
+    gardenArea: number;
 };
 
 const TaskListSection = ({
@@ -22,6 +23,7 @@ const TaskListSection = ({
     handleInputChange,
     styles,
     gardenAreaType,
+    gardenArea,
 }: Props) => {
     return (
         <View>
@@ -32,6 +34,11 @@ const TaskListSection = ({
                 {taskInputs.map((task, index) => {
                     const isCompleted = task.taskStatus === 'COMPELETED';
                     const isDisabled = task.disabled || isCompleted;
+                    const areaValue = parseFloat(task.area);
+                    const showWarning =
+                        !isDisabled &&
+                        !isNaN(areaValue) &&
+                        areaValue > gardenArea;
 
                     return (
                         <CollapsibleTaskBlock
@@ -60,15 +67,22 @@ const TaskListSection = ({
 
                             <TextInput
                                 style={styles.input}
-                                keyboardType='numeric'
-                                placeholder='Nhập diện tích'
-                                placeholderTextColor='black'
+                                keyboardType="numeric"
+                                placeholder="Nhập diện tích"
+                                placeholderTextColor="black"
                                 value={task.area}
                                 onChangeText={text =>
                                     handleInputChange(index, 'area', text)
                                 }
                                 editable={!isDisabled}
                             />
+
+                            {showWarning && (
+                                <Text style={styles.warningText}>
+                                    Diện tích không được vượt quá {gardenArea}{' '}
+                                    {gardenAreaType}
+                                </Text>
+                            )}
                         </CollapsibleTaskBlock>
                     );
                 })}

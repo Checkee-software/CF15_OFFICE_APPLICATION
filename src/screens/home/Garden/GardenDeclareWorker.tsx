@@ -31,6 +31,7 @@ type AdditionalSupply = {
 
 const GardenDeclare = () => {
     const [machineShifts, setMachineShifts] = useState<MachineShiftInput[]>([]);
+    const [availableMachines, setAvailableMachines] = useState<INorm[]>([]);
 
     const handleMachineShiftChange = (
         index: number,
@@ -98,15 +99,24 @@ const GardenDeclare = () => {
     }, [detailWorkSchedule, userInfo]);
     useEffect(() => {
         if (detailWorkSchedule?.childTasks?.length) {
-            const shifts = detailWorkSchedule.childTasks.flatMap((task: any) =>
-                (task.machines || []).map((machine: any) => ({
-                    machineId: '',
-                    hours: '',
-                    taskName: task.name,
-                    gardenAreaType: detailWorkSchedule.gardenAreaType || 'm²',
-                })),
+            const taskWithMachines = detailWorkSchedule.childTasks.find(
+                (task: any) => task.machines && task.machines.length > 0,
             );
-            setMachineShifts(shifts);
+
+            if (taskWithMachines) {
+                const shifts = [
+                    {
+                        machineId: '',
+                        hours: '',
+                        taskName: taskWithMachines.name,
+                        gardenAreaType:
+                            detailWorkSchedule.gardenAreaType || 'm²',
+                    },
+                ];
+                setMachineShifts(shifts);
+
+                setAvailableMachines(taskWithMachines.machines);
+            }
         }
     }, [detailWorkSchedule]);
 
@@ -307,13 +317,15 @@ const GardenDeclare = () => {
                     handleInputChange={handleInputChange}
                     styles={styles}
                     gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
+                    gardenArea={detailWorkSchedule?.gardenArea || 0}
                 />
 
                 <MachineShiftSelector
-                    machines={uniqueMachines}
+                    machines={availableMachines}
                     machineShifts={machineShifts}
                     gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
                     onChange={handleMachineShiftChange}
+                    gardenArea={detailWorkSchedule?.gardenArea || 0}
                 />
 
                 <AdditionalSupplySection
@@ -406,6 +418,11 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: '600',
         fontSize: 16,
+    },
+    warningText: {
+        color: 'red',
+        fontSize: 12,
+        marginTop: 4,
     },
 });
 
