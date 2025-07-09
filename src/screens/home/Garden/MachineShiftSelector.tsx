@@ -15,6 +15,7 @@ interface Props {
     machines: INorm[];
     machineShifts: MachineShiftInput[];
     gardenAreaType: string;
+    gardenArea: number;
     onChange: (
         index: number,
         field: 'machineId' | 'hours',
@@ -27,12 +28,13 @@ const MachineShiftSelector: React.FC<Props> = ({
     machineShifts,
     onChange,
     gardenAreaType,
+    gardenArea,
 }) => {
+    if (!machineShifts.length) return null;
+
     return (
         <View>
-            <Text style={styles.sectionTitle}>
-                Ca máy ({machineShifts.length})
-            </Text>
+            <Text style={styles.sectionTitle}>Ca máy</Text>
 
             <View style={{gap: 12}}>
                 {machineShifts.map((shift, index) => (
@@ -40,46 +42,54 @@ const MachineShiftSelector: React.FC<Props> = ({
                         key={index}
                         title={shift.taskName}
                         backgroundColor='#FF98004D'>
-                        <Text style={styles.label}>
-                            Loại ca máy <Text style={{color: 'red'}}>*</Text>
-                        </Text>
-                        <View style={styles.pickerWrapper}>
-                            <Picker
-                                selectedValue={shift.machineId}
-                                onValueChange={value =>
-                                    onChange(index, 'machineId', value)
-                                }
-                                style={styles.picker}>
-                                <Picker.Item label='Chọn' value='' />
-                                {machines.map(machine => (
-                                    <Picker.Item
-                                        key={machine._id}
-                                        label={machine.name}
-                                        value={machine._id}
-                                    />
-                                ))}
-                            </Picker>
-                        </View>
-
-                        {shift.machineId ? (
-                            <>
-                                <Text style={styles.label}>
-                                    Diện tích đã làm ({gardenAreaType})
-                                    <Text style={{color: 'red'}}>*</Text>
-                                </Text>
-
-                                <TextInput
-                                    style={styles.input}
-                                    keyboardType='numeric'
-                                    placeholder='Nhập diện tích'
-                                    placeholderTextColor='black'
-                                    value={shift.hours}
-                                    onChangeText={text =>
-                                        onChange(index, 'hours', text)
+                        <View style={{gap: 8}}>
+                            <Text style={styles.label}>
+                                Loại ca máy{' '}
+                                <Text style={{color: 'red'}}>*</Text>
+                            </Text>
+                            <View style={styles.pickerWrapper}>
+                                <Picker
+                                    selectedValue={shift.machineId}
+                                    onValueChange={value =>
+                                        onChange(index, 'machineId', value)
                                     }
-                                />
-                            </>
-                        ) : null}
+                                    style={styles.picker}>
+                                    <Picker.Item label='Chọn' value='' />
+                                    {machines.map(machine => (
+                                        <Picker.Item
+                                            key={machine._id}
+                                            label={machine.name}
+                                            value={machine._id}
+                                        />
+                                    ))}
+                                </Picker>
+                            </View>
+
+                            {shift.machineId ? (
+                                <>
+                                    <Text style={styles.label}>
+                                        Diện tích đã làm ({gardenAreaType}){' '}
+                                        <Text style={{color: 'red'}}>*</Text>
+                                    </Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        keyboardType='numeric'
+                                        placeholder='Nhập diện tích'
+                                        placeholderTextColor='black'
+                                        value={shift.hours}
+                                        onChangeText={text =>
+                                            onChange(index, 'hours', text)
+                                        }
+                                    />
+                                    {parseFloat(shift.hours) > gardenArea && (
+                                        <Text style={styles.warningText}>
+                                            Diện tích không được vượt quá{' '}
+                                            {gardenArea} {gardenAreaType}
+                                        </Text>
+                                    )}
+                                </>
+                            ) : null}
+                        </View>
                     </CollapsibleTaskBlock>
                 ))}
             </View>
@@ -88,6 +98,11 @@ const MachineShiftSelector: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
+    warningText: {
+        color: 'red',
+        fontSize: 12,
+        marginTop: 4,
+    },
     sectionTitle: {
         fontSize: 16,
         fontWeight: '600',
@@ -104,7 +119,6 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     picker: {
-        // height: 55,
         width: '100%',
     },
     input: {
