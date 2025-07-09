@@ -43,7 +43,9 @@ const InitApp = () => {
             const data = event.notification.additionalData;
 
             if (data?._id !== '') {
-                setRedirectData(data?._id);
+                setRedirectData('schdule', data?._id);
+            } else {
+                setRedirectData('request', data?._id);
             }
         };
 

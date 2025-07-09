@@ -47,6 +47,7 @@ type AuthStore = {
     isLoading: boolean;
     isLogin: boolean;
     redirectData: string | null;
+    redirectDataRequestSchedule: string | null;
     login: (userAccount: ILogin) => Promise<void>;
     autoLogin: () => Promise<void>;
     getScheduleCollection: () => Promise<
@@ -60,7 +61,7 @@ type AuthStore = {
     >;
     logout: () => Promise<void>;
     updatePassword: (userPasswordUpdate: IUpdatePassword) => Promise<any>;
-    setRedirectData: (data: string) => void;
+    setRedirectData: (type: string, data: string) => void;
     clearRedirectData: () => void;
 };
 
@@ -74,6 +75,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     userLogin: {} as ILogin,
     userPasswordUpdate: {} as IUpdatePassword,
     redirectData: null,
+    redirectDataRequestSchedule: null,
     isLoading: false,
     isLogin: false,
 
@@ -250,7 +252,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         }
     },
 
-    setRedirectData: (data: string) => set({redirectData: data}),
+    setRedirectData: (type: string, data: string) =>
+        set(
+            type === 'schdule'
+                ? {redirectData: data}
+                : {redirectDataRequestSchedule: data},
+        ),
     clearRedirectData: () => set({redirectData: null}),
 
     logout: async () => {

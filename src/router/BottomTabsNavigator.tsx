@@ -17,7 +17,8 @@ import Backdrop from '@/screens/subscreen/Loading/index2';
 import {useAuthStore} from '@/stores/authStore';
 
 const BottomTabsNavigator = ({navigation}: any) => {
-    const {redirectData, clearRedirectData} = useAuthStore();
+    const {redirectData, redirectDataRequestSchedule, clearRedirectData} =
+        useAuthStore();
 
     const Tab = createBottomTabNavigator();
 
@@ -37,6 +38,9 @@ const BottomTabsNavigator = ({navigation}: any) => {
         <Backdrop open />
     ) : (
         <Tab.Navigator
+            initialRouteName={
+                redirectDataRequestSchedule ? 'Công việc' : 'Trang chủ'
+            }
             screenOptions={{
                 headerStyle: {
                     backgroundColor: 'white',

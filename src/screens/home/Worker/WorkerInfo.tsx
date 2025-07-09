@@ -85,7 +85,7 @@ const WorkerInfo = ({route}: any) => {
                 </View>
 
                 <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>Năm sinh</Text>
+                    <Text style={WorkerInfoStyles.labelText}>Ngày sinh</Text>
                     <Text style={WorkerInfoStyles.valueText}>
                         {moment(item.dateOfBirth).format('l')}
                     </Text>
@@ -145,7 +145,7 @@ const WorkerInfo = ({route}: any) => {
                         Địa chỉ thường trú
                     </Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {item.address.resident}
+                        {/* {item.address.resident} */}
                     </Text>
                 </View>
 
@@ -154,7 +154,7 @@ const WorkerInfo = ({route}: any) => {
                         Địa chỉ tạm trú
                     </Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {item.address.temporary}
+                        {/* {item.address.temporary} */}
                     </Text>
                 </View>
             </View>

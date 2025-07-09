@@ -30,7 +30,7 @@ interface gardenWorkStore {
     listGardenWorkBrowse: IGardenData[];
     listGardenWorkBrowseFilter: IGardenData[];
     badgeGardenWorkUnBrowse: number;
-    getRequestDataGarden: () => Promise<any>;
+    getRequestDataGarden: (userGroupId: string) => Promise<any>;
     createRateReportHarvest: (
         harvestReportId: string,
         formRateReport: IRateReportHarvest,
@@ -47,22 +47,26 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
     listGardenWorkBrowse: [],
     listGardenWorkBrowseFilter: [],
 
-    getRequestDataGarden: async () => {
+    getRequestDataGarden: async (userGroupId: string) => {
         set({isLoading: true});
         try {
             const response = await axiosClient.get<any>(
                 `${ENV.BACKEND_URL}/resources/schedule-requests/collection`,
             );
 
+            const filterByGroupId = response.data.data.filter(
+                (item: any) => item.groupIdWorker === userGroupId,
+            );
+
             set({
-                listGardenWorkBrowse: response.data?.data || [],
+                listGardenWorkBrowse: filterByGroupId,
                 listGardenWorkBrowseFilter:
-                    response.data?.data.filter(
+                    filterByGroupId.filter(
                         (item: {status: any}) =>
                             item.status === EStatus.REQUEST,
                     ) || [],
                 badgeGardenWorkUnBrowse:
-                    response.data?.data.filter(
+                    filterByGroupId.filter(
                         (item: {status: any}) =>
                             item.status === EStatus.REQUEST,
                     ).length || 0,

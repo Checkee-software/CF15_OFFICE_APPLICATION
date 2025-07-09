@@ -23,7 +23,7 @@ import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 const Statistic = () => {
     const listStatisticTypeDefault = [
-        {_id: 'WORK', name: 'Công việc'},
+        {_id: 'WORK', name: 'Quy trình'},
         {_id: 'PRODUCT', name: 'Sản phẩm'},
         {_id: 'GROUP', name: 'Đội sản xuất'},
     ];

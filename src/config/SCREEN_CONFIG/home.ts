@@ -78,12 +78,12 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     WORKSCHEDULE: {
         key: 'WORKSCHEDULE',
-        headerTitle: 'LỊCH LÀM VIỆC',
+        headerTitle: 'QUY TRÌNH',
         isOpenQRCamera: false,
     } as ScreenInformation,
     SCHEDULEDETAIL: {
         key: 'SCHEDULEDETAIL',
-        headerTitle: 'CHI TIẾT LỊCH LÀM VIỆC',
+        headerTitle: 'CHI TIẾT QUY TRÌNH',
         isOpenQRCamera: false,
     } as ScreenInformation,
     UNIT: {

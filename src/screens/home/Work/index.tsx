@@ -354,7 +354,7 @@ const WorkScreen = () => {
     };
 
     const handleGetRequestGardenData = async () => {
-        const responseData = await getRequestDataGarden();
+        const responseData = await getRequestDataGarden(userInfo.groupId);
 
         filterByStatus(EStatus.REQUEST);
 

@@ -19,6 +19,8 @@ import ENV from '@/config/ENV';
 const DetailDocuments = ({route}: any) => {
     const [loadingDownload, setLoadingDownload] = useState(false);
 
+    console.log(route);
+
     const htmlContent = `
     <html>
       <head>

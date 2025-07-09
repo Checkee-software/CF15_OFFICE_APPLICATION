@@ -555,7 +555,7 @@ const ScheduleDetail = ({route}: any) => {
 
                     <View style={ScheduleDetailStyles.warpMainWork}>
                         <Text style={ScheduleDetailStyles.mainWorkSummary}>
-                            Tổng số công việc con
+                            Tổng số quy trình làm việc
                         </Text>
                         <Text style={ScheduleDetailStyles.statusText}>
                             {scheduleDetail?.childTasks.length}
@@ -822,6 +822,7 @@ const ScheduleDetailStyles = StyleSheet.create({
     jobDescription: {
         gap: 10,
         marginVertical: 10,
+        marginBottom: 30,
     },
     description: {
         color: '#212121',

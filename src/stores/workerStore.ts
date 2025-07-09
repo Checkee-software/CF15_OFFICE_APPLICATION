@@ -126,6 +126,8 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                 `${ENV.BACKEND_URL}/resources/users/collection`,
             );
 
+            console.log(response);
+
             if (response) {
                 const updateImgPathListWorker = response.data.data.map(
                     (item: {avatar: string}) => {

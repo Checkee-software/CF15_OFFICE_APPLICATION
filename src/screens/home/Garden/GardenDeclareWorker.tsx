@@ -225,6 +225,7 @@ const GardenDeclare = () => {
                             <TextInput
                                 style={styles.input}
                                 placeholder='Tên vật tư'
+                                placeholderTextColor={'black'}
                                 value={item.name}
                                 onChangeText={text =>
                                     handleChangeSupplyField(index, 'name', text)
@@ -233,6 +234,7 @@ const GardenDeclare = () => {
                             <TextInput
                                 style={styles.input}
                                 placeholder='Giá trị (kg)'
+                                placeholderTextColor={'black'}
                                 keyboardType='numeric'
                                 value={item.value}
                                 onChangeText={text =>
@@ -245,6 +247,7 @@ const GardenDeclare = () => {
                             />
                             <View style={styles.dropdownContainer}>
                                 <Picker
+                                    style={{color: 'black'}}
                                     selectedValue={item.childTaskId}
                                     onValueChange={value =>
                                         handleChangeSupplyField(

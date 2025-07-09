@@ -147,7 +147,8 @@ export default function Main({navigation}: any) {
                 item =>
                     item.key !== 'unit' &&
                     item.key !== 'employee' &&
-                    item.key !== 'gardenInfo',
+                    item.key !== 'gardenInfo' &&
+                    item.key !== 'statistic',
             );
         }
 
