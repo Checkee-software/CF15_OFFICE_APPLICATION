@@ -12,12 +12,14 @@ interface MachineShift {
 
 interface Props {
     shifts: MachineShift[];
-    currentUserName: string;
+    gardenAreaType: string;
 }
 
-const MachineShiftHistorySection = ({shifts, currentUserName}: Props) => {
+const MachineShiftHistorySection = ({shifts, gardenAreaType}: Props) => {
     return (
-        <CollapsibleTaskBlock title={`Lịch sử ca máy (${shifts.length})`}>
+        <CollapsibleTaskBlock
+            noWrapperPadding={true}
+            title={`Lịch sử ca máy (${shifts.length})`}>
             <View style={styles.container}>
                 {shifts.map(shift => (
                     <View key={shift._id} style={styles.card}>
@@ -25,16 +27,7 @@ const MachineShiftHistorySection = ({shifts, currentUserName}: Props) => {
 
                         <View style={styles.row}>
                             <Text style={styles.label}>Người thực hiện</Text>
-                            <Text
-                                style={[
-                                    styles.value,
-                                    shift.createdBy === currentUserName &&
-                                        styles.you,
-                                ]}>
-                                {shift.createdBy === currentUserName
-                                    ? 'Bạn'
-                                    : shift.createdBy}
-                            </Text>
+                            <Text style={styles.value}>{shift.createdBy}</Text>
                         </View>
 
                         <View style={styles.row}>
@@ -43,9 +36,9 @@ const MachineShiftHistorySection = ({shifts, currentUserName}: Props) => {
                         </View>
 
                         <View style={styles.row}>
-                            <Text style={styles.label}>Thời gian</Text>
+                            <Text style={styles.label}>Diện tích</Text>
                             <Text style={styles.value}>
-                                {shift.totalTime} giờ
+                                {shift.totalTime} ({gardenAreaType})
                             </Text>
                         </View>
                     </View>
@@ -84,10 +77,6 @@ const styles = StyleSheet.create({
     value: {
         fontSize: 14,
         color: '#333',
-    },
-    you: {
-        color: '#007AFF',
-        fontWeight: 'bold',
     },
 });
 

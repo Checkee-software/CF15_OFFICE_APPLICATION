@@ -20,7 +20,6 @@ interface Props {
         field: 'machineId' | 'hours',
         value: string,
     ) => void;
-    
 }
 
 const MachineShiftSelector: React.FC<Props> = ({
@@ -105,7 +104,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     picker: {
-        height: 55,
+        // height: 55,
         width: '100%',
     },
     input: {
@@ -113,7 +112,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 6,
         padding: 8,
-        height: 55,
+        height: 60,
     },
 });
 

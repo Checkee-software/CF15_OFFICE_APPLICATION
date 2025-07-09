@@ -31,8 +31,7 @@ interface workScheduleStore {
 
     requestAdditionalMaterial: (
         scheduleId: string,
-        childTaskId: string,
-        data: Omit<IRequestMaterial, 'scheduleId' | 'childTaskId'>,
+        data: Omit<IRequestMaterial, 'scheduleId'>,
     ) => Promise<void>;
 }
 
@@ -76,11 +75,11 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
         }
     },
 
-    requestAdditionalMaterial: async (scheduleId, childTaskId, data) => {
+    requestAdditionalMaterial: async (scheduleId, data) => {
         set({isLoading: true});
         try {
             await axiosClient.post(
-                `${ENV.BACKEND_URL}/resources/schedules/add-marterials-by-staff/${scheduleId}/${childTaskId}`,
+                `${ENV.BACKEND_URL}/resources/schedules/add-marterials-by-staff/${scheduleId}`,
                 data,
             );
             Snackbar.show({
