@@ -5,17 +5,17 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
-    TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Picker} from '@react-native-picker/picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import ActionButtons from './ActionButtons';
 import {useAuthStore} from '../../../stores/authStore';
 import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
 import TaskListSection from './TaskListSection';
-import Snackbar from 'react-native-snackbar';
-
+import AdditionalSupplySection from './AdditionalSupplySection';
+import MachineShiftSelector from './MachineShiftSelector';
+import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/ProcessesFormData';
+import MachineShiftHistorySection from './ActiveMachine';
 type TaskInput = {
     taskId: string;
     taskName: string;
@@ -27,14 +27,27 @@ type TaskInput = {
 type AdditionalSupply = {
     name: string;
     value: string;
-    childTaskId: string;
 };
 
 const GardenDeclare = () => {
+    const [machineShifts, setMachineShifts] = useState<MachineShiftInput[]>([]);
+
+    const handleMachineShiftChange = (
+        index: number,
+        field: 'machineId' | 'hours',
+        value: string,
+    ) => {
+        setMachineShifts(prev => {
+            const updated = [...prev];
+            updated[index][field] = value;
+            return updated;
+        });
+    };
+
     const [taskInputs, setTaskInputs] = useState<TaskInput[]>([]);
     const [additionalSupplies, setAdditionalSupplies] = useState<
         AdditionalSupply[]
-    >([{name: '', value: '', childTaskId: ''}]);
+    >([{name: '', value: ''}]);
 
     const {userInfo} = useAuthStore();
     const {
@@ -83,6 +96,19 @@ const GardenDeclare = () => {
             setTaskInputs(inputs);
         }
     }, [detailWorkSchedule, userInfo]);
+    useEffect(() => {
+        if (detailWorkSchedule?.childTasks?.length) {
+            const shifts = detailWorkSchedule.childTasks.flatMap((task: any) =>
+                (task.machines || []).map((machine: any) => ({
+                    machineId: '',
+                    hours: '',
+                    taskName: task.name,
+                    gardenAreaType: detailWorkSchedule.gardenAreaType || 'm²',
+                })),
+            );
+            setMachineShifts(shifts);
+        }
+    }, [detailWorkSchedule]);
 
     const handleInputChange = (index: number, field: 'area', value: string) => {
         setTaskInputs(prev => {
@@ -99,8 +125,10 @@ const GardenDeclare = () => {
     };
 
     const handleReport = () => {
-        const someValid = taskInputs.some(isTaskValid);
-        if (someValid) {
+        const someTaskValid = taskInputs.some(isTaskValid);
+        const someMachineValid = machineShifts.some(isMachineShiftValid);
+
+        if (someTaskValid || someMachineValid) {
             setShowReportConfirmation(true);
         } else {
             setShowExitAlert(true);
@@ -109,7 +137,12 @@ const GardenDeclare = () => {
 
     const handleCancelReport = () => setShowReportConfirmation(false);
 
-    const hasDeclarations = taskInputs.some(isTaskValid);
+    const isMachineShiftValid = (shift: MachineShiftInput) => {
+        return shift.machineId.trim() !== '' && shift.hours.trim() !== '';
+    };
+
+    const hasDeclarations =
+        taskInputs.some(isTaskValid) || machineShifts.some(isMachineShiftValid);
 
     const handleConfirmReport = async () => {
         setShowReportConfirmation(false);
@@ -121,6 +154,11 @@ const GardenDeclare = () => {
                 const payload = {
                     area: parseFloat(task.area),
                 };
+                console.log('📤 Gửi lao động:', {
+                    scheduleId: detailWorkSchedule._id,
+                    taskId: task.taskId,
+                    payload,
+                });
 
                 await requestPersonalTask(
                     detailWorkSchedule._id,
@@ -128,13 +166,44 @@ const GardenDeclare = () => {
                     payload,
                 );
             }
+            for (const shift of machineShifts.filter(isMachineShiftValid)) {
+                const matchingTask = detailWorkSchedule.childTasks.find(
+                    (task: any) => task.name === shift.taskName,
+                );
+                if (!matchingTask) continue;
 
+                const payload = {
+                    area: parseFloat(shift.hours),
+                    machineId: shift.machineId,
+                    type: EProcessesType.CA_MAY,
+                };
+                console.log('📤 Gửi ca máy:', {
+                    scheduleId: detailWorkSchedule._id,
+                    taskId: matchingTask._id,
+                    payload,
+                });
+
+                await requestPersonalTask(
+                    detailWorkSchedule._id,
+                    matchingTask._id,
+                    payload,
+                );
+            }
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 1000);
+
             setTaskInputs(prev =>
                 prev.map(task => ({
                     ...task,
                     area: '',
+                })),
+            );
+
+            setMachineShifts(prev =>
+                prev.map(shift => ({
+                    ...shift,
+                    machineId: '',
+                    hours: '',
                 })),
             );
         } catch (err) {
@@ -143,10 +212,7 @@ const GardenDeclare = () => {
     };
 
     const handleAddSupply = () => {
-        setAdditionalSupplies(prev => [
-            ...prev,
-            {name: '', value: '', childTaskId: ''},
-        ]);
+        setAdditionalSupplies(prev => [...prev, {name: '', value: ''}]);
     };
 
     const handleChangeSupplyField = (
@@ -161,6 +227,25 @@ const GardenDeclare = () => {
         });
     };
 
+    const handleSubmitAdditionalSupplies = async () => {
+        if (!detailWorkSchedule?._id) return;
+        try {
+            for (const supply of additionalSupplies) {
+                await requestAdditionalMaterial(
+                    detailWorkSchedule._id,
+
+                    {
+                        name: supply.name,
+                        value: Number(supply.value),
+                    },
+                );
+            }
+            setAdditionalSupplies([{name: '', value: ''}]);
+        } catch (err) {
+            console.error('❌ Lỗi khi gửi vật tư thêm:', err);
+        }
+    };
+
     if (!detailWorkSchedule) {
         return (
             <View style={styles.centered}>
@@ -168,6 +253,26 @@ const GardenDeclare = () => {
             </View>
         );
     }
+    const machineShiftHistories = detailWorkSchedule.childTasks.flatMap(
+        (task: any) =>
+            (task.machines || []).flatMap((machine: any) =>
+                (machine.history || []).map((h: any, index: number) => ({
+                    _id: `${machine._id}-${index}`,
+                    title: task.name || 'Chưa có tên công việc',
+                    createdBy: h.staffName || 'Không rõ',
+                    name: machine.name,
+                    totalTime: h.area || 0,
+                })),
+            ),
+    );
+
+    const uniqueMachines = Array.from(
+        new Map(
+            detailWorkSchedule.childTasks
+                .flatMap((task: any) => task.machines || [])
+                .map(machine => [machine._id, machine]),
+        ).values(),
+    );
 
     return (
         <View style={{flex: 1}}>
@@ -192,6 +297,11 @@ const GardenDeclare = () => {
                     </View>
                 </View>
 
+                <MachineShiftHistorySection
+                    shifts={machineShiftHistories}
+                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
+                />
+
                 <TaskListSection
                     taskInputs={taskInputs}
                     handleInputChange={handleInputChange}
@@ -199,121 +309,19 @@ const GardenDeclare = () => {
                     gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
                 />
 
-                <View style={{marginTop: 16}}>
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: 12,
-                        }}>
-                        <Text
-                            style={{
-                                fontSize: 16,
-                                fontWeight: '600',
-                                marginBottom: 12,
-                            }}>
-                            Nguồn cung thêm
-                        </Text>
-                        <TouchableOpacity onPress={handleAddSupply}>
-                            <Icon name='add' size={20} color='blue' />
-                        </TouchableOpacity>
-                    </View>
+                <MachineShiftSelector
+                    machines={uniqueMachines}
+                    machineShifts={machineShifts}
+                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
+                    onChange={handleMachineShiftChange}
+                />
 
-                    {additionalSupplies.map((item, index) => (
-                        <View key={index} style={{marginBottom: 28}}>
-                            <TextInput
-                                style={styles.input}
-                                placeholder='Tên vật tư'
-                                placeholderTextColor={'black'}
-                                value={item.name}
-                                onChangeText={text =>
-                                    handleChangeSupplyField(index, 'name', text)
-                                }
-                            />
-                            <TextInput
-                                style={styles.input}
-                                placeholder='Giá trị (kg)'
-                                placeholderTextColor={'black'}
-                                keyboardType='numeric'
-                                value={item.value}
-                                onChangeText={text =>
-                                    handleChangeSupplyField(
-                                        index,
-                                        'value',
-                                        text,
-                                    )
-                                }
-                            />
-                            <View style={styles.dropdownContainer}>
-                                <Picker
-                                    style={{color: 'black'}}
-                                    selectedValue={item.childTaskId}
-                                    onValueChange={value =>
-                                        handleChangeSupplyField(
-                                            index,
-                                            'childTaskId',
-                                            value,
-                                        )
-                                    }>
-                                    <Picker.Item
-                                        label='Chọn công việc'
-                                        value=''
-                                    />
-                                    {detailWorkSchedule.childTasks.map(
-                                        (task: any) => (
-                                            <Picker.Item
-                                                key={task._id}
-                                                label={task.name}
-                                                value={task._id}
-                                            />
-                                        ),
-                                    )}
-                                </Picker>
-                            </View>
-                        </View>
-                    ))}
-
-                    <TouchableOpacity
-                        style={[
-                            styles.saveButton,
-                            additionalSupplies.every(
-                                s => s.name && s.value && s.childTaskId,
-                            )
-                                ? null
-                                : {backgroundColor: '#ccc'},
-                        ]}
-                        disabled={
-                            !additionalSupplies.every(
-                                s => s.name && s.value && s.childTaskId,
-                            )
-                        }
-                        onPress={async () => {
-                            if (!detailWorkSchedule?._id) return;
-                            try {
-                                for (const supply of additionalSupplies) {
-                                    await requestAdditionalMaterial(
-                                        detailWorkSchedule._id,
-                                        supply.childTaskId,
-                                        {
-                                            name: supply.name,
-                                            value: Number(supply.value),
-                                        },
-                                    );
-                                }
-                                setAdditionalSupplies([
-                                    {name: '', value: '', childTaskId: ''},
-                                ]);
-                            } catch (err) {
-                                console.error(
-                                    '❌ Lỗi khi gửi vật tư thêm:',
-                                    err,
-                                );
-                            }
-                        }}>
-                        <Text style={styles.saveButtonText}>Lưu</Text>
-                    </TouchableOpacity>
-                </View>
+                <AdditionalSupplySection
+                    supplies={additionalSupplies}
+                    onAdd={handleAddSupply}
+                    onChange={handleChangeSupplyField}
+                    onSubmit={handleSubmitAdditionalSupplies}
+                />
             </ScrollView>
 
             <View style={styles.footer}>
@@ -348,12 +356,6 @@ const GardenDeclare = () => {
 };
 
 const styles = StyleSheet.create({
-    dropdownContainer: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 6,
-        backgroundColor: '#fff',
-    },
     container: {padding: 16, backgroundColor: 'white'},
     centered: {flex: 1, justifyContent: 'center', alignItems: 'center'},
     infoContainer: {marginBottom: 16},
@@ -368,6 +370,14 @@ const styles = StyleSheet.create({
     productLabel: {fontSize: 14, color: 'black'},
     productRow: {flexDirection: 'row', alignItems: 'center', marginTop: 4},
     productText: {marginLeft: 8, fontSize: 16},
+    footer: {padding: 16, borderTopWidth: 1, borderColor: '#eee'},
+    exitButton1: {
+        padding: 12,
+        backgroundColor: 'red',
+        borderRadius: 26,
+        alignItems: 'center',
+    },
+    exitText1: {color: 'white', fontWeight: '600', fontSize: 16},
     label: {fontWeight: '500', marginBottom: 4},
     input: {
         borderWidth: 1,
@@ -378,14 +388,7 @@ const styles = StyleSheet.create({
         height: 55,
         color: 'black',
     },
-    footer: {padding: 16, borderTopWidth: 1, borderColor: '#eee'},
-    exitButton1: {
-        padding: 12,
-        backgroundColor: 'red',
-        borderRadius: 26,
-        alignItems: 'center',
-    },
-    exitText1: {color: 'white', fontWeight: '600', fontSize: 16},
+
     sectionTitle: {
         fontSize: 16,
         fontWeight: '600',

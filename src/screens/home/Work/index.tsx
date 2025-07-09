@@ -44,6 +44,8 @@ const WorkScreen = () => {
         {label: 'Đã hủy bỏ', value: 3},
     ];
 
+    console.log(listGardenWorkBrowseFilter);
+
     const [selectedStatus, setSelectedStatus] = useState(1);
     const {userInfo} = useAuthStore();
     const [showComfirmView, setShowComfirmView] = useState<initialRadioState>(

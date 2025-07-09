@@ -75,7 +75,7 @@ const WorkerInfo = ({route}: any) => {
                         Số điện thoại
                     </Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {formatPhoneNumber(item.phoneNumber)}
+                        {item.phoneNumber}
                     </Text>
                 </View>
 
@@ -145,7 +145,7 @@ const WorkerInfo = ({route}: any) => {
                         Địa chỉ thường trú
                     </Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {/* {item.address.resident} */}
+                        {item.address.resident}
                     </Text>
                 </View>
 
@@ -154,7 +154,7 @@ const WorkerInfo = ({route}: any) => {
                         Địa chỉ tạm trú
                     </Text>
                     <Text style={WorkerInfoStyles.valueText}>
-                        {/* {item.address.temporary} */}
+                        {item.address.temporary}
                     </Text>
                 </View>
             </View>

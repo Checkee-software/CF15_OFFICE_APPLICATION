@@ -97,10 +97,14 @@ export default function Profile({navigation}: any) {
                                         'Dân tộc',
                                         `${userInfo.nation}`,
                                     )}
-                                    {renderInfoRow(
-                                        'Phòng ban',
-                                        `${userInfo.departmentName}`,
-                                    )}
+                                    {userInfo.userType.level !==
+                                    EOrganization.WORKER
+                                        ? renderInfoRow(
+                                              'Phòng ban',
+                                              `${userInfo.departmentName}`,
+                                          )
+                                        : null}
+
                                     {userInfo.userType.level !==
                                     EOrganization.DEPARTMENT
                                         ? renderInfoRow(

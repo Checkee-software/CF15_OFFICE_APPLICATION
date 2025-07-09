@@ -42,10 +42,12 @@ const InitApp = () => {
         const handleNotificationClick = (event: any) => {
             const data = event.notification.additionalData;
 
+            console.log(data);
+
             if (data?._id !== '') {
                 setRedirectData('schdule', data?._id);
             } else {
-                setRedirectData('request', data?._id);
+                setRedirectData('request', data?.requestId);
             }
         };
 

@@ -207,8 +207,6 @@ const ScheduleDetail = ({route}: any) => {
         </View>
     );
 
-    console.log(userInfo);
-
     const renderMachinesHistory = (itemMachinesHistory: any) => (
         <View style={ScheduleDetailStyles.historyInfo}>
             <Text style={ScheduleDetailStyles.historyInfoLabel}>
@@ -822,7 +820,6 @@ const ScheduleDetailStyles = StyleSheet.create({
     jobDescription: {
         gap: 10,
         marginVertical: 10,
-        marginBottom: 30,
     },
     description: {
         color: '#212121',

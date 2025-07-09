@@ -30,7 +30,9 @@ const TaskListSection = ({
             </Text>
             <View style={{gap: 12}}>
                 {taskInputs.map((task, index) => {
-                    const isCompleted = task.taskStatus === 'COMPLETED';
+                    const isCompleted = task.taskStatus === 'COMPELETED';
+                    const isDisabled = task.disabled || isCompleted;
+
                     return (
                         <CollapsibleTaskBlock
                             key={task.taskId}
@@ -38,15 +40,16 @@ const TaskListSection = ({
                             backgroundColor={
                                 isCompleted ? '#d4edda' : '#e6f3ff'
                             }>
-                            {task.disabled && (
+                            {isDisabled && (
                                 <Text
                                     style={{
                                         color: 'red',
                                         fontStyle: 'italic',
                                         marginBottom: 8,
                                     }}>
-                                    Công việc này đã bị huỷ, bạn không thể chỉnh
-                                    sửa.
+                                    {task.disabled
+                                        ? 'Công việc này đã bị huỷ, bạn không thể chỉnh sửa.'
+                                        : 'Công việc này đã hoàn thành, bạn không thể chỉnh sửa.'}
                                 </Text>
                             )}
 
@@ -64,7 +67,7 @@ const TaskListSection = ({
                                 onChangeText={text =>
                                     handleInputChange(index, 'area', text)
                                 }
-                                editable={!task.disabled}
+                                editable={!isDisabled}
                             />
                         </CollapsibleTaskBlock>
                     );

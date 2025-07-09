@@ -19,7 +19,13 @@ import ENV from '@/config/ENV';
 const DetailDocuments = ({route}: any) => {
     const [loadingDownload, setLoadingDownload] = useState(false);
 
-    console.log(route);
+    const fixEncoding = (input: string): string => {
+        try {
+            return decodeURIComponent(escape(input));
+        } catch (error) {
+            return input;
+        }
+    };
 
     const htmlContent = `
     <html>
@@ -124,7 +130,7 @@ const DetailDocuments = ({route}: any) => {
                 />
                 <View style={DetailDocumentsStyles.infoDocument}>
                     <Text style={DetailDocumentsStyles.infoDocumentText}>
-                        {itemAttachedFiles.originalname}
+                        {fixEncoding(itemAttachedFiles.originalname)}
                     </Text>
                     <Text style={DetailDocumentsStyles.infoDocumentSizeText}>
                         {formatFileSize(itemAttachedFiles.size)}

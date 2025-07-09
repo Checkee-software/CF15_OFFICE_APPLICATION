@@ -22,6 +22,8 @@ const BottomTabsNavigator = ({navigation}: any) => {
 
     const Tab = createBottomTabNavigator();
 
+    console.log(redirectDataRequestSchedule);
+
     useEffect(() => {
         if (redirectData) {
             navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
@@ -32,7 +34,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
                 clearRedirectData();
             }, 1000);
         }
-    }, [redirectData]);
+    }, [redirectData, redirectDataRequestSchedule]);
 
     return redirectData ? (
         <Backdrop open />
