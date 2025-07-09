@@ -165,10 +165,10 @@ const useGardenStore = create<GardenState>(set => ({
                 'FETCH_HARVEST_HISTORY_ERROR:',
                 error?.response?.data || error.message,
             );
-            Snackbar.show({
-                text: 'Không thể tải lịch sử thu hoạch',
-                duration: Snackbar.LENGTH_SHORT,
-            });
+            // Snackbar.show({
+            //     text: 'Không thể tải lịch sử thu hoạch',
+            //     duration: Snackbar.LENGTH_SHORT,
+            // });
         } finally {
             set({isLoading: false});
         }
@@ -186,10 +186,10 @@ const useGardenStore = create<GardenState>(set => ({
                 'FETCH_HARVEST_HISTORY_ERROR:',
                 error?.response?.data || error.message,
             );
-            Snackbar.show({
-                text: 'Không thể tải lịch sử thu hoạch',
-                duration: Snackbar.LENGTH_SHORT,
-            });
+            // Snackbar.show({
+            //     text: 'Không thể tải lịch sử thu hoạch',
+            //     duration: Snackbar.LENGTH_SHORT,
+            // });
         } finally {
             set({isLoading: false});
         }

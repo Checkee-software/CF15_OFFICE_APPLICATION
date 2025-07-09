@@ -312,9 +312,7 @@ const WorkScreen = () => {
                                     <Text style={styles.label}>Duyệt lúc</Text>
 
                                     <Text style={styles.value}>
-                                        {moment(
-                                            itemGardenWork.updatedAt,
-                                        ).format('HH:mm DD/MM/YYYY')}
+                                        {itemGardenWork.updatedAt}
                                     </Text>
                                 </View>
 
@@ -333,9 +331,7 @@ const WorkScreen = () => {
                                     <Text style={styles.label}>Hủy bỏ lúc</Text>
 
                                     <Text style={styles.value}>
-                                        {moment(
-                                            itemGardenWork.updatedAt,
-                                        ).format('HH:mm DD/MM/YYYY')}
+                                        {itemGardenWork.updatedAt}
                                     </Text>
                                 </View>
 

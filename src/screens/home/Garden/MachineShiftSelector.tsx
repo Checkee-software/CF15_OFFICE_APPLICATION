@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     },
     picker: {
         width: '100%',
+        color: 'black',
     },
     input: {
         borderWidth: 1,

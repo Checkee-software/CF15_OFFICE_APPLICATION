@@ -683,6 +683,7 @@ const styles = StyleSheet.create({
         color: '#808080',
     },
     statisticTargetText: {
+        width: '78%',
         fontWeight: 600,
     },
     warpIconTextStatistic: {
