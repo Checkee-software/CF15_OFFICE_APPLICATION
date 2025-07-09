@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Text, TextInput, View} from 'react-native';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 
@@ -25,6 +25,21 @@ const TaskListSection = ({
     gardenAreaType,
     gardenArea,
 }: Props) => {
+    const [tempInputValues, setTempInputValues] = useState<
+        Record<string, string>
+    >({});
+
+    const handleAreaChange = (index: number, text: string) => {
+        const numericValue = parseFloat(text);
+
+        if (isNaN(numericValue) || numericValue <= gardenArea) {
+            handleInputChange(index, 'area', text);
+            setTempInputValues(prev => ({...prev, [index]: ''}));
+        } else {
+            setTempInputValues(prev => ({...prev, [index]: text}));
+        }
+    };
+
     return (
         <View>
             <Text style={styles.sectionTitle}>
@@ -34,7 +49,9 @@ const TaskListSection = ({
                 {taskInputs.map((task, index) => {
                     const isCompleted = task.taskStatus === 'COMPELETED';
                     const isDisabled = task.disabled || isCompleted;
-                    const areaValue = parseFloat(task.area);
+                    const currentInputValue =
+                        tempInputValues[index] || task.area;
+                    const areaValue = parseFloat(currentInputValue);
                     const showWarning =
                         !isDisabled &&
                         !isNaN(areaValue) &&
@@ -66,13 +83,16 @@ const TaskListSection = ({
                             </Text>
 
                             <TextInput
-                                style={styles.input}
-                                keyboardType="numeric"
-                                placeholder="Nhập diện tích"
-                                placeholderTextColor="black"
+                                style={[
+                                    styles.input,
+                                    showWarning && {borderColor: 'red'},
+                                ]}
+                                keyboardType='numeric'
+                                placeholder='Nhập diện tích'
+                                placeholderTextColor='black'
                                 value={task.area}
                                 onChangeText={text =>
-                                    handleInputChange(index, 'area', text)
+                                    handleAreaChange(index, text)
                                 }
                                 editable={!isDisabled}
                             />
