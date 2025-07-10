@@ -79,24 +79,24 @@ const GardenDeclare = () => {
     }, [detailWorkSchedule]);
 
     useEffect(() => {
-        if (detailWorkSchedule?.childTasks?.length && userInfo?._id) {
+        if (detailWorkSchedule?.childTasks?.length) {
             const inputs = detailWorkSchedule.childTasks.map((task: any) => {
                 const userInTask = task.staff?.find(
-                    (s: any) => s.userId === userInfo._id,
+                    (s: any) => s.userId === userInfo?._id,
                 );
-                const isCanceled = userInTask?.status === 'CANCELED';
 
                 return {
                     taskId: task._id,
                     taskName: task.name,
                     area: '',
-                    disabled: isCanceled,
-                    taskStatus: task.status,
+                    taskStatus: userInTask?.status || task.status,
                 };
             });
+
             setTaskInputs(inputs);
         }
     }, [detailWorkSchedule, userInfo]);
+
     useEffect(() => {
         if (detailWorkSchedule?.childTasks?.length) {
             const taskWithMachines = detailWorkSchedule.childTasks.find(

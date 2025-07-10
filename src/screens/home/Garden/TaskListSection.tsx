@@ -48,7 +48,7 @@ const TaskListSection = ({
             <View style={{gap: 12}}>
                 {taskInputs.map((task, index) => {
                     const isCompleted = task.taskStatus === 'COMPELETED';
-                    const isDisabled = task.disabled || isCompleted;
+                    const isDisabled = isCompleted;
                     const currentInputValue =
                         tempInputValues[index] || task.area;
                     const areaValue = parseFloat(currentInputValue);
@@ -64,16 +64,15 @@ const TaskListSection = ({
                             backgroundColor={
                                 isCompleted ? '#d4edda' : '#e6f3ff'
                             }>
-                            {isDisabled && (
+                            {isCompleted && (
                                 <Text
                                     style={{
                                         color: 'red',
                                         fontStyle: 'italic',
                                         marginBottom: 8,
                                     }}>
-                                    {task.disabled
-                                        ? 'Công việc này đã bị huỷ, bạn không thể chỉnh sửa.'
-                                        : 'Công việc này đã hoàn thành, bạn không thể chỉnh sửa.'}
+                                    Công việc này đã hoàn thành, bạn không thể
+                                    chỉnh sửa.
                                 </Text>
                             )}
 
