@@ -16,6 +16,8 @@ import AdditionalSupplySection from './AdditionalSupplySection';
 import MachineShiftSelector from './MachineShiftSelector';
 import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/ProcessesFormData';
 import MachineShiftHistorySection from './ActiveMachine';
+import Backdrop from '../../subscreen/Loading/index2';
+
 type TaskInput = {
     taskId: string;
     taskName: string;
@@ -32,6 +34,7 @@ type AdditionalSupply = {
 const GardenDeclare = () => {
     const [machineShifts, setMachineShifts] = useState<MachineShiftInput[]>([]);
     const [availableMachines, setAvailableMachines] = useState<INorm[]>([]);
+    const [loading, setLoading] = useState(false);
 
     const handleMachineShiftChange = (
         index: number,
@@ -159,6 +162,8 @@ const GardenDeclare = () => {
         if (!detailWorkSchedule?._id) return;
 
         try {
+            setLoading(true);
+
             const requests = taskInputs.filter(isTaskValid);
             for (const task of requests) {
                 const payload = {
@@ -176,6 +181,7 @@ const GardenDeclare = () => {
                     payload,
                 );
             }
+
             for (const shift of machineShifts.filter(isMachineShiftValid)) {
                 const matchingTask = detailWorkSchedule.childTasks.find(
                     (task: any) => task.name === shift.taskName,
@@ -199,6 +205,7 @@ const GardenDeclare = () => {
                     payload,
                 );
             }
+
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 1000);
 
@@ -218,6 +225,10 @@ const GardenDeclare = () => {
             );
         } catch (err) {
             console.error('❌ Lỗi khi gửi báo cáo:', err);
+        } finally {
+            setTimeout(() => {
+                setLoading(false);
+            }, 700);
         }
     };
 
@@ -240,19 +251,22 @@ const GardenDeclare = () => {
     const handleSubmitAdditionalSupplies = async () => {
         if (!detailWorkSchedule?._id) return;
         try {
-            for (const supply of additionalSupplies) {
-                await requestAdditionalMaterial(
-                    detailWorkSchedule._id,
+            setLoading(true);
 
-                    {
-                        name: supply.name,
-                        value: Number(supply.value),
-                    },
-                );
+            for (const supply of additionalSupplies) {
+                await requestAdditionalMaterial(detailWorkSchedule._id, {
+                    name: supply.name,
+                    value: Number(supply.value),
+                });
             }
+
             setAdditionalSupplies([{name: '', value: ''}]);
         } catch (err) {
             console.error('❌ Lỗi khi gửi vật tư thêm:', err);
+        } finally {
+            setTimeout(() => {
+                setLoading(false);
+            }, 700);
         }
     };
 
@@ -363,6 +377,7 @@ const GardenDeclare = () => {
                 onCancelReport={handleCancelReport}
                 onlyShowReportButton={onlyShowReportButton}
             />
+            <Backdrop open={loading} />
         </View>
     );
 };
