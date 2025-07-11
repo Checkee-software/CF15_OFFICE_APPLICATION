@@ -37,12 +37,14 @@ const MachineShiftSelector: React.FC<Props> = ({
     if (!machineShifts.length) return null;
 
     const handleHoursChange = (index: number, text: string) => {
-        const numericValue = parseFloat(text);
+        const normalizedText = text.replace(',', '.');
+        const numericValue = parseFloat(normalizedText);
+
         if (isNaN(numericValue) || numericValue <= gardenArea) {
-            onChange(index, 'hours', text);
+            onChange(index, 'hours', normalizedText);
             setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
-            setTempInputValues(prev => ({...prev, [index]: text}));
+            setTempInputValues(prev => ({...prev, [index]: normalizedText}));
         }
     };
 

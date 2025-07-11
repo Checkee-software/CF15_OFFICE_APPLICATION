@@ -57,7 +57,10 @@ const AdditionalSupplySection = ({
                         placeholderTextColor={'black'}
                         keyboardType='numeric'
                         value={item.value}
-                        onChangeText={text => onChange(index, 'value', text)}
+                        onChangeText={text => {
+                            const normalized = text.replace(',', '.');
+                            onChange(index, 'value', normalized);
+                        }}
                     />
                 </View>
             ))}

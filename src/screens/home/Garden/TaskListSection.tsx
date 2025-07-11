@@ -30,13 +30,14 @@ const TaskListSection = ({
     >({});
 
     const handleAreaChange = (index: number, text: string) => {
-        const numericValue = parseFloat(text);
+        const normalizedText = text.replace(',', '.');
+        const numericValue = parseFloat(normalizedText);
 
         if (isNaN(numericValue) || numericValue <= gardenArea) {
-            handleInputChange(index, 'area', text);
+            handleInputChange(index, 'area', normalizedText);
             setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
-            setTempInputValues(prev => ({...prev, [index]: text}));
+            setTempInputValues(prev => ({...prev, [index]: normalizedText}));
         }
     };
 
