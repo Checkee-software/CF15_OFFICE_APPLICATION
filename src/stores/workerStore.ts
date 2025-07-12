@@ -27,7 +27,7 @@ interface DocumentStore {
     isLoading: boolean;
     listWorker: IUser[];
     listWorkerFilterByRole: listWorkerFilterByRole[];
-    getListWorkerByDepartment: () => Promise<void>;
+    getListWorkerByDepartment: (userId: string) => Promise<void>;
     getListWorkerByLeader: () => Promise<void>;
     resetStateWhenLogout: () => void;
 }
@@ -42,7 +42,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
     listWorker: [],
     listWorkerFilterByRole: [],
 
-    getListWorkerByDepartment: async () => {
+    getListWorkerByDepartment: async (userId: string) => {
         set({isLoading: true});
         //await new Promise(resolve => setTimeout(resolve, 1 * 10000));
         try {
@@ -68,8 +68,12 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                 );
 
                 const filterWorkers = updateImgPathListWorker.filter(
-                    (user: {userType: {level: string}}) =>
-                        user.userType.level !== 'LEADER',
+                    (user: {
+                        _id: string;
+                        userType: {_id: string; level: string};
+                    }) =>
+                        user.userType.level === 'DEPARTMENT' &&
+                        user._id !== userId,
                 );
 
                 //thêm order cho 2 mảng
@@ -90,7 +94,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                         data: filterLeaders,
                     },
                     {
-                        title: 'Người lao động',
+                        title: 'Phòng ban',
                         data: filterWorkers,
                     },
                 ];

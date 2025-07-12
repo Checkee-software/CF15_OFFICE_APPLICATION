@@ -14,6 +14,7 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import images from '../../../assets/images';
 import {useWorkerStore} from '../../../stores/workerStore';
 import Loading from '@/screens/subscreen/Loading';
+import {useAuthStore} from '../../../stores/authStore';
 
 const Woker = ({navigation}: any) => {
     const {
@@ -22,6 +23,8 @@ const Woker = ({navigation}: any) => {
         getListWorkerByDepartment,
         isLoading,
     } = useWorkerStore();
+
+    const {userInfo} = useAuthStore();
 
     const [searchWorker, setSearchWorker] = useState('');
 
@@ -33,7 +36,7 @@ const Woker = ({navigation}: any) => {
         if (searchWorker.length !== 0) {
             setSearchWorker('');
         }
-        getListWorkerByDepartment();
+        getListWorkerByDepartment(userInfo._id);
     };
 
     const renderWorkerBySearch = (itemWorkerBySearch: any) => (
@@ -121,7 +124,7 @@ const Woker = ({navigation}: any) => {
     );
 
     useEffect(() => {
-        getListWorkerByDepartment();
+        getListWorkerByDepartment(userInfo._id);
         // eslint-disable-next-line
     }, []);
 

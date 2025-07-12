@@ -6,7 +6,7 @@ import asyncStorageHelper from './src/utils/localStorageHelper/index';
 import {useAuthStore} from './src/stores/authStore';
 
 /* packages */
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {OneSignal, LogLevel} from 'react-native-onesignal';
 
 /* screens */
@@ -42,8 +42,6 @@ const InitApp = () => {
         const handleNotificationClick = (event: any) => {
             const data = event.notification.additionalData;
 
-            console.log(data);
-
             if (data?._id !== '') {
                 setRedirectData('schdule', data?._id);
             } else {
@@ -74,8 +72,8 @@ const InitApp = () => {
 
 export default function App() {
     return (
-        <SafeAreaProvider>
+        <SafeAreaView edges={['bottom']} style={{flex: 1}}>
             <InitApp />
-        </SafeAreaProvider>
+        </SafeAreaView>
     );
 }
