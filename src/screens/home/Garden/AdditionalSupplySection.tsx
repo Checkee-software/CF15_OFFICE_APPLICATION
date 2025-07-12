@@ -7,11 +7,13 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Picker} from '@react-native-picker/picker';
+import {Dropdown} from 'react-native-element-dropdown';
 
 type AdditionalSupply = {
     name: string;
-    value: string;
+    unit: string;
+    quantity: string;
+    total: string;
 };
 
 type Props = {
@@ -25,13 +27,27 @@ type Props = {
     onSubmit: () => void;
 };
 
+const unitOptions = [
+    {label: 'Kg', value: 'Kg'},
+    {label: 'Lít', value: 'Lít'},
+    {label: 'Bao', value: 'Bao'},
+    {label: 'Chai', value: 'Chai'},
+    {label: 'Gói', value: 'Gói'},
+];
+const formatMoney = (value: string | undefined | null) => {
+    const numeric = (value || '').replace(/\D/g, '');
+    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+};
+
 const AdditionalSupplySection = ({
     supplies,
     onAdd,
     onChange,
     onSubmit,
 }: Props) => {
-    const allValid = supplies.every(s => s.name && s.value);
+    const allValid = supplies.every(
+        s => s.name && s.unit && s.quantity && s.total,
+    );
 
     return (
         <View style={{marginTop: 16}}>
@@ -47,19 +63,45 @@ const AdditionalSupplySection = ({
                     <TextInput
                         style={styles.input}
                         placeholder='Tên vật tư'
-                        placeholderTextColor={'black'}
+                        placeholderTextColor={'gray'}
                         value={item.name}
                         onChangeText={text => onChange(index, 'name', text)}
                     />
+
+                    <Dropdown
+                        mode='modal'
+                        style={styles.dropdown}
+                        data={unitOptions}
+                        labelField='label'
+                        valueField='value'
+                        placeholder='Đơn vị tính'
+                        placeholderStyle={{color: 'gray'}}
+                        search
+                        searchPlaceholder='Tìm kiếm'
+                        value={item.unit}
+                        onChange={value => onChange(index, 'unit', value.value)}
+                    />
+
                     <TextInput
                         style={styles.input}
-                        placeholder='Giá trị (kg)'
-                        placeholderTextColor={'black'}
+                        placeholder='Khối lượng'
+                        placeholderTextColor={'gray'}
                         keyboardType='numeric'
-                        value={item.value}
+                        value={item.quantity}
+                        onChangeText={text =>
+                            onChange(index, 'quantity', text.replace(',', '.'))
+                        }
+                    />
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Thành tiền (VNĐ)'
+                        placeholderTextColor='gray'
+                        keyboardType='numeric'
+                        value={formatMoney(item.total)}
                         onChangeText={text => {
-                            const normalized = text.replace(',', '.');
-                            onChange(index, 'value', normalized);
+                            const raw = text.replace(/\s/g, '');
+                            onChange(index, 'total', raw);
                         }}
                     />
                 </View>
@@ -99,11 +141,14 @@ const styles = StyleSheet.create({
         height: 55,
         color: 'black',
     },
-    dropdownContainer: {
+    dropdown: {
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 6,
-        backgroundColor: '#fff',
+        paddingHorizontal: 8,
+        marginBottom: 8,
+        height: 55,
+        justifyContent: 'center',
     },
     saveButton: {
         backgroundColor: '#4CAF50',
