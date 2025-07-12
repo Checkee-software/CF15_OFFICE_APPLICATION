@@ -52,6 +52,14 @@ const ScheduleDetail = ({route}: any) => {
         {name: 'Thành tiền (vnđ)'},
     ];
 
+    const fixEncoding = (input: string): string => {
+        try {
+            return decodeURIComponent(escape(input));
+        } catch (error) {
+            return input;
+        }
+    };
+
     const formatFileSize = (size: number) => {
         if (size >= 1024 * 1024) {
             return `${(size / (1024 * 1024)).toFixed(2)} MB`;
@@ -147,7 +155,7 @@ const ScheduleDetail = ({route}: any) => {
                 />
                 <View style={ScheduleDetailStyles.infoDocument}>
                     <Text style={ScheduleDetailStyles.infoDocumentText}>
-                        {itemAttachedFiles.originalname}
+                        {fixEncoding(itemAttachedFiles.originalname)}
                     </Text>
                     <Text style={ScheduleDetailStyles.infoDocumentSizeText}>
                         Kích cỡ: {formatFileSize(itemAttachedFiles.size)}
@@ -529,6 +537,8 @@ const ScheduleDetail = ({route}: any) => {
         getScheduleDetail(route.params._id);
     }, []);
 
+    console.log(scheduleDetail);
+
     if (isLoadingGet) return <Loading />;
 
     return (
@@ -539,7 +549,25 @@ const ScheduleDetail = ({route}: any) => {
                     {scheduleDetail?.title}
                 </Text>
 
-                <View style={ScheduleDetailStyles.mainWorkProgressSection}>
+                <View
+                    style={[
+                        ScheduleDetailStyles.listChildTasks,
+                        {
+                            borderBottomWidth: 1,
+                            borderColor: '#ccc',
+                            borderStyle: 'dashed',
+                            paddingBottom: 12,
+                        },
+                    ]}>
+                    <FlatList
+                        scrollEnabled={false}
+                        data={scheduleDetail?.childTasks as any}
+                        renderItem={({item}) => renderChildTask(item)}
+                        keyExtractor={item => item._id}
+                    />
+                </View>
+
+                {/* <View style={ScheduleDetailStyles.mainWorkProgressSection}>
                     <View style={ScheduleDetailStyles.warpMainWork}>
                         <Text style={ScheduleDetailStyles.mainWorkSummary}>
                             Số CBQL/NLĐ
@@ -559,7 +587,7 @@ const ScheduleDetail = ({route}: any) => {
                             {scheduleDetail?.childTasks.length}
                         </Text>
                     </View>
-                </View>
+                </View> */}
 
                 <Text style={ScheduleDetailStyles.timeWorkEnd}>
                     {renderScheduleRemain(
@@ -572,6 +600,47 @@ const ScheduleDetail = ({route}: any) => {
                         <Text style={ScheduleDetailStyles.generalInfoText}>
                             Thông tin chung
                         </Text>
+
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Vườn cây
+                            </Text>
+
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                {scheduleDetail?.gardenName}
+                            </Text>
+                        </View>
+
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Loại cây trồng
+                            </Text>
+
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                {scheduleDetail?.productName}
+                            </Text>
+                        </View>
+
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Chủ vườn cây
+                            </Text>
+
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                {userInfo?.fullName}
+                            </Text>
+                        </View>
+
+                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                            <Text style={ScheduleDetailStyles.infoLabel}>
+                                Đơn vị
+                            </Text>
+
+                            <Text style={ScheduleDetailStyles.infoValue}>
+                                {userInfo.groupName}
+                            </Text>
+                        </View>
+
                         <View style={ScheduleDetailStyles.warpLabelValue}>
                             <Text style={ScheduleDetailStyles.infoLabel}>
                                 Ngày bắt đầu
@@ -596,45 +665,15 @@ const ScheduleDetail = ({route}: any) => {
                             </Text>
                         </View>
 
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
+                        {/* <View style={ScheduleDetailStyles.warpLabelValue}>
                             <Text style={ScheduleDetailStyles.infoLabel}>
-                                Người tạo việc
+                                Mã khu vườn
                             </Text>
 
                             <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail?.createdUser}
+                                {scheduleDetail?.gardenId}
                             </Text>
-                        </View>
-
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Khu vườn
-                            </Text>
-
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail?.gardenName}
-                            </Text>
-                        </View>
-
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Loại cây trồng
-                            </Text>
-
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail?.productName}
-                            </Text>
-                        </View>
-
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Cây trồng
-                            </Text>
-
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail?.gardenName}
-                            </Text>
-                        </View>
+                        </View> */}
                     </View>
                 </View>
 
@@ -681,7 +720,7 @@ const ScheduleDetail = ({route}: any) => {
                         />
                     </List.Accordion>
 
-                    <List.Accordion
+                    {/* <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion1}
                         title={`Người lao động (${scheduleDetail?.employees?.length})`}
                         style={ScheduleDetailStyles.boxAccordion}
@@ -694,7 +733,7 @@ const ScheduleDetail = ({route}: any) => {
                             }
                             keyExtractor={item => item._id}
                         />
-                    </List.Accordion>
+                    </List.Accordion> */}
 
                     {/* <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion1}
@@ -713,7 +752,7 @@ const ScheduleDetail = ({route}: any) => {
                         </View>
                     </List.Accordion> */}
 
-                    <List.Accordion
+                    {/* <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion2}
                         title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}
                         style={ScheduleDetailStyles.boxAccordion}
@@ -726,7 +765,7 @@ const ScheduleDetail = ({route}: any) => {
                                 keyExtractor={item => item._id}
                             />
                         </View>
-                    </List.Accordion>
+                    </List.Accordion> */}
                 </View>
             </ScrollView>
         </View>
@@ -753,9 +792,7 @@ const ScheduleDetailStyles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 10,
         gap: 20,
-        borderBottomWidth: 1,
-        borderColor: '#ccc',
-        borderStyle: 'dashed',
+
         justifyContent: 'space-between',
     },
     warpMainWork: {

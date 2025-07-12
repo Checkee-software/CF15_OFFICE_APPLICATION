@@ -5,14 +5,19 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
-    Linking,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useAuthStore} from '../../../stores/authStore';
-import moment from 'moment';
+import {PDFDocument, rgb, degrees} from 'pdf-lib';
+import {FlatList} from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Feather from 'react-native-vector-icons/Feather';
+import ENV from '@/config/ENV';
+import RNFS from 'react-native-fs';
+import Snackbar from 'react-native-snackbar';
 
 const CollapsibleRow = ({
     label,
@@ -50,18 +55,101 @@ const GardenWorker = () => {
     const route = useRoute<any>();
     const code = route.params?.code;
 
-    const [showAreaInfo, setShowAreaInfo] = React.useState(false);
     const [showLocationInfo, setShowLocationInfo] = React.useState(false);
     const [showInfo, setShowInfo] = React.useState(false);
     const [showManagementAreaInfo, setShowManagementAreaInfo] =
         React.useState(false);
 
-    const {gardens, searchGardens, isLoading, harvestHistory} =
-        useGardenStore();
-    const [contractExpanded, setContractExpanded] = React.useState(false);
+    const {gardens, isLoading, harvestHistory} = useGardenStore();
+
+    const fixEncoding = (input: string): string => {
+        try {
+            return decodeURIComponent(escape(input));
+        } catch (error) {
+            return input;
+        }
+    };
+
+    const fixFilePath = (path: string) => {
+        const updatedPath = path.replace(/\\/g, '/');
+        return `${ENV.BACKEND_URL}${updatedPath}`;
+    };
+
+    const formatFileSize = (size: number) => {
+        if (size >= 1024 * 1024) {
+            return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+        } else if (size >= 1024) {
+            return `${(size / 1024).toFixed(2)} KB`;
+        } else {
+            return `${size} Bytes`;
+        }
+    };
+
+    const downloadFile = async (fileUrl: string, fileName: string) => {
+        const updatedFileUrl = fixFilePath(fileUrl);
+        try {
+            const downloadDest = `${RNFS.DownloadDirectoryPath}/${fileName}`;
+            const options = {
+                fromUrl: updatedFileUrl,
+                toFile: downloadDest,
+            };
+            const result = await RNFS.downloadFile(options).promise;
+            if (result.statusCode === 200) {
+                Snackbar.show({
+                    text: 'Đã tải tập tin về điện thoại của bạn!',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            } else {
+                Snackbar.show({
+                    text: 'Tải file không thành công!',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            }
+        } catch (error) {
+            Snackbar.show({
+                text: 'Có lỗi xảy ra khi tải file.',
+                duration: Snackbar.LENGTH_LONG,
+            });
+        }
+    };
+
+    const renderItemAttachedFiles = (itemAttachedFiles: any) => (
+        <View style={styles.cardDocument}>
+            <View style={styles.leftCardDocument}>
+                <MaterialCommunityIcons
+                    name='text-box'
+                    color={'rgba(255, 78, 69, 1)'}
+                    size={28}
+                />
+                <View style={styles.infoDocument}>
+                    <Text style={styles.infoDocumentText}>
+                        {fixEncoding(itemAttachedFiles.originalname)}
+                    </Text>
+                    <Text style={styles.infoDocumentSizeText}>
+                        Kích cỡ: {formatFileSize(itemAttachedFiles.size)}
+                    </Text>
+                </View>
+            </View>
+
+            <TouchableOpacity
+                onPress={() =>
+                    downloadFile(
+                        itemAttachedFiles.path,
+                        itemAttachedFiles.filename,
+                    )
+                }>
+                <Feather
+                    name='download'
+                    color={'rgba(33, 150, 243, 1)'}
+                    size={22}
+                />
+            </TouchableOpacity>
+        </View>
+    );
+
     useEffect(() => {
         if (code) {
-            useGardenStore.getState().searchGardens(code);
+            useGardenStore.getState().searchGardens(code, userInfo._id);
         }
     }, [code]);
 
@@ -82,28 +170,34 @@ const GardenWorker = () => {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Section title='Thông tin khu vườn'>
-                <Row label='Tên khu vườn' value={gardens.name} />
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        width: '100%',
+                        justifyContent: 'space-between',
+                    }}>
+                    <Text style={(styles.label, {width: '45%'})}>
+                        Tên khu vườn
+                    </Text>
+                    <Text
+                        style={
+                            (styles.value,
+                            {
+                                width: '52%',
+                                textAlign: 'right',
+                            })
+                        }>
+                        {!gardens.gardenNickname
+                            ? gardens.name
+                            : gardens.gardenNickname}
+                    </Text>
+                </View>
                 <View style={styles.row}>
                     <Text style={styles.label}>Mã khu vườn</Text>
                     <Text style={[styles.value, {color: 'green'}]}>
                         {gardens.code}
                     </Text>
                 </View>
-
-                <CollapsibleRow
-                    label='Diện tích (m2)'
-                    value={gardens.area?.totalSquare}
-                    expanded={showAreaInfo}
-                    onToggle={() => setShowAreaInfo(!showAreaInfo)}>
-                    <Row
-                        label='Chiều dài'
-                        value={`${gardens.area?.length} m`}
-                    />
-                    <Row
-                        label='Chiều rộng'
-                        value={`${gardens.area?.width} m`}
-                    />
-                </CollapsibleRow>
 
                 <CollapsibleRow
                     label='Vị trí khu vườn'
@@ -190,6 +284,17 @@ const GardenWorker = () => {
                     </View>
                 ))}
             </Section>
+
+            {gardens.management?.files.length !== 0 ? (
+                <Section title='Tệp đính kèm'>
+                    <FlatList
+                        scrollEnabled={false}
+                        data={gardens.management?.files}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({item}) => renderItemAttachedFiles(item)}
+                    />
+                </Section>
+            ) : null}
 
             {gardens.sidePlants?.length > 0 && (
                 <Section title='Thông tin cây trồng xen'>
@@ -331,5 +436,32 @@ const styles = StyleSheet.create({
     separator: {
         fontSize: 14,
         color: '#ddd',
+    },
+
+    cardDocument: {
+        borderRadius: 8,
+        padding: 10,
+        flex: 1,
+        backgroundColor: 'rgba(128, 128, 128, 0.15)',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    leftCardDocument: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+        gap: 10,
+    },
+    infoDocument: {
+        width: '85%',
+    },
+    infoDocumentText: {
+        fontSize: 11,
+    },
+    infoDocumentSizeText: {
+        fontSize: 11,
+        color: 'rgba(128, 128, 128, 1)',
     },
 });

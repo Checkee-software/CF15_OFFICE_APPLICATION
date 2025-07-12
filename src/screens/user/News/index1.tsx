@@ -77,6 +77,8 @@ export default function NewsDetail() {
         );
     }
 
+    console.log(selectedNews);
+
     return (
         <ScrollView style={styles.container}>
             <Image

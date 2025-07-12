@@ -160,7 +160,10 @@ export default function Main({navigation}: any) {
 
     return (
         <View style={MainStyles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                overScrollMode='never'>
                 <View style={MainStyles.welcomeUser}>
                     <View style={MainStyles.helloTime}>
                         <Text

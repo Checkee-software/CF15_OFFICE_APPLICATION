@@ -114,6 +114,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 ) {
                     OneSignal.login(response.data.data._id);
                     OneSignal.User.pushSubscription.optIn();
+
+                    const responseGroup = await axiosClient.get(
+                        `${ENV.BACKEND_URL}/resources/units/selection`,
+                    );
+
+                    const findGroupName = responseGroup.data.data.find(
+                        (item: any) => item._id === response.data.data.groupId,
+                    );
+
+                    userData.groupName = findGroupName.name;
                 }
                 set({userInfo: userData, isLogin: true});
                 set({isLoading: false});
@@ -195,6 +205,22 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     )}`;
                 } else {
                     userData.avatar = '';
+                }
+
+                if (
+                    response.data.data.userType.level ===
+                        EOrganization.LEADER ||
+                    response.data.data.userType.level === EOrganization.WORKER
+                ) {
+                    const responseGroup = await axiosClient.get(
+                        `${ENV.BACKEND_URL}/resources/units/selection`,
+                    );
+
+                    const findGroupName = responseGroup.data.data.find(
+                        (item: any) => item._id === response.data.data.groupId,
+                    );
+
+                    userData.groupName = findGroupName.name;
                 }
 
                 const getTasks = await get().getScheduleCollection();

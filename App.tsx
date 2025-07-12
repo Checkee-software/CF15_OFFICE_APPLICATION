@@ -6,12 +6,13 @@ import asyncStorageHelper from './src/utils/localStorageHelper/index';
 import {useAuthStore} from './src/stores/authStore';
 
 /* packages */
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {OneSignal, LogLevel} from 'react-native-onesignal';
 
 /* screens */
 import Router from './src/router';
 import Loading from './src/screens/subscreen/Loading';
+import {StatusBar} from 'react-native';
 
 const InitApp = () => {
     const {autoLogin, setRedirectData} = useAuthStore();
@@ -41,6 +42,8 @@ const InitApp = () => {
         // gắn sự kiện khi người dùng nhấn vào thông báo
         const handleNotificationClick = (event: any) => {
             const data = event.notification.additionalData;
+
+            console.log(data);
 
             if (data?._id !== '') {
                 setRedirectData('schdule', data?._id);
@@ -72,8 +75,11 @@ const InitApp = () => {
 
 export default function App() {
     return (
-        <SafeAreaView edges={['bottom']} style={{flex: 1}}>
-            <InitApp />
-        </SafeAreaView>
+        <SafeAreaProvider>
+            <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+                <StatusBar barStyle='dark-content' />
+                <InitApp />
+            </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
