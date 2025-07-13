@@ -24,8 +24,6 @@ const BottomTabsNavigator = ({navigation}: any) => {
     const Tab = createBottomTabNavigator();
     const insets = useSafeAreaInsets();
 
-    console.log(redirectDataRequestSchedule);
-
     useEffect(() => {
         if (redirectData) {
             navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {

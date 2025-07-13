@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {
@@ -16,9 +17,10 @@ import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import {useGardenWorkStore} from '../../../stores/gardenWorkStore';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import Loading from '@/screens/subscreen/Loading';
-import moment from 'moment';
 import Snackbar from 'react-native-snackbar';
 import {EStatus} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
+import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
+import {useIsFocused} from '@react-navigation/native';
 
 const WorkScreen = () => {
     interface listRadioBtn {
@@ -27,6 +29,8 @@ const WorkScreen = () => {
     }
 
     type initialRadioState = listRadioBtn[];
+
+    const isFocused = useIsFocused();
 
     const {
         listGardenWorkBrowseFilter,
@@ -38,16 +42,18 @@ const WorkScreen = () => {
         createRateReportHarvest,
     } = useGardenWorkStore();
 
+    const {userInfo, redirectDataRequestSchedule, clearRedirectData} =
+        useAuthStore();
+
+    console.log(listGardenWorkBrowseFilter);
+
     const statusList = [
         {label: 'Đang chờ', value: 1},
         {label: 'Đã duyệt', value: 2},
         {label: 'Đã hủy bỏ', value: 3},
     ];
 
-    console.log(listGardenWorkBrowseFilter);
-
     const [selectedStatus, setSelectedStatus] = useState(1);
-    const {userInfo} = useAuthStore();
     const [showComfirmView, setShowComfirmView] = useState<initialRadioState>(
         [],
     );
@@ -82,9 +88,8 @@ const WorkScreen = () => {
             ]}>
             <View style={styles.gardenTitleSection}>
                 <Text style={styles.gardenName}>
-                    {itemGardenWork.gardenName}
+                    {itemGardenWork.productName}
                 </Text>
-                <Text style={styles.gardenId}>{itemGardenWork.gardenCode}</Text>
             </View>
 
             <View style={styles.gardenContentSection}>
@@ -123,29 +128,25 @@ const WorkScreen = () => {
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Diện tích đã làm</Text>
                     <Text style={styles.value}>
-                        {`${itemGardenWork.area} ${itemGardenWork.gardenAreaType} \n`}
+                        {`${
+                            selectedStatus !== 1
+                                ? itemGardenWork.processingRate
+                                : itemGardenWork.area
+                        } ha \n`}
 
                         <Text style={styles.valueRemaining}>
                             {selectedStatus !== 1
-                                ? itemGardenWork.firstRequested
-                                    ? `(còn: ${formatNumber(
-                                          Math.max(
-                                              itemGardenWork.gardenArea -
-                                                  itemGardenWork.area,
-                                              0,
-                                          ),
-                                      )})`
-                                    : `(còn: ${formatNumber(
-                                          Math.max(
-                                              itemGardenWork.gardenArea -
-                                                  itemGardenWork.processingRate,
-                                              0,
-                                          ),
-                                      )})`
+                                ? `(còn: ${formatNumber(
+                                      Math.max(
+                                          itemGardenWork.totalSquare -
+                                              itemGardenWork.processingRate,
+                                          0,
+                                      ),
+                                  )})`
                                 : itemGardenWork.processingRate !== 0
                                 ? `(còn: ${formatNumber(
                                       Math.max(
-                                          itemGardenWork.gardenArea -
+                                          itemGardenWork.totalSquare -
                                               (itemGardenWork.processingRate +
                                                   itemGardenWork.area),
                                           0,
@@ -153,7 +154,7 @@ const WorkScreen = () => {
                                   )})`
                                 : `(còn: ${formatNumber(
                                       Math.max(
-                                          itemGardenWork.gardenArea -
+                                          itemGardenWork.totalSquare -
                                               itemGardenWork.area,
                                           0,
                                       ),
@@ -292,7 +293,10 @@ const WorkScreen = () => {
                                                         style={
                                                             styles.approveRequestText
                                                         }>
-                                                        Duyệt
+                                                        {itemComfirm.radioSelectedType ===
+                                                        3
+                                                            ? 'Từ chối'
+                                                            : 'Duyệt'}
                                                     </Text>
                                                 </TouchableOpacity>
                                             )}
@@ -366,10 +370,18 @@ const WorkScreen = () => {
         filterByStatus(EStatus.REQUEST);
 
         const initialRadioState = responseData.map(
-            (item: {_id: string; gardenArea: any; area: any}) => ({
+            (item: {
+                _id: string;
+                totalSquare: any;
+                area: any;
+                processingRate: any;
+            }) => ({
                 _id: item._id,
                 radioSelectedType: 1,
-                completeRequest: item.gardenArea === item.area ? true : false,
+                completeRequest:
+                    item.totalSquare === item.area + item.processingRate
+                        ? true
+                        : false,
             }),
         );
 
@@ -413,6 +425,12 @@ const WorkScreen = () => {
             }
         }
     };
+
+    useEffect(() => {
+        if (!isFocused && redirectDataRequestSchedule) {
+            clearRedirectData();
+        }
+    }, [isFocused, redirectDataRequestSchedule]);
 
     useEffect(() => {
         if (userInfo.userType.level === EOrganization.LEADER) {
@@ -475,7 +493,7 @@ const WorkScreen = () => {
 
                 {userInfo.userType.level === EOrganization.LEADER ? (
                     <View style={styles.gardenWorkList}>
-                        <FlatList
+                        <KeyboardAwareFlatList
                             contentContainerStyle={styles.flatListGardenWork}
                             data={listGardenWorkBrowseFilter}
                             keyExtractor={item => item._id}
@@ -483,7 +501,9 @@ const WorkScreen = () => {
                             onRefresh={handleGetRequestGardenData}
                             refreshing={isLoading}
                             showsVerticalScrollIndicator={false}
-                            removeClippedSubviews={false}
+                            //removeClippedSubviews={false}
+                            enableOnAndroid
+                            extraHeight={300}
                             keyboardShouldPersistTaps='handled'
                             ListEmptyComponent={
                                 <View style={styles.emptyContainer}>

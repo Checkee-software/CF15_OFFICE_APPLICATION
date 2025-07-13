@@ -1,11 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import ActionButtons from './ActionButtons';
@@ -17,6 +11,7 @@ import MachineShiftSelector from './MachineShiftSelector';
 import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/ProcessesFormData';
 import MachineShiftHistorySection from './ActiveMachine';
 import Backdrop from '../../subscreen/Loading/index2';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 type TaskInput = {
     taskId: string;
@@ -28,7 +23,9 @@ type TaskInput = {
 
 type AdditionalSupply = {
     name: string;
+    unit: string;
     value: string;
+    price: string;
 };
 
 const GardenDeclare = () => {
@@ -51,7 +48,7 @@ const GardenDeclare = () => {
     const [taskInputs, setTaskInputs] = useState<TaskInput[]>([]);
     const [additionalSupplies, setAdditionalSupplies] = useState<
         AdditionalSupply[]
-    >([{name: '', value: ''}]);
+    >([{name: '', unit: '', value: '', price: ''}]);
 
     const {userInfo} = useAuthStore();
     const {
@@ -71,7 +68,7 @@ const GardenDeclare = () => {
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
 
     useEffect(() => {
-        if (id) getDetailWorkSchedule(id);
+        if (id) getDetailWorkSchedule(id, userInfo._id);
     }, [id]);
 
     useEffect(() => {
@@ -233,7 +230,10 @@ const GardenDeclare = () => {
     };
 
     const handleAddSupply = () => {
-        setAdditionalSupplies(prev => [...prev, {name: '', value: ''}]);
+        setAdditionalSupplies(prev => [
+            ...prev,
+            {name: '', unit: '', value: '', price: ''},
+        ]);
     };
 
     const handleChangeSupplyField = (
@@ -256,11 +256,13 @@ const GardenDeclare = () => {
             for (const supply of additionalSupplies) {
                 await requestAdditionalMaterial(detailWorkSchedule._id, {
                     name: supply.name,
+                    unit: supply.unit,
                     value: Number(supply.value),
+                    price: Number(supply.price),
                 });
             }
 
-            setAdditionalSupplies([{name: '', value: ''}]);
+            setAdditionalSupplies([{name: '', unit: '', value: '', price: ''}]);
         } catch (err) {
             console.error('❌ Lỗi khi gửi vật tư thêm:', err);
         } finally {
@@ -290,24 +292,15 @@ const GardenDeclare = () => {
             ),
     );
 
-    const uniqueMachines = Array.from(
-        new Map(
-            detailWorkSchedule.childTasks
-                .flatMap((task: any) => task.machines || [])
-                .map(machine => [machine._id, machine]),
-        ).values(),
-    );
+    console.log(detailWorkSchedule);
 
     return (
         <View style={{flex: 1}}>
-            <ScrollView contentContainerStyle={styles.container}>
+            <KeyboardAwareScrollView
+                contentContainerStyle={styles.container}
+                enableOnAndroid
+                extraHeight={150}>
                 <View style={styles.infoContainer}>
-                    <Text style={styles.gardenName}>
-                        {detailWorkSchedule.gardenName}
-                    </Text>
-                    <Text style={styles.gardenCode}>
-                        {(detailWorkSchedule as any).gardenCode}
-                    </Text>
                     <View style={styles.productBox}>
                         <Text style={styles.productLabel}>
                             Sản phẩm/cây trồng
@@ -323,23 +316,35 @@ const GardenDeclare = () => {
 
                 <MachineShiftHistorySection
                     shifts={machineShiftHistories}
-                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
+                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'ha'}
                 />
 
                 <TaskListSection
                     taskInputs={taskInputs}
                     handleInputChange={handleInputChange}
                     styles={styles}
-                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
-                    gardenArea={detailWorkSchedule?.gardenArea || 0}
+                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'ha'}
+                    gardenArea={
+                        detailWorkSchedule?.childTasks[0].staff[0].totalSquare
+                    }
+                    processingRate={
+                        detailWorkSchedule?.childTasks[0].staff[0]
+                            .processingRate
+                    }
                 />
 
                 <MachineShiftSelector
                     machines={availableMachines}
                     machineShifts={machineShifts}
-                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
+                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'ha'}
                     onChange={handleMachineShiftChange}
-                    gardenArea={detailWorkSchedule?.gardenArea || 0}
+                    gardenArea={
+                        detailWorkSchedule?.childTasks[0].staff[0].totalSquare
+                    }
+                    processingRate={
+                        detailWorkSchedule?.childTasks[0].staff[0]
+                            .processingRate
+                    }
                 />
 
                 <AdditionalSupplySection
@@ -348,13 +353,17 @@ const GardenDeclare = () => {
                     onChange={handleChangeSupplyField}
                     onSubmit={handleSubmitAdditionalSupplies}
                 />
-            </ScrollView>
+            </KeyboardAwareScrollView>
 
             <View style={styles.footer}>
                 <TouchableOpacity
                     style={styles.exitButton1}
                     onPress={handleExit}>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                        }}>
                         <Icon
                             name='arrow-circle-left'
                             size={22}
@@ -383,7 +392,7 @@ const GardenDeclare = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {padding: 16, backgroundColor: 'white'},
+    container: {paddingHorizontal: 16, backgroundColor: 'white'},
     centered: {flex: 1, justifyContent: 'center', alignItems: 'center'},
     infoContainer: {marginBottom: 16},
     gardenName: {fontSize: 20, fontWeight: 'bold'},

@@ -15,7 +15,6 @@ import Snackbar from 'react-native-snackbar';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import AutoHeightWebView from 'react-native-autoheight-webview';
 import ENV from '@/config/ENV';
-import {useAuthStore} from '@/stores/authStore';
 
 const DetailDocuments = ({route}: any) => {
     const [loadingDownload, setLoadingDownload] = useState(false);

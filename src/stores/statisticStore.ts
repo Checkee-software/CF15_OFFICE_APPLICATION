@@ -27,6 +27,7 @@ type StatisticStore = {
     listSelection: IListSelection[];
     isLoading: boolean;
     getStatistic: (data: IStatisticFormData) => Promise<void>;
+    getStatisticForWorker: (data: IStatisticFormData) => Promise<void>;
     getListSelection: (selection: string) => Promise<void>;
     getGroupName: (groupId: string) => Promise<void>;
     clearStatisticData: () => void;
@@ -88,6 +89,34 @@ const convertToChartData = (data: any[]): IChartData[] => {
     return result;
 };
 
+const convertToPieData = (data: any) => {
+    const COLORS = [
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+        '#4BC0C0',
+        '#9966FF',
+        '#FF9F40',
+        '#66BB6A',
+        '#EF5350',
+        '#29B6F6',
+        '#AB47BC',
+        '#FFA726',
+        '#8D6E63',
+    ];
+
+    const pieData = data.map((item: any, index: any) => ({
+        value: item.percentage,
+        text: `${item.percentage}%`,
+        color: COLORS[index % COLORS.length],
+        label: item.taskName,
+        processingRate: item.processingRate,
+        totalSquare: item.totalSquare,
+    }));
+
+    return pieData;
+};
+
 export const useStatisticStore = create<StatisticStore>(set => ({
     statisticData: null,
     listSelection: [],
@@ -118,7 +147,61 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                 };
                 set({statisticData: mainStatisticData});
                 set({isLoading: false});
+            } else {
+                set({isLoading: false});
             }
+        } catch (error: any) {
+            console.log(error);
+            set({isLoading: false});
+
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error?.response?.data) {
+                    Snackbar.show({
+                        text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                } else {
+                    Snackbar.show({
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    getStatisticForWorker: async ({
+        type,
+        targetId,
+        startDate,
+        endDate,
+    }: IStatisticFormData) => {
+        const formattedStartDate = moment(startDate).toISOString();
+        const formattedEndDate = moment(endDate).toISOString();
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.get(
+                `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}&targetId=${targetId}`,
+            );
+            if (response.data.data) {
+                const mainStatisticData = {
+                    //list: [...response.data.data.list],
+                    //totalCost: response.data.data.totalCost,
+                    //totalGarden: response.data.data.totalGarden,
+                    //totalGroup: response.data.data.totalGroup,
+                    //totalMember: response.data.data.totalMember,
+                    //totalWork: response.data.data.totalWork,
+                    chart: convertToPieData(response.data.data || []),
+                };
+                set({statisticData: mainStatisticData});
+                set({isLoading: false});
+            } else {
+                set({isLoading: false});
+            }
+
+            set({isLoading: false});
         } catch (error: any) {
             console.log(error);
             set({isLoading: false});

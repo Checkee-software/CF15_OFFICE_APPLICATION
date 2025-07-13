@@ -12,8 +12,8 @@ import {Dropdown} from 'react-native-element-dropdown';
 type AdditionalSupply = {
     name: string;
     unit: string;
-    quantity: string;
-    total: string;
+    value: number;
+    price: number;
 };
 
 type Props = {
@@ -28,11 +28,13 @@ type Props = {
 };
 
 const unitOptions = [
-    {label: 'Kg', value: 'Kg'},
-    {label: 'Lít', value: 'Lít'},
-    {label: 'Bao', value: 'Bao'},
-    {label: 'Chai', value: 'Chai'},
-    {label: 'Gói', value: 'Gói'},
+    {label: 'kg', value: 'kg'},
+    {label: 'g', value: 'g'},
+    {label: 'lít', value: 'lít'},
+    {label: 'ml', value: 'ml'},
+    {label: 'tấn', value: 'tấn'},
+    {label: 'tạ', value: 'tạ'},
+    {label: 'yến', value: 'yến'},
 ];
 const formatMoney = (value: string | undefined | null) => {
     const numeric = (value || '').replace(/\D/g, '');
@@ -46,7 +48,7 @@ const AdditionalSupplySection = ({
     onSubmit,
 }: Props) => {
     const allValid = supplies.every(
-        s => s.name && s.unit && s.quantity && s.total,
+        s => s.name && s.unit && s.value && s.price,
     );
 
     return (
@@ -87,9 +89,9 @@ const AdditionalSupplySection = ({
                         placeholder='Khối lượng'
                         placeholderTextColor={'gray'}
                         keyboardType='numeric'
-                        value={item.quantity}
+                        value={item.value?.toString() ?? ''}
                         onChangeText={text =>
-                            onChange(index, 'quantity', text.replace(',', '.'))
+                            onChange(index, 'value', text.replace(',', '.'))
                         }
                     />
 
@@ -98,10 +100,10 @@ const AdditionalSupplySection = ({
                         placeholder='Thành tiền (VNĐ)'
                         placeholderTextColor='gray'
                         keyboardType='numeric'
-                        value={formatMoney(item.total)}
+                        value={formatMoney(item.price?.toString())}
                         onChangeText={text => {
                             const raw = text.replace(/\s/g, '');
-                            onChange(index, 'total', raw);
+                            onChange(index, 'price', raw);
                         }}
                     />
                 </View>

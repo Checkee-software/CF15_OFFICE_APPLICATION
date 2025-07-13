@@ -52,7 +52,9 @@ const History = () => {
     );
 
     useEffect(() => {
-        handleGetHistoryRecord();
+        if (userInfo.userType.level !== EOrganization.WORKER) {
+            handleGetHistoryRecord();
+        }
     }, [isFocused]);
 
     if (isLoading) return <Loading />;

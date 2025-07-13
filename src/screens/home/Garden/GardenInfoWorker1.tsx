@@ -104,7 +104,7 @@ const JobListWorker = () => {
             <View style={styles.cardContent}>
                 <View style={styles.cardTextContainer}>
                     <Text style={styles.cardTitle}>{item.title}</Text>
-                    <Text style={styles.cardSubtitle}>{item.gardenName}</Text>
+                    <Text style={styles.cardSubtitle}>{item.productName}</Text>
                     <View
                         style={{
                             flexDirection: 'row',
@@ -155,7 +155,7 @@ const JobListWorker = () => {
                             />
                             <TextInput
                                 style={styles.searchInput}
-                                placeholder='Tìm kiếm công việc'
+                                placeholder='Tìm kiếm quy trình'
                                 value={searchText}
                                 onChangeText={setSearchText}
                                 placeholderTextColor='#888'

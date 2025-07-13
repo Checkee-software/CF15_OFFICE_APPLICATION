@@ -33,7 +33,8 @@ const ActionButtons = ({
             {showReportConfirmation && (
                 <View style={styles.confirmationContainerOverlay}>
                     <Text style={styles.confirmationText}>
-                        Bạn có chắc chắn muốn báo cáo các công việc đã thực hiện không?
+                        Bạn có chắc chắn muốn báo cáo các công việc đã thực hiện
+                        không?
                     </Text>
                     <View style={styles.confirmationButtons}>
                         <TouchableOpacity
@@ -44,7 +45,9 @@ const ActionButtons = ({
                         <TouchableOpacity
                             style={styles.confirmButton}
                             onPress={onConfirmReport}>
-                            <Text style={styles.confirmButtonText}>Xác nhận</Text>
+                            <Text style={styles.confirmButtonText}>
+                                Xác nhận
+                            </Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.confirmationDivider} />
@@ -58,7 +61,8 @@ const ActionButtons = ({
                     <View style={styles.alertInSnackbar}>
                         <Icon name='warning' size={20} color='#F59E0B' />
                         <Text style={styles.alertText}>
-                            {alertMessage || 'Vui lòng nhập thông tin đầy đủ các công việc hoặc thoát.'}
+                            {alertMessage ||
+                                'Vui lòng nhập thông tin đầy đủ các công việc hoặc thoát.'}
                         </Text>
                         {onCloseAlert && (
                             <TouchableOpacity
@@ -74,11 +78,27 @@ const ActionButtons = ({
                 <View style={styles.buttonContainer}>
                     {!onlyShowReportButton && (
                         <TouchableOpacity
-                            style={[styles.snackbarButton, styles.exitActionButton]}
+                            style={[
+                                styles.snackbarButton,
+                                styles.exitActionButton,
+                            ]}
                             onPress={onExit}>
-                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                <Icon name='arrow-back' size={24} color='#fff' />
-                                <Text style={{color: '#fff', marginLeft: 6, fontWeight: '600'}}>
+                            <View
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                }}>
+                                <Icon
+                                    name='arrow-back'
+                                    size={24}
+                                    color='#fff'
+                                />
+                                <Text
+                                    style={{
+                                        color: '#fff',
+                                        marginLeft: 6,
+                                        fontWeight: '600',
+                                    }}>
                                     Thoát ra
                                 </Text>
                             </View>
@@ -89,7 +109,9 @@ const ActionButtons = ({
                         style={[
                             styles.snackbarButton,
                             styles.reportButton,
-                            onlyShowReportButton ? styles.reportButtonOnly : null,
+                            onlyShowReportButton
+                                ? styles.reportButtonOnly
+                                : null,
                         ]}
                         onPress={onReport}>
                         <Text style={styles.snackbarText1}>Báo cáo</Text>
@@ -186,7 +208,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
+        shadowOffset: {width: 0, height: -2},
         shadowOpacity: 0.2,
         shadowRadius: 3,
         elevation: 6,

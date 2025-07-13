@@ -30,6 +30,7 @@ const Statistic = () => {
 
     const {
         getStatistic,
+        getStatisticForWorker,
         getListSelection,
         getGroupName,
         clearStatisticData,
@@ -191,8 +192,38 @@ const Statistic = () => {
                         (item: any) => item._id === 'WORK',
                     ),
                 );
-                setSelectedType('WORK' as EType);
+                setSelectedType('GROUP' as EType);
                 await getListSelection('WORK');
+
+                const selectedStartDate = moment()
+                    .startOf('month')
+                    .set({
+                        hour: 0,
+                        minute: 0,
+                        second: 0,
+                        millisecond: 0,
+                    })
+                    .add(7, 'hours')
+                    .toISOString();
+                const selectedEndDate = moment()
+                    .endOf('month')
+                    .set({
+                        hour: 23,
+                        minute: 59,
+                        second: 59,
+                        millisecond: 999,
+                    })
+                    .add(7, 'hours')
+                    .toISOString();
+
+                setSelectedTimeOption('month');
+
+                await getStatisticForWorker({
+                    type: 'GROUP' as EType,
+                    startDate: new Date(selectedStartDate),
+                    endDate: new Date(selectedEndDate),
+                    targetId: selectedTarget,
+                });
             } else {
                 setListStatisticType(listStatisticTypeDefault);
             }
@@ -232,12 +263,24 @@ const Statistic = () => {
                 <ScrollView>
                     <View style={styles.listStatistic}>
                         <TouchableOpacity
-                            style={styles.btnCurrentStatistic}
+                            style={[
+                                styles.btnCurrentStatistic,
+                                userInfo.userType.level === EOrganization.WORKER
+                                    ? {gap: 4}
+                                    : {gap: 0},
+                            ]}
+                            disabled={
+                                userInfo.userType.level === EOrganization.WORKER
+                                    ? true
+                                    : false
+                            }
                             onPress={() => setShowForm(!showForm)}>
                             <Text style={styles.statisticTypeText}>
                                 {selectedType === 'WORK'
                                     ? 'Công việc'
-                                    : 'Sản phẩm'}
+                                    : selectedType === 'PRODUCT'
+                                    ? 'Sản phẩm'
+                                    : 'Công việc của tôi'}
                             </Text>
                             <View style={styles.warpIconTextStatistic}>
                                 <View style={{flexDirection: 'row', gap: 10}}>
@@ -253,17 +296,20 @@ const Statistic = () => {
                                     </Text>
                                 </View>
 
-                                <View
-                                    style={[
-                                        styles.btnFilter,
-                                        {backgroundColor: '#4CAF50'},
-                                    ]}>
-                                    <MaterialIcons
-                                        name='manage-search'
-                                        size={22}
-                                        color={'#F5F5F5'}
-                                    />
-                                </View>
+                                {userInfo.userType.level !==
+                                    EOrganization.WORKER && (
+                                    <View
+                                        style={[
+                                            styles.btnFilter,
+                                            {backgroundColor: '#4CAF50'},
+                                        ]}>
+                                        <MaterialIcons
+                                            name='manage-search'
+                                            size={22}
+                                            color={'#F5F5F5'}
+                                        />
+                                    </View>
+                                )}
                             </View>
                             <Text
                                 style={

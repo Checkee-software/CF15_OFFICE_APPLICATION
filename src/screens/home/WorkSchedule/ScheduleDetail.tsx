@@ -74,12 +74,36 @@ const ScheduleDetail = ({route}: any) => {
         return new Intl.NumberFormat('vi-VN').format(num);
     };
 
-    const formattedGardenArea =
-        Number(scheduleDetail?.gardenArea) % 1 === 0
-            ? formatNumber(scheduleDetail?.gardenArea ?? 0) // số nguyên
-            : formatNumber(
-                  Number(Number(scheduleDetail?.gardenArea ?? 0).toFixed(5)),
-              ); // số thực
+    const formattedGardenArea = (totalSquare: any) => {
+        console.log(totalSquare);
+        const formattedTotalSquare =
+            Number(totalSquare) % 1 === 0
+                ? formatNumber(totalSquare ?? 0) // số nguyên
+                : formatNumber(Number(Number(totalSquare ?? 0).toFixed(5))); // số thực
+
+        return formattedTotalSquare;
+    };
+
+    const calculatePercent = (staff: any) => {
+        const totalProcessing = staff.reduce(
+            (sum: any, item: any) => sum + item.processingRate,
+            0,
+        );
+        const totalSquare = staff.reduce(
+            (sum: any, item: any) => sum + item.totalSquare,
+            0,
+        );
+
+        const percentageRaw =
+            totalSquare === 0 ? 0 : (totalProcessing / totalSquare) * 100;
+
+        const percentage =
+            percentageRaw % 1 === 0
+                ? `${percentageRaw.toFixed(0)}%`
+                : `${percentageRaw.toFixed(1)}%`;
+
+        return `(${percentage})`;
+    };
 
     const downloadFile = async (fileUrl: string, fileName: string) => {
         const updatedFileUrl = fixFilePath(fileUrl);
@@ -269,10 +293,92 @@ const ScheduleDetail = ({route}: any) => {
         </View>
     );
 
-    const renderChildTask = (itemChildTask: any) => (
+    const renderChildTaskForWorker = (itemChildTask: any) => (
         <View style={ScheduleDetailStyles.childTaskInfo}>
             <Text style={ScheduleDetailStyles.taskTitle}>
                 {itemChildTask.name}
+            </Text>
+
+            {/* <Text style={ScheduleDetailStyles.taskEndIn}>
+                {`Kết thúc vào ${renderTaskEndIn(itemChildTask.finishedTime)}`}
+            </Text> */}
+
+            <FlatList
+                scrollEnabled={false}
+                data={itemChildTask.staff}
+                keyExtractor={item => item.userId}
+                renderItem={(itemStaff: any) => (
+                    <View style={ScheduleDetailStyles.participant}>
+                        <View style={ScheduleDetailStyles.statusTask}>
+                            <MaterialIcons
+                                name='check-circle'
+                                size={20}
+                                color={
+                                    itemStaff.item.status ===
+                                    ETaskStatus.WAITING
+                                        ? '#808080'
+                                        : itemStaff.item.status ===
+                                          ETaskStatus.PROCESSING
+                                        ? '#2196F3'
+                                        : itemStaff.item.status ===
+                                          ETaskStatus.COMPLETED
+                                        ? '#4CAF50'
+                                        : '#FF4E45'
+                                }
+                            />
+                        </View>
+                        <View style={ScheduleDetailStyles.warpParticipant}>
+                            <Text style={ScheduleDetailStyles.participantName}>
+                                {itemStaff.item.name}
+                            </Text>
+                            <Text
+                                style={[
+                                    ScheduleDetailStyles.participantStatus,
+                                    itemStaff.item.status ===
+                                    ETaskStatus.WAITING
+                                        ? ScheduleDetailStyles.participantStatus1
+                                        : itemStaff.item.status ===
+                                          ETaskStatus.CANCELED
+                                        ? ScheduleDetailStyles.participantStatus3
+                                        : itemStaff.item.status ===
+                                          ETaskStatus.PROCESSING
+                                        ? ScheduleDetailStyles.participantStatus2
+                                        : ScheduleDetailStyles.participantStatus4,
+                                ]}>
+                                {itemStaff.item.status === ETaskStatus.CANCELED
+                                    ? `(${moment(
+                                          itemStaff.item.canceledTime,
+                                      ).format('L')}) Lý do: ${
+                                          itemStaff.item.canceledNote
+                                      }`
+                                    : 'Đã làm ' +
+                                      formatNumber(
+                                          itemStaff.item.processingRate,
+                                      ) +
+                                      '/' +
+                                      formattedGardenArea(
+                                          itemStaff.item.totalSquare,
+                                      ) +
+                                      ' (ha) ' +
+                                      (itemStaff.item.completedTime === null
+                                          ? ''
+                                          : `${moment(
+                                                itemStaff.item.completedTime,
+                                            ).format('L')}`)}
+                            </Text>
+                        </View>
+                    </View>
+                )}
+            />
+        </View>
+    );
+
+    const renderChildTask = (itemChildTask: any) => (
+        <View style={ScheduleDetailStyles.childTaskInfo}>
+            <Text style={ScheduleDetailStyles.taskTitle}>
+                {`${itemChildTask.name} ${calculatePercent(
+                    itemChildTask.staff,
+                )}`}
             </Text>
 
             {itemChildTask.labour &&
@@ -329,7 +435,7 @@ const ScheduleDetail = ({route}: any) => {
                                                         ? 'Nhân công'
                                                         : index === 1
                                                         ? itemChildTask.labour
-                                                              .name
+                                                              .processName
                                                         : index === 2
                                                         ? itemChildTask.labour
                                                               .value
@@ -375,12 +481,17 @@ const ScheduleDetail = ({route}: any) => {
                                                                                   4
                                                                             ? 'right'
                                                                             : 'center',
+                                                                    color:
+                                                                        index ===
+                                                                        0
+                                                                            ? '#2196F3'
+                                                                            : 'black',
                                                                 }}>
                                                                 {index === 0
                                                                     ? 'Vật tư'
                                                                     : index ===
                                                                       1
-                                                                    ? itemMaterials.name
+                                                                    ? itemMaterials.processName
                                                                     : index ===
                                                                       2
                                                                     ? itemMaterials.value
@@ -434,7 +545,7 @@ const ScheduleDetail = ({route}: any) => {
                                                                     ? 'Ca máy'
                                                                     : index ===
                                                                       1
-                                                                    ? itemMachines.name
+                                                                    ? itemMachines.processName
                                                                     : index ===
                                                                       2
                                                                     ? itemMachines.value
@@ -516,10 +627,10 @@ const ScheduleDetail = ({route}: any) => {
                                           itemStaff.item.processingRate,
                                       ) +
                                       '/' +
-                                      formattedGardenArea +
-                                      ' (' +
-                                      scheduleDetail?.gardenAreaType +
-                                      ') ' +
+                                      formattedGardenArea(
+                                          itemStaff.item.totalSquare,
+                                      ) +
+                                      ' (ha) ' +
                                       (itemStaff.item.completedTime === null
                                           ? ''
                                           : `${moment(
@@ -530,6 +641,157 @@ const ScheduleDetail = ({route}: any) => {
                     </View>
                 )}
             />
+        </View>
+    );
+
+    const renderLabour = (itemChildTask: any) => (
+        <View style={ScheduleDetailStyles.listProcesses}>
+            <View
+                style={{
+                    marginBottom: 15,
+                }}>
+                <FlatList
+                    horizontal
+                    data={processesTitle}
+                    keyExtractor={item => item.name}
+                    renderItem={({item, index}) => (
+                        <View
+                            style={{
+                                width: 108,
+                                alignItems: 'flex-start',
+                                justifyContent: 'flex-start',
+                            }}>
+                            <View>
+                                <Text
+                                    style={{
+                                        fontSize: 12,
+                                        fontWeight: 500,
+                                        textAlign:
+                                            index === 4 || index === 5
+                                                ? 'right'
+                                                : 'left',
+                                    }}>
+                                    {item.name}
+                                </Text>
+
+                                <View style={{marginVertical: 5}}>
+                                    <Text
+                                        style={{
+                                            fontSize: 12,
+                                            fontWeight: 400,
+                                            textAlign:
+                                                index === 0 || index === 1
+                                                    ? 'left'
+                                                    : index === 3 || index === 4
+                                                    ? 'right'
+                                                    : 'center',
+                                            color:
+                                                index === 0
+                                                    ? '#2196F3'
+                                                    : 'black',
+                                        }}>
+                                        {index === 0
+                                            ? 'Nhân công'
+                                            : index === 1
+                                            ? itemChildTask.labour.name
+                                            : index === 2
+                                            ? itemChildTask.labour.value
+                                            : index === 3
+                                            ? formatNumber(
+                                                  itemChildTask.labour.cost,
+                                              )
+                                            : formatNumber(
+                                                  itemChildTask.labour.cost *
+                                                      itemChildTask.labour
+                                                          .value,
+                                              )}
+                                    </Text>
+                                </View>
+
+                                {itemChildTask.materials.length !== 0 && (
+                                    <View style={{marginVertical: 5}}>
+                                        {itemChildTask.materials.map(
+                                            (itemMaterials: any) => (
+                                                <Text
+                                                    key={itemMaterials._id}
+                                                    style={{
+                                                        fontSize: 12,
+                                                        fontWeight: 400,
+                                                        textAlign:
+                                                            index === 0 ||
+                                                            index === 1
+                                                                ? 'left'
+                                                                : index === 3 ||
+                                                                  index === 4
+                                                                ? 'right'
+                                                                : 'center',
+                                                    }}>
+                                                    {index === 0
+                                                        ? 'Vật tư'
+                                                        : index === 1
+                                                        ? itemMaterials.name
+                                                        : index === 2
+                                                        ? itemMaterials.value
+                                                        : index === 3
+                                                        ? formatNumber(
+                                                              itemMaterials.cost,
+                                                          )
+                                                        : formatNumber(
+                                                              itemMaterials.cost *
+                                                                  itemMaterials.value,
+                                                          )}
+                                                </Text>
+                                            ),
+                                        )}
+                                    </View>
+                                )}
+
+                                {itemChildTask.machines.length !== 0 && (
+                                    <View style={{marginVertical: 5}}>
+                                        {itemChildTask.machines.map(
+                                            (itemMachines: any) => (
+                                                <Text
+                                                    key={itemMachines._id}
+                                                    style={{
+                                                        fontSize: 12,
+                                                        fontWeight: 400,
+                                                        textAlign:
+                                                            index === 0 ||
+                                                            index === 1
+                                                                ? 'left'
+                                                                : index === 3 ||
+                                                                  index === 4
+                                                                ? 'right'
+                                                                : 'center',
+                                                        color:
+                                                            index === 0
+                                                                ? '#2196F3'
+                                                                : 'black',
+                                                    }}>
+                                                    {index === 0
+                                                        ? 'Ca máy'
+                                                        : index === 1
+                                                        ? itemMachines.name
+                                                        : index === 2
+                                                        ? itemMachines.value
+                                                        : index === 3
+                                                        ? formatNumber(
+                                                              itemMachines.cost,
+                                                          )
+                                                        : formatNumber(
+                                                              itemMachines.cost *
+                                                                  itemMachines.value,
+                                                          )}
+                                                </Text>
+                                            ),
+                                        )}
+                                    </View>
+                                )}
+                            </View>
+                        </View>
+                    )}
+                />
+            </View>
         </View>
     );
 
@@ -549,133 +811,304 @@ const ScheduleDetail = ({route}: any) => {
                     {scheduleDetail?.title}
                 </Text>
 
-                <View
-                    style={[
-                        ScheduleDetailStyles.listChildTasks,
-                        {
-                            borderBottomWidth: 1,
-                            borderColor: '#ccc',
-                            borderStyle: 'dashed',
-                            paddingBottom: 12,
-                        },
-                    ]}>
-                    <FlatList
-                        scrollEnabled={false}
-                        data={scheduleDetail?.childTasks as any}
-                        renderItem={({item}) => renderChildTask(item)}
-                        keyExtractor={item => item._id}
-                    />
-                </View>
+                {userInfo.userType.level === EOrganization.LEADER && (
+                    <>
+                        <View
+                            style={[
+                                ScheduleDetailStyles.mainWorkProgressSection,
+                                {
+                                    borderBottomWidth: 1.5,
+                                    borderStyle: 'dashed',
+                                    borderBottomColor: '#d3d3d3',
+                                    paddingBottom: 10,
+                                },
+                            ]}>
+                            <View style={ScheduleDetailStyles.warpMainWork}>
+                                <Text
+                                    style={
+                                        ScheduleDetailStyles.mainWorkSummary
+                                    }>
+                                    Số CBQL/NLĐ
+                                </Text>
+                                <Text style={ScheduleDetailStyles.statusText}>
+                                    {`${
+                                        scheduleDetail?.followers?.length ?? 0
+                                    }/${
+                                        scheduleDetail?.employees?.length ?? 0
+                                    }`}
+                                </Text>
+                            </View>
 
-                {/* <View style={ScheduleDetailStyles.mainWorkProgressSection}>
-                    <View style={ScheduleDetailStyles.warpMainWork}>
-                        <Text style={ScheduleDetailStyles.mainWorkSummary}>
-                            Số CBQL/NLĐ
-                        </Text>
-                        <Text style={ScheduleDetailStyles.statusText}>
-                            {`${scheduleDetail?.followers?.length ?? 0}/${
-                                scheduleDetail?.employees?.length ?? 0
-                            }`}
-                        </Text>
-                    </View>
-
-                    <View style={ScheduleDetailStyles.warpMainWork}>
-                        <Text style={ScheduleDetailStyles.mainWorkSummary}>
-                            Tổng số quy trình làm việc
-                        </Text>
-                        <Text style={ScheduleDetailStyles.statusText}>
-                            {scheduleDetail?.childTasks.length}
-                        </Text>
-                    </View>
-                </View> */}
-
-                <Text style={ScheduleDetailStyles.timeWorkEnd}>
-                    {renderScheduleRemain(
-                        moment(scheduleDetail?.finishedDate).format('L'),
-                    )}
-                </Text>
-
-                <View style={ScheduleDetailStyles.workInfoSection}>
-                    <View style={ScheduleDetailStyles.generalInfo}>
-                        <Text style={ScheduleDetailStyles.generalInfoText}>
-                            Thông tin chung
-                        </Text>
-
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Vườn cây
-                            </Text>
-
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail?.gardenName}
-                            </Text>
+                            <View style={ScheduleDetailStyles.warpMainWork}>
+                                <Text
+                                    style={
+                                        ScheduleDetailStyles.mainWorkSummary
+                                    }>
+                                    Tổng số quy trình làm việc
+                                </Text>
+                                <Text style={ScheduleDetailStyles.statusText}>
+                                    {scheduleDetail?.childTasks.length}
+                                </Text>
+                            </View>
                         </View>
 
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Loại cây trồng
-                            </Text>
+                        <View style={ScheduleDetailStyles.workInfoSection}>
+                            <View style={ScheduleDetailStyles.generalInfo}>
+                                <Text
+                                    style={
+                                        ScheduleDetailStyles.generalInfoText
+                                    }>
+                                    Thông tin chung
+                                </Text>
 
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail?.productName}
-                            </Text>
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Ngày bắt đầu
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {moment(
+                                            scheduleDetail?.startedDate,
+                                        ).format('L')}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Ngày kết thúc
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {moment(
+                                            scheduleDetail?.finishedDate,
+                                        ).format('L')}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Người tạo việc
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {scheduleDetail?.createdUser}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Loại cây trồng
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {scheduleDetail?.productName}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                    </>
+                )}
+
+                {userInfo.userType.level === EOrganization.WORKER && (
+                    <>
+                        <View
+                            style={[
+                                ScheduleDetailStyles.listChildTasks,
+                                {
+                                    borderBottomWidth: 1,
+                                    borderColor: '#ccc',
+                                    borderStyle: 'dashed',
+                                    paddingBottom: 12,
+                                },
+                            ]}>
+                            <FlatList
+                                scrollEnabled={false}
+                                data={scheduleDetail?.childTasks as any}
+                                renderItem={({item}) =>
+                                    renderChildTaskForWorker(item)
+                                }
+                                keyExtractor={item => item._id}
+                            />
                         </View>
 
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Chủ vườn cây
-                            </Text>
-
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {userInfo?.fullName}
-                            </Text>
-                        </View>
-
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Đơn vị
-                            </Text>
-
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {userInfo.groupName}
-                            </Text>
-                        </View>
-
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Ngày bắt đầu
-                            </Text>
-
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {moment(scheduleDetail?.startedDate).format(
-                                    'L',
+                        <>
+                            <Text style={ScheduleDetailStyles.timeWorkEnd}>
+                                {renderScheduleRemain(
+                                    moment(scheduleDetail?.finishedDate).format(
+                                        'L',
+                                    ),
                                 )}
                             </Text>
-                        </View>
+                            <View style={ScheduleDetailStyles.workInfoSection}>
+                                <View style={ScheduleDetailStyles.generalInfo}>
+                                    <Text
+                                        style={
+                                            ScheduleDetailStyles.generalInfoText
+                                        }>
+                                        Thông tin chung
+                                    </Text>
 
-                        <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Ngày kết thúc
-                            </Text>
+                                    <View
+                                        style={
+                                            ScheduleDetailStyles.warpLabelValue
+                                        }>
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoLabel
+                                            }>
+                                            Loại cây trồng
+                                        </Text>
 
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {moment(scheduleDetail?.finishedDate).format(
-                                    'L',
-                                )}
-                            </Text>
-                        </View>
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoValue
+                                            }>
+                                            {scheduleDetail?.productName}
+                                        </Text>
+                                    </View>
 
-                        {/* <View style={ScheduleDetailStyles.warpLabelValue}>
-                            <Text style={ScheduleDetailStyles.infoLabel}>
-                                Mã khu vườn
-                            </Text>
+                                    <View
+                                        style={
+                                            ScheduleDetailStyles.warpLabelValue
+                                        }>
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoLabel
+                                            }>
+                                            Chủ vườn cây
+                                        </Text>
 
-                            <Text style={ScheduleDetailStyles.infoValue}>
-                                {scheduleDetail?.gardenId}
-                            </Text>
-                        </View> */}
-                    </View>
-                </View>
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoValue
+                                            }>
+                                            {userInfo?.fullName}
+                                        </Text>
+                                    </View>
+
+                                    <View
+                                        style={
+                                            ScheduleDetailStyles.warpLabelValue
+                                        }>
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoLabel
+                                            }>
+                                            Đơn vị
+                                        </Text>
+
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoValue
+                                            }>
+                                            {userInfo.groupName}
+                                        </Text>
+                                    </View>
+
+                                    <View
+                                        style={
+                                            ScheduleDetailStyles.warpLabelValue
+                                        }>
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoLabel
+                                            }>
+                                            Ngày bắt đầu
+                                        </Text>
+
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoValue
+                                            }>
+                                            {moment(
+                                                scheduleDetail?.startedDate,
+                                            ).format('L')}
+                                        </Text>
+                                    </View>
+
+                                    <View
+                                        style={
+                                            ScheduleDetailStyles.warpLabelValue
+                                        }>
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoLabel
+                                            }>
+                                            Ngày kết thúc
+                                        </Text>
+
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoValue
+                                            }>
+                                            {moment(
+                                                scheduleDetail?.finishedDate,
+                                            ).format('L')}
+                                        </Text>
+                                    </View>
+
+                                    {scheduleDetail?.materialsByStaff.length !==
+                                        0 &&
+                                        scheduleDetail?.materialsByStaff.some(
+                                            (item: any) =>
+                                                item.staffId === userInfo._id,
+                                        ) && (
+                                            <View
+                                                style={{marginTop: 12, gap: 5}}>
+                                                <Text
+                                                    style={
+                                                        ScheduleDetailStyles.generalInfoText
+                                                    }>
+                                                    Nguồn cung thêm
+                                                </Text>
+
+                                                {scheduleDetail?.materialsByStaff
+                                                    .filter(
+                                                        (item: any) =>
+                                                            item.staffId ===
+                                                            userInfo._id,
+                                                    )
+                                                    .map((item: any) => (
+                                                        <Text
+                                                            style={[
+                                                                ScheduleDetailStyles.infoLabel,
+                                                                {width: '100%'},
+                                                            ]}
+                                                            key={item._id}>{`${
+                                                            item.name
+                                                        }: ${' '} ${
+                                                            item.value
+                                                        } ${
+                                                            item.unit
+                                                        } = ${new Intl.NumberFormat(
+                                                            'vi-VN',
+                                                            {
+                                                                style: 'currency',
+                                                                currency: 'VND',
+                                                            },
+                                                        ).format(
+                                                            item?.price ?? 0,
+                                                        )}`}</Text>
+                                                    ))}
+                                            </View>
+                                        )}
+                                </View>
+                            </View>
+                        </>
+                    </>
+                )}
 
                 <View style={ScheduleDetailStyles.jobDescription}>
                     <Text style={ScheduleDetailStyles.description}>
@@ -705,35 +1138,65 @@ const ScheduleDetail = ({route}: any) => {
                 ) : null}
 
                 <View style={ScheduleDetailStyles.listAccordion}>
-                    <List.Accordion
-                        titleStyle={ScheduleDetailStyles.titleAccordion1}
-                        title={`Cán bộ quản lý (${scheduleDetail?.followers?.length})`}
-                        style={ScheduleDetailStyles.boxAccordion}
-                        id='1'>
-                        <FlatList
-                            scrollEnabled={false}
-                            data={scheduleDetail?.followers as any}
-                            renderItem={({item, index}) =>
-                                renderStaff(item, index)
-                            }
-                            keyExtractor={item => item._id}
-                        />
-                    </List.Accordion>
+                    {userInfo.userType.level !== EOrganization.DEPARTMENT && (
+                        <List.Accordion
+                            titleStyle={ScheduleDetailStyles.titleAccordion1}
+                            title={`Cán bộ quản lý (${scheduleDetail?.followers?.length})`}
+                            style={ScheduleDetailStyles.boxAccordion}
+                            id='1'>
+                            <FlatList
+                                scrollEnabled={false}
+                                data={scheduleDetail?.followers as any}
+                                renderItem={({item, index}) =>
+                                    renderStaff(item, index)
+                                }
+                                keyExtractor={item => item._id}
+                            />
+                        </List.Accordion>
+                    )}
 
-                    {/* <List.Accordion
-                        titleStyle={ScheduleDetailStyles.titleAccordion1}
-                        title={`Người lao động (${scheduleDetail?.employees?.length})`}
-                        style={ScheduleDetailStyles.boxAccordion}
-                        id='2'>
-                        <FlatList
-                            scrollEnabled={false}
-                            data={scheduleDetail?.employees as any}
-                            renderItem={({item, index}) =>
-                                renderStaff(item, index)
-                            }
-                            keyExtractor={item => item._id}
-                        />
-                    </List.Accordion> */}
+                    {userInfo.userType.level === EOrganization.LEADER && (
+                        <>
+                            <List.Accordion
+                                titleStyle={
+                                    ScheduleDetailStyles.titleAccordion2
+                                }
+                                title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}
+                                style={ScheduleDetailStyles.boxAccordion}
+                                id='3'>
+                                <View
+                                    style={ScheduleDetailStyles.listChildTasks}>
+                                    <FlatList
+                                        scrollEnabled={false}
+                                        data={scheduleDetail?.childTasks as any}
+                                        renderItem={({item}) =>
+                                            renderChildTask(item)
+                                        }
+                                        keyExtractor={item => item._id}
+                                    />
+                                </View>
+                            </List.Accordion>
+
+                            {scheduleDetail?.employees?.length !== 0 && (
+                                <List.Accordion
+                                    titleStyle={
+                                        ScheduleDetailStyles.titleAccordion1
+                                    }
+                                    title={`Người lao động (${scheduleDetail?.employees?.length})`}
+                                    style={ScheduleDetailStyles.boxAccordion}
+                                    id='2'>
+                                    <FlatList
+                                        scrollEnabled={false}
+                                        data={scheduleDetail?.employees as any}
+                                        renderItem={({item, index}) =>
+                                            renderStaff(item, index)
+                                        }
+                                        keyExtractor={item => item._id}
+                                    />
+                                </List.Accordion>
+                            )}
+                        </>
+                    )}
 
                     {/* <List.Accordion
                         titleStyle={ScheduleDetailStyles.titleAccordion1}

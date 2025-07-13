@@ -24,6 +24,7 @@ const TaskListSection = ({
     styles,
     gardenAreaType,
     gardenArea,
+    processingRate,
 }: Props) => {
     const [tempInputValues, setTempInputValues] = useState<
         Record<string, string>
@@ -56,7 +57,7 @@ const TaskListSection = ({
                     const showWarning =
                         !isDisabled &&
                         !isNaN(areaValue) &&
-                        areaValue > gardenArea;
+                        areaValue + processingRate > gardenArea;
 
                     return (
                         <CollapsibleTaskBlock
@@ -77,31 +78,42 @@ const TaskListSection = ({
                                 </Text>
                             )}
 
-                            <Text style={styles.label}>
-                                Diện tích đã làm ({gardenAreaType}){' '}
-                                <Text style={{color: 'red'}}>*</Text>
-                            </Text>
+                            {!isCompleted && (
+                                <>
+                                    <Text style={styles.label}>
+                                        Diện tích đã làm ({gardenAreaType}){' '}
+                                        <Text style={{color: 'red'}}>*</Text>
+                                    </Text>
 
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    showWarning && {borderColor: 'red'},
-                                ]}
-                                keyboardType='numeric'
-                                placeholder='Nhập diện tích'
-                                placeholderTextColor='black'
-                                value={task.area}
-                                onChangeText={text =>
-                                    handleAreaChange(index, text)
-                                }
-                                editable={!isDisabled}
-                            />
+                                    <TextInput
+                                        style={[
+                                            styles.input,
+                                            showWarning && {borderColor: 'red'},
+                                        ]}
+                                        keyboardType='numeric'
+                                        placeholder='Nhập diện tích'
+                                        placeholderTextColor='black'
+                                        value={task.area}
+                                        onChangeText={text =>
+                                            handleAreaChange(index, text)
+                                        }
+                                        editable={!isDisabled}
+                                    />
+                                </>
+                            )}
 
                             {showWarning && (
-                                <Text style={styles.warningText}>
-                                    Diện tích không được vượt quá {gardenArea}{' '}
-                                    {gardenAreaType}
-                                </Text>
+                                <View style={{gap: 0, marginBottom: 10}}>
+                                    <Text style={styles.warningText}>
+                                        Diện tích không được vượt quá{' '}
+                                        {gardenArea} {gardenAreaType}
+                                    </Text>
+
+                                    <Text style={styles.warningText}>
+                                        Diện tích đã làm: {processingRate}{' '}
+                                        {gardenAreaType}
+                                    </Text>
+                                </View>
                             )}
                         </CollapsibleTaskBlock>
                     );

@@ -38,6 +38,7 @@ type IUser = {
     managedGardens: string[];
     tasks: tasks;
     groupId: string;
+    groupName: string;
 };
 
 type AuthStore = {
@@ -284,7 +285,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 ? {redirectData: data}
                 : {redirectDataRequestSchedule: data},
         ),
-    clearRedirectData: () => set({redirectData: null}),
+    clearRedirectData: () =>
+        set({redirectData: null, redirectDataRequestSchedule: null}),
 
     logout: async () => {
         await asyncStorageHelper.clearToken();

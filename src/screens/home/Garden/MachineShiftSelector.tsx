@@ -29,6 +29,7 @@ const MachineShiftSelector: React.FC<Props> = ({
     onChange,
     gardenAreaType,
     gardenArea,
+    processingRate,
 }) => {
     const [tempInputValues, setTempInputValues] = useState<
         Record<string, string>
@@ -58,7 +59,8 @@ const MachineShiftSelector: React.FC<Props> = ({
                         tempInputValues[index] || shift.hours;
                     const areaValue = parseFloat(currentInputValue);
                     const showWarning =
-                        !isNaN(areaValue) && areaValue > gardenArea;
+                        !isNaN(areaValue) &&
+                        areaValue + processingRate > gardenArea;
 
                     return (
                         <CollapsibleTaskBlock
@@ -81,7 +83,7 @@ const MachineShiftSelector: React.FC<Props> = ({
                                         {machines.map(machine => (
                                             <Picker.Item
                                                 key={machine._id}
-                                                label={machine.name}
+                                                label={machine.processName}
                                                 value={machine._id}
                                             />
                                         ))}
@@ -112,10 +114,28 @@ const MachineShiftSelector: React.FC<Props> = ({
                                             }
                                         />
                                         {showWarning && (
-                                            <Text style={styles.warningText}>
-                                                Diện tích không được vượt quá{' '}
-                                                {gardenArea} {gardenAreaType}
-                                            </Text>
+                                            <View
+                                                style={{
+                                                    gap: 0,
+                                                    marginBottom: 10,
+                                                }}>
+                                                <Text
+                                                    style={styles.warningText}>
+                                                    Diện tích không được vượt
+                                                    quá {gardenArea}{' '}
+                                                    {gardenAreaType}
+                                                </Text>
+
+                                                <Text
+                                                    style={[
+                                                        styles.warningText,
+                                                        {marginTop: 0},
+                                                    ]}>
+                                                    Diện tích đã làm:{' '}
+                                                    {processingRate}{' '}
+                                                    {gardenAreaType}
+                                                </Text>
+                                            </View>
                                         )}
                                     </>
                                 ) : null}
@@ -159,6 +179,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         padding: 8,
         height: 60,
+        color: 'black',
     },
 });
 

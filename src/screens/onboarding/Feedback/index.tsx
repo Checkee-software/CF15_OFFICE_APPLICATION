@@ -13,6 +13,7 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useFeedbackStore from '../../../stores/feedbackStore';
 import dayjs from 'dayjs';
 import images from '../../../assets/images';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 // import {useAuthStore} from '../../../stores/authStore';
 
 export default function FeedbackScreen({navigation}: any) {
@@ -43,6 +44,8 @@ export default function FeedbackScreen({navigation}: any) {
     const renderItem = ({item}: any) => {
         const avatarUrl = getFullAvatarUrl(item.avatar) || images.avatar;
 
+        console.log(item);
+
         return (
             <View style={styles.itemContainer}>
                 <View style={styles.row}>
@@ -57,8 +60,9 @@ export default function FeedbackScreen({navigation}: any) {
                             {item.fullName || 'Không rõ tên'}
                         </Text>
                         <Text style={styles.role}>
-                            {item.roleName || 'Không rõ vai trò'}
-                            
+                            {item.level === EOrganization.LEADER
+                                ? item.roleName
+                                : item.role || 'Không rõ vai trò'}
                         </Text>
                     </View>
                 </View>

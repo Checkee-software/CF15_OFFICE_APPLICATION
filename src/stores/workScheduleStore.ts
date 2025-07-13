@@ -22,7 +22,7 @@ interface workScheduleStore {
     getScheduleDetail: (id: string) => Promise<void>;
     filterByStatus: (status: string) => void;
     resetData: () => void;
-    getDetailWorkSchedule: (id: string) => Promise<void>;
+    getDetailWorkSchedule: (id: string, userId: string) => Promise<void>;
     requestPersonalTask: (
         scheduleId: string,
         childTaskId: string,
@@ -38,6 +38,16 @@ interface workScheduleStore {
 const fixAvatarPath = (path: string) => {
     const updatedPath = path.replace(/\\/g, '/');
     return `${ENV.BACKEND_URL}${updatedPath}`;
+};
+
+const filterStaffByUserId = (data: any, userId: string) => {
+    return {
+        ...data,
+        childTasks: data.childTasks.map((task: any) => ({
+            ...task,
+            staff: task.staff.filter((member: any) => member.userId === userId),
+        })),
+    };
 };
 
 export const useWorkScheduleStore = create<workScheduleStore>(set => ({
@@ -100,7 +110,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
         }
     },
 
-    getDetailWorkSchedule: async (id: string) => {
+    getDetailWorkSchedule: async (id: string, userId: string) => {
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
@@ -121,7 +131,11 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                     });
                 }
 
-                set({detailWorkSchedule: schedule});
+                const filteredData = filterStaffByUserId(schedule, userId);
+
+                console.log(filteredData);
+
+                set({detailWorkSchedule: filteredData});
             } else {
                 set({detailWorkSchedule: null});
             }

@@ -6,7 +6,6 @@ import {
     Image,
     TouchableOpacity,
     TextInput,
-    ScrollView,
     Alert,
     ImageBackground,
     Platform,
@@ -22,6 +21,7 @@ import {Dimensions} from 'react-native';
 import Backdrop from '../../subscreen/Loading/index2';
 // import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import colors from '@/assets/colors';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const {width} = Dimensions.get('window');
 
@@ -96,8 +96,9 @@ export default function Login() {
 
     return (
         <View style={LoginStyles.container}>
-            <ScrollView
+            <KeyboardAwareScrollView
                 keyboardShouldPersistTaps='handled'
+                enableOnAndroid
                 contentContainerStyle={{flex: 1}}>
                 <ImageBackground
                     source={images.backgroundLogin}
@@ -261,7 +262,7 @@ export default function Login() {
                 <View style={LoginStyles.version}>
                     <Text style={LoginStyles.textVersion}>Version 1.0.0</Text>
                 </View>
-            </ScrollView>
+            </KeyboardAwareScrollView>
 
             <Backdrop open={isLoading} />
         </View>
