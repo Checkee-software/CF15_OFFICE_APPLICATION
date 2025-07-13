@@ -296,6 +296,17 @@ const GardenDeclare = () => {
 
     return (
         <View style={{flex: 1}}>
+            <ActionButtons
+                visible={hasDeclarations}
+                showAlert={showExitAlert}
+                showReportConfirmation={showReportConfirmation}
+                onReport={handleReport}
+                onExit={handleExit}
+                onCloseAlert={() => setShowExitAlert(false)}
+                onConfirmReport={handleConfirmReport}
+                onCancelReport={handleCancelReport}
+                onlyShowReportButton={onlyShowReportButton}
+            />
             <KeyboardAwareScrollView
                 contentContainerStyle={styles.container}
                 enableOnAndroid
@@ -375,17 +386,6 @@ const GardenDeclare = () => {
                 </TouchableOpacity>
             </View>
 
-            <ActionButtons
-                visible={hasDeclarations}
-                showAlert={showExitAlert}
-                showReportConfirmation={showReportConfirmation}
-                onReport={handleReport}
-                onExit={handleExit}
-                onCloseAlert={() => setShowExitAlert(false)}
-                onConfirmReport={handleConfirmReport}
-                onCancelReport={handleCancelReport}
-                onlyShowReportButton={onlyShowReportButton}
-            />
             <Backdrop open={loading} />
         </View>
     );

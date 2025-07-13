@@ -89,7 +89,7 @@ const ActionButtons = ({
                                     alignItems: 'center',
                                 }}>
                                 <Icon
-                                    name='arrow-back'
+                                    name='arrow-circle-left'
                                     size={24}
                                     color='#fff'
                                 />
@@ -131,20 +131,21 @@ const styles = StyleSheet.create({
     },
     snackbarContainer: {
         position: 'absolute',
-        bottom: 0,
+        top: 0,
         left: 0,
         right: 0,
         backgroundColor: '#fff',
         padding: 10,
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: -2},
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         shadowRadius: 3,
         elevation: 5,
-        borderTopLeftRadius: 15,
-        borderTopRightRadius: 15,
-        zIndex: 1,
+        borderBottomLeftRadius: 15,
+        borderBottomRightRadius: 15,
+        zIndex: 10,
     },
+
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -199,20 +200,21 @@ const styles = StyleSheet.create({
     },
     confirmationContainerOverlay: {
         position: 'absolute',
-        bottom: 0,
+        top: 0,
         left: 0,
         right: 0,
         backgroundColor: '#fff',
-        zIndex: 10,
+        zIndex: 20,
         padding: 15,
-        borderTopLeftRadius: 15,
-        borderTopRightRadius: 15,
+        borderBottomLeftRadius: 15,
+        borderBottomRightRadius: 15,
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: -2},
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         shadowRadius: 3,
         elevation: 6,
     },
+
     confirmationText: {
         fontSize: 16,
         textAlign: 'center',
