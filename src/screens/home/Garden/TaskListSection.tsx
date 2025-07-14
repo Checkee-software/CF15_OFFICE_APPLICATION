@@ -31,6 +31,14 @@ const TaskListSection = ({
     >({});
 
     const handleAreaChange = (index: number, text: string) => {
+        const currentText = tempInputValues[index] || taskInputs[index].area;
+        if (
+            (currentText.includes('.') || currentText.includes(',')) &&
+            /[.,]$/.test(text)
+        ) {
+            return;
+        }
+
         const normalizedText = text.replace(',', '.');
         const numericValue = parseFloat(normalizedText);
 

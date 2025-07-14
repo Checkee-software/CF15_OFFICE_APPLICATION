@@ -54,7 +54,7 @@ const AdditionalSupplySection = ({
     return (
         <View style={{marginTop: 16}}>
             <View style={styles.header}>
-                <Text style={styles.title}>Nguồn cung thêm</Text>
+                <Text style={styles.title}>Đầu tư tăng thêm</Text>
                 <TouchableOpacity onPress={onAdd}>
                     <Icon name='add' size={20} color='blue' />
                 </TouchableOpacity>
@@ -90,9 +90,14 @@ const AdditionalSupplySection = ({
                         placeholderTextColor={'gray'}
                         keyboardType='numeric'
                         value={item.value?.toString() ?? ''}
-                        onChangeText={text =>
-                            onChange(index, 'value', text.replace(',', '.'))
-                        }
+                        onChangeText={text => {
+                            const normalizedText = text.replace(',', '.');
+                            const dotCount = (normalizedText.match(/\./g) || [])
+                                .length;
+                            if (dotCount > 1) return;
+
+                            onChange(index, 'value', normalizedText);
+                        }}
                     />
 
                     <TextInput
