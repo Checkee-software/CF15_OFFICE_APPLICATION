@@ -256,7 +256,7 @@ const StatisticResult = () => {
                             textBackgroundRadius={26}
                             data={statisticData?.chart}
                             onPress={(item, index) => {
-                                console.log(item);
+                             
                                 setSelectedItem(item);
                             }}
                         />

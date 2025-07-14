@@ -217,22 +217,22 @@ const GardenWorker = () => {
                         value={(gardens as any).unit || 'Không xác định'}
                     />
 
-                    <CollapsibleRow
-                        label='Diện tích giao khoán (m2)'
-                        value={gardens.management?.area?.totalSquare}
-                        expanded={showManagementAreaInfo}
-                        onToggle={() =>
-                            setShowManagementAreaInfo(!showManagementAreaInfo)
-                        }>
-                        <Row
-                            label='Chiều dài'
-                            value={`${gardens.management?.area?.length} m`}
-                        />
-                        <Row
-                            label='Chiều rộng'
-                            value={`${gardens.management?.area?.width} m`}
-                        />
-                    </CollapsibleRow>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                        }}>
+                        <Text style={{width: '65%'}}>
+                            Diện tích giao khoán (ha)
+                        </Text>
+                        <Text
+                            style={{
+                                width: '30%',
+                                textAlign: 'right',
+                            }}>
+                            {gardens.management?.area?.totalSquare}
+                        </Text>
+                    </View>
                 </CollapsibleRow>
             </Section>
 

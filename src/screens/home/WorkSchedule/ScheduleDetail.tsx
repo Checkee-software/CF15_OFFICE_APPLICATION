@@ -75,7 +75,6 @@ const ScheduleDetail = ({route}: any) => {
     };
 
     const formattedGardenArea = (totalSquare: any) => {
-        console.log(totalSquare);
         const formattedTotalSquare =
             Number(totalSquare) % 1 === 0
                 ? formatNumber(totalSquare ?? 0) // số nguyên
@@ -1071,7 +1070,7 @@ const ScheduleDetail = ({route}: any) => {
                                                     style={
                                                         ScheduleDetailStyles.generalInfoText
                                                     }>
-                                                    Nguồn cung thêm
+                                                    Đầu tư tăng thêm
                                                 </Text>
 
                                                 {scheduleDetail?.materialsByStaff

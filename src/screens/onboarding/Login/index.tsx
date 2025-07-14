@@ -95,11 +95,12 @@ export default function Login() {
     };
 
     return (
-        <View style={LoginStyles.container}>
-            <KeyboardAwareScrollView
-                keyboardShouldPersistTaps='handled'
-                enableOnAndroid
-                contentContainerStyle={{flex: 1}}>
+        <KeyboardAwareScrollView
+            keyboardShouldPersistTaps='handled'
+            enableOnAndroid
+            contentContainerStyle={{flexGrow: 1}}
+            extraScrollHeight={Platform.OS === 'android' ? 200 : 20}>
+            <View style={LoginStyles.container}>
                 <ImageBackground
                     source={images.backgroundLogin}
                     style={LoginStyles.welcomeSceenBackground}>
@@ -262,16 +263,16 @@ export default function Login() {
                 <View style={LoginStyles.version}>
                     <Text style={LoginStyles.textVersion}>Version 1.0.0</Text>
                 </View>
-            </KeyboardAwareScrollView>
 
-            <Backdrop open={isLoading} />
-        </View>
+                <Backdrop open={isLoading} />
+            </View>
+        </KeyboardAwareScrollView>
     );
 }
 
 const LoginStyles = StyleSheet.create({
     container: {
-        flex: 1,
+        minHeight: '100%',
         justifyContent: 'center',
     },
     welcomeSceenBackground: {

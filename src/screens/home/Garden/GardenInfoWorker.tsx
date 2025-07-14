@@ -139,6 +139,8 @@ const GardenInfoWorker = () => {
             />
             <View style={styles.cardContent}>
                 <View style={styles.cardTextContainer}>
+                    <Text style={styles.cardTitle}>{item.name}</Text>
+
                     {showInputGardenName._id === item._id ? (
                         <TextInput
                             style={{
@@ -158,11 +160,11 @@ const GardenInfoWorker = () => {
                             value={gardenNameInput.name}
                         />
                     ) : (
-                        <Text style={styles.cardTitle}>
-                            {item.gardenNickname !== ''
-                                ? item.gardenNickname
-                                : item.name}
-                        </Text>
+                        item.gardenNickname !== '' && (
+                            <Text style={styles.cardTitle}>
+                                {item.gardenNickname}
+                            </Text>
+                        )
                     )}
 
                     <Text style={styles.cardSubtitle}>{item.code}</Text>
@@ -191,7 +193,7 @@ const GardenInfoWorker = () => {
                                 _id: item._id,
                                 name: item.gardenNickname
                                     ? item.gardenNickname
-                                    : item.name,
+                                    : '',
                             });
                     }}>
                     <FontAwesome name='pencil' size={24} color={'#FF4E45'} />

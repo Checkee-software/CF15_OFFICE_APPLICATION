@@ -105,8 +105,25 @@ export default function Profile({navigation}: any) {
                                           )
                                         : null}
 
-                                    {userInfo.userType.level !==
-                                    EOrganization.DEPARTMENT
+                                    {userInfo.userType.level ===
+                                        EOrganization.LEADER ||
+                                    userInfo.userType.level ===
+                                        EOrganization.WORKER
+                                        ? renderInfoRow(
+                                              'Đội sản xuất',
+                                              //{userInfo.userType.unit}
+                                              `${
+                                                  userInfo.userType.unit === ''
+                                                      ? 'Chưa cập nhật'
+                                                      : userInfo.groupName
+                                              }`,
+                                          )
+                                        : null}
+
+                                    {userInfo.userType.level ===
+                                        EOrganization.LEADER ||
+                                    userInfo.userType.level ===
+                                        EOrganization.WORKER
                                         ? renderInfoRow(
                                               'Tổ',
                                               //{userInfo.userType.unit}
@@ -219,26 +236,11 @@ const renderOption = (
         />
     </TouchableOpacity>
 );
-const renderInfoRow = (
-    label: string,
-    value: string,
-    hasDownloadIcon = false,
-) => (
+const renderInfoRow = (label: string, value: string) => (
     <View style={styles.infoRow}>
         <Text style={styles.infoLabel}>{label}</Text>
         <View style={styles.infoValueContainer}>
             <Text style={styles.infoValue}>{value}</Text>
-            {hasDownloadIcon && (
-                <TouchableOpacity
-                    onPress={() => console.log('Download tapped')}>
-                    <Icon
-                        name='download'
-                        size={16}
-                        color='#fff'
-                        style={{marginLeft: 6}}
-                    />
-                </TouchableOpacity>
-            )}
         </View>
     </View>
 );

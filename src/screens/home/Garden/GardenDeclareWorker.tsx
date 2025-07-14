@@ -292,8 +292,6 @@ const GardenDeclare = () => {
             ),
     );
 
-    console.log(detailWorkSchedule);
-
     return (
         <View style={{flex: 1}}>
             <ActionButtons
@@ -325,10 +323,10 @@ const GardenDeclare = () => {
                     </View>
                 </View>
 
-                <MachineShiftHistorySection
+                {/* <MachineShiftHistorySection
                     shifts={machineShiftHistories}
                     gardenAreaType={detailWorkSchedule?.gardenAreaType || 'ha'}
-                />
+                /> */}
 
                 <TaskListSection
                     taskInputs={taskInputs}

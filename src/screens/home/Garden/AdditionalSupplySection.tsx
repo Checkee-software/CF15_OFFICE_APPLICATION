@@ -54,7 +54,7 @@ const AdditionalSupplySection = ({
     return (
         <View style={{marginTop: 16}}>
             <View style={styles.header}>
-                <Text style={styles.title}>Nguồn cung thêm</Text>
+                <Text style={styles.title}>Đầu tư tăng thêm</Text>
                 <TouchableOpacity onPress={onAdd}>
                     <Icon name='add' size={20} color='blue' />
                 </TouchableOpacity>

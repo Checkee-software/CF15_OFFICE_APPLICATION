@@ -43,12 +43,12 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     GARDENINFOWORKER1: {
         key: 'GARDENINFOWORKER1',
-        headerTitle: 'KHAI BÁO QUY TRÌNH',
+        headerTitle: 'BÁO CÁO QUY TRÌNH',
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENDECLAREWORKER: {
         key: 'GARDENDECLAREWORKER',
-        headerTitle: 'CHI TIẾT QUY TRÌNH',
+        headerTitle: 'CHI TIẾT BÁO CÁO QUY TRÌNH',
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENCAMERASCAN: {
@@ -78,12 +78,12 @@ const HOME_SCREENS = {
     } as ScreenInformation,
     WORKSCHEDULE: {
         key: 'WORKSCHEDULE',
-        headerTitle: 'QUY TRÌNH',
+        headerTitle: 'LỊCH SỬ QUY TRÌNH',
         isOpenQRCamera: false,
     } as ScreenInformation,
     SCHEDULEDETAIL: {
         key: 'SCHEDULEDETAIL',
-        headerTitle: 'CHI TIẾT QUY TRÌNH',
+        headerTitle: 'CHI TIẾT LỊCH SỬ QUY TRÌNH',
         isOpenQRCamera: false,
     } as ScreenInformation,
     UNIT: {
