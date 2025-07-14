@@ -90,9 +90,14 @@ const AdditionalSupplySection = ({
                         placeholderTextColor={'gray'}
                         keyboardType='numeric'
                         value={item.value?.toString() ?? ''}
-                        onChangeText={text =>
-                            onChange(index, 'value', text.replace(',', '.'))
-                        }
+                        onChangeText={text => {
+                            const normalizedText = text.replace(',', '.');
+                            const dotCount = (normalizedText.match(/\./g) || [])
+                                .length;
+                            if (dotCount > 1) return;
+
+                            onChange(index, 'value', normalizedText);
+                        }}
                     />
 
                     <TextInput
