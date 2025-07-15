@@ -32,10 +32,17 @@ const TaskListSection = ({
 
     const handleAreaChange = (index: number, text: string) => {
         const currentText = tempInputValues[index] || taskInputs[index].area;
-        if (
-            (currentText.includes('.') || currentText.includes(',')) &&
-            /[.,]$/.test(text)
-        ) {
+
+        if (text.includes('-')) {
+            return;
+        }
+
+        const isAdding = text.length > currentText.length;
+        const endsWithDotOrComma = /[.,]$/.test(text);
+        const alreadyHasDotOrComma =
+            currentText.includes('.') || currentText.includes(',');
+
+        if (isAdding && alreadyHasDotOrComma && endsWithDotOrComma) {
             return;
         }
 

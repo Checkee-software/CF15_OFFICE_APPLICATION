@@ -38,6 +38,22 @@ const MachineShiftSelector: React.FC<Props> = ({
     if (!machineShifts.length) return null;
 
     const handleHoursChange = (index: number, text: string) => {
+        const currentText =
+            tempInputValues[index] || machineShifts[index].hours;
+
+        if (text.includes('-')) {
+            return;
+        }
+
+        const isAdding = text.length > currentText.length;
+        const endsWithDotOrComma = /[.,]$/.test(text);
+        const alreadyHasDotOrComma =
+            currentText.includes('.') || currentText.includes(',');
+
+        if (isAdding && alreadyHasDotOrComma && endsWithDotOrComma) {
+            return;
+        }
+
         const normalizedText = text.replace(',', '.');
         const numericValue = parseFloat(normalizedText);
 
