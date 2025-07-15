@@ -11,7 +11,6 @@ import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useAuthStore} from '../../../stores/authStore';
-import {PDFDocument, rgb, degrees} from 'pdf-lib';
 import {FlatList} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -167,6 +166,8 @@ const GardenWorker = () => {
         return <Loading />;
     }
 
+    console.log(gardens);
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Section title='Thông tin khu vườn'>
@@ -244,7 +245,7 @@ const GardenWorker = () => {
                     </Text>
                 </View>
                 <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Số lượng giống cây</Text>
+                    <Text style={styles.infoLabel}>Số lượng cây trồng</Text>
                     <Text
                         style={
                             styles.infoValue
@@ -258,10 +259,11 @@ const GardenWorker = () => {
                                 style={
                                     styles.yearTitle
                                 }>{`Năm ${item.year}`}</Text>
-                            <Text
-                                style={
-                                    styles.plantedText
-                                }>{`Trồng ${item.quantity} cây`}</Text>
+                            <Text style={styles.plantedText}>{`Trồng ${
+                                gardens.totalProductByYear[
+                                    gardens.totalProductByYear.length - 1
+                                ].quantity
+                            } cây`}</Text>
                         </View>
 
                         <View style={styles.qualityRow}>
@@ -281,20 +283,20 @@ const GardenWorker = () => {
                                 item.qualities?.[3] ?? 0
                             }`}</Text>
                         </View>
+
+                        <View style={styles.warpNewTreeDead}>
+                            <Text style={styles.labelTree}>{`Cây trồng mới: ${
+                                item.newTree || 0
+                            }`}</Text>
+                            <Text
+                                style={[
+                                    styles.labelTree,
+                                    {textAlign: 'right'},
+                                ]}>{`Cây chết: ${item.deadTree || 0}`}</Text>
+                        </View>
                     </View>
                 ))}
             </Section>
-
-            {gardens.management?.files.length !== 0 ? (
-                <Section title='Tệp đính kèm'>
-                    <FlatList
-                        scrollEnabled={false}
-                        data={gardens.management?.files}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({item}) => renderItemAttachedFiles(item)}
-                    />
-                </Section>
-            ) : null}
 
             {gardens.sidePlants?.length > 0 && (
                 <Section title='Thông tin cây trồng xen'>
@@ -311,6 +313,19 @@ const GardenWorker = () => {
                     ))}
                 </Section>
             )}
+
+            {gardens.management?.files.length !== 0 ? (
+                <Section title='Tệp đính kèm'>
+                    <FlatList
+                        scrollEnabled={false}
+                        data={gardens.management?.files}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({item}) => renderItemAttachedFiles(item)}
+                    />
+                </Section>
+            ) : null}
+
+            {gardens.note && <Text>{gardens.note}</Text>}
         </ScrollView>
     );
 };
@@ -436,6 +451,15 @@ const styles = StyleSheet.create({
     separator: {
         fontSize: 14,
         color: '#ddd',
+    },
+    warpNewTreeDead: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    labelTree: {
+        flex: 1,
+        flexShrink: 1,
     },
 
     cardDocument: {

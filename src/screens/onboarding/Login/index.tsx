@@ -99,7 +99,7 @@ export default function Login() {
             keyboardShouldPersistTaps='handled'
             enableOnAndroid
             contentContainerStyle={{flexGrow: 1}}
-            extraScrollHeight={Platform.OS === 'android' ? 200 : 20}>
+            extraScrollHeight={Platform.OS === 'android' ? 160 : 20}>
             <View style={LoginStyles.container}>
                 <ImageBackground
                     source={images.backgroundLogin}

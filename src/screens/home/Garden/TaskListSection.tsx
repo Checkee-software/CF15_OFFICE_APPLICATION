@@ -53,7 +53,7 @@ const TaskListSection = ({
     return (
         <View>
             <Text style={styles.sectionTitle}>
-                Quy trình ({taskInputs.length})
+                Báo cáo quy trình ({taskInputs.length})
             </Text>
             <View style={{gap: 12}}>
                 {taskInputs.map((task, index) => {

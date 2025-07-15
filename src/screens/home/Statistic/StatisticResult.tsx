@@ -1,19 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import {useStatisticStore} from '@/stores/statisticStore';
 import {useAuthStore} from '@/stores/authStore';
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {BarChart, PieChart} from 'react-native-gifted-charts';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
-const StatisticResult = () => {
+const StatisticResult = (props: any) => {
     const {statisticData} = useStatisticStore();
     const {userInfo} = useAuthStore();
-
-    // const maxValue = Math.max(
-    //     ...(statisticData?.chart?.map(d => d.value) ?? []),
-    // );
-    // const yAxisLabelWidth = `${maxValue}`.length * 8 + 10;
 
     const formatVND = (value: number) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -22,8 +17,6 @@ const StatisticResult = () => {
             maximumFractionDigits: 0, // không hiển thị số lẻ
         }).format(value);
     };
-
-    // console.log(statisticData);
 
     // Hàm format đơn vị tiền
     const formatCurrency = (value: number) => {
@@ -48,11 +41,10 @@ const StatisticResult = () => {
         formatCurrency(Math.round(i * step)),
     );
 
-    const [selectedItem, setSelectedItem] = useState(null);
-
     return (
         <View style={styles.container}>
-            {userInfo.userType.level !== EOrganization.WORKER ? (
+            {userInfo.userType.level !== EOrganization.WORKER &&
+            props.selectedType !== 'DISPLAY' ? (
                 <>
                     <View style={styles.listCard}>
                         <View style={styles.card}>
@@ -93,229 +85,409 @@ const StatisticResult = () => {
                         </View>
                     </View>
 
-                    <View style={styles.chartSection}>
-                        {statisticData?.chart.length !== 0 ? (
-                            <>
-                                {/* <Text style={styles.chartLabel}>Biểu đồ quy trình sử dụng</Text>
+                    {userInfo.userType.level === EOrganization.LEADER &&
+                        props.selectedType === 'DISPLAY'}
+
+                    {statisticData?.chart &&
+                        statisticData.chart.length !== 0 && (
+                            <View style={styles.chartSection}>
+                                <>
+                                    {/* <Text style={styles.chartLabel}>Biểu đồ quy trình sử dụng</Text>
                 <Text style={styles.chartValue}>57.588.045</Text>
                 <Text style={styles.currency}>vnđ</Text> */}
 
-                                <View style={styles.chart}>
-                                    <ScrollView
-                                        horizontal
-                                        showsHorizontalScrollIndicator={false}>
-                                        <BarChart
-                                            data={statisticData?.chart}
-                                            barWidth={14}
-                                            spacing={10}
-                                            labelWidth={120}
-                                            // maxValue={
-                                            //     Math.max(
-                                            //         ...(statisticData?.chart?.map(
-                                            //             d => d._realValue ?? d.value,
-                                            //         ) ?? []),
-                                            //     ) * 1.1
-                                            // }
-                                            maxValue={100}
-                                            initialSpacing={15}
-                                            //yAxisLabelTexts={['0', '25%', '50%', '75%', '100%']}
-                                            yAxisLabelTexts={yAxisLabelTexts}
-                                            noOfSections={4}
-                                            yAxisThickness={1}
-                                            xAxisLabelTextStyle={{
-                                                fontSize: 11,
-                                                textAlign: 'left',
-                                            }}
-                                            width={
-                                                (statisticData?.chart?.length ??
-                                                    0) * 100
-                                            }
-                                            //hideYAxisText
-                                            yAxisLabelWidth={45}
-                                            //yAxisLabelWidth={yAxisLabelWidth}
-                                            yAxisExtraHeight={40}
-                                            renderTooltip={(item: any) => (
-                                                <View
-                                                    style={styles.chartTooltip}>
-                                                    <Text
+                                    <View style={styles.chart}>
+                                        <ScrollView
+                                            horizontal
+                                            showsHorizontalScrollIndicator={
+                                                false
+                                            }>
+                                            <BarChart
+                                                data={statisticData?.chart}
+                                                barWidth={14}
+                                                spacing={10}
+                                                labelWidth={120}
+                                                maxValue={100}
+                                                initialSpacing={15}
+                                                //yAxisLabelTexts={['0', '25%', '50%', '75%', '100%']}
+                                                yAxisLabelTexts={
+                                                    yAxisLabelTexts
+                                                }
+                                                noOfSections={4}
+                                                yAxisThickness={1}
+                                                xAxisLabelTextStyle={{
+                                                    fontSize: 11,
+                                                    textAlign: 'left',
+                                                }}
+                                                width={
+                                                    (statisticData?.chart
+                                                        ?.length ?? 0) * 100
+                                                }
+                                                yAxisLabelWidth={45}
+                                                yAxisExtraHeight={40}
+                                                renderTooltip={(item: any) => (
+                                                    <View
                                                         style={
-                                                            styles.tooltipText
+                                                            styles.chartTooltip
                                                         }>
-                                                        {formatVND(
-                                                            item._realValue ??
-                                                                item.value,
-                                                        )}
-                                                    </Text>
-                                                </View>
-                                            )}
-                                        />
-                                    </ScrollView>
+                                                        <Text
+                                                            style={
+                                                                styles.tooltipText
+                                                            }>
+                                                            {formatVND(
+                                                                item._realValue ??
+                                                                    item.value,
+                                                            )}
+                                                        </Text>
+                                                    </View>
+                                                )}
+                                            />
+                                        </ScrollView>
 
-                                    <View style={styles.legendRow}>
-                                        <View style={styles.legendItem}>
-                                            <View
-                                                style={[
-                                                    styles.legendDot,
-                                                    {
-                                                        backgroundColor:
-                                                            '#FF4C4C',
-                                                    },
-                                                ]}
-                                            />
-                                            <Text style={styles.legendText}>
-                                                Nhân công
-                                            </Text>
+                                        <View style={styles.legendRow}>
+                                            <View style={styles.legendItem}>
+                                                <View
+                                                    style={[
+                                                        styles.legendDot,
+                                                        {
+                                                            backgroundColor:
+                                                                '#FF4C4C',
+                                                        },
+                                                    ]}
+                                                />
+                                                <Text style={styles.legendText}>
+                                                    Nhân công
+                                                </Text>
+                                            </View>
+                                            <View style={styles.legendItem}>
+                                                <View
+                                                    style={[
+                                                        styles.legendDot,
+                                                        {
+                                                            backgroundColor:
+                                                                '#4CAF50',
+                                                        },
+                                                    ]}
+                                                />
+                                                <Text style={styles.legendText}>
+                                                    Vật tư
+                                                </Text>
+                                            </View>
+                                            <View style={styles.legendItem}>
+                                                <View
+                                                    style={[
+                                                        styles.legendDot,
+                                                        {
+                                                            backgroundColor:
+                                                                '#2196F3',
+                                                        },
+                                                    ]}
+                                                />
+                                                <Text style={styles.legendText}>
+                                                    Ca máy
+                                                </Text>
+                                            </View>
                                         </View>
-                                        <View style={styles.legendItem}>
-                                            <View
-                                                style={[
-                                                    styles.legendDot,
-                                                    {
-                                                        backgroundColor:
-                                                            '#4CAF50',
-                                                    },
-                                                ]}
-                                            />
-                                            <Text style={styles.legendText}>
-                                                Vật tư
+                                    </View>
+                                </>
+                            </View>
+                        )}
+
+                    {statisticData?.list &&
+                        statisticData?.list.length !== 0 && (
+                            <View style={styles.taskListContainer}>
+                                {statisticData?.list.map((task, index) => (
+                                    <View key={index} style={styles.taskItem}>
+                                        <Text style={styles.taskTitle}>
+                                            {task.title}
+                                        </Text>
+                                        <Text style={styles.taskLocation}>
+                                            {task.gardenName}
+                                        </Text>
+
+                                        <View style={styles.taskCosts}>
+                                            <Text style={styles.costText}>
+                                                Chi phí nhân công: {''}
+                                                <Text style={styles.costValue}>
+                                                    {new Intl.NumberFormat(
+                                                        'vi-VN',
+                                                        {
+                                                            style: 'currency',
+                                                            currency: 'VND',
+                                                        },
+                                                    ).format(
+                                                        task?.labourCost ?? 0,
+                                                    )}
+                                                </Text>
                                             </Text>
-                                        </View>
-                                        <View style={styles.legendItem}>
-                                            <View
-                                                style={[
-                                                    styles.legendDot,
-                                                    {
-                                                        backgroundColor:
-                                                            '#2196F3',
-                                                    },
-                                                ]}
-                                            />
-                                            <Text style={styles.legendText}>
-                                                Ca máy
+                                            <Text style={styles.costText}>
+                                                Chi phí vật tư: {''}
+                                                <Text style={styles.costValue}>
+                                                    {new Intl.NumberFormat(
+                                                        'vi-VN',
+                                                        {
+                                                            style: 'currency',
+                                                            currency: 'VND',
+                                                        },
+                                                    ).format(
+                                                        task?.materialCost ?? 0,
+                                                    )}
+                                                </Text>
+                                            </Text>
+                                            <Text style={styles.costText}>
+                                                Chi phí ca máy: {''}
+                                                <Text style={styles.costValue}>
+                                                    {new Intl.NumberFormat(
+                                                        'vi-VN',
+                                                        {
+                                                            style: 'currency',
+                                                            currency: 'VND',
+                                                        },
+                                                    ).format(
+                                                        task?.machineCost ?? 0,
+                                                    )}
+                                                </Text>
                                             </Text>
                                         </View>
                                     </View>
-                                </View>
-                            </>
-                        ) : null}
-                    </View>
-
-                    <View style={styles.taskListContainer}>
-                        {statisticData?.list.map((task, index) => (
-                            <View key={index} style={styles.taskItem}>
-                                <Text style={styles.taskTitle}>
-                                    {task.title}
-                                </Text>
-                                <Text style={styles.taskLocation}>
-                                    {task.gardenName}
-                                </Text>
-
-                                <View style={styles.taskCosts}>
-                                    <Text style={styles.costText}>
-                                        Chi phí nhân công: {''}
-                                        <Text style={styles.costValue}>
-                                            {new Intl.NumberFormat('vi-VN', {
-                                                style: 'currency',
-                                                currency: 'VND',
-                                            }).format(task?.labourCost ?? 0)}
-                                        </Text>
-                                    </Text>
-                                    <Text style={styles.costText}>
-                                        Chi phí vật tư: {''}
-                                        <Text style={styles.costValue}>
-                                            {new Intl.NumberFormat('vi-VN', {
-                                                style: 'currency',
-                                                currency: 'VND',
-                                            }).format(task?.materialCost ?? 0)}
-                                        </Text>
-                                    </Text>
-                                    <Text style={styles.costText}>
-                                        Chi phí ca máy: {''}
-                                        <Text style={styles.costValue}>
-                                            {new Intl.NumberFormat('vi-VN', {
-                                                style: 'currency',
-                                                currency: 'VND',
-                                            }).format(task?.machineCost ?? 0)}
-                                        </Text>
-                                    </Text>
-                                </View>
-                            </View>
-                        ))}
-                    </View>
-                </>
-            ) : (
-                <View style={{marginVertical: 20}}>
-                    <View style={{alignItems: 'center'}}>
-                        <PieChart
-                            showText
-                            focusOnPress
-                            textColor='black'
-                            radius={150}
-                            textSize={20}
-                            innerRadius={50}
-                            textBackgroundRadius={26}
-                            data={statisticData?.chart}
-                            onPress={(item, index) => {
-                             
-                                setSelectedItem(item);
-                            }}
-                        />
-
-                        {selectedItem && (
-                            <View
-                                style={{
-                                    marginTop: 20,
-                                    backgroundColor: '#fff',
-                                    paddingVertical: 10,
-                                    paddingHorizontal: 16,
-                                    borderRadius: 10,
-                                    shadowColor: '#000',
-                                    shadowOpacity: 0.1,
-                                    shadowOffset: {width: 0, height: 2},
-                                    shadowRadius: 4,
-                                    elevation: 3,
-                                    alignItems: 'center',
-                                }}>
-                                <Text
-                                    style={{fontSize: 16, fontWeight: 'bold'}}>
-                                    {`${selectedItem.label} ${selectedItem.text}`}
-                                </Text>
-                                <Text style={{fontSize: 14, color: '#666'}}>
-                                    {`Đã làm ${selectedItem.processingRate}/${selectedItem.totalSquare} (ha)`}
-                                </Text>
+                                ))}
                             </View>
                         )}
+                </>
+            ) : props.selectedType === 'DISPLAY' && statisticData?.pieChart ? (
+                <View style={{marginVertical: 20, gap: 30}}>
+                    <View style={{flexDirection: 'row', gap: 15}}>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 5,
+                            }}>
+                            <View
+                                style={{
+                                    width: 12,
+                                    height: 12,
+                                    backgroundColor: '#FF4E45',
+                                    borderRadius: 6,
+                                }}
+                            />
+
+                            <Text>Chưa làm</Text>
+                        </View>
+
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 5,
+                            }}>
+                            <View
+                                style={{
+                                    width: 12,
+                                    height: 12,
+                                    backgroundColor: '#4CAF50',
+                                    borderRadius: 6,
+                                }}
+                            />
+
+                            <Text>Đã làm</Text>
+                        </View>
                     </View>
 
-                    <View style={{gap: 5}}>
-                        {statisticData?.chart.map((item, index) => (
-                            <View
-                                key={index}
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'flex-start',
-                                }}>
-                                <View
-                                    style={{
-                                        width: 12,
-                                        height: 12,
-                                        backgroundColor:
-                                            statisticData.chart[index].color,
-                                        marginRight: 8,
-                                        borderRadius: 6,
-                                    }}
+                    {statisticData?.pieChart.map((item: any, index: number) => {
+                        const labelsPosition =
+                            item.percentage === 100 ? 'inward' : 'mid';
+
+                        return (
+                            <View style={styles.pieChartView} key={index}>
+                                <PieChart
+                                    showText
+                                    textColor='white'
+                                    fontWeight='500'
+                                    radius={80}
+                                    innerRadius={30}
+                                    labelsPosition={labelsPosition}
+                                    textSize={14}
+                                    // textBackgroundRadius={26}
+                                    data={item?.pieChart}
                                 />
-                                <Text
-                                    style={{
-                                        fontSize: 14,
-                                    }}>
-                                    {item.label}
+                                <Text style={{textAlign: 'center'}}>
+                                    {`${item.taskName} ${
+                                        userInfo.userType.level ===
+                                        EOrganization.WORKER
+                                            ? item.processingRate
+                                            : item.totalProcessingRate
+                                    }/${item.totalSquare} (ha)`}
                                 </Text>
                             </View>
-                        ))}
-                    </View>
+                        );
+                    })}
                 </View>
+            ) : (
+                props.selectedType === 'WORK' &&
+                statisticData?.chart && (
+                    <View>
+                        <View style={styles.chartSection}>
+                            {statisticData?.chart.length !== 0 ? (
+                                <>
+                                    {/* <Text style={styles.chartLabel}>Biểu đồ quy trình sử dụng</Text>
+                <Text style={styles.chartValue}>57.588.045</Text>
+                <Text style={styles.currency}>vnđ</Text> */}
+
+                                    <View style={styles.chart}>
+                                        <ScrollView
+                                            horizontal
+                                            showsHorizontalScrollIndicator={
+                                                false
+                                            }>
+                                            <BarChart
+                                                data={statisticData?.chart}
+                                                barWidth={14}
+                                                spacing={10}
+                                                labelWidth={120}
+                                                maxValue={100}
+                                                initialSpacing={15}
+                                                //yAxisLabelTexts={['0', '25%', '50%', '75%', '100%']}
+                                                yAxisLabelTexts={
+                                                    yAxisLabelTexts
+                                                }
+                                                noOfSections={4}
+                                                yAxisThickness={1}
+                                                xAxisLabelTextStyle={{
+                                                    fontSize: 11,
+                                                    textAlign: 'left',
+                                                }}
+                                                width={
+                                                    (statisticData?.chart
+                                                        ?.length ?? 0) * 100
+                                                }
+                                                yAxisLabelWidth={45}
+                                                yAxisExtraHeight={40}
+                                                renderTooltip={(item: any) => (
+                                                    <View
+                                                        style={
+                                                            styles.chartTooltip
+                                                        }>
+                                                        <Text
+                                                            style={
+                                                                styles.tooltipText
+                                                            }>
+                                                            {formatVND(
+                                                                item._realValue ??
+                                                                    item.value,
+                                                            )}
+                                                        </Text>
+                                                    </View>
+                                                )}
+                                            />
+                                        </ScrollView>
+
+                                        <View style={styles.legendRow}>
+                                            <View style={styles.legendItem}>
+                                                <View
+                                                    style={[
+                                                        styles.legendDot,
+                                                        {
+                                                            backgroundColor:
+                                                                '#FF4C4C',
+                                                        },
+                                                    ]}
+                                                />
+                                                <Text style={styles.legendText}>
+                                                    Nhân công
+                                                </Text>
+                                            </View>
+                                            <View style={styles.legendItem}>
+                                                <View
+                                                    style={[
+                                                        styles.legendDot,
+                                                        {
+                                                            backgroundColor:
+                                                                '#4CAF50',
+                                                        },
+                                                    ]}
+                                                />
+                                                <Text style={styles.legendText}>
+                                                    Vật tư
+                                                </Text>
+                                            </View>
+                                            <View style={styles.legendItem}>
+                                                <View
+                                                    style={[
+                                                        styles.legendDot,
+                                                        {
+                                                            backgroundColor:
+                                                                '#2196F3',
+                                                        },
+                                                    ]}
+                                                />
+                                                <Text style={styles.legendText}>
+                                                    Ca máy
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </>
+                            ) : null}
+                        </View>
+
+                        <View style={styles.taskListContainer}>
+                            {statisticData?.list.map((task, index) => (
+                                <View key={index} style={styles.taskItem}>
+                                    <Text style={styles.taskTitle}>
+                                        {task.title}
+                                    </Text>
+                                    <Text style={styles.taskLocation}>
+                                        {task.gardenName}
+                                    </Text>
+
+                                    <View style={styles.taskCosts}>
+                                        <Text style={styles.costText}>
+                                            Chi phí nhân công: {''}
+                                            <Text style={styles.costValue}>
+                                                {new Intl.NumberFormat(
+                                                    'vi-VN',
+                                                    {
+                                                        style: 'currency',
+                                                        currency: 'VND',
+                                                    },
+                                                ).format(task?.labourCost ?? 0)}
+                                            </Text>
+                                        </Text>
+                                        <Text style={styles.costText}>
+                                            Chi phí vật tư: {''}
+                                            <Text style={styles.costValue}>
+                                                {new Intl.NumberFormat(
+                                                    'vi-VN',
+                                                    {
+                                                        style: 'currency',
+                                                        currency: 'VND',
+                                                    },
+                                                ).format(
+                                                    task?.materialCost ?? 0,
+                                                )}
+                                            </Text>
+                                        </Text>
+                                        <Text style={styles.costText}>
+                                            Chi phí ca máy: {''}
+                                            <Text style={styles.costValue}>
+                                                {new Intl.NumberFormat(
+                                                    'vi-VN',
+                                                    {
+                                                        style: 'currency',
+                                                        currency: 'VND',
+                                                    },
+                                                ).format(
+                                                    task?.machineCost ?? 0,
+                                                )}
+                                            </Text>
+                                        </Text>
+                                    </View>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+                )
             )}
         </View>
     );
@@ -449,6 +621,10 @@ const styles = StyleSheet.create({
     },
     costValue: {
         color: 'black',
+    },
+    pieChartView: {
+        gap: 8,
+        alignItems: 'center',
     },
 });
 

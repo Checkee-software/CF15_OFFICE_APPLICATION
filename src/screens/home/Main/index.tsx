@@ -89,6 +89,12 @@ export default function Main({navigation}: any) {
             navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
         },
         {
+            key: 'statistic',
+            label: 'Báo cáo thống kê',
+            buttonImage: images.pieChart,
+            navigateTo: SCREEN_INFO.STATISTIC.key,
+        },
+        {
             key: 'feedback',
             label: 'Góp ý',
             buttonImage: images.feedBack,
@@ -105,12 +111,6 @@ export default function Main({navigation}: any) {
             label: 'Tài liệu',
             buttonImage: images.document,
             navigateTo: SCREEN_INFO.DOCUMENT.key,
-        },
-        {
-            key: 'statistic',
-            label: 'Báo cáo thống kê',
-            buttonImage: images.pieChart,
-            navigateTo: SCREEN_INFO.STATISTIC.key,
         },
     ];
 

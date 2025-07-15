@@ -15,6 +15,7 @@ interface IStatisticResponse {
     totalProduct?: number;
     list: IWorkList[];
     chart: IChartData[];
+    //pieChart: []
 }
 
 interface IListSelection {
@@ -27,7 +28,7 @@ type StatisticStore = {
     listSelection: IListSelection[];
     isLoading: boolean;
     getStatistic: (data: IStatisticFormData) => Promise<void>;
-    getStatisticForWorker: (data: IStatisticFormData) => Promise<void>;
+    getStatisticProgress: (data: IStatisticFormData) => Promise<void>;
     getListSelection: (selection: string) => Promise<void>;
     getGroupName: (groupId: string) => Promise<void>;
     clearStatisticData: () => void;
@@ -89,34 +90,6 @@ const convertToChartData = (data: any[]): IChartData[] => {
     return result;
 };
 
-const convertToPieData = (data: any) => {
-    const COLORS = [
-        '#FF6384',
-        '#36A2EB',
-        '#FFCE56',
-        '#4BC0C0',
-        '#9966FF',
-        '#FF9F40',
-        '#66BB6A',
-        '#EF5350',
-        '#29B6F6',
-        '#AB47BC',
-        '#FFA726',
-        '#8D6E63',
-    ];
-
-    const pieData = data.map((item: any, index: any) => ({
-        value: item.percentage,
-        text: `${item.percentage}%`,
-        color: COLORS[index % COLORS.length],
-        label: item.taskName,
-        processingRate: item.processingRate,
-        totalSquare: item.totalSquare,
-    }));
-
-    return pieData;
-};
-
 export const useStatisticStore = create<StatisticStore>(set => ({
     statisticData: null,
     listSelection: [],
@@ -144,6 +117,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     totalMember: response.data.data.totalMember,
                     totalWork: response.data.data.totalWork,
                     chart: convertToChartData(response.data.data.chart || []),
+                    pieChart: [],
                 };
                 set({statisticData: mainStatisticData});
                 set({isLoading: false});
@@ -172,7 +146,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
         }
     },
 
-    getStatisticForWorker: async ({
+    getStatisticProgress: async ({
         type,
         targetId,
         startDate,
@@ -186,14 +160,37 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                 `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}&targetId=${targetId}`,
             );
             if (response.data.data) {
+                const chartData = response.data.data.map((item: any) => {
+                    const notComplete = 100 - item.percentage;
+
+                    return {
+                        ...item,
+                        pieChart: [
+                            {
+                                value: item.percentage,
+                                color: '#4CAF50',
+                                text: `${item.percentage}%`,
+                            },
+                            {
+                                value: notComplete,
+                                color: '#FF4E45',
+                                text: notComplete > 0 ? `${notComplete}%` : '',
+                            },
+                        ],
+                    };
+                });
+
+                console.log(chartData);
+
                 const mainStatisticData = {
-                    //list: [...response.data.data.list],
-                    //totalCost: response.data.data.totalCost,
-                    //totalGarden: response.data.data.totalGarden,
-                    //totalGroup: response.data.data.totalGroup,
-                    //totalMember: response.data.data.totalMember,
-                    //totalWork: response.data.data.totalWork,
-                    chart: convertToPieData(response.data.data || []),
+                    list: [],
+                    totalCost: 0,
+                    totalGarden: 0,
+                    totalGroup: 0,
+                    totalMember: 0,
+                    totalWork: '0',
+                    chart: [],
+                    pieChart: chartData,
                 };
                 set({statisticData: mainStatisticData});
                 set({isLoading: false});

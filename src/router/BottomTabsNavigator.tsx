@@ -15,14 +15,12 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import {useAuthStore} from '@/stores/authStore';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const BottomTabsNavigator = ({navigation}: any) => {
     const {redirectData, redirectDataRequestSchedule, clearRedirectData} =
         useAuthStore();
 
     const Tab = createBottomTabNavigator();
-    const insets = useSafeAreaInsets();
 
     useEffect(() => {
         if (redirectData) {
@@ -45,12 +43,9 @@ const BottomTabsNavigator = ({navigation}: any) => {
             }
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: 'white',
+                    backgroundColor: '#fff',
                 },
-
                 tabBarStyle: {
-                    height: 26 + insets.bottom,
-                    paddingBottom: insets.bottom || 10,
                     borderColor: '#D3D3D3',
                     borderTopWidth: 1,
                     boxShadow: '-1 2 0 #00000040',

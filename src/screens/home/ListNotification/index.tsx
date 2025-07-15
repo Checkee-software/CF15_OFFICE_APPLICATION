@@ -1,16 +1,9 @@
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    Image,
-    FlatList,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import images from '../../../assets/images';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const ListNotification = () => {
     const data: any = [];
@@ -266,9 +259,10 @@ const ListNotification = () => {
                     )}
                     ListEmptyComponent={
                         <View style={NotificationStyle.emptyListNotifyView}>
-                            <Image
-                                source={images.emptyNotificationList}
-                                style={NotificationStyle.emptyListNotifyImg}
+                            <FontAwesome
+                                name='bell'
+                                size={120}
+                                color={'rgba(76, 175, 80, 1)'}
                             />
                             <Text style={NotificationStyle.emptyListNotifyText}>
                                 Hiện tại bạn không có thông báo!
@@ -332,10 +326,7 @@ const NotificationStyle = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    emptyListNotifyImg: {
-        width: 316,
-        height: 205,
+        gap: 15,
     },
     emptyListNotifyText: {
         color: 'rgba(0, 0, 0, 1)',

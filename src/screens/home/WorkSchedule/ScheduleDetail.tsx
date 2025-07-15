@@ -8,8 +8,9 @@ import {
     TouchableOpacity,
     FlatList,
     Image,
+    Modal,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -27,11 +28,21 @@ import {useAuthStore} from '@/stores/authStore';
 import Loading from '@/screens/subscreen/Loading';
 import ENV from '@/config/ENV';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import {useWindowDimensions} from 'react-native';
 
 const ScheduleDetail = ({route}: any) => {
     const {userInfo} = useAuthStore();
     const {isLoadingGet, scheduleDetail, getScheduleDetail} =
         useWorkScheduleStore();
+
+    const [openModal, setOpenModal] = useState(false);
+    const [dataWorkerRenderForLeader, setDataWorkerRenderForLeader] = useState(
+        [],
+    );
+
+    const {width, height} = useWindowDimensions();
+    const isPortrait = height >= width;
+    const itemWidth = isPortrait ? width / 3 : width / 5;
 
     type AttachedFiles = {
         destination: string;
@@ -48,8 +59,8 @@ const ScheduleDetail = ({route}: any) => {
         {name: 'Loại'},
         {name: 'Tên'},
         {name: 'Định mức'},
-        {name: 'Đơn giá (vnđ)'},
-        {name: 'Thành tiền (vnđ)'},
+        {name: 'Đơn giá'},
+        {name: 'Thành tiền'},
     ];
 
     const fixEncoding = (input: string): string => {
@@ -81,6 +92,20 @@ const ScheduleDetail = ({route}: any) => {
                 : formatNumber(Number(Number(totalSquare ?? 0).toFixed(5))); // số thực
 
         return formattedTotalSquare;
+    };
+
+    const calculateProgressSquare = (staff: any) => {
+        const totalSquareProcessing = staff.reduce(
+            (sum: any, item: any) => sum + item.processingRate,
+            0,
+        );
+
+        const totalSquare = staff.reduce(
+            (sum: any, item: any) => sum + item.totalSquare,
+            0,
+        );
+
+        return `${totalSquareProcessing} / ${totalSquare} ha`;
     };
 
     const calculatePercent = (staff: any) => {
@@ -373,273 +398,200 @@ const ScheduleDetail = ({route}: any) => {
     );
 
     const renderChildTask = (itemChildTask: any) => (
-        <View style={ScheduleDetailStyles.childTaskInfo}>
-            <Text style={ScheduleDetailStyles.taskTitle}>
-                {`${itemChildTask.name} ${calculatePercent(
+        <View
+            style={[
+                ScheduleDetailStyles.childTaskInfo,
+                {
+                    backgroundColor: '#F5F5F5',
+                    borderRadius: 12,
+                    padding: 12,
+                    boxShadow: '0 1 2 0 #00000040',
+                },
+            ]}>
+            <Text
+                style={ScheduleDetailStyles.taskTitle}
+                onPress={() => {
+                    setOpenModal(!openModal),
+                        setDataWorkerRenderForLeader(itemChildTask.staff);
+                }}>
+                {`${itemChildTask.name}: ${calculateProgressSquare(
                     itemChildTask.staff,
-                )}`}
+                )} ${calculatePercent(itemChildTask.staff)}`}
             </Text>
 
-            {itemChildTask.labour &&
-                userInfo.userType.level !== EOrganization.WORKER && (
-                    <View style={ScheduleDetailStyles.listProcesses}>
-                        <View
-                            style={{
-                                marginBottom: 15,
-                            }}>
-                            <FlatList
-                                horizontal
-                                data={processesTitle}
-                                keyExtractor={item => item.name}
-                                renderItem={({item, index}) => (
-                                    <View
-                                        style={{
-                                            width: 108,
-                                            alignItems: 'flex-start',
-                                            justifyContent: 'flex-start',
-                                        }}>
-                                        <View>
+            {itemChildTask.labour && (
+                <View style={ScheduleDetailStyles.listProcesses}>
+                    <View style={{flex: 1}}>
+                        <FlatList
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            data={processesTitle}
+                            keyExtractor={item => item.name}
+                            renderItem={({item, index}) => (
+                                <View
+                                    style={{
+                                        width: itemWidth,
+                                        alignItems: 'flex-start',
+                                        justifyContent: 'flex-start',
+                                    }}>
+                                    <View>
+                                        <Text
+                                            style={{
+                                                fontSize: 12,
+                                                fontWeight: 500,
+                                                textAlign:
+                                                    index === 4 || index === 5
+                                                        ? 'right'
+                                                        : 'left',
+                                            }}>
+                                            {item.name}
+                                        </Text>
+
+                                        <View style={{marginVertical: 4}}>
                                             <Text
                                                 style={{
                                                     fontSize: 12,
-                                                    fontWeight: 500,
+                                                    fontWeight: 400,
                                                     textAlign:
-                                                        index === 4 ||
-                                                        index === 5
+                                                        index === 0 ||
+                                                        index === 1
+                                                            ? 'left'
+                                                            : index === 3 ||
+                                                              index === 4
                                                             ? 'right'
-                                                            : 'left',
+                                                            : 'center',
+                                                    color:
+                                                        index === 0
+                                                            ? '#2196F3'
+                                                            : 'black',
                                                 }}>
-                                                {item.name}
+                                                {index === 0
+                                                    ? 'Nhân công'
+                                                    : index === 1
+                                                    ? itemChildTask.labour
+                                                          .processName
+                                                    : index === 2
+                                                    ? itemChildTask.labour.value
+                                                    : index === 3
+                                                    ? formatNumber(
+                                                          itemChildTask.labour
+                                                              .cost,
+                                                      )
+                                                    : formatNumber(
+                                                          itemChildTask.labour
+                                                              .cost *
+                                                              itemChildTask
+                                                                  .labour.value,
+                                                      )}
                                             </Text>
-
-                                            <View style={{marginVertical: 5}}>
-                                                <Text
-                                                    style={{
-                                                        fontSize: 12,
-                                                        fontWeight: 400,
-                                                        textAlign:
-                                                            index === 0 ||
-                                                            index === 1
-                                                                ? 'left'
-                                                                : index === 3 ||
-                                                                  index === 4
-                                                                ? 'right'
-                                                                : 'center',
-                                                        color:
-                                                            index === 0
-                                                                ? '#2196F3'
-                                                                : 'black',
-                                                    }}>
-                                                    {index === 0
-                                                        ? 'Nhân công'
-                                                        : index === 1
-                                                        ? itemChildTask.labour
-                                                              .processName
-                                                        : index === 2
-                                                        ? itemChildTask.labour
-                                                              .value
-                                                        : index === 3
-                                                        ? formatNumber(
-                                                              itemChildTask
-                                                                  .labour.cost,
-                                                          )
-                                                        : formatNumber(
-                                                              itemChildTask
-                                                                  .labour.cost *
-                                                                  itemChildTask
-                                                                      .labour
-                                                                      .value,
-                                                          )}
-                                                </Text>
-                                            </View>
-
-                                            {itemChildTask.materials.length !==
-                                                0 && (
-                                                <View
-                                                    style={{marginVertical: 5}}>
-                                                    {itemChildTask.materials.map(
-                                                        (
-                                                            itemMaterials: any,
-                                                        ) => (
-                                                            <Text
-                                                                key={
-                                                                    itemMaterials._id
-                                                                }
-                                                                style={{
-                                                                    fontSize: 12,
-                                                                    fontWeight: 400,
-                                                                    textAlign:
-                                                                        index ===
-                                                                            0 ||
-                                                                        index ===
-                                                                            1
-                                                                            ? 'left'
-                                                                            : index ===
-                                                                                  3 ||
-                                                                              index ===
-                                                                                  4
-                                                                            ? 'right'
-                                                                            : 'center',
-                                                                    color:
-                                                                        index ===
-                                                                        0
-                                                                            ? '#2196F3'
-                                                                            : 'black',
-                                                                }}>
-                                                                {index === 0
-                                                                    ? 'Vật tư'
-                                                                    : index ===
-                                                                      1
-                                                                    ? itemMaterials.processName
-                                                                    : index ===
-                                                                      2
-                                                                    ? itemMaterials.value
-                                                                    : index ===
-                                                                      3
-                                                                    ? formatNumber(
-                                                                          itemMaterials.cost,
-                                                                      )
-                                                                    : formatNumber(
-                                                                          itemMaterials.cost *
-                                                                              itemMaterials.value,
-                                                                      )}
-                                                            </Text>
-                                                        ),
-                                                    )}
-                                                </View>
-                                            )}
-
-                                            {itemChildTask.machines.length !==
-                                                0 && (
-                                                <View
-                                                    style={{marginVertical: 5}}>
-                                                    {itemChildTask.machines.map(
-                                                        (itemMachines: any) => (
-                                                            <Text
-                                                                key={
-                                                                    itemMachines._id
-                                                                }
-                                                                style={{
-                                                                    fontSize: 12,
-                                                                    fontWeight: 400,
-                                                                    textAlign:
-                                                                        index ===
-                                                                            0 ||
-                                                                        index ===
-                                                                            1
-                                                                            ? 'left'
-                                                                            : index ===
-                                                                                  3 ||
-                                                                              index ===
-                                                                                  4
-                                                                            ? 'right'
-                                                                            : 'center',
-                                                                    color:
-                                                                        index ===
-                                                                        0
-                                                                            ? '#2196F3'
-                                                                            : 'black',
-                                                                }}>
-                                                                {index === 0
-                                                                    ? 'Ca máy'
-                                                                    : index ===
-                                                                      1
-                                                                    ? itemMachines.processName
-                                                                    : index ===
-                                                                      2
-                                                                    ? itemMachines.value
-                                                                    : index ===
-                                                                      3
-                                                                    ? formatNumber(
-                                                                          itemMachines.cost,
-                                                                      )
-                                                                    : formatNumber(
-                                                                          itemMachines.cost *
-                                                                              itemMachines.value,
-                                                                      )}
-                                                            </Text>
-                                                        ),
-                                                    )}
-                                                </View>
-                                            )}
                                         </View>
+
+                                        {itemChildTask.materials.length !==
+                                            0 && (
+                                            <View style={{marginVertical: 4}}>
+                                                {itemChildTask.materials.map(
+                                                    (itemMaterials: any) => (
+                                                        <Text
+                                                            key={
+                                                                itemMaterials._id
+                                                            }
+                                                            style={{
+                                                                fontSize: 12,
+                                                                fontWeight: 400,
+                                                                textAlign:
+                                                                    index ===
+                                                                        0 ||
+                                                                    index === 1
+                                                                        ? 'left'
+                                                                        : index ===
+                                                                              3 ||
+                                                                          index ===
+                                                                              4
+                                                                        ? 'right'
+                                                                        : 'center',
+                                                                color:
+                                                                    index === 0
+                                                                        ? '#2196F3'
+                                                                        : 'black',
+                                                            }}>
+                                                            {index === 0
+                                                                ? 'Vật tư'
+                                                                : index === 1
+                                                                ? itemMaterials.processName
+                                                                : index === 2
+                                                                ? itemMaterials.value
+                                                                : index === 3
+                                                                ? formatNumber(
+                                                                      itemMaterials.cost,
+                                                                  )
+                                                                : formatNumber(
+                                                                      itemMaterials.cost *
+                                                                          itemMaterials.value,
+                                                                  )}
+                                                        </Text>
+                                                    ),
+                                                )}
+                                            </View>
+                                        )}
+
+                                        {itemChildTask.machines.length !==
+                                            0 && (
+                                            <View style={{marginVertical: 4}}>
+                                                {itemChildTask.machines.map(
+                                                    (itemMachines: any) => (
+                                                        <Text
+                                                            key={
+                                                                itemMachines._id
+                                                            }
+                                                            style={{
+                                                                fontSize: 12,
+                                                                fontWeight: 400,
+                                                                textAlign:
+                                                                    index ===
+                                                                        0 ||
+                                                                    index === 1
+                                                                        ? 'left'
+                                                                        : index ===
+                                                                              3 ||
+                                                                          index ===
+                                                                              4
+                                                                        ? 'right'
+                                                                        : 'center',
+                                                                color:
+                                                                    index === 0
+                                                                        ? '#2196F3'
+                                                                        : 'black',
+                                                            }}>
+                                                            {index === 0
+                                                                ? 'Ca máy'
+                                                                : index === 1
+                                                                ? itemMachines.processName
+                                                                : index === 2
+                                                                ? itemMachines.value
+                                                                : index === 3
+                                                                ? formatNumber(
+                                                                      itemMachines.cost,
+                                                                  )
+                                                                : formatNumber(
+                                                                      itemMachines.cost *
+                                                                          itemMachines.value,
+                                                                  )}
+                                                        </Text>
+                                                    ),
+                                                )}
+                                            </View>
+                                        )}
                                     </View>
-                                )}
-                            />
-                        </View>
+                                </View>
+                            )}
+                        />
                     </View>
-                )}
+                </View>
+            )}
 
             {/* <Text style={ScheduleDetailStyles.taskEndIn}>
                 {`Kết thúc vào ${renderTaskEndIn(itemChildTask.finishedTime)}`}
             </Text> */}
-
-            <FlatList
-                scrollEnabled={false}
-                data={itemChildTask.staff}
-                keyExtractor={item => item.userId}
-                renderItem={(itemStaff: any) => (
-                    <View style={ScheduleDetailStyles.participant}>
-                        <View style={ScheduleDetailStyles.statusTask}>
-                            <MaterialIcons
-                                name='check-circle'
-                                size={20}
-                                color={
-                                    itemStaff.item.status ===
-                                    ETaskStatus.WAITING
-                                        ? '#808080'
-                                        : itemStaff.item.status ===
-                                          ETaskStatus.PROCESSING
-                                        ? '#2196F3'
-                                        : itemStaff.item.status ===
-                                          ETaskStatus.COMPLETED
-                                        ? '#4CAF50'
-                                        : '#FF4E45'
-                                }
-                            />
-                        </View>
-                        <View style={ScheduleDetailStyles.warpParticipant}>
-                            <Text style={ScheduleDetailStyles.participantName}>
-                                {itemStaff.item.name}
-                            </Text>
-                            <Text
-                                style={[
-                                    ScheduleDetailStyles.participantStatus,
-                                    itemStaff.item.status ===
-                                    ETaskStatus.WAITING
-                                        ? ScheduleDetailStyles.participantStatus1
-                                        : itemStaff.item.status ===
-                                          ETaskStatus.CANCELED
-                                        ? ScheduleDetailStyles.participantStatus3
-                                        : ETaskStatus.PROCESSING
-                                        ? ScheduleDetailStyles.participantStatus2
-                                        : ScheduleDetailStyles.participantStatus4,
-                                ]}>
-                                {itemStaff.item.status === ETaskStatus.CANCELED
-                                    ? `(${moment(
-                                          itemStaff.item.canceledTime,
-                                      ).format('L')}) Lý do: ${
-                                          itemStaff.item.canceledNote
-                                      }`
-                                    : 'Đã làm ' +
-                                      formatNumber(
-                                          itemStaff.item.processingRate,
-                                      ) +
-                                      '/' +
-                                      formattedGardenArea(
-                                          itemStaff.item.totalSquare,
-                                      ) +
-                                      ' (ha) ' +
-                                      (itemStaff.item.completedTime === null
-                                          ? ''
-                                          : `${moment(
-                                                itemStaff.item.completedTime,
-                                            ).format('L')}`)}
-                            </Text>
-                        </View>
-                    </View>
-                )}
-            />
         </View>
     );
 
@@ -805,6 +757,9 @@ const ScheduleDetail = ({route}: any) => {
     return (
         <View style={ScheduleDetailStyles.container}>
             <ScrollView
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                overScrollMode='never'
                 contentContainerStyle={ScheduleDetailStyles.scrollViewStyle}>
                 <Text style={ScheduleDetailStyles.mainWorkTitle}>
                     {scheduleDetail?.title}
@@ -851,6 +806,18 @@ const ScheduleDetail = ({route}: any) => {
                             </View>
                         </View>
 
+                        <Text
+                            style={[
+                                ScheduleDetailStyles.timeWorkEnd,
+                                {marginTop: 8, marginBottom: 4},
+                            ]}>
+                            {renderScheduleRemain(
+                                moment(scheduleDetail?.finishedDate).format(
+                                    'L',
+                                ),
+                            )}
+                        </Text>
+
                         <View style={ScheduleDetailStyles.workInfoSection}>
                             <View style={ScheduleDetailStyles.generalInfo}>
                                 <Text
@@ -859,6 +826,32 @@ const ScheduleDetail = ({route}: any) => {
                                     }>
                                     Thông tin chung
                                 </Text>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Loại cây trồng
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {scheduleDetail?.productName}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Cây trồng
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {scheduleDetail?.productTypeName}
+                                    </Text>
+                                </View>
 
                                 <View
                                     style={ScheduleDetailStyles.warpLabelValue}>
@@ -900,19 +893,6 @@ const ScheduleDetail = ({route}: any) => {
                                     <Text
                                         style={ScheduleDetailStyles.infoValue}>
                                         {scheduleDetail?.createdUser}
-                                    </Text>
-                                </View>
-
-                                <View
-                                    style={ScheduleDetailStyles.warpLabelValue}>
-                                    <Text
-                                        style={ScheduleDetailStyles.infoLabel}>
-                                        Loại cây trồng
-                                    </Text>
-
-                                    <Text
-                                        style={ScheduleDetailStyles.infoValue}>
-                                        {scheduleDetail?.productName}
                                     </Text>
                                 </View>
                             </View>
@@ -975,6 +955,25 @@ const ScheduleDetail = ({route}: any) => {
                                                 ScheduleDetailStyles.infoValue
                                             }>
                                             {scheduleDetail?.productName}
+                                        </Text>
+                                    </View>
+
+                                    <View
+                                        style={
+                                            ScheduleDetailStyles.warpLabelValue
+                                        }>
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoLabel
+                                            }>
+                                            Cây trồng
+                                        </Text>
+
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.infoValue
+                                            }>
+                                            {scheduleDetail?.productTypeName}
                                         </Text>
                                     </View>
 
@@ -1229,6 +1228,122 @@ const ScheduleDetail = ({route}: any) => {
                         </View>
                     </List.Accordion> */}
                 </View>
+
+                <Modal visible={openModal} animationType='slide'>
+                    <View style={ScheduleDetailStyles.workerProgressModal}>
+                        <TouchableOpacity
+                            style={ScheduleDetailStyles.btnCloseModal}
+                            onPress={() => {
+                                setOpenModal(!openModal),
+                                    setDataWorkerRenderForLeader([]);
+                            }}>
+                            <MaterialIcons
+                                name='arrow-back'
+                                size={22}
+                                color='#AB47BC'
+                            />
+                            <Text style={ScheduleDetailStyles.btnCloseText}>
+                                Quay lại
+                            </Text>
+                        </TouchableOpacity>
+
+                        <View style={{marginVertical: 10}}>
+                            <FlatList
+                                data={dataWorkerRenderForLeader}
+                                keyExtractor={item => item.userId}
+                                renderItem={(itemStaff: any) => (
+                                    <View
+                                        style={
+                                            ScheduleDetailStyles.participant
+                                        }>
+                                        <View
+                                            style={
+                                                ScheduleDetailStyles.statusTask
+                                            }>
+                                            <MaterialIcons
+                                                name={
+                                                    itemStaff.item.status ===
+                                                    ETaskStatus.CANCELED
+                                                        ? 'cancel'
+                                                        : 'check-circle'
+                                                }
+                                                size={20}
+                                                color={
+                                                    itemStaff.item.status ===
+                                                    ETaskStatus.WAITING
+                                                        ? '#808080'
+                                                        : itemStaff.item
+                                                              .status ===
+                                                          ETaskStatus.PROCESSING
+                                                        ? '#2196F3'
+                                                        : itemStaff.item
+                                                              .status ===
+                                                          ETaskStatus.COMPLETED
+                                                        ? '#4CAF50'
+                                                        : '#FF4E45'
+                                                }
+                                            />
+                                        </View>
+                                        <View
+                                            style={
+                                                ScheduleDetailStyles.warpParticipant
+                                            }>
+                                            <Text
+                                                style={
+                                                    ScheduleDetailStyles.participantName
+                                                }>
+                                                {itemStaff.item.name}
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    ScheduleDetailStyles.participantStatus,
+                                                    itemStaff.item.status ===
+                                                    ETaskStatus.WAITING
+                                                        ? ScheduleDetailStyles.participantStatus1
+                                                        : itemStaff.item
+                                                              .status ===
+                                                          ETaskStatus.CANCELED
+                                                        ? ScheduleDetailStyles.participantStatus3
+                                                        : ETaskStatus.PROCESSING
+                                                        ? ScheduleDetailStyles.participantStatus2
+                                                        : ScheduleDetailStyles.participantStatus4,
+                                                ]}>
+                                                {itemStaff.item.status ===
+                                                ETaskStatus.CANCELED
+                                                    ? `(${moment(
+                                                          itemStaff.item
+                                                              .canceledTime,
+                                                      ).format('L')}) Lý do: ${
+                                                          itemStaff.item
+                                                              .canceledNote
+                                                      }`
+                                                    : 'Đã làm ' +
+                                                      formatNumber(
+                                                          itemStaff.item
+                                                              .processingRate,
+                                                      ) +
+                                                      '/' +
+                                                      formattedGardenArea(
+                                                          itemStaff.item
+                                                              .totalSquare,
+                                                      ) +
+                                                      ' (ha) ' +
+                                                      (itemStaff.item
+                                                          .completedTime ===
+                                                      null
+                                                          ? ''
+                                                          : `${moment(
+                                                                itemStaff.item
+                                                                    .completedTime,
+                                                            ).format('L')}`)}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                )}
+                            />
+                        </View>
+                    </View>
+                </Modal>
             </ScrollView>
         </View>
     );
@@ -1467,10 +1582,9 @@ const ScheduleDetailStyles = StyleSheet.create({
     },
     listProcesses: {
         paddingVertical: 5,
-        borderStyle: 'dashed',
-        borderBottomWidth: 1,
-        borderBottomColor: '#808080',
         marginBottom: 5,
+        borderTopWidth: 1,
+        borderTopColor: 'black',
     },
     taskEndIn: {
         fontSize: 12,
@@ -1511,6 +1625,20 @@ const ScheduleDetailStyles = StyleSheet.create({
     },
     participantStatus4: {
         color: '#4CAF50', //đã xong
+    },
+    workerProgressModal: {
+        flex: 1,
+        backgroundColor: '#F5F5F5',
+        padding: 15,
+    },
+    btnCloseModal: {
+        flexDirection: 'row',
+        gap: 10,
+        alignItems: 'center',
+    },
+    btnCloseText: {
+        color: '#AB47BC',
+        fontWeight: 500,
     },
 });
 

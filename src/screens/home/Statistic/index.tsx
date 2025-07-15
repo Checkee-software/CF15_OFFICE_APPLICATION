@@ -13,7 +13,6 @@ import StatisticResult from './StatisticResult';
 import {useStatisticStore} from '../../../stores/statisticStore';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import moment from 'moment';
-import Snackbar from 'react-native-snackbar';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Dropdown} from 'react-native-element-dropdown';
 import {EType} from '@/shared-types/form-data/StatisticFormData/StatisticFormData';
@@ -24,13 +23,14 @@ import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 const Statistic = () => {
     const listStatisticTypeDefault = [
         {_id: 'WORK', name: 'Quy trình'},
-        {_id: 'PRODUCT', name: 'Sản phẩm'},
+        {_id: 'PRODUCT', name: 'Cây trồng'},
         {_id: 'GROUP', name: 'Đội sản xuất'},
+        {_id: 'DISPLAY', name: 'Tiến độ'},
     ];
 
     const {
         getStatistic,
-        getStatisticForWorker,
+        getStatisticProgress,
         getListSelection,
         getGroupName,
         clearStatisticData,
@@ -74,6 +74,7 @@ const Statistic = () => {
     };
 
     const onChangeSelectedType = async (value: EType) => {
+        console.log(value);
         if (
             value === 'GROUP' &&
             userInfo.userType.level === EOrganization.LEADER
@@ -81,9 +82,15 @@ const Statistic = () => {
             setSelectedType('GROUP' as EType);
             await getGroupName(userInfo.groupId);
             setSelectedTarget(userInfo.groupId);
-        } else {
+        } else if (value !== 'DISPLAY') {
             setSelectedType(value);
             await getListSelection(value);
+            setSelectedTarget('');
+            setSelectedTargetName('');
+        } else {
+            console.log(value);
+            await getListSelection('WORK');
+            setSelectedType(value);
             setSelectedTarget('');
             setSelectedTargetName('');
         }
@@ -111,6 +118,25 @@ const Statistic = () => {
                 .toISOString();
             selectedEndDate = moment()
                 .endOf(value)
+                .set({
+                    hour: 23,
+                    minute: 59,
+                    second: 59,
+                    millisecond: 999,
+                })
+                .add(7, 'hours')
+                .toISOString();
+        } else {
+            selectedStartDate = moment()
+                .set({
+                    hour: 0,
+                    minute: 0,
+                    second: 0,
+                    millisecond: 0,
+                })
+                .add(7, 'hours')
+                .toISOString();
+            selectedEndDate = moment()
                 .set({
                     hour: 23,
                     minute: 59,
@@ -156,28 +182,27 @@ const Statistic = () => {
     };
 
     const handleGetStatistic = async () => {
-        if (!selectedType || !startDate || !endDate) {
-            Snackbar.show({
-                text: 'Bạn hãy chọn đầy đủ các thông tin',
-                duration: Snackbar.LENGTH_LONG,
+        setShowForm(!showForm);
+        if (selectedType === 'DISPLAY') {
+            await getStatisticProgress({
+                type: selectedType as EType,
+                startDate: new Date(startDate as string),
+                endDate: new Date(endDate as string),
+                targetId: selectedTarget,
             });
         } else {
-            setShowForm(!showForm);
-
             await getStatistic({
                 type: selectedType as EType,
-                startDate: new Date(startDate),
-                endDate: new Date(endDate),
+                startDate: new Date(startDate as string),
+                endDate: new Date(endDate as string),
                 targetId: selectedTarget,
             });
         }
     };
 
     useEffect(() => {
-        if (!statisticData || listSelection.length !== 0) {
-            clearStatisticData();
-            clearListSelection();
-        }
+        clearStatisticData();
+        clearListSelection();
 
         const fetchData = async () => {
             if (userInfo.userType.level === EOrganization.LEADER) {
@@ -186,13 +211,8 @@ const Statistic = () => {
                         (item: any) => item._id !== 'PRODUCT',
                     ),
                 );
-            } else if (userInfo.userType.level === EOrganization.WORKER) {
-                setListStatisticType(
-                    listStatisticTypeDefault.filter(
-                        (item: any) => item._id === 'WORK',
-                    ),
-                );
-                setSelectedType('GROUP' as EType);
+
+                setSelectedType('DISPLAY' as EType);
                 await getListSelection('WORK');
 
                 const selectedStartDate = moment()
@@ -217,15 +237,100 @@ const Statistic = () => {
                     .toISOString();
 
                 setSelectedTimeOption('month');
+                setStartDate(selectedStartDate);
+                setEndDate(selectedEndDate);
 
-                await getStatisticForWorker({
-                    type: 'GROUP' as EType,
+                await getStatisticProgress({
+                    type: 'DISPLAY' as EType,
+                    startDate: new Date(selectedStartDate),
+                    endDate: new Date(selectedEndDate),
+                    targetId: selectedTarget,
+                });
+            } else if (userInfo.userType.level === EOrganization.WORKER) {
+                setListStatisticType(
+                    listStatisticTypeDefault.filter(
+                        (item: any) =>
+                            item._id === 'WORK' || item._id === 'DISPLAY',
+                    ),
+                );
+                setSelectedType('DISPLAY' as EType);
+                await getListSelection('WORK');
+
+                const selectedStartDate = moment()
+                    .startOf('month')
+                    .set({
+                        hour: 0,
+                        minute: 0,
+                        second: 0,
+                        millisecond: 0,
+                    })
+                    .add(7, 'hours')
+                    .toISOString();
+                const selectedEndDate = moment()
+                    .endOf('month')
+                    .set({
+                        hour: 23,
+                        minute: 59,
+                        second: 59,
+                        millisecond: 999,
+                    })
+                    .add(7, 'hours')
+                    .toISOString();
+
+                setSelectedTimeOption('month');
+                setStartDate(selectedStartDate);
+                setEndDate(selectedEndDate);
+
+                await getStatisticProgress({
+                    type: 'DISPLAY' as EType,
                     startDate: new Date(selectedStartDate),
                     endDate: new Date(selectedEndDate),
                     targetId: selectedTarget,
                 });
             } else {
-                setListStatisticType(listStatisticTypeDefault);
+                setListStatisticType(
+                    listStatisticTypeDefault.filter(
+                        (item: any) => item._id !== 'DISPLAY',
+                    ),
+                );
+
+                setSelectedType('WORK' as EType);
+                await getListSelection('WORK');
+
+                setSelectedTarget('');
+                setSelectedTargetName('');
+
+                const selectedStartDate = moment()
+                    .startOf('month')
+                    .set({
+                        hour: 0,
+                        minute: 0,
+                        second: 0,
+                        millisecond: 0,
+                    })
+                    .add(7, 'hours')
+                    .toISOString();
+                const selectedEndDate = moment()
+                    .endOf('month')
+                    .set({
+                        hour: 23,
+                        minute: 59,
+                        second: 59,
+                        millisecond: 999,
+                    })
+                    .add(7, 'hours')
+                    .toISOString();
+
+                setSelectedTimeOption('month');
+                setStartDate(selectedStartDate);
+                setEndDate(selectedEndDate);
+
+                await getStatistic({
+                    type: 'WORK' as EType,
+                    startDate: new Date(selectedStartDate),
+                    endDate: new Date(selectedEndDate),
+                    targetId: selectedTarget,
+                });
             }
         };
 
@@ -263,24 +368,16 @@ const Statistic = () => {
                 <ScrollView>
                     <View style={styles.listStatistic}>
                         <TouchableOpacity
-                            style={[
-                                styles.btnCurrentStatistic,
-                                userInfo.userType.level === EOrganization.WORKER
-                                    ? {gap: 4}
-                                    : {gap: 0},
-                            ]}
-                            disabled={
-                                userInfo.userType.level === EOrganization.WORKER
-                                    ? true
-                                    : false
-                            }
+                            style={styles.btnCurrentStatistic}
                             onPress={() => setShowForm(!showForm)}>
                             <Text style={styles.statisticTypeText}>
                                 {selectedType === 'WORK'
                                     ? 'Công việc'
                                     : selectedType === 'PRODUCT'
-                                    ? 'Sản phẩm'
-                                    : 'Công việc của tôi'}
+                                    ? 'Cây trồng'
+                                    : selectedType === 'GROUP'
+                                    ? 'Đội sản xuất'
+                                    : 'Tiến độ'}
                             </Text>
                             <View style={styles.warpIconTextStatistic}>
                                 <View style={{flexDirection: 'row', gap: 10}}>
@@ -296,20 +393,17 @@ const Statistic = () => {
                                     </Text>
                                 </View>
 
-                                {userInfo.userType.level !==
-                                    EOrganization.WORKER && (
-                                    <View
-                                        style={[
-                                            styles.btnFilter,
-                                            {backgroundColor: '#4CAF50'},
-                                        ]}>
-                                        <MaterialIcons
-                                            name='manage-search'
-                                            size={22}
-                                            color={'#F5F5F5'}
-                                        />
-                                    </View>
-                                )}
+                                <View
+                                    style={[
+                                        styles.btnFilter,
+                                        {backgroundColor: '#4CAF50'},
+                                    ]}>
+                                    <MaterialIcons
+                                        name='manage-search'
+                                        size={22}
+                                        color={'#F5F5F5'}
+                                    />
+                                </View>
                             </View>
                             <Text
                                 style={
@@ -317,7 +411,7 @@ const Statistic = () => {
                                 }>{`Thời gian: ${renderTimeStatistic()}`}</Text>
                         </TouchableOpacity>
 
-                        <StatisticResult />
+                        <StatisticResult selectedType={selectedType} />
                     </View>
                 </ScrollView>
             )}
@@ -327,11 +421,6 @@ const Statistic = () => {
                     <View style={styles.modalContent}>
                         <Text style={styles.text1}>Thống kê</Text>
                         <Dropdown
-                            disable={
-                                userInfo.userType.level === EOrganization.WORKER
-                                    ? true
-                                    : false
-                            }
                             style={styles.dropdown}
                             placeholderStyle={styles.placeholderStyle}
                             selectedTextStyle={styles.selectedTextStyle}

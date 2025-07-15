@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 
@@ -72,14 +73,12 @@ const InitApp = () => {
 };
 
 export default function App() {
-    const {isLogin} = useAuthStore();
-
     return (
         <SafeAreaProvider>
-            <SafeAreaView style={{flex: 1}} edges={['bottom']}>
-                <StatusBar
-                    barStyle={isLogin ? 'dark-content' : 'light-content'}
-                />
+            <SafeAreaView
+                style={{flex: 1, backgroundColor: '#fff'}}
+                edges={['top', 'bottom']}>
+                <StatusBar barStyle={'dark-content'} />
                 <InitApp />
             </SafeAreaView>
         </SafeAreaProvider>

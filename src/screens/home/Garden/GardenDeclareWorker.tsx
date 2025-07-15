@@ -312,7 +312,7 @@ const GardenDeclare = () => {
                 <View style={styles.infoContainer}>
                     <View style={styles.productBox}>
                         <Text style={styles.productLabel}>
-                            Sản phẩm/cây trồng
+                            Cây trồng/Loại cây trồng
                         </Text>
                         <View style={styles.productRow}>
                             <Icon name='group-work' color='green' size={20} />
