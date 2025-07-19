@@ -45,8 +45,6 @@ const WorkScreen = () => {
     const {userInfo, redirectDataRequestSchedule, clearRedirectData} =
         useAuthStore();
 
-    console.log(listGardenWorkBrowseFilter);
-
     const statusList = [
         {label: 'Đang chờ', value: 1},
         {label: 'Đã duyệt', value: 2},

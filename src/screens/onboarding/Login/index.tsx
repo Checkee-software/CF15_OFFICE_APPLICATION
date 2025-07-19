@@ -9,6 +9,7 @@ import {
     Alert,
     ImageBackground,
     Platform,
+    KeyboardAvoidingView,
     // PermissionsAndroid,
     // ToastAndroid,
 } from 'react-native';
@@ -21,7 +22,6 @@ import {Dimensions} from 'react-native';
 import Backdrop from '../../subscreen/Loading/index2';
 // import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import colors from '@/assets/colors';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const {width} = Dimensions.get('window');
 
@@ -95,185 +95,153 @@ export default function Login() {
     };
 
     return (
-        <KeyboardAwareScrollView
-            keyboardShouldPersistTaps='handled'
-            enableOnAndroid
-            contentContainerStyle={{flexGrow: 1}}
-            extraScrollHeight={Platform.OS === 'android' ? 160 : 20}>
-            <View style={LoginStyles.container}>
-                <ImageBackground
-                    source={images.backgroundLogin}
-                    style={LoginStyles.welcomeSceenBackground}>
-                    <View style={LoginStyles.warpwelcomeSceenAndBlurImage}>
-                        <ImageBackground
-                            source={images.backgroundLogin}
-                            style={LoginStyles.blurImageStyle}
-                            //imageStyle={{borderRadius: 16}}
-                            blurRadius={Platform.OS === 'ios' ? 10 : 6}>
-                            <View style={LoginStyles.welcomeSceen}>
-                                <Image
-                                    source={images.logoCF15}
-                                    resizeMode='contain'
-                                    style={LoginStyles.logo}
-                                />
+        <View style={LoginStyles.container}>
+            <ImageBackground
+                source={images.backgroundLogin}
+                style={LoginStyles.welcomeSceenBackground}>
+                <KeyboardAvoidingView
+                    style={LoginStyles.warpwelcomeSceenAndBlurImage}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+                    behavior='padding'>
+                    <ImageBackground
+                        source={images.backgroundLogin}
+                        style={LoginStyles.blurImageStyle}
+                        blurRadius={Platform.OS === 'ios' ? 10 : 6}>
+                        <View style={LoginStyles.welcomeSceen}>
+                            <Image
+                                source={images.logoCF15}
+                                resizeMode='contain'
+                                style={LoginStyles.logo}
+                            />
 
-                                <Text style={LoginStyles.labelBrand}>
-                                    CF15 OFFICE
-                                </Text>
+                            <Text style={LoginStyles.labelBrand}>
+                                CF15 OFFICE
+                            </Text>
 
-                                {showLoginForm ? (
-                                    <View style={LoginStyles.loginForm}>
-                                        <Text style={LoginStyles.loginText}>
-                                            ĐĂNG NHẬP
-                                        </Text>
+                            {showLoginForm ? (
+                                <View style={LoginStyles.loginForm}>
+                                    <Text style={LoginStyles.loginText}>
+                                        ĐĂNG NHẬP
+                                    </Text>
 
-                                        <View
-                                            style={
-                                                LoginStyles.warpInputAndIcon
-                                            }>
-                                            <FontAwesome5
-                                                name='user-circle'
-                                                color='white'
-                                                size={20}
-                                            />
-                                            <TextInput
-                                                value={userAccount.username}
-                                                onChangeText={onChangeUserName}
-                                                placeholder='TÀI KHOẢN HOẶC SĐT'
-                                                autoCapitalize='none'
-                                                style={LoginStyles.loginInput}
-                                                placeholderTextColor={
-                                                    'rgba(245, 245, 245, 1)'
-                                                }
-                                            />
-                                        </View>
+                                    <View style={LoginStyles.warpInputAndIcon}>
+                                        <FontAwesome5
+                                            name='user-circle'
+                                            color='white'
+                                            size={20}
+                                        />
+                                        <TextInput
+                                            value={userAccount.username}
+                                            onChangeText={onChangeUserName}
+                                            placeholder='TÀI KHOẢN HOẶC SĐT'
+                                            autoCapitalize='none'
+                                            style={LoginStyles.loginInput}
+                                            placeholderTextColor={
+                                                'rgba(245, 245, 245, 1)'
+                                            }
+                                        />
+                                    </View>
 
-                                        <View
-                                            style={
-                                                LoginStyles.warpInputAndIcon
-                                            }>
-                                            <MaterialIcons
-                                                name='key'
-                                                color='white'
-                                                size={20}
-                                            />
-                                            <TextInput
-                                                value={userAccount.password}
-                                                onChangeText={onChangePassword}
-                                                placeholder='MẬT KHẨU'
-                                                autoCapitalize='none'
-                                                style={LoginStyles.loginInput}
-                                                secureTextEntry={
-                                                    showPassword ? false : true
-                                                }
-                                                placeholderTextColor={
-                                                    'rgba(245, 245, 245, 1)'
-                                                }
-                                            />
-
-                                            <TouchableOpacity
-                                                style={
-                                                    LoginStyles.hidePasswordIcon
-                                                }
-                                                onPress={() =>
-                                                    setShowPassword(
-                                                        !showPassword,
-                                                    )
-                                                }>
-                                                <Feather
-                                                    name={
-                                                        showPassword
-                                                            ? 'eye-off'
-                                                            : 'eye'
-                                                    }
-                                                    color='white'
-                                                    size={20}
-                                                />
-                                            </TouchableOpacity>
-                                        </View>
+                                    <View style={LoginStyles.warpInputAndIcon}>
+                                        <MaterialIcons
+                                            name='key'
+                                            color='white'
+                                            size={20}
+                                        />
+                                        <TextInput
+                                            value={userAccount.password}
+                                            onChangeText={onChangePassword}
+                                            placeholder='MẬT KHẨU'
+                                            autoCapitalize='none'
+                                            style={LoginStyles.loginInput}
+                                            secureTextEntry={
+                                                showPassword ? false : true
+                                            }
+                                            placeholderTextColor={
+                                                'rgba(245, 245, 245, 1)'
+                                            }
+                                        />
 
                                         <TouchableOpacity
+                                            style={LoginStyles.hidePasswordIcon}
+                                            onPress={() =>
+                                                setShowPassword(!showPassword)
+                                            }>
+                                            <Feather
+                                                name={
+                                                    showPassword
+                                                        ? 'eye-off'
+                                                        : 'eye'
+                                                }
+                                                color='white'
+                                                size={20}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
+
+                                    <TouchableOpacity
+                                        style={LoginStyles.btnLogin}
+                                        onPress={handleLogin}>
+                                        <Text style={LoginStyles.btnText}>
+                                            BẮT ĐẦU
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            ) : (
+                                <>
+                                    <View style={LoginStyles.welcomeContainer}>
+                                        <Text style={LoginStyles.welcomeTitle}>
+                                            XIN CHÀO!
+                                        </Text>
+                                        <Text
+                                            style={LoginStyles.welcomeContent}>
+                                            Chào mừng bạn quay trở lại hệ thống
+                                            quản lý CF15 Office.
+                                        </Text>
+                                    </View>
+
+                                    <View style={LoginStyles.welcomeWarpButton}>
+                                        <TouchableOpacity
                                             style={LoginStyles.btnLogin}
-                                            onPress={handleLogin}>
+                                            onPress={() =>
+                                                setShowLoginForm(!showLoginForm)
+                                            }>
                                             <Text style={LoginStyles.btnText}>
-                                                BẮT ĐẦU
+                                                ĐĂNG NHẬP
+                                            </Text>
+                                        </TouchableOpacity>
+
+                                        <TouchableOpacity
+                                            style={LoginStyles.btnRetriveInfo}>
+                                            <MaterialIcons
+                                                name='qr-code-scanner'
+                                                size={22}
+                                                color='white'
+                                            />
+                                            <Text style={LoginStyles.btnText}>
+                                                TRUY XUẤT TỰ ĐỘNG
                                             </Text>
                                         </TouchableOpacity>
                                     </View>
-                                ) : (
-                                    <>
-                                        <View
-                                            style={
-                                                LoginStyles.welcomeContainer
-                                            }>
-                                            <Text
-                                                style={
-                                                    LoginStyles.welcomeTitle
-                                                }>
-                                                XIN CHÀO!
-                                            </Text>
-                                            <Text
-                                                style={
-                                                    LoginStyles.welcomeContent
-                                                }>
-                                                Chào mừng bạn quay trở lại hệ
-                                                thống quản lý CF15 Office.
-                                            </Text>
-                                        </View>
+                                </>
+                            )}
+                        </View>
+                    </ImageBackground>
+                </KeyboardAvoidingView>
+            </ImageBackground>
 
-                                        <View
-                                            style={
-                                                LoginStyles.welcomeWarpButton
-                                            }>
-                                            <TouchableOpacity
-                                                style={LoginStyles.btnLogin}
-                                                onPress={() =>
-                                                    setShowLoginForm(
-                                                        !showLoginForm,
-                                                    )
-                                                }>
-                                                <Text
-                                                    style={LoginStyles.btnText}>
-                                                    ĐĂNG NHẬP
-                                                </Text>
-                                            </TouchableOpacity>
-
-                                            <TouchableOpacity
-                                                style={
-                                                    LoginStyles.btnRetriveInfo
-                                                }>
-                                                <MaterialIcons
-                                                    name='qr-code-scanner'
-                                                    size={22}
-                                                    color='white'
-                                                />
-                                                <Text
-                                                    style={LoginStyles.btnText}>
-                                                    TRUY XUẤT TỰ ĐỘNG
-                                                </Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    </>
-                                )}
-                            </View>
-                        </ImageBackground>
-                    </View>
-                </ImageBackground>
-
-                <View style={LoginStyles.version}>
-                    <Text style={LoginStyles.textVersion}>Version 1.0.0</Text>
-                </View>
-
-                <Backdrop open={isLoading} />
+            <View style={LoginStyles.version}>
+                <Text style={LoginStyles.textVersion}>Version 1.0.0</Text>
             </View>
-        </KeyboardAwareScrollView>
+
+            <Backdrop open={isLoading} />
+        </View>
     );
 }
 
 const LoginStyles = StyleSheet.create({
     container: {
-        minHeight: '100%',
-        justifyContent: 'center',
+        flex: 1,
     },
     welcomeSceenBackground: {
         flex: 1,
@@ -282,6 +250,7 @@ const LoginStyles = StyleSheet.create({
     warpwelcomeSceenAndBlurImage: {
         alignItems: 'center',
         justifyContent: 'center',
+        flex: 1,
     },
     welcomeSceen: {
         padding: 10,
@@ -328,6 +297,7 @@ const LoginStyles = StyleSheet.create({
         width: '100%',
     },
     btnLogin: {
+        marginTop: 5,
         backgroundColor: 'rgba(76, 175, 80, 1)',
         paddingVertical: 10,
         borderRadius: 25,
@@ -361,7 +331,7 @@ const LoginStyles = StyleSheet.create({
         textAlign: 'center',
     },
     loginForm: {
-        marginVertical: 40,
+        marginVertical: 35,
         width: '100%',
     },
     loginText: {

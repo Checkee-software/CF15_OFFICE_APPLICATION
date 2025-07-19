@@ -15,6 +15,7 @@ import images from '../../../assets/images';
 import {useWorkerStore} from '../../../stores/workerStore';
 import Loading from '@/screens/subscreen/Loading';
 import {useAuthStore} from '../../../stores/authStore';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 const Woker = ({navigation}: any) => {
     const {
@@ -36,7 +37,7 @@ const Woker = ({navigation}: any) => {
         if (searchWorker.length !== 0) {
             setSearchWorker('');
         }
-        getListWorkerByDepartment(userInfo._id);
+        getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
     };
 
     const renderWorkerBySearch = (itemWorkerBySearch: any) => (
@@ -109,22 +110,25 @@ const Woker = ({navigation}: any) => {
                             {itemListWorker.fullName}
                         </Text>
                         <Text style={WokerStyles.workerUnit}>
-                            {itemListWorker.userType.unit}
+                            {itemListWorker.userType.level ===
+                            EOrganization.LEADER
+                                ? ''
+                                : itemListWorker.roleName}
                         </Text>
                     </View>
                 </View>
 
-                <View>
+                {/* <View>
                     <Text style={WokerStyles.workerOrder}>
                         {itemListWorker.order}
                     </Text>
-                </View>
+                </View> */}
             </TouchableOpacity>
         </View>
     );
 
     useEffect(() => {
-        getListWorkerByDepartment(userInfo._id);
+        getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
         // eslint-disable-next-line
     }, []);
 

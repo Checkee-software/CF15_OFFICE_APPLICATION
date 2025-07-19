@@ -14,10 +14,10 @@ import useFeedbackStore from '../../../stores/feedbackStore';
 import dayjs from 'dayjs';
 import images from '../../../assets/images';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-// import {useAuthStore} from '../../../stores/authStore';
+import {useAuthStore} from '../../../stores/authStore';
 
 export default function FeedbackScreen({navigation}: any) {
-    // const {userInfo} = useAuthStore();
+    const {userInfo} = useAuthStore();
 
     const {feedbacks, fetchFeedbacks, isLoading, getFullAvatarUrl} =
         useFeedbackStore();
@@ -93,17 +93,21 @@ export default function FeedbackScreen({navigation}: any) {
                 }
             />
 
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate(SCREEN_INFO.FEEDBACK1.key)}>
-                <MaterialCommunityIcons
-                    name='pencil'
-                    size={18}
-                    color='#fff'
-                    style={styles.icon}
-                />
-                <Text style={styles.buttonText}>Tạo góp ý</Text>
-            </TouchableOpacity>
+            {userInfo.userType.level !== EOrganization.MANAGEMENT && (
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() =>
+                        navigation.navigate(SCREEN_INFO.FEEDBACK1.key)
+                    }>
+                    <MaterialCommunityIcons
+                        name='pencil'
+                        size={18}
+                        color='#fff'
+                        style={styles.icon}
+                    />
+                    <Text style={styles.buttonText}>Tạo góp ý</Text>
+                </TouchableOpacity>
+            )}
         </View>
     );
 }

@@ -1,13 +1,34 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import {IList} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {ISchedule} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {
     IRequest,
     IRequestMaterial,
 } from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
 import ENV from '@/config/ENV';
+import {IProductType} from '@/shared-types/Response/ProductTypeResponse/ProductTypeResponse';
+import moment from 'moment';
+
+interface IList {
+    _id: string;
+    status: string;
+    title: string;
+    description: string;
+    startedDate: string;
+    startedDateVN: string;
+    finishedDateVN: string;
+    finishedDate: string;
+    totalEmployees: number;
+    totalChildTasks: number;
+    productId: string;
+    productTypeId: string;
+}
+
+interface IProduct {
+    _id: string;
+    name: string;
+}
 
 interface workScheduleStore {
     isLoading: boolean;
@@ -15,12 +36,20 @@ interface workScheduleStore {
     listWorkSchedule: IList[];
     listWorkScheduleFilter: IList[];
     listJobs: IList[];
+    listProductType: IProductType[];
+    listProduct: IProduct[];
     getListJobs: () => Promise<void>;
     detailWorkSchedule: ISchedule | null;
     scheduleDetail: ISchedule | null;
     getListWorkSchedule: () => Promise<void>;
     getScheduleDetail: (id: string) => Promise<void>;
     filterByStatus: (status: string) => void;
+    filterWorkSchedule: (
+        startedDate: string,
+        finishedDate: string,
+        productTypeId: string,
+        productId: string,
+    ) => void;
     resetData: () => void;
     getDetailWorkSchedule: (id: string, userId: string) => Promise<void>;
     requestPersonalTask: (
@@ -28,11 +57,12 @@ interface workScheduleStore {
         childTaskId: string,
         data: Omit<IRequest, 'scheduleId' | 'childTaskId'>,
     ) => Promise<void>;
-
     requestAdditionalMaterial: (
         scheduleId: string,
         data: Omit<IRequestMaterial, 'scheduleId'>,
     ) => Promise<void>;
+    getProductType: () => Promise<void>;
+    getProduct: () => Promise<void>;
 }
 
 const fixAvatarPath = (path: string) => {
@@ -58,6 +88,8 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     detailWorkSchedule: null,
     scheduleDetail: null,
     listJobs: [],
+    listProductType: [],
+    listProduct: [],
 
     requestPersonalTask: async (
         scheduleId: string,
@@ -66,7 +98,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     ) => {
         set({isLoading: true});
         try {
-            const response = await axiosClient.post(
+            await axiosClient.post(
                 `${ENV.BACKEND_URL}/resources/schedule-requests/request/${scheduleId}/${childTaskId}`,
                 data,
             );
@@ -172,6 +204,50 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
         }
     },
 
+    getProductType: async () => {
+        try {
+            const response = await axiosClient.get(
+                `${ENV.BACKEND_URL}/resources/product-types/selection`,
+            );
+
+            set({listProductType: response.data.data || []});
+        } catch (error: any) {
+            set({isLoadingGet: false});
+
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error.response.status === 500) {
+                    Snackbar.show({
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    getProduct: async () => {
+        try {
+            const response = await axiosClient.get(
+                `${ENV.BACKEND_URL}/resources/products/selection`,
+            );
+
+            set({listProduct: response.data.data || []});
+        } catch (error: any) {
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error.response.status === 500) {
+                    Snackbar.show({
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
     getListWorkSchedule: async () => {
         set({isLoading: true});
         try {
@@ -179,28 +255,20 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 `${ENV.BACKEND_URL}/resources/schedules/collection`,
             );
 
-            if (response) {
-                const updateImgPathListSchedule = response.data.data.map(
-                    (item: any) => {
-                        item.employees.map((employees: any) => {
-                            if (employees.avatar) {
-                                employees.avatar = fixAvatarPath(
-                                    employees.avatar,
-                                );
-                            }
-
-                            return {...employees};
-                        });
-
-                        return {
-                            ...item,
-                        };
-                    },
-                );
+            if (response.data.data.length !== 0) {
+                const convertedTime = response.data.data.map((item: any) => ({
+                    ...item,
+                    startedDateVN: moment(item.startedDate).format(
+                        'DD/MM/YYYY',
+                    ),
+                    finishedDateVN: moment(item.finishedDate).format(
+                        'DD/MM/YYYY',
+                    ),
+                }));
 
                 set({
-                    listWorkSchedule: updateImgPathListSchedule,
-                    listWorkScheduleFilter: updateImgPathListSchedule,
+                    listWorkSchedule: convertedTime,
+                    listWorkScheduleFilter: convertedTime,
                 });
             } else {
                 set({
@@ -281,6 +349,35 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 task => task.status === status,
             ),
         })),
+    filterWorkSchedule: (fromDate, toDate, productTypeId, productId) =>
+        set(state => {
+            const parseDate = (dateStr: string) => {
+                const [day, month, year] = dateStr.split('/').map(Number);
+                return new Date(year, month - 1, day);
+            };
+
+            const from = parseDate(fromDate);
+            const to = parseDate(toDate);
+
+            const filtered = state.listWorkSchedule.filter(item => {
+                const itemStart = parseDate(item.startedDateVN);
+                const itemEnd = parseDate(item.finishedDateVN);
+
+                const isInRange = itemEnd >= from && itemStart <= to;
+
+                const matchProductTypeId =
+                    !productTypeId?.trim() ||
+                    item.productTypeId === productTypeId;
+                const matchProductId =
+                    !productId?.trim() || item.productId === productId;
+
+                return isInRange && matchProductTypeId && matchProductId;
+            });
+
+            return {
+                listWorkScheduleFilter: filtered,
+            };
+        }),
 
     resetData: () =>
         set(state => ({listWorkScheduleFilter: state.listWorkSchedule})),

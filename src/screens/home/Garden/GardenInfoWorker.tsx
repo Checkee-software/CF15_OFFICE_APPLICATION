@@ -148,6 +148,8 @@ const GardenInfoWorker = () => {
                                 padding: 0,
                                 margin: 0,
                             }}
+                            placeholder='Bạn hãy đặt tên khu vườn'
+                            placeholderTextColor={'black'}
                             autoFocus={
                                 gardenNameInput._id === item._id ? true : false
                             }

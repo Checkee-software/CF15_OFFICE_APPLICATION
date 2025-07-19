@@ -41,7 +41,7 @@ const MachineShiftSelector: React.FC<Props> = ({
         const currentText =
             tempInputValues[index] || machineShifts[index].hours;
 
-        if (text.includes('-')) {
+        if (text.includes('-') || text.includes(' ')) {
             return;
         }
 
@@ -124,6 +124,7 @@ const MachineShiftSelector: React.FC<Props> = ({
                                             keyboardType='numeric'
                                             placeholder='Nhập diện tích'
                                             placeholderTextColor='black'
+                                            maxLength={6}
                                             value={shift.hours}
                                             onChangeText={text =>
                                                 handleHoursChange(index, text)

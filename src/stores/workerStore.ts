@@ -27,7 +27,10 @@ interface DocumentStore {
     isLoading: boolean;
     listWorker: IUser[];
     listWorkerFilterByRole: listWorkerFilterByRole[];
-    getListWorkerByDepartment: (userId: string) => Promise<void>;
+    getListWorkerByDepartment: (
+        userId: string,
+        userLevel: string,
+    ) => Promise<void>;
     getListWorkerByLeader: () => Promise<void>;
     resetStateWhenLogout: () => void;
 }
@@ -42,7 +45,8 @@ export const useWorkerStore = create<DocumentStore>(set => ({
     listWorker: [],
     listWorkerFilterByRole: [],
 
-    getListWorkerByDepartment: async (userId: string) => {
+    getListWorkerByDepartment: async (userId: string, userLevel: string) => {
+        console.log(userLevel);
         set({isLoading: true});
         //await new Promise(resolve => setTimeout(resolve, 1 * 10000));
         try {
@@ -62,47 +66,92 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     },
                 );
 
-                const filterLeaders = updateImgPathListWorker.filter(
-                    (user: {userType: {level: string}}) =>
-                        user.userType.level === 'LEADER',
-                );
+                if (userLevel === 'DEPARTMENT') {
+                    const filterLeaders = updateImgPathListWorker.filter(
+                        (user: {userType: {level: string}}) =>
+                            user.userType.level === 'LEADER',
+                    );
 
-                const filterWorkers = updateImgPathListWorker.filter(
-                    (user: {
-                        _id: string;
-                        userType: {_id: string; level: string};
-                    }) =>
-                        user.userType.level === 'DEPARTMENT' &&
-                        user._id !== userId,
-                );
+                    const filterWorkers = updateImgPathListWorker.filter(
+                        (user: {
+                            _id: string;
+                            userType: {_id: string; level: string};
+                        }) =>
+                            user.userType.level === 'DEPARTMENT' &&
+                            user._id !== userId,
+                    );
 
-                //thêm order cho 2 mảng
-                let order = 0;
-                filterLeaders.forEach((item: {order: number}) => {
-                    item.order = order += 1;
-                });
+                    //thêm order cho 2 mảng
+                    let order = 0;
+                    filterLeaders.forEach((item: {order: number}) => {
+                        item.order = order += 1;
+                    });
 
-                order = 0;
+                    order = 0;
 
-                filterWorkers.forEach((item: {order: number}) => {
-                    item.order = order += 1;
-                });
+                    filterWorkers.forEach((item: {order: number}) => {
+                        item.order = order += 1;
+                    });
 
-                const newListWorker = [
-                    {
-                        title: 'Cán bộ quản lý',
-                        data: filterLeaders,
-                    },
-                    {
-                        title: 'Phòng ban',
-                        data: filterWorkers,
-                    },
-                ];
+                    const newListWorker = [
+                        {
+                            title: 'Cán bộ quản lý',
+                            data: filterLeaders,
+                        },
+                        {
+                            title: 'Phòng ban',
+                            data: filterWorkers,
+                        },
+                    ];
 
-                set({
-                    listWorker: updateImgPathListWorker,
-                    listWorkerFilterByRole: newListWorker,
-                });
+                    set({
+                        listWorker: updateImgPathListWorker,
+                        listWorkerFilterByRole: newListWorker,
+                    });
+                } else {
+                    const filterManagements = updateImgPathListWorker.filter(
+                        (user: {_id: string; userType: {level: string}}) =>
+                            user.userType.level === 'MANAGEMENT' &&
+                            user._id !== userId,
+                    );
+
+                    const filterDepartment = updateImgPathListWorker.filter(
+                        (user: {
+                            _id: string;
+                            userType: {_id: string; level: string};
+                        }) =>
+                            user.userType.level === 'DEPARTMENT' &&
+                            user._id !== userId,
+                    );
+
+                    //thêm order cho 2 mảng
+                    let order = 0;
+                    filterManagements.forEach((item: {order: number}) => {
+                        item.order = order += 1;
+                    });
+
+                    order = 0;
+
+                    filterDepartment.forEach((item: {order: number}) => {
+                        item.order = order += 1;
+                    });
+
+                    const newListWorker = [
+                        {
+                            title: 'Ban lãnh đạo',
+                            data: filterManagements,
+                        },
+                        {
+                            title: 'Phòng ban',
+                            data: filterDepartment,
+                        },
+                    ];
+
+                    set({
+                        listWorker: updateImgPathListWorker,
+                        listWorkerFilterByRole: newListWorker,
+                    });
+                }
             } else {
                 set({listWorker: [], listWorkerFilterByRole: []});
             }
@@ -142,20 +191,20 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     },
                 );
 
-                const filterRole = updateImgPathListWorker.filter(
-                    (user: {userType: {level: string}}) =>
-                        user.userType.level === 'WORKER',
-                );
+                // const filterRole = updateImgPathListWorker.filter(
+                //     (user: {userType: {level: string}}) =>
+                //         user.userType.level === 'WORKER',
+                // );
 
                 //thêm order cho mảng
                 let order = 0;
-                filterRole.forEach((item: {order: number}) => {
+                updateImgPathListWorker.forEach((item: {order: number}) => {
                     item.order = order += 1;
                 });
 
                 set({
-                    listWorker: filterRole,
-                    listWorkerFilterByRole: filterRole,
+                    listWorker: updateImgPathListWorker,
+                    listWorkerFilterByRole: updateImgPathListWorker,
                 });
 
                 //đoạn code dưới này dùng khi nó đẻ ra thêm nhiều unit

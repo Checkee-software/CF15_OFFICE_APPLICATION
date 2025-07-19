@@ -100,7 +100,7 @@ export default function Profile({navigation}: any) {
                                     {userInfo.userType.level !==
                                     EOrganization.WORKER
                                         ? renderInfoRow(
-                                              'Phòng ban',
+                                              'Cấp đơn vị',
                                               `${userInfo.departmentName}`,
                                           )
                                         : null}
@@ -155,7 +155,6 @@ export default function Profile({navigation}: any) {
                                     {renderInfoRow(
                                         'Loại hợp đồng',
                                         `${userInfo.contract}`,
-                                        true,
                                     )}
                                 </View>
                             )}

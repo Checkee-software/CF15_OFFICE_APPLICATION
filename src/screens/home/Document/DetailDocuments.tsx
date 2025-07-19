@@ -15,6 +15,7 @@ import Snackbar from 'react-native-snackbar';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import AutoHeightWebView from 'react-native-autoheight-webview';
 import ENV from '@/config/ENV';
+import {Dimensions} from 'react-native';
 
 const DetailDocuments = ({route}: any) => {
     const [loadingDownload, setLoadingDownload] = useState(false);
@@ -277,6 +278,7 @@ const DetailDocumentsStyles = StyleSheet.create({
     },
     documentContent: {
         marginVertical: 5,
+        width: Dimensions.get('window').width - 15,
     },
     attachedDocuments: {
         //marginBottom: 15,

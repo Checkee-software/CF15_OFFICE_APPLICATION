@@ -408,15 +408,23 @@ const ScheduleDetail = ({route}: any) => {
                     boxShadow: '0 1 2 0 #00000040',
                 },
             ]}>
-            <Text
-                style={ScheduleDetailStyles.taskTitle}
-                onPress={() => {
-                    setOpenModal(!openModal),
-                        setDataWorkerRenderForLeader(itemChildTask.staff);
-                }}>
+            <Text style={ScheduleDetailStyles.taskTitle}>
                 {`${itemChildTask.name}: ${calculateProgressSquare(
                     itemChildTask.staff,
-                )} ${calculatePercent(itemChildTask.staff)}`}
+                )} ${calculatePercent(itemChildTask.staff)} `}
+
+                {userInfo.userType.level !== EOrganization.DEPARTMENT && (
+                    <Text
+                        style={{color: '#2196F3', fontSize: 12}}
+                        onPress={() => {
+                            setOpenModal(!openModal),
+                                setDataWorkerRenderForLeader(
+                                    itemChildTask.staff,
+                                );
+                        }}>
+                        xem thêm
+                    </Text>
+                )}
             </Text>
 
             {itemChildTask.labour && (
@@ -765,6 +773,102 @@ const ScheduleDetail = ({route}: any) => {
                     {scheduleDetail?.title}
                 </Text>
 
+                {userInfo.userType.level === EOrganization.DEPARTMENT && (
+                    <>
+                        <Text
+                            style={[
+                                ScheduleDetailStyles.timeWorkEnd,
+                                {marginTop: 8, marginBottom: 4},
+                            ]}>
+                            {renderScheduleRemain(
+                                moment(scheduleDetail?.finishedDate).format(
+                                    'L',
+                                ),
+                            )}
+                        </Text>
+
+                        <View style={ScheduleDetailStyles.workInfoSection}>
+                            <View style={ScheduleDetailStyles.generalInfo}>
+                                <Text
+                                    style={
+                                        ScheduleDetailStyles.generalInfoText
+                                    }>
+                                    Thông tin chung
+                                </Text>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Cây trồng
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {scheduleDetail?.productTypeName}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Khu vườn
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {scheduleDetail?.productName}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Ngày bắt đầu
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {moment(
+                                            scheduleDetail?.startedDate,
+                                        ).format('L')}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Ngày kết thúc
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {moment(
+                                            scheduleDetail?.finishedDate,
+                                        ).format('L')}
+                                    </Text>
+                                </View>
+
+                                <View
+                                    style={ScheduleDetailStyles.warpLabelValue}>
+                                    <Text
+                                        style={ScheduleDetailStyles.infoLabel}>
+                                        Người tạo việc
+                                    </Text>
+
+                                    <Text
+                                        style={ScheduleDetailStyles.infoValue}>
+                                        {scheduleDetail?.createdUser}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+                    </>
+                )}
+
                 {userInfo.userType.level === EOrganization.LEADER && (
                     <>
                         <View
@@ -831,12 +935,12 @@ const ScheduleDetail = ({route}: any) => {
                                     style={ScheduleDetailStyles.warpLabelValue}>
                                     <Text
                                         style={ScheduleDetailStyles.infoLabel}>
-                                        Loại cây trồng
+                                        Cây trồng
                                     </Text>
 
                                     <Text
                                         style={ScheduleDetailStyles.infoValue}>
-                                        {scheduleDetail?.productName}
+                                        {scheduleDetail?.productTypeName}
                                     </Text>
                                 </View>
 
@@ -844,12 +948,12 @@ const ScheduleDetail = ({route}: any) => {
                                     style={ScheduleDetailStyles.warpLabelValue}>
                                     <Text
                                         style={ScheduleDetailStyles.infoLabel}>
-                                        Cây trồng
+                                        Khu vườn
                                     </Text>
 
                                     <Text
                                         style={ScheduleDetailStyles.infoValue}>
-                                        {scheduleDetail?.productTypeName}
+                                        {scheduleDetail?.productName}
                                     </Text>
                                 </View>
 
@@ -947,14 +1051,14 @@ const ScheduleDetail = ({route}: any) => {
                                             style={
                                                 ScheduleDetailStyles.infoLabel
                                             }>
-                                            Loại cây trồng
+                                            Cây trồng
                                         </Text>
 
                                         <Text
                                             style={
                                                 ScheduleDetailStyles.infoValue
                                             }>
-                                            {scheduleDetail?.productName}
+                                            {scheduleDetail?.productTypeName}
                                         </Text>
                                     </View>
 
@@ -966,14 +1070,14 @@ const ScheduleDetail = ({route}: any) => {
                                             style={
                                                 ScheduleDetailStyles.infoLabel
                                             }>
-                                            Cây trồng
+                                            Khu vườn
                                         </Text>
 
                                         <Text
                                             style={
                                                 ScheduleDetailStyles.infoValue
                                             }>
-                                            {scheduleDetail?.productTypeName}
+                                            {scheduleDetail?.productName}
                                         </Text>
                                     </View>
 
@@ -1227,6 +1331,49 @@ const ScheduleDetail = ({route}: any) => {
                             />
                         </View>
                     </List.Accordion> */}
+                </View>
+
+                <View style={ScheduleDetailStyles.listAccordion}>
+                    {userInfo.userType.level === EOrganization.DEPARTMENT && (
+                        <>
+                            <List.Accordion
+                                titleStyle={
+                                    ScheduleDetailStyles.titleAccordion1
+                                }
+                                title={`Cán bộ quản lý (${scheduleDetail?.followers?.length})`}
+                                style={ScheduleDetailStyles.boxAccordion}
+                                id='1'>
+                                <FlatList
+                                    scrollEnabled={false}
+                                    data={scheduleDetail?.followers as any}
+                                    renderItem={({item, index}) =>
+                                        renderStaff(item, index)
+                                    }
+                                    keyExtractor={item => item._id}
+                                />
+                            </List.Accordion>
+
+                            <List.Accordion
+                                titleStyle={
+                                    ScheduleDetailStyles.titleAccordion2
+                                }
+                                title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}
+                                style={ScheduleDetailStyles.boxAccordion}
+                                id='3'>
+                                <View
+                                    style={ScheduleDetailStyles.listChildTasks}>
+                                    <FlatList
+                                        scrollEnabled={false}
+                                        data={scheduleDetail?.childTasks as any}
+                                        renderItem={({item}) =>
+                                            renderChildTask(item)
+                                        }
+                                        keyExtractor={item => item._id}
+                                    />
+                                </View>
+                            </List.Accordion>
+                        </>
+                    )}
                 </View>
 
                 <Modal visible={openModal} animationType='slide'>

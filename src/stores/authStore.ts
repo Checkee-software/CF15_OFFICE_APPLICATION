@@ -10,7 +10,10 @@ import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/Schedule
 import UserType from '@/shared-types/common/UserType';
 import Address from '@/shared-types/common/Address';
 import {OneSignal} from 'react-native-onesignal';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import {
+    EOrganization,
+    IFunction,
+} from '@/shared-types/common/Permissions/Permissions';
 import ENV from '@/config/ENV';
 
 type tasks = {
@@ -36,6 +39,7 @@ type IUser = {
     userType: UserType.IUserType;
     address: Address.IAddresses;
     managedGardens: string[];
+    functions: IFunction[];
     tasks: tasks;
     groupId: string;
     groupName: string;

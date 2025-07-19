@@ -12,9 +12,86 @@ import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useAuthStore} from '../../../stores/authStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import Snackbar from 'react-native-snackbar';
 
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
+
+    const menuItems = [
+        {
+            function: 'GARDEN',
+            key: 'gardenForWorker',
+            label: 'Khu vườn',
+            buttonImage: images.garden,
+            navigateTo: SCREEN_INFO.GARDENINFOWORKER.key,
+            navigateNext: SCREEN_INFO.GARDENWORKER.key,
+            level: [],
+        },
+        {
+            function: '',
+            key: 'gardenDeclareForWorker',
+            label: 'Báo cáo quy trình',
+            buttonImage: images.gardener,
+            navigateTo: SCREEN_INFO.GARDENINFOWORKER1.key,
+            navigateNext: SCREEN_INFO.GARDENDECLAREWORKER.key,
+        },
+        {
+            function: 'GARDEN',
+            key: 'gardenInfo',
+            label: 'Thông tin khu vườn',
+            buttonImage: images.garden,
+            navigateTo: SCREEN_INFO.GARDENINFO.key,
+        },
+        {
+            function: 'EMPLOYEES',
+            key: 'unit',
+            label: 'Nhân sự',
+            buttonImage: images.workers,
+            navigateTo: SCREEN_INFO.UNIT.key,
+        },
+        {
+            function: 'EMPLOYEES',
+            key: 'employee',
+            label: 'Nhân sự',
+            buttonImage: images.workers,
+            navigateTo: SCREEN_INFO.WORKER.key,
+        },
+        {
+            function: 'SCHEDULE',
+            key: 'workschedule',
+            label: 'Lịch sử quy trình',
+            buttonImage: images.toDoList,
+            navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
+        },
+        {
+            function: 'STATISTIC',
+            key: 'statistic',
+            label: 'Báo cáo thống kê',
+            buttonImage: images.pieChart,
+            navigateTo: SCREEN_INFO.STATISTIC.key,
+        },
+        {
+            function: 'FEEDBACK',
+            key: 'feedback',
+            label: 'Góp ý',
+            buttonImage: images.feedBack,
+            navigateTo: SCREEN_INFO.FEEDBACK.key,
+        },
+        {
+            function: 'DOCUMENT',
+            key: 'document',
+            label: 'Tài liệu',
+            buttonImage: images.document,
+            navigateTo: SCREEN_INFO.DOCUMENT.key,
+        },
+        {
+            function: '',
+            key: 'news',
+            label: 'Tin tức',
+            buttonImage: images.megaphone,
+            navigateTo: SCREEN_INFO.NEWS.key,
+        },
+    ];
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -49,74 +126,53 @@ export default function Main({navigation}: any) {
         }
     };
 
-    const menuItems = [
-        {
-            key: 'gardenForWorker',
-            label: 'Khu vườn',
-            buttonImage: images.garden,
-            navigateTo: SCREEN_INFO.GARDENINFOWORKER.key,
-            navigateNext: SCREEN_INFO.GARDENWORKER.key,
-        },
-        {
-            key: 'gardenDeclareForWorker',
-            label: 'Báo cáo quy trình',
-            buttonImage: images.gardener,
-            navigateTo: SCREEN_INFO.GARDENINFOWORKER1.key,
-            navigateNext: SCREEN_INFO.GARDENDECLAREWORKER.key,
-        },
-        {
-            key: 'gardenInfo',
-            label: 'Thông tin khu vườn',
-            buttonImage: images.garden,
-            navigateTo: SCREEN_INFO.GARDENINFO.key,
-        },
-        {
-            key: 'unit',
-            label: 'Đơn vị',
-            buttonImage: images.workers,
-            navigateTo: SCREEN_INFO.UNIT.key,
-        },
-        {
-            key: 'employee',
-            label: 'Nhân sự',
-            buttonImage: images.workers,
-            navigateTo: SCREEN_INFO.WORKER.key,
-        },
-        {
-            key: 'workschedule',
-            label: 'Lịch sử quy trình',
-            buttonImage: images.toDoList,
-            navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
-        },
-        {
-            key: 'statistic',
-            label: 'Báo cáo thống kê',
-            buttonImage: images.pieChart,
-            navigateTo: SCREEN_INFO.STATISTIC.key,
-        },
-        {
-            key: 'feedback',
-            label: 'Góp ý',
-            buttonImage: images.feedBack,
-            navigateTo: SCREEN_INFO.FEEDBACK.key,
-        },
-        {
-            key: 'news',
-            label: 'Tin tức',
-            buttonImage: images.megaphone,
-            navigateTo: SCREEN_INFO.NEWS.key,
-        },
-        {
-            key: 'document',
-            label: 'Tài liệu',
-            buttonImage: images.document,
-            navigateTo: SCREEN_INFO.DOCUMENT.key,
-        },
-    ];
+    console.log(userInfo);
+
+    const handleNavigate = (
+        navigateTo: any,
+        navigateNext: any,
+        functionName: any,
+        label: string,
+    ) => {
+        if (functionName !== '') {
+            const findAccess = userInfo.functions.find(
+                (item: any) => item._id === functionName,
+            );
+            console.log(findAccess);
+            if (findAccess?.access) {
+                navigation.navigate(navigateTo, {
+                    navigateNext: navigateNext || null,
+                });
+            } else {
+                Snackbar.show({
+                    text: `Bạn không có quyền truy cập chức năng ${label}`,
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            }
+        } else {
+            navigation.navigate(navigateTo, {
+                navigateNext: navigateNext || null,
+            });
+        }
+    };
 
     const filterMenuByRole = (role: string) => {
-        if (role === EOrganization.ADMIN || role === EOrganization.MANAGEMENT) {
-            return menuItems.filter(item => item.key === 'statistic');
+        if (role === EOrganization.MANAGEMENT) {
+            const menu = menuItems.filter(
+                item =>
+                    item.key !== 'gardenForWorker' &&
+                    item.key !== 'gardenDeclareForWorker' &&
+                    item.key !== 'gardenInfo' &&
+                    item.key !== 'unit' &&
+                    item.key !== 'workschedule',
+            );
+
+            const reorderedMenu = [
+                ...menu.filter(item => item.key === 'statistic'),
+                ...menu.filter(item => item.key !== 'statistic'),
+            ];
+
+            return reorderedMenu;
         }
 
         if (role === EOrganization.DEPARTMENT) {

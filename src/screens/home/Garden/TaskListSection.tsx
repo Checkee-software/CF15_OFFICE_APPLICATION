@@ -33,7 +33,7 @@ const TaskListSection = ({
     const handleAreaChange = (index: number, text: string) => {
         const currentText = tempInputValues[index] || taskInputs[index].area;
 
-        if (text.includes('-')) {
+        if (text.includes('-') || text.includes(' ')) {
             return;
         }
 
@@ -108,6 +108,7 @@ const TaskListSection = ({
                                         keyboardType='numeric'
                                         placeholder='Nhập diện tích'
                                         placeholderTextColor='black'
+                                        maxLength={6}
                                         value={task.area}
                                         onChangeText={text =>
                                             handleAreaChange(index, text)

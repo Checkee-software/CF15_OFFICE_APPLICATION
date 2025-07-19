@@ -7,7 +7,7 @@ import asyncStorageHelper from './src/utils/localStorageHelper/index';
 import {useAuthStore} from './src/stores/authStore';
 
 /* packages */
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {OneSignal, LogLevel} from 'react-native-onesignal';
 
 /* screens */
@@ -73,14 +73,12 @@ const InitApp = () => {
 };
 
 export default function App() {
+    const {isLogin} = useAuthStore();
+
     return (
-        <SafeAreaProvider>
-            <SafeAreaView
-                style={{flex: 1, backgroundColor: '#fff'}}
-                edges={['top', 'bottom']}>
-                <StatusBar barStyle={'dark-content'} />
-                <InitApp />
-            </SafeAreaView>
-        </SafeAreaProvider>
+        <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+            <StatusBar barStyle={isLogin ? 'dark-content' : 'light-content'} />
+            <InitApp />
+        </SafeAreaView>
     );
 }

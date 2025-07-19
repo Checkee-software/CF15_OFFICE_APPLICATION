@@ -12,6 +12,7 @@ import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/Process
 import MachineShiftHistorySection from './ActiveMachine';
 import Backdrop from '../../subscreen/Loading/index2';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {Dropdown} from 'react-native-element-dropdown';
 
 type TaskInput = {
     taskId: string;
@@ -292,6 +293,8 @@ const GardenDeclare = () => {
             ),
     );
 
+    console.log(detailWorkSchedule);
+
     return (
         <View style={{flex: 1}}>
             <ActionButtons
@@ -321,6 +324,31 @@ const GardenDeclare = () => {
                             </Text>
                         </View>
                     </View>
+
+                    {detailWorkSchedule?.childTasks[0].staff[0].gardens.length >
+                        1 && (
+                        <Dropdown
+                            mode='modal'
+                            style={styles.dropdown}
+                            search
+                            searchPlaceholder='Tìm khu vườn'
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            iconStyle={styles.iconStyle}
+                            data={
+                                detailWorkSchedule?.childTasks[0].staff[0]
+                                    .gardens
+                            }
+                            maxHeight={300}
+                            labelField='name'
+                            valueField='gardenId'
+                            placeholder='Chọn khu vườn cần làm'
+                            // value={selectedMonth}
+                            // onChange={itemValue =>
+                            //     setSelectedMonth(itemValue._id)
+                            // }
+                        />
+                    )}
                 </View>
 
                 {/* <MachineShiftHistorySection
@@ -332,7 +360,7 @@ const GardenDeclare = () => {
                     taskInputs={taskInputs}
                     handleInputChange={handleInputChange}
                     styles={styles}
-                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'ha'}
+                    gardenAreaType={'ha'}
                     gardenArea={
                         detailWorkSchedule?.childTasks[0].staff[0].totalSquare
                     }
@@ -345,7 +373,7 @@ const GardenDeclare = () => {
                 <MachineShiftSelector
                     machines={availableMachines}
                     machineShifts={machineShifts}
-                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'ha'}
+                    gardenAreaType={'ha'}
                     onChange={handleMachineShiftChange}
                     gardenArea={
                         detailWorkSchedule?.childTasks[0].staff[0].totalSquare
@@ -445,6 +473,28 @@ const styles = StyleSheet.create({
         color: 'red',
         fontSize: 12,
         marginTop: 4,
+    },
+    dropdown: {
+        height: 52,
+        minWidth: '100%',
+        borderColor: '#9A9A9A',
+        borderWidth: 1,
+        paddingHorizontal: 8,
+        borderRadius: 8,
+        marginTop: 15,
+    },
+    placeholderStyle: {
+        fontSize: 15,
+        color: '#666666',
+        fontWeight: 400,
+    },
+    selectedTextStyle: {
+        fontSize: 15,
+        fontWeight: 400,
+    },
+    iconStyle: {
+        width: 20,
+        height: 20,
     },
 });
 

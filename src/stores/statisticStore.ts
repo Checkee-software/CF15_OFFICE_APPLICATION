@@ -180,8 +180,6 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     };
                 });
 
-                console.log(chartData);
-
                 const mainStatisticData = {
                     list: [],
                     totalCost: 0,
