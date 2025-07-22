@@ -1,49 +1,67 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, TextInput} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import {INorm} from '../../../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
+import Snackbar from 'react-native-snackbar';
 
 interface MachineShiftInput {
     machineId: string;
-    hours: string;
+    area: string;
     taskName: string;
     gardenAreaType: string;
+    processId: string;
 }
 
 interface Props {
-    machines: INorm[];
+    gardenId: string;
+    machines: any[];
     machineShifts: MachineShiftInput[];
     gardenAreaType: string;
     gardenArea: number;
+    processingRate: number;
     onChange: (
         index: number,
-        field: 'machineId' | 'hours',
+        field: 'processId' | 'area',
         value: string,
     ) => void;
 }
 
 const MachineShiftSelector: React.FC<Props> = ({
+    gardenId,
     machines,
     machineShifts,
     onChange,
     gardenAreaType,
     gardenArea,
-    processingRate,
 }) => {
     const [tempInputValues, setTempInputValues] = useState<
         Record<string, string>
     >({});
 
-    if (!machineShifts.length) return null;
+    if (!machines.length) return null;
 
     const handleHoursChange = (index: number, text: string) => {
-        const currentText =
-            tempInputValues[index] || machineShifts[index].hours;
+        if (gardenId === '') {
+            Snackbar.show({
+                text: 'Bạn chưa chọn khu vườn cần làm',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+
+            return;
+        }
+
+        // Không cho bắt đầu bằng . hoặc ,
+        if (text.startsWith('.') || text.startsWith(',')) {
+            return;
+        }
 
         if (text.includes('-') || text.includes(' ')) {
             return;
         }
+
+        const currentText =
+            tempInputValues[index] || machineShifts[index]?.area || '';
 
         const isAdding = text.length > currentText.length;
         const endsWithDotOrComma = /[.,]$/.test(text);
@@ -58,7 +76,7 @@ const MachineShiftSelector: React.FC<Props> = ({
         const numericValue = parseFloat(normalizedText);
 
         if (isNaN(numericValue) || numericValue <= gardenArea) {
-            onChange(index, 'hours', normalizedText);
+            onChange(index, 'area', normalizedText);
             setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
             setTempInputValues(prev => ({...prev, [index]: normalizedText}));
@@ -70,80 +88,91 @@ const MachineShiftSelector: React.FC<Props> = ({
             <Text style={styles.sectionTitle}>Ca máy</Text>
 
             <View style={{gap: 12}}>
-                {machineShifts.map((shift, index) => {
-                    const currentInputValue =
-                        tempInputValues[index] || shift.hours;
+                {machines.map((shift, index) => {
+                    const currentInputValue = tempInputValues[index];
                     const areaValue = parseFloat(currentInputValue);
                     const showWarning =
-                        !isNaN(areaValue) &&
-                        areaValue + processingRate > gardenArea;
-
+                        !isNaN(areaValue) && areaValue > gardenArea;
+                    //console.log('1', shift.processId);
                     return (
                         <CollapsibleTaskBlock
                             key={index}
-                            title={shift.taskName}
+                            title={shift.childTaskName}
                             backgroundColor='#FF98004D'>
-                            <View style={{gap: 8}}>
-                                <Text style={styles.label}>
-                                    Loại ca máy{' '}
-                                    <Text style={{color: 'red'}}>*</Text>
-                                </Text>
-                                <View style={styles.pickerWrapper}>
-                                    <Picker
-                                        selectedValue={shift.machineId}
-                                        onValueChange={value =>
-                                            onChange(index, 'machineId', value)
-                                        }
-                                        style={styles.picker}>
-                                        <Picker.Item label='Chọn' value='' />
-                                        {machines.map(machine => (
-                                            <Picker.Item
-                                                key={machine._id}
-                                                label={machine.processName}
-                                                value={machine._id}
-                                            />
-                                        ))}
-                                    </Picker>
-                                </View>
-
-                                {shift.machineId ? (
-                                    <>
-                                        <Text style={styles.label}>
-                                            Diện tích đã làm ({gardenAreaType}){' '}
-                                            <Text style={{color: 'red'}}>
-                                                *
-                                            </Text>
-                                        </Text>
-                                        <TextInput
-                                            style={[
-                                                styles.input,
-                                                showWarning && {
-                                                    borderColor: 'red',
-                                                },
-                                            ]}
-                                            keyboardType='numeric'
-                                            placeholder='Nhập diện tích'
-                                            placeholderTextColor='black'
-                                            maxLength={6}
-                                            value={shift.hours}
-                                            onChangeText={text =>
-                                                handleHoursChange(index, text)
+                            {gardenId !== '' ? (
+                                <View style={{gap: 8}}>
+                                    <Text style={styles.label}>
+                                        Loại ca máy{' '}
+                                        <Text style={{color: 'red'}}>*</Text>
+                                    </Text>
+                                    <View style={styles.pickerWrapper}>
+                                        <Picker
+                                            selectedValue={shift.processId}
+                                            onValueChange={value =>
+                                                onChange(
+                                                    index,
+                                                    'processId',
+                                                    value,
+                                                )
                                             }
-                                        />
-                                        {showWarning && (
-                                            <View
-                                                style={{
-                                                    gap: 0,
-                                                    marginBottom: 10,
-                                                }}>
-                                                <Text
-                                                    style={styles.warningText}>
-                                                    Diện tích không được vượt
-                                                    quá {gardenArea}{' '}
-                                                    {gardenAreaType}
-                                                </Text>
+                                            style={styles.picker}>
+                                            <Picker.Item
+                                                label='Chọn'
+                                                value=''
+                                            />
 
-                                                <Text
+                                            <Picker.Item
+                                                key={shift._id}
+                                                label={shift.processName}
+                                                value={shift._id}
+                                            />
+                                        </Picker>
+                                    </View>
+
+                                    {machineShifts[index]?.processId ? (
+                                        <>
+                                            <Text style={styles.label}>
+                                                Diện tích đã làm (
+                                                {gardenAreaType}){' '}
+                                                <Text style={{color: 'red'}}>
+                                                    *
+                                                </Text>
+                                            </Text>
+                                            <TextInput
+                                                style={[
+                                                    styles.input,
+                                                    showWarning && {
+                                                        borderColor: 'red',
+                                                    },
+                                                ]}
+                                                keyboardType='numeric'
+                                                placeholder='Nhập diện tích'
+                                                placeholderTextColor='black'
+                                                maxLength={6}
+                                                value={machineShifts.area}
+                                                onChangeText={text =>
+                                                    handleHoursChange(
+                                                        index,
+                                                        text,
+                                                    )
+                                                }
+                                            />
+                                            {showWarning && (
+                                                <View
+                                                    style={{
+                                                        gap: 0,
+                                                        marginBottom: 10,
+                                                    }}>
+                                                    <Text
+                                                        style={
+                                                            styles.warningText
+                                                        }>
+                                                        Diện tích không được
+                                                        vượt quá {gardenArea}{' '}
+                                                        {gardenAreaType}
+                                                    </Text>
+
+                                                    {/* <Text
                                                     style={[
                                                         styles.warningText,
                                                         {marginTop: 0},
@@ -151,12 +180,22 @@ const MachineShiftSelector: React.FC<Props> = ({
                                                     Diện tích đã làm:{' '}
                                                     {processingRate}{' '}
                                                     {gardenAreaType}
-                                                </Text>
-                                            </View>
-                                        )}
-                                    </>
-                                ) : null}
-                            </View>
+                                                </Text> */}
+                                                </View>
+                                            )}
+                                        </>
+                                    ) : null}
+                                </View>
+                            ) : (
+                                <Text
+                                    style={{
+                                        color: 'red',
+                                        fontStyle: 'italic',
+                                        marginBottom: 8,
+                                    }}>
+                                    Hãy chọn khu vườn cần làm
+                                </Text>
+                            )}
                         </CollapsibleTaskBlock>
                     );
                 })}

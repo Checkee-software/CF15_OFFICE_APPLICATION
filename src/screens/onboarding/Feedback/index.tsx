@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback} from 'react';
 import {
     View,
     Text,
@@ -22,6 +22,13 @@ export default function FeedbackScreen({navigation}: any) {
     const {feedbacks, fetchFeedbacks, isLoading, getFullAvatarUrl} =
         useFeedbackStore();
 
+    let hasFeedbackEditPermission = true;
+    if (userInfo.userType.level !== EOrganization.WORKER) {
+        hasFeedbackEditPermission = userInfo.functions.some(
+            (item: any) => item._id === 'FEEDBACK' && item.edit,
+        );
+    }
+
     const fetchData = async () => {
         try {
             await fetchFeedbacks();
@@ -37,14 +44,8 @@ export default function FeedbackScreen({navigation}: any) {
         }, []),
     );
 
-    useEffect(() => {
-        console.log('FEEDBACKS_RECEIVED:', feedbacks);
-    }, [feedbacks]);
-
     const renderItem = ({item}: any) => {
         const avatarUrl = getFullAvatarUrl(item.avatar) || images.avatar;
-
-        console.log(item);
 
         return (
             <View style={styles.itemContainer}>
@@ -59,11 +60,7 @@ export default function FeedbackScreen({navigation}: any) {
                         <Text style={styles.name}>
                             {item.fullName || 'Không rõ tên'}
                         </Text>
-                        <Text style={styles.role}>
-                            {item.level === EOrganization.LEADER
-                                ? item.roleName
-                                : item.role || 'Không rõ vai trò'}
-                        </Text>
+                        <Text style={styles.role}>{item.roleName}</Text>
                     </View>
                 </View>
                 <Text style={styles.title}>{item.title}</Text>
@@ -93,21 +90,22 @@ export default function FeedbackScreen({navigation}: any) {
                 }
             />
 
-            {userInfo.userType.level !== EOrganization.MANAGEMENT && (
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() =>
-                        navigation.navigate(SCREEN_INFO.FEEDBACK1.key)
-                    }>
-                    <MaterialCommunityIcons
-                        name='pencil'
-                        size={18}
-                        color='#fff'
-                        style={styles.icon}
-                    />
-                    <Text style={styles.buttonText}>Tạo góp ý</Text>
-                </TouchableOpacity>
-            )}
+            {userInfo.userType.level !== EOrganization.MANAGEMENT &&
+                hasFeedbackEditPermission && (
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() =>
+                            navigation.navigate(SCREEN_INFO.FEEDBACK1.key)
+                        }>
+                        <MaterialCommunityIcons
+                            name='pencil'
+                            size={18}
+                            color='#fff'
+                            style={styles.icon}
+                        />
+                        <Text style={styles.buttonText}>Tạo góp ý</Text>
+                    </TouchableOpacity>
+                )}
         </View>
     );
 }

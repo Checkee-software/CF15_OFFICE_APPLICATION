@@ -52,19 +52,36 @@ export default function Profile({navigation}: any) {
                             )}
                         </Text>
 
-                        <View style={styles.divider} />
+                        {userInfo.userType.level !== EOrganization.ADMIN &&
+                            userInfo.userType.level !==
+                                EOrganization.MANAGEMENT && (
+                                <>
+                                    <View style={styles.divider} />
 
-                        <Text style={styles.sectionLabel}>Công việc</Text>
+                                    <Text style={styles.sectionLabel}>
+                                        Công việc
+                                    </Text>
 
-                        <View style={styles.jobStats}>
-                            {renderStat('Tổng', userInfo.tasks.total)}
-                            {renderStat(
-                                'Hoàn thành',
-                                userInfo.tasks.compeleted,
+                                    <View style={styles.jobStats}>
+                                        {renderStat(
+                                            'Tổng',
+                                            userInfo.tasks.total,
+                                        )}
+                                        {renderStat(
+                                            'Hoàn thành',
+                                            userInfo.tasks.compeleted,
+                                        )}
+                                        {renderStat(
+                                            'Đang làm',
+                                            userInfo.tasks.processing,
+                                        )}
+                                        {renderStat(
+                                            'Thất bại',
+                                            userInfo.tasks.expired,
+                                        )}
+                                    </View>
+                                </>
                             )}
-                            {renderStat('Đang làm', userInfo.tasks.processing)}
-                            {renderStat('Thất bại', userInfo.tasks.expired)}
-                        </View>
                     </View>
 
                     <View style={styles.buttonGroup}>
@@ -113,7 +130,7 @@ export default function Profile({navigation}: any) {
                                               'Đội sản xuất',
                                               //{userInfo.userType.unit}
                                               `${
-                                                  userInfo.userType.unit === ''
+                                                  userInfo.groupName === ''
                                                       ? 'Chưa cập nhật'
                                                       : userInfo.groupName
                                               }`,

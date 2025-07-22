@@ -46,7 +46,6 @@ export const useWorkerStore = create<DocumentStore>(set => ({
     listWorkerFilterByRole: [],
 
     getListWorkerByDepartment: async (userId: string, userLevel: string) => {
-        console.log(userLevel);
         set({isLoading: true});
         //await new Promise(resolve => setTimeout(resolve, 1 * 10000));
         try {
@@ -67,12 +66,17 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                 );
 
                 if (userLevel === 'DEPARTMENT') {
-                    const filterLeaders = updateImgPathListWorker.filter(
+                    const filterManagements = updateImgPathListWorker.filter(
+                        (item: {userType: {level: string}}) =>
+                            item.userType.level !== 'MANAGEMENT',
+                    );
+
+                    const filterLeaders = filterManagements.filter(
                         (user: {userType: {level: string}}) =>
                             user.userType.level === 'LEADER',
                     );
 
-                    const filterWorkers = updateImgPathListWorker.filter(
+                    const filterWorkers = filterManagements.filter(
                         (user: {
                             _id: string;
                             userType: {_id: string; level: string};
@@ -105,17 +109,22 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     ];
 
                     set({
-                        listWorker: updateImgPathListWorker,
+                        listWorker: filterManagements,
                         listWorkerFilterByRole: newListWorker,
                     });
                 } else {
-                    const filterManagements = updateImgPathListWorker.filter(
+                    const filterLeaders = updateImgPathListWorker.filter(
+                        (item: {userType: {level: string}}) =>
+                            item.userType.level !== 'LEADER',
+                    );
+
+                    const filterManagements = filterLeaders.filter(
                         (user: {_id: string; userType: {level: string}}) =>
                             user.userType.level === 'MANAGEMENT' &&
                             user._id !== userId,
                     );
 
-                    const filterDepartment = updateImgPathListWorker.filter(
+                    const filterDepartment = filterLeaders.filter(
                         (user: {
                             _id: string;
                             userType: {_id: string; level: string};
@@ -148,7 +157,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     ];
 
                     set({
-                        listWorker: updateImgPathListWorker,
+                        listWorker: filterLeaders,
                         listWorkerFilterByRole: newListWorker,
                     });
                 }

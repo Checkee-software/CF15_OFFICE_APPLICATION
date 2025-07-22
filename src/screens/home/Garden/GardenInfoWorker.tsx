@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useCallback, useEffect, useState} from 'react';
 import {
@@ -6,15 +7,13 @@ import {
     StyleSheet,
     TouchableOpacity,
     Image,
-    FlatList,
     TextInput,
-    ScrollView,
 } from 'react-native';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
-import {IGarden} from '@/shared-types/Response/GardenResponse/GardenResponse';
+import {IGarden} from '../../../stores/gardenStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {useAuthStore} from '../../../stores/authStore';
@@ -44,9 +43,9 @@ const GardenInfoWorker = () => {
         route.params?.navigateNext ?? SCREEN_INFO.GARDENWORKER.key;
 
     const handleNavigate = (code: string) => {
-        setShowInputGardenName({
+        setGardenNameInput({
             _id: '',
-            check: false,
+            name: '',
         });
         setShowInputGardenName({_id: '', check: false});
 
@@ -120,7 +119,7 @@ const GardenInfoWorker = () => {
                     garden.code
                         .toLowerCase()
                         .includes(searchText.toLowerCase()) ||
-                    garden.gardenNickname
+                    (garden.gardenNickname ?? '')
                         .toLowerCase()
                         .includes(searchText.toLowerCase()),
             );
@@ -148,7 +147,7 @@ const GardenInfoWorker = () => {
                                 padding: 0,
                                 margin: 0,
                             }}
-                            placeholder='Bạn hãy đặt tên khu vườn'
+                            placeholder='Hãy đặt tên khu vườn'
                             placeholderTextColor={'black'}
                             autoFocus={
                                 gardenNameInput._id === item._id ? true : false
@@ -182,7 +181,7 @@ const GardenInfoWorker = () => {
 
             {showInputGardenName._id === item._id ? (
                 <TouchableOpacity onPress={saveGardenName}>
-                    <FontAwesome name='check' size={24} color={'#2196F3'} />
+                    <FontAwesome name='check' size={28} color={'#2196F3'} />
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity
@@ -198,7 +197,7 @@ const GardenInfoWorker = () => {
                                     : '',
                             });
                     }}>
-                    <FontAwesome name='pencil' size={24} color={'#FF4E45'} />
+                    <FontAwesome name='pencil' size={28} color={'#FF4E45'} />
                 </TouchableOpacity>
             )}
         </TouchableOpacity>

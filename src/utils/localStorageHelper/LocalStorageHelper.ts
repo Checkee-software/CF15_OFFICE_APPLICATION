@@ -42,11 +42,11 @@ export default class LocalStorageHelper {
     private save = async () => {
         try {
             const data = JSON.stringify(this.data);
-            console.log('token-data: ', data);
+            //console.log('token-data: ', data);
             await AsyncStorage.setItem(STORAGE_KEY, data);
-            console.log('💾 LocalStorageHelper saved');
+            //console.log('💾 LocalStorageHelper saved');
         } catch (e) {
-            console.log(e);
+            //console.log(e);
         }
     };
 
@@ -72,7 +72,7 @@ export default class LocalStorageHelper {
     };
 
     private load = async () => {
-        console.log('💾 LocalStorageHelper loading');
+        //console.log('💾 LocalStorageHelper loading');
         this._isLoad = true;
         const strData = await AsyncStorage.getItem(STORAGE_KEY);
 
@@ -87,7 +87,7 @@ export default class LocalStorageHelper {
 
             this.data = _data;
             this._isLoad = false;
-            console.log('💾 LocalStorageHelper loaded');
+            //console.log('💾 LocalStorageHelper loaded');
             return;
         } catch {
             this._isLoad = false;

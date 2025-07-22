@@ -29,6 +29,7 @@ import Loading from '@/screens/subscreen/Loading';
 import ENV from '@/config/ENV';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import {useWindowDimensions} from 'react-native';
+import {EStatus} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
 
 const ScheduleDetail = ({route}: any) => {
     const {userInfo} = useAuthStore();
@@ -187,12 +188,6 @@ const ScheduleDetail = ({route}: any) => {
         return `Còn ${days} ngày, ${hours} giờ ${minutes} phút`;
     };
 
-    const renderTaskEndIn = (finishedDate: string) => {
-        const day = moment(finishedDate).format('L');
-        const hour = moment(finishedDate).format('LT');
-        return `${hour} ${day}`;
-    };
-
     const renderItemAttachedFiles = (itemAttachedFiles: AttachedFiles) => (
         <View style={ScheduleDetailStyles.cardDocument}>
             <View style={ScheduleDetailStyles.leftCardDocument}>
@@ -263,69 +258,65 @@ const ScheduleDetail = ({route}: any) => {
         </View>
     );
 
-    const renderMachinesHistory = (itemMachinesHistory: any) => (
-        <View style={ScheduleDetailStyles.historyInfo}>
-            <Text style={ScheduleDetailStyles.historyInfoLabel}>
-                {itemMachinesHistory.name}
-            </Text>
+    // const renderMachinesHistory = (itemMachinesHistory: any) => (
+    //     <View style={ScheduleDetailStyles.historyInfo}>
+    //         <Text style={ScheduleDetailStyles.historyInfoLabel}>
+    //             {itemMachinesHistory.name}
+    //         </Text>
 
-            {itemMachinesHistory.history ? (
-                <View style={{gap: 20}}>
-                    {itemMachinesHistory.history.map((item: any) => (
-                        <View
-                            key={item._id}
-                            style={{
-                                gap: 4,
-                            }}>
-                            <View
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    width: '100%',
-                                    marginTop: 5,
-                                }}>
-                                <Text style={{flex: 1, textAlign: 'center'}}>
-                                    Bắt đầu
-                                </Text>
-                                <Text style={{flex: 1, textAlign: 'center'}}>
-                                    Kết thúc
-                                </Text>
-                            </View>
-                            <Text style={{textAlign: 'center'}}>
-                                {moment(item.startAt).format(
-                                    'HH:mm DD/MM/YYYY',
-                                )}{' '}
-                                -{' '}
-                                {item.endAt
-                                    ? moment(item.endAt).format(
-                                          'HH:mm DD/MM/YYYY',
-                                      )
-                                    : ''}
-                            </Text>
-                        </View>
-                    ))}
-                </View>
-            ) : (
-                <Text
-                    style={[
-                        ScheduleDetailStyles.historyInfoValue,
-                        {width: '100%'},
-                    ]}>
-                    Không có lịch sử hoạt động
-                </Text>
-            )}
-        </View>
-    );
+    //         {itemMachinesHistory.history ? (
+    //             <View style={{gap: 20}}>
+    //                 {itemMachinesHistory.history.map((item: any) => (
+    //                     <View
+    //                         key={item._id}
+    //                         style={{
+    //                             gap: 4,
+    //                         }}>
+    //                         <View
+    //                             style={{
+    //                                 flexDirection: 'row',
+    //                                 alignItems: 'center',
+    //                                 width: '100%',
+    //                                 marginTop: 5,
+    //                             }}>
+    //                             <Text style={{flex: 1, textAlign: 'center'}}>
+    //                                 Bắt đầu
+    //                             </Text>
+    //                             <Text style={{flex: 1, textAlign: 'center'}}>
+    //                                 Kết thúc
+    //                             </Text>
+    //                         </View>
+    //                         <Text style={{textAlign: 'center'}}>
+    //                             {moment(item.startAt).format(
+    //                                 'HH:mm DD/MM/YYYY',
+    //                             )}{' '}
+    //                             -{' '}
+    //                             {item.endAt
+    //                                 ? moment(item.endAt).format(
+    //                                       'HH:mm DD/MM/YYYY',
+    //                                   )
+    //                                 : ''}
+    //                         </Text>
+    //                     </View>
+    //                 ))}
+    //             </View>
+    //         ) : (
+    //             <Text
+    //                 style={[
+    //                     ScheduleDetailStyles.historyInfoValue,
+    //                     {width: '100%'},
+    //                 ]}>
+    //                 Không có lịch sử hoạt động
+    //             </Text>
+    //         )}
+    //     </View>
+    // );
 
     const renderChildTaskForWorker = (itemChildTask: any) => (
         <View style={ScheduleDetailStyles.childTaskInfo}>
             <Text style={ScheduleDetailStyles.taskTitle}>
                 {itemChildTask.name}
             </Text>
-
-            {/* <Text style={ScheduleDetailStyles.taskEndIn}>
-                {`Kết thúc vào ${renderTaskEndIn(itemChildTask.finishedTime)}`}
-            </Text> */}
 
             <FlatList
                 scrollEnabled={false}
@@ -596,169 +587,40 @@ const ScheduleDetail = ({route}: any) => {
                     </View>
                 </View>
             )}
-
-            {/* <Text style={ScheduleDetailStyles.taskEndIn}>
-                {`Kết thúc vào ${renderTaskEndIn(itemChildTask.finishedTime)}`}
-            </Text> */}
         </View>
     );
 
-    const renderLabour = (itemChildTask: any) => (
-        <View style={ScheduleDetailStyles.listProcesses}>
-            <View
-                style={{
-                    marginBottom: 15,
-                }}>
-                <FlatList
-                    horizontal
-                    data={processesTitle}
-                    keyExtractor={item => item.name}
-                    renderItem={({item, index}) => (
-                        <View
-                            style={{
-                                width: 108,
-                                alignItems: 'flex-start',
-                                justifyContent: 'flex-start',
-                            }}>
-                            <View>
-                                <Text
-                                    style={{
-                                        fontSize: 12,
-                                        fontWeight: 500,
-                                        textAlign:
-                                            index === 4 || index === 5
-                                                ? 'right'
-                                                : 'left',
-                                    }}>
-                                    {item.name}
-                                </Text>
-
-                                <View style={{marginVertical: 5}}>
-                                    <Text
-                                        style={{
-                                            fontSize: 12,
-                                            fontWeight: 400,
-                                            textAlign:
-                                                index === 0 || index === 1
-                                                    ? 'left'
-                                                    : index === 3 || index === 4
-                                                    ? 'right'
-                                                    : 'center',
-                                            color:
-                                                index === 0
-                                                    ? '#2196F3'
-                                                    : 'black',
-                                        }}>
-                                        {index === 0
-                                            ? 'Nhân công'
-                                            : index === 1
-                                            ? itemChildTask.labour.name
-                                            : index === 2
-                                            ? itemChildTask.labour.value
-                                            : index === 3
-                                            ? formatNumber(
-                                                  itemChildTask.labour.cost,
-                                              )
-                                            : formatNumber(
-                                                  itemChildTask.labour.cost *
-                                                      itemChildTask.labour
-                                                          .value,
-                                              )}
-                                    </Text>
-                                </View>
-
-                                {itemChildTask.materials.length !== 0 && (
-                                    <View style={{marginVertical: 5}}>
-                                        {itemChildTask.materials.map(
-                                            (itemMaterials: any) => (
-                                                <Text
-                                                    key={itemMaterials._id}
-                                                    style={{
-                                                        fontSize: 12,
-                                                        fontWeight: 400,
-                                                        textAlign:
-                                                            index === 0 ||
-                                                            index === 1
-                                                                ? 'left'
-                                                                : index === 3 ||
-                                                                  index === 4
-                                                                ? 'right'
-                                                                : 'center',
-                                                    }}>
-                                                    {index === 0
-                                                        ? 'Vật tư'
-                                                        : index === 1
-                                                        ? itemMaterials.name
-                                                        : index === 2
-                                                        ? itemMaterials.value
-                                                        : index === 3
-                                                        ? formatNumber(
-                                                              itemMaterials.cost,
-                                                          )
-                                                        : formatNumber(
-                                                              itemMaterials.cost *
-                                                                  itemMaterials.value,
-                                                          )}
-                                                </Text>
-                                            ),
-                                        )}
-                                    </View>
-                                )}
-
-                                {itemChildTask.machines.length !== 0 && (
-                                    <View style={{marginVertical: 5}}>
-                                        {itemChildTask.machines.map(
-                                            (itemMachines: any) => (
-                                                <Text
-                                                    key={itemMachines._id}
-                                                    style={{
-                                                        fontSize: 12,
-                                                        fontWeight: 400,
-                                                        textAlign:
-                                                            index === 0 ||
-                                                            index === 1
-                                                                ? 'left'
-                                                                : index === 3 ||
-                                                                  index === 4
-                                                                ? 'right'
-                                                                : 'center',
-                                                        color:
-                                                            index === 0
-                                                                ? '#2196F3'
-                                                                : 'black',
-                                                    }}>
-                                                    {index === 0
-                                                        ? 'Ca máy'
-                                                        : index === 1
-                                                        ? itemMachines.name
-                                                        : index === 2
-                                                        ? itemMachines.value
-                                                        : index === 3
-                                                        ? formatNumber(
-                                                              itemMachines.cost,
-                                                          )
-                                                        : formatNumber(
-                                                              itemMachines.cost *
-                                                                  itemMachines.value,
-                                                          )}
-                                                </Text>
-                                            ),
-                                        )}
-                                    </View>
-                                )}
-                            </View>
-                        </View>
-                    )}
-                />
-            </View>
-        </View>
-    );
+    const checkAccess = () => {
+        if (userInfo.userType.level === EOrganization.WORKER) {
+            getScheduleDetail(route.params._id);
+        } else {
+            if (
+                userInfo.functions.some(
+                    (item: any) => item._id === 'SCHEDULE' && item.detail,
+                )
+            ) {
+                getScheduleDetail(route.params._id);
+            } else {
+                return (
+                    <View
+                        style={[
+                            ScheduleDetailStyles.container,
+                            {justifyContent: 'center', alignItems: 'center'},
+                        ]}>
+                        <Text style={ScheduleDetailStyles.mainWorkTitle}>
+                            Bạn không có quyền xem chi tiết tài liệu
+                        </Text>
+                    </View>
+                );
+            }
+        }
+    };
 
     useEffect(() => {
-        getScheduleDetail(route.params._id);
+        checkAccess();
     }, []);
 
-    console.log(scheduleDetail);
+    //console.log(scheduleDetail);
 
     if (isLoadingGet) return <Loading />;
 
@@ -773,8 +635,54 @@ const ScheduleDetail = ({route}: any) => {
                     {scheduleDetail?.title}
                 </Text>
 
-                {userInfo.userType.level === EOrganization.DEPARTMENT && (
+                {(userInfo.userType.level === EOrganization.LEADER ||
+                    userInfo.userType.level === EOrganization.DEPARTMENT) && (
                     <>
+                        {userInfo.userType.level === EOrganization.LEADER && (
+                            <View
+                                style={[
+                                    ScheduleDetailStyles.mainWorkProgressSection,
+                                    {
+                                        borderBottomWidth: 1.5,
+                                        borderStyle: 'dashed',
+                                        borderBottomColor: '#d3d3d3',
+                                        paddingBottom: 10,
+                                    },
+                                ]}>
+                                <View style={ScheduleDetailStyles.warpMainWork}>
+                                    <Text
+                                        style={
+                                            ScheduleDetailStyles.mainWorkSummary
+                                        }>
+                                        Số CBQL/NLĐ
+                                    </Text>
+                                    <Text
+                                        style={ScheduleDetailStyles.statusText}>
+                                        {`${
+                                            scheduleDetail?.followers?.length ??
+                                            0
+                                        }/${
+                                            scheduleDetail?.employees?.length ??
+                                            0
+                                        }`}
+                                    </Text>
+                                </View>
+
+                                <View style={ScheduleDetailStyles.warpMainWork}>
+                                    <Text
+                                        style={
+                                            ScheduleDetailStyles.mainWorkSummary
+                                        }>
+                                        Tổng số quy trình làm việc
+                                    </Text>
+                                    <Text
+                                        style={ScheduleDetailStyles.statusText}>
+                                        {scheduleDetail?.childTasks.length}
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+
                         <Text
                             style={[
                                 ScheduleDetailStyles.timeWorkEnd,
@@ -864,141 +772,45 @@ const ScheduleDetail = ({route}: any) => {
                                         {scheduleDetail?.createdUser}
                                     </Text>
                                 </View>
-                            </View>
-                        </View>
-                    </>
-                )}
 
-                {userInfo.userType.level === EOrganization.LEADER && (
-                    <>
-                        <View
-                            style={[
-                                ScheduleDetailStyles.mainWorkProgressSection,
-                                {
-                                    borderBottomWidth: 1.5,
-                                    borderStyle: 'dashed',
-                                    borderBottomColor: '#d3d3d3',
-                                    paddingBottom: 10,
-                                },
-                            ]}>
-                            <View style={ScheduleDetailStyles.warpMainWork}>
-                                <Text
-                                    style={
-                                        ScheduleDetailStyles.mainWorkSummary
-                                    }>
-                                    Số CBQL/NLĐ
-                                </Text>
-                                <Text style={ScheduleDetailStyles.statusText}>
-                                    {`${
-                                        scheduleDetail?.followers?.length ?? 0
-                                    }/${
-                                        scheduleDetail?.employees?.length ?? 0
-                                    }`}
-                                </Text>
-                            </View>
+                                {scheduleDetail?.materialsByStaff.length !==
+                                    0 && (
+                                    <View style={{marginTop: 12, gap: 5}}>
+                                        <Text
+                                            style={
+                                                ScheduleDetailStyles.generalInfoText
+                                            }>
+                                            Đầu tư tăng thêm
+                                        </Text>
 
-                            <View style={ScheduleDetailStyles.warpMainWork}>
-                                <Text
-                                    style={
-                                        ScheduleDetailStyles.mainWorkSummary
-                                    }>
-                                    Tổng số quy trình làm việc
-                                </Text>
-                                <Text style={ScheduleDetailStyles.statusText}>
-                                    {scheduleDetail?.childTasks.length}
-                                </Text>
-                            </View>
-                        </View>
-
-                        <Text
-                            style={[
-                                ScheduleDetailStyles.timeWorkEnd,
-                                {marginTop: 8, marginBottom: 4},
-                            ]}>
-                            {renderScheduleRemain(
-                                moment(scheduleDetail?.finishedDate).format(
-                                    'L',
-                                ),
-                            )}
-                        </Text>
-
-                        <View style={ScheduleDetailStyles.workInfoSection}>
-                            <View style={ScheduleDetailStyles.generalInfo}>
-                                <Text
-                                    style={
-                                        ScheduleDetailStyles.generalInfoText
-                                    }>
-                                    Thông tin chung
-                                </Text>
-
-                                <View
-                                    style={ScheduleDetailStyles.warpLabelValue}>
-                                    <Text
-                                        style={ScheduleDetailStyles.infoLabel}>
-                                        Cây trồng
-                                    </Text>
-
-                                    <Text
-                                        style={ScheduleDetailStyles.infoValue}>
-                                        {scheduleDetail?.productTypeName}
-                                    </Text>
-                                </View>
-
-                                <View
-                                    style={ScheduleDetailStyles.warpLabelValue}>
-                                    <Text
-                                        style={ScheduleDetailStyles.infoLabel}>
-                                        Khu vườn
-                                    </Text>
-
-                                    <Text
-                                        style={ScheduleDetailStyles.infoValue}>
-                                        {scheduleDetail?.productName}
-                                    </Text>
-                                </View>
-
-                                <View
-                                    style={ScheduleDetailStyles.warpLabelValue}>
-                                    <Text
-                                        style={ScheduleDetailStyles.infoLabel}>
-                                        Ngày bắt đầu
-                                    </Text>
-
-                                    <Text
-                                        style={ScheduleDetailStyles.infoValue}>
-                                        {moment(
-                                            scheduleDetail?.startedDate,
-                                        ).format('L')}
-                                    </Text>
-                                </View>
-
-                                <View
-                                    style={ScheduleDetailStyles.warpLabelValue}>
-                                    <Text
-                                        style={ScheduleDetailStyles.infoLabel}>
-                                        Ngày kết thúc
-                                    </Text>
-
-                                    <Text
-                                        style={ScheduleDetailStyles.infoValue}>
-                                        {moment(
-                                            scheduleDetail?.finishedDate,
-                                        ).format('L')}
-                                    </Text>
-                                </View>
-
-                                <View
-                                    style={ScheduleDetailStyles.warpLabelValue}>
-                                    <Text
-                                        style={ScheduleDetailStyles.infoLabel}>
-                                        Người tạo việc
-                                    </Text>
-
-                                    <Text
-                                        style={ScheduleDetailStyles.infoValue}>
-                                        {scheduleDetail?.createdUser}
-                                    </Text>
-                                </View>
+                                        {scheduleDetail?.materialsByStaff
+                                            .filter(
+                                                (item: any) =>
+                                                    item.status ===
+                                                    EStatus.CONFIRMED,
+                                            )
+                                            .map((item: any) => (
+                                                <Text
+                                                    style={[
+                                                        ScheduleDetailStyles.infoLabel,
+                                                        {width: '100%'},
+                                                    ]}
+                                                    key={item._id}>{`${
+                                                    item.name
+                                                }: ${' '} ${item.value} ${
+                                                    item.unit
+                                                } = ${new Intl.NumberFormat(
+                                                    'vi-VN',
+                                                    {
+                                                        style: 'currency',
+                                                        currency: 'VND',
+                                                    },
+                                                ).format(
+                                                    item?.price ?? 0,
+                                                )}`}</Text>
+                                            ))}
+                                    </View>
+                                )}
                             </View>
                         </View>
                     </>
@@ -1180,7 +992,9 @@ const ScheduleDetail = ({route}: any) => {
                                                     .filter(
                                                         (item: any) =>
                                                             item.staffId ===
-                                                            userInfo._id,
+                                                                userInfo._id &&
+                                                            item.status ===
+                                                                EStatus.CONFIRMED,
                                                     )
                                                     .map((item: any) => (
                                                         <Text
@@ -1222,7 +1036,7 @@ const ScheduleDetail = ({route}: any) => {
                     </Text>
                 </View>
 
-                {scheduleDetail?.files.length !== 0 ? (
+                {scheduleDetail?.files.length !== 0 && (
                     <View style={ScheduleDetailStyles.attachedFile}>
                         <Text
                             style={
@@ -1237,25 +1051,23 @@ const ScheduleDetail = ({route}: any) => {
                             }
                         />
                     </View>
-                ) : null}
+                )}
 
                 <View style={ScheduleDetailStyles.listAccordion}>
-                    {userInfo.userType.level !== EOrganization.DEPARTMENT && (
-                        <List.Accordion
-                            titleStyle={ScheduleDetailStyles.titleAccordion1}
-                            title={`Cán bộ quản lý (${scheduleDetail?.followers?.length})`}
-                            style={ScheduleDetailStyles.boxAccordion}
-                            id='1'>
-                            <FlatList
-                                scrollEnabled={false}
-                                data={scheduleDetail?.followers as any}
-                                renderItem={({item, index}) =>
-                                    renderStaff(item, index)
-                                }
-                                keyExtractor={item => item._id}
-                            />
-                        </List.Accordion>
-                    )}
+                    <List.Accordion
+                        titleStyle={ScheduleDetailStyles.titleAccordion1}
+                        title={`Cán bộ quản lý (${scheduleDetail?.followers?.length})`}
+                        style={ScheduleDetailStyles.boxAccordion}
+                        id='1'>
+                        <FlatList
+                            scrollEnabled={false}
+                            data={scheduleDetail?.followers as any}
+                            renderItem={({item, index}) =>
+                                renderStaff(item, index)
+                            }
+                            keyExtractor={item => item._id}
+                        />
+                    </List.Accordion>
 
                     {userInfo.userType.level === EOrganization.LEADER && (
                         <>
@@ -1265,7 +1077,7 @@ const ScheduleDetail = ({route}: any) => {
                                 }
                                 title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}
                                 style={ScheduleDetailStyles.boxAccordion}
-                                id='3'>
+                                id='2'>
                                 <View
                                     style={ScheduleDetailStyles.listChildTasks}>
                                     <FlatList
@@ -1286,7 +1098,7 @@ const ScheduleDetail = ({route}: any) => {
                                     }
                                     title={`Người lao động (${scheduleDetail?.employees?.length})`}
                                     style={ScheduleDetailStyles.boxAccordion}
-                                    id='2'>
+                                    id='3'>
                                     <FlatList
                                         scrollEnabled={false}
                                         data={scheduleDetail?.employees as any}
@@ -1298,6 +1110,25 @@ const ScheduleDetail = ({route}: any) => {
                                 </List.Accordion>
                             )}
                         </>
+                    )}
+
+                    {userInfo.userType.level === EOrganization.DEPARTMENT && (
+                        <List.Accordion
+                            titleStyle={ScheduleDetailStyles.titleAccordion2}
+                            title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}
+                            style={ScheduleDetailStyles.boxAccordion}
+                            id='2'>
+                            <View style={ScheduleDetailStyles.listChildTasks}>
+                                <FlatList
+                                    scrollEnabled={false}
+                                    data={scheduleDetail?.childTasks as any}
+                                    renderItem={({item}) =>
+                                        renderChildTask(item)
+                                    }
+                                    keyExtractor={item => item._id}
+                                />
+                            </View>
+                        </List.Accordion>
                     )}
 
                     {/* <List.Accordion
@@ -1316,64 +1147,6 @@ const ScheduleDetail = ({route}: any) => {
                             />
                         </View>
                     </List.Accordion> */}
-
-                    {/* <List.Accordion
-                        titleStyle={ScheduleDetailStyles.titleAccordion2}
-                        title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}
-                        style={ScheduleDetailStyles.boxAccordion}
-                        id='3'>
-                        <View style={ScheduleDetailStyles.listChildTasks}>
-                            <FlatList
-                                scrollEnabled={false}
-                                data={scheduleDetail?.childTasks as any}
-                                renderItem={({item}) => renderChildTask(item)}
-                                keyExtractor={item => item._id}
-                            />
-                        </View>
-                    </List.Accordion> */}
-                </View>
-
-                <View style={ScheduleDetailStyles.listAccordion}>
-                    {userInfo.userType.level === EOrganization.DEPARTMENT && (
-                        <>
-                            <List.Accordion
-                                titleStyle={
-                                    ScheduleDetailStyles.titleAccordion1
-                                }
-                                title={`Cán bộ quản lý (${scheduleDetail?.followers?.length})`}
-                                style={ScheduleDetailStyles.boxAccordion}
-                                id='1'>
-                                <FlatList
-                                    scrollEnabled={false}
-                                    data={scheduleDetail?.followers as any}
-                                    renderItem={({item, index}) =>
-                                        renderStaff(item, index)
-                                    }
-                                    keyExtractor={item => item._id}
-                                />
-                            </List.Accordion>
-
-                            <List.Accordion
-                                titleStyle={
-                                    ScheduleDetailStyles.titleAccordion2
-                                }
-                                title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}
-                                style={ScheduleDetailStyles.boxAccordion}
-                                id='3'>
-                                <View
-                                    style={ScheduleDetailStyles.listChildTasks}>
-                                    <FlatList
-                                        scrollEnabled={false}
-                                        data={scheduleDetail?.childTasks as any}
-                                        renderItem={({item}) =>
-                                            renderChildTask(item)
-                                        }
-                                        keyExtractor={item => item._id}
-                                    />
-                                </View>
-                            </List.Accordion>
-                        </>
-                    )}
                 </View>
 
                 <Modal visible={openModal} animationType='slide'>
@@ -1396,7 +1169,12 @@ const ScheduleDetail = ({route}: any) => {
 
                         <View style={{marginVertical: 10}}>
                             <FlatList
-                                data={dataWorkerRenderForLeader}
+                                data={
+                                    dataWorkerRenderForLeader as Array<{
+                                        userId: string;
+                                        [key: string]: any;
+                                    }>
+                                }
                                 keyExtractor={item => item.userId}
                                 renderItem={(itemStaff: any) => (
                                     <View
@@ -1451,7 +1229,9 @@ const ScheduleDetail = ({route}: any) => {
                                                               .status ===
                                                           ETaskStatus.CANCELED
                                                         ? ScheduleDetailStyles.participantStatus3
-                                                        : ETaskStatus.PROCESSING
+                                                        : itemStaff.item
+                                                              .status ===
+                                                          ETaskStatus.PROCESSING
                                                         ? ScheduleDetailStyles.participantStatus2
                                                         : ScheduleDetailStyles.participantStatus4,
                                                 ]}>

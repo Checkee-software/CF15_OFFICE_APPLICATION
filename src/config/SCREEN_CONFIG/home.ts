@@ -6,6 +6,11 @@ const HOME_SCREENS = {
         headerTitle: 'CF15 OFFICE',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    BROWSEADDMATERIALS: {
+        key: 'BROWSEADDMATERIALS',
+        headerTitle: 'ĐẦU TƯ TĂNG THÊM',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     NOTIFICATION: {
         key: 'NOTIFICATION',
         headerTitle: 'THÔNG BÁO',

@@ -1,7 +1,6 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import {IGarden} from '@/shared-types/Response/GardenResponse/GardenResponse';
 import {
     THarvestHistory,
     TCollection,
@@ -9,9 +8,40 @@ import {
 } from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
 import ENV from '@/config/ENV';
 import asyncStorageHelper from '../utils/localStorageHelper/index';
+import {
+    IArea,
+    ILocation,
+    IManagement,
+    ISidePlant,
+    ITotalProductByYear,
+} from '@/shared-types/Response/GardenResponse/GardenResponse';
+
+export interface IGarden {
+    _id: string /* Id khu vườn */;
+    groupId: string /* Id nhom khu vồn */;
+    name: string /* Tên khu vườn */;
+    code: string /* Mã khu vườn */;
+    area: IArea /* Diện tích thực khu vườn */;
+    location: ILocation /* Vị trí khu vườn */;
+    management: IManagement /* Ban quản lý khu vườn */;
+    productId: string /* Id sản phẩm/cây trồng */;
+    productTypeId: string /* Id loại sản phẩm/cây trồng */;
+    productQuantity: number /* Số lượng sản phẩm/cây trồng */;
+    totalProductByYear: ITotalProductByYear[] /* Số cây trồng theo năm */;
+    isSidePlant: boolean /* Có cây trồng xen không? */;
+    sidePlants: ISidePlant[] /* Danh sách cây trồng xen */;
+    lifeEnd: Date /* Vòng đời kết thúc */;
+    currentLife: number /* Vòng đời hiện tại */;
+    isHarvest: boolean /* Có đang thu hoạch không */;
+    currentHarvestId: string /* Id thu hoạch hiện tại */;
+    createdAt?: Date;
+    gardenNickname?: string;
+    note: string;
+}
 
 type GardenState = {
     gardens: IGarden[] | [];
+    gardenDetail: IGarden | null;
     selectedGarden: IGarden | null;
     isLoading: boolean;
     isLoading2: boolean;
@@ -25,13 +55,14 @@ type GardenState = {
     ) => Promise<void>;
     postHarvestReport: (_id: string, amount: number) => Promise<void>;
     harvestHistory: IHavestHistory[];
-
     fetchHarvestHistory: (_id: string) => Promise<void>;
     fetchHarvestCollection: (_id: string) => Promise<void>;
+    setGardenData: (newGardens: any) => void;
 };
 
 const useGardenStore = create<GardenState>(set => ({
     gardens: [],
+    gardenDetail: null,
     selectedGarden: null,
     isLoading: false,
     isLoading2: false,
@@ -117,13 +148,13 @@ const useGardenStore = create<GardenState>(set => ({
                 gardenNickname: findGarden?.gardenNickname,
             };
 
-            set({gardens: newDetailGardenNickname || null});
+            set({gardenDetail: newDetailGardenNickname || null});
         } catch (error: any) {
             Snackbar.show({
                 text: 'Không thể tìm thấy khu vườn',
                 duration: Snackbar.LENGTH_SHORT,
             });
-            set({gardens: null});
+            set({gardens: []});
         } finally {
             set({isLoading: false});
         }

@@ -12,10 +12,11 @@ import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useAuthStore} from '../../../stores/authStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import Snackbar from 'react-native-snackbar';
 
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
+
+    //console.log(userInfo);
 
     const menuItems = [
         {
@@ -25,7 +26,6 @@ export default function Main({navigation}: any) {
             buttonImage: images.garden,
             navigateTo: SCREEN_INFO.GARDENINFOWORKER.key,
             navigateNext: SCREEN_INFO.GARDENWORKER.key,
-            level: [],
         },
         {
             function: '',
@@ -69,6 +69,13 @@ export default function Main({navigation}: any) {
             label: 'Báo cáo thống kê',
             buttonImage: images.pieChart,
             navigateTo: SCREEN_INFO.STATISTIC.key,
+        },
+        {
+            function: '',
+            key: 'browseaddmaterial',
+            label: 'Duyệt đầu tư tăng thêm',
+            buttonImage: images.approve,
+            navigateTo: SCREEN_INFO.BROWSEADDMATERIALS.key,
         },
         {
             function: 'FEEDBACK',
@@ -126,67 +133,50 @@ export default function Main({navigation}: any) {
         }
     };
 
-    console.log(userInfo);
-
-    const handleNavigate = (
-        navigateTo: any,
-        navigateNext: any,
-        functionName: any,
-        label: string,
-    ) => {
-        if (functionName !== '') {
-            const findAccess = userInfo.functions.find(
-                (item: any) => item._id === functionName,
-            );
-            console.log(findAccess);
-            if (findAccess?.access) {
-                navigation.navigate(navigateTo, {
-                    navigateNext: navigateNext || null,
-                });
-            } else {
-                Snackbar.show({
-                    text: `Bạn không có quyền truy cập chức năng ${label}`,
-                    duration: Snackbar.LENGTH_LONG,
-                });
-            }
-        } else {
-            navigation.navigate(navigateTo, {
-                navigateNext: navigateNext || null,
-            });
-        }
-    };
-
     const filterMenuByRole = (role: string) => {
+        const hasAccessToFunction = (functionKey: string) => {
+            return userInfo.functions.some(
+                func => func._id === functionKey && func.access,
+            );
+        };
+
+        let filteredMenu: typeof menuItems = [];
+
         if (role === EOrganization.MANAGEMENT) {
-            const menu = menuItems.filter(
+            filteredMenu = menuItems.filter(
                 item =>
                     item.key !== 'gardenForWorker' &&
                     item.key !== 'gardenDeclareForWorker' &&
                     item.key !== 'gardenInfo' &&
                     item.key !== 'unit' &&
-                    item.key !== 'workschedule',
+                    item.key !== 'workschedule' &&
+                    item.key !== 'browseaddmaterial',
             );
-
             const reorderedMenu = [
-                ...menu.filter(item => item.key === 'statistic'),
-                ...menu.filter(item => item.key !== 'statistic'),
+                ...filteredMenu.filter(item => item.key === 'statistic'),
+                ...filteredMenu.filter(item => item.key !== 'statistic'),
             ];
-
-            return reorderedMenu;
+            return reorderedMenu.filter(
+                item => !item.function || hasAccessToFunction(item.function),
+            );
         }
 
         if (role === EOrganization.DEPARTMENT) {
-            return menuItems.filter(
+            filteredMenu = menuItems.filter(
                 item =>
                     item.key !== 'gardenForWorker' &&
                     item.key !== 'gardenDeclareForWorker' &&
-                    item.key !== 'unit',
+                    item.key !== 'unit' &&
+                    item.key !== 'browseaddmaterial',
+            );
+            return filteredMenu.filter(
+                item => !item.function || hasAccessToFunction(item.function),
             );
         }
 
         if (role === EOrganization.LEADER) {
-            return menuItems.filter(item => {
-                const excludeForLeader =
+            filteredMenu = menuItems.filter(item => {
+                const excludeKeys =
                     item.key !== 'gardenForWorker' &&
                     item.key !== 'gardenDeclareForWorker' &&
                     item.key !== 'employee';
@@ -194,20 +184,33 @@ export default function Main({navigation}: any) {
                 const excludeStatistic =
                     userInfo.groupId === '' ? item.key !== 'statistic' : true;
 
-                return excludeForLeader && excludeStatistic;
+                return excludeKeys && excludeStatistic;
             });
-        }
 
-        if (role === EOrganization.WORKER) {
-            return menuItems.filter(
-                item =>
-                    item.key !== 'unit' &&
-                    item.key !== 'employee' &&
-                    item.key !== 'gardenInfo',
+            return filteredMenu.filter(
+                item => !item.function || hasAccessToFunction(item.function),
             );
         }
 
-        return []; // Nếu không hợp lệ, trả mảng trống
+        if (role === EOrganization.WORKER) {
+            filteredMenu = menuItems.filter(
+                item =>
+                    item.key !== 'unit' &&
+                    item.key !== 'employee' &&
+                    item.key !== 'gardenInfo' &&
+                    item.key !== 'browseaddmaterial',
+            );
+
+            return filteredMenu.filter(item => {
+                // Chỉ kiểm tra quyền access đối với STATISTIC
+                if (item.function === 'STATISTIC') {
+                    return hasAccessToFunction(item.function);
+                }
+                return true;
+            });
+        }
+
+        return [];
     };
 
     const menuList = filterMenuByRole(userInfo.userType.level);
@@ -332,7 +335,9 @@ const MainStyles = StyleSheet.create({
     },
     menuButton: {
         width: '48%',
+        gap: 10,
         paddingVertical: 24,
+        paddingHorizontal: 15,
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
@@ -344,7 +349,8 @@ const MainStyles = StyleSheet.create({
         aspectRatio: 1,
     },
     menuButtonText: {
-        marginTop: 10,
         fontSize: 12,
+        flexShrink: 1,
+        textAlign: 'center',
     },
 });

@@ -1,6 +1,8 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {Text, TextInput, View} from 'react-native';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
+import Snackbar from 'react-native-snackbar';
 
 type TaskInput = {
     taskId: string;
@@ -11,14 +13,17 @@ type TaskInput = {
 };
 
 type Props = {
+    gardenId: string;
     taskInputs: TaskInput[];
     handleInputChange: (index: number, field: 'area', value: string) => void;
     styles: any;
     gardenAreaType: string;
     gardenArea: number;
+    processingRate: number;
 };
 
 const TaskListSection = ({
+    gardenId,
     taskInputs,
     handleInputChange,
     styles,
@@ -31,12 +36,24 @@ const TaskListSection = ({
     >({});
 
     const handleAreaChange = (index: number, text: string) => {
-        const currentText = tempInputValues[index] || taskInputs[index].area;
+        if (gardenId === '') {
+            Snackbar.show({
+                text: 'Bạn chưa chọn khu vườn cần làm',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+            return;
+        }
+
+        // Không cho bắt đầu bằng . hoặc ,
+        if (text.startsWith('.') || text.startsWith(',')) {
+            return;
+        }
 
         if (text.includes('-') || text.includes(' ')) {
             return;
         }
 
+        const currentText = tempInputValues[index] || taskInputs[index].area;
         const isAdding = text.length > currentText.length;
         const endsWithDotOrComma = /[.,]$/.test(text);
         const alreadyHasDotOrComma =
@@ -53,7 +70,10 @@ const TaskListSection = ({
             handleInputChange(index, 'area', normalizedText);
             setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
-            setTempInputValues(prev => ({...prev, [index]: normalizedText}));
+            setTempInputValues(prev => ({
+                ...prev,
+                [index]: normalizedText,
+            }));
         }
     };
 
@@ -88,12 +108,33 @@ const TaskListSection = ({
                                         fontStyle: 'italic',
                                         marginBottom: 8,
                                     }}>
-                                    Công việc này đã hoàn thành, bạn không thể
+                                    Quy trình này đã hoàn thành, bạn không thể
                                     chỉnh sửa.
                                 </Text>
                             )}
 
-                            {!isCompleted && (
+                            {!isCompleted &&
+                            gardenArea === processingRate &&
+                            gardenId !== '' ? (
+                                <Text
+                                    style={{
+                                        color: 'red',
+                                        fontStyle: 'italic',
+                                        marginBottom: 8,
+                                    }}>
+                                    Bạn đã làm đủ diện tích của quy trình này.
+                                    Chờ cán bộ duyệt để hoàn thành.
+                                </Text>
+                            ) : gardenId === '' ? (
+                                <Text
+                                    style={{
+                                        color: 'red',
+                                        fontStyle: 'italic',
+                                        marginBottom: 8,
+                                    }}>
+                                    Hãy chọn khu vườn cần làm
+                                </Text>
+                            ) : (
                                 <>
                                     <Text style={styles.label}>
                                         Diện tích đã làm ({gardenAreaType}){' '}

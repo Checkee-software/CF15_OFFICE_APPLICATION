@@ -14,9 +14,13 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useDocumentStore} from '../../../stores/documentStore';
 import moment from 'moment';
 import Loading from '@/screens/subscreen/Loading';
+import {useAuthStore} from '../../../stores/authStore';
+import Snackbar from 'react-native-snackbar';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 const Document = ({navigation}: any) => {
     const {listDocument, getListDocument, isLoading} = useDocumentStore();
+    const {userInfo} = useAuthStore();
 
     const [searchTitle, setSearchTitle] = useState('');
 
@@ -34,6 +38,29 @@ const Document = ({navigation}: any) => {
         receivedObject: string;
     };
 
+    const handleNavigate = (itemDocument: any) => {
+        if (userInfo.userType.level === EOrganization.WORKER) {
+            navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key, {
+                itemDocument,
+            });
+        } else {
+            if (
+                userInfo.functions.some(
+                    (item: any) => item._id === 'DOCUMENT' && item.detail,
+                )
+            ) {
+                navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key, {
+                    itemDocument,
+                });
+            } else {
+                Snackbar.show({
+                    text: 'Bạn không có quyền xem chi tiết tài liệu',
+                    duration: Snackbar.LENGTH_SHORT,
+                });
+            }
+        }
+    };
+
     const filterDocuments = listDocument.filter(item =>
         item.title.toLowerCase().includes(searchTitle.toLowerCase()),
     );
@@ -48,11 +75,7 @@ const Document = ({navigation}: any) => {
     const renderItemDocument = (itemDocument: itemDocument) => (
         <TouchableOpacity
             style={DocumentStyles.warpDocumentContentAndIcon}
-            onPress={() =>
-                navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key, {
-                    itemDocument,
-                })
-            }>
+            onPress={() => handleNavigate(itemDocument)}>
             <View style={DocumentStyles.iconDocument}>
                 <Image
                     style={DocumentStyles.iconDocumentImage}

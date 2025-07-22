@@ -13,15 +13,35 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import images from '../../../assets/images';
 import {useWorkerStore} from '../../../stores/workerStore';
 import Loading from '@/screens/subscreen/Loading';
+import {useAuthStore} from '../../../stores/authStore';
+import Snackbar from 'react-native-snackbar';
 
 const Unit = ({navigation}: any) => {
     const {listWorker, getListWorkerByLeader, isLoading} = useWorkerStore();
+    const {userInfo} = useAuthStore();
 
     const [searchWorker, setSearchWorker] = useState('');
 
     const filterWorkerBySearch = listWorker.filter(user =>
         user?.fullName.toLowerCase().includes(searchWorker.toLowerCase()),
     );
+
+    const handleNavigate = (itemListWorker: any) => {
+        if (
+            userInfo.functions.some(
+                (item: any) => item._id === 'EMPLOYEES' && item.detail,
+            )
+        ) {
+            navigation.navigate(SCREEN_INFO.WORKERINFO.key, {
+                itemListWorker,
+            });
+        } else {
+            Snackbar.show({
+                text: 'Bạn không có quyền xem chi tiết người lao động',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+        }
+    };
 
     const handleReFetch = () => {
         if (searchWorker.length !== 0) {
@@ -34,11 +54,7 @@ const Unit = ({navigation}: any) => {
         <View style={UnitStyles.listWorkerMargin}>
             <TouchableOpacity
                 style={UnitStyles.workerCard}
-                onPress={() =>
-                    navigation.navigate(SCREEN_INFO.WORKERINFO.key, {
-                        itemListWorker,
-                    })
-                }>
+                onPress={() => handleNavigate(itemListWorker)}>
                 <View style={UnitStyles.leftWorkerCard}>
                     <View style={UnitStyles.workerAvatar}>
                         <Image

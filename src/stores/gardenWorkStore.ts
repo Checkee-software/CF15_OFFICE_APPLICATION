@@ -4,6 +4,7 @@ import Snackbar from 'react-native-snackbar';
 import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
 import {EStatus} from '@/shared-types/Response/ScheduleRequestResponse/ScheduleRequestResponse';
 import ENV from '@/config/ENV';
+import {IMaterialsByStaff} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
 
 type IGardenData = {
     _id: string;
@@ -30,7 +31,10 @@ interface gardenWorkStore {
     listGardenWorkBrowse: IGardenData[];
     listGardenWorkBrowseFilter: IGardenData[];
     badgeGardenWorkUnBrowse: number;
-    getRequestDataGarden: (userGroupId: string) => Promise<any>;
+    listMaterialsBrowse: IMaterialsByStaff[];
+    listMaterialsBrowseFilter: IMaterialsByStaff[];
+    badgeMaterialsUnBrowse: number;
+    getRequestDataGarden: () => Promise<any>;
     createRateReportHarvest: (
         harvestReportId: string,
         formRateReport: IRateReportHarvest,
@@ -38,6 +42,13 @@ interface gardenWorkStore {
     filterByStatus: (status: string) => void;
     resetData: () => void;
     setBadgeUnBrowse: () => void;
+    filterAddMaterialsByStatus: (status: string) => void;
+    getRequestAddingMaterials: () => Promise<any>;
+    createAddingMaterials: (
+        materialId: string,
+        scheduleId: string,
+        formRateReport: IRateReportHarvest,
+    ) => Promise<void | undefined>;
 }
 
 export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
@@ -46,27 +57,44 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
     badgeGardenWorkUnBrowse: 0,
     listGardenWorkBrowse: [],
     listGardenWorkBrowseFilter: [],
+    listMaterialsBrowse: [],
+    listMaterialsBrowseFilter: [],
+    badgeMaterialsUnBrowse: 0,
 
-    getRequestDataGarden: async (userGroupId: string) => {
+    getRequestDataGarden: async () => {
         set({isLoading: true});
         try {
             const response = await axiosClient.get<any>(
                 `${ENV.BACKEND_URL}/resources/schedule-requests/collection`,
             );
 
-            const filterByGroupId = response.data.data.filter(
-                (item: any) => item.groupIdWorker === userGroupId,
-            );
+            const filteredData = (() => {
+                const map = new Map();
+                const result = [];
+
+                for (let i = response.data.data.length - 1; i >= 0; i--) {
+                    const item = response.data.data[i];
+
+                    if (item.status === 'CONFIRMED') {
+                        const key = `${item.createdBy}-${item.childTaskId}`;
+
+                        if (!map.has(key)) {
+                            map.set(key, true);
+                            result.unshift(item); // giữ thứ tự ban đầu
+                        }
+                    } else {
+                        result.unshift(item); // luôn giữ lại các item khác CONFIRMED
+                    }
+                }
+
+                return result;
+            })();
 
             set({
-                listGardenWorkBrowse: filterByGroupId,
-                listGardenWorkBrowseFilter:
-                    filterByGroupId.filter(
-                        (item: {status: any}) =>
-                            item.status === EStatus.REQUEST,
-                    ) || [],
+                listGardenWorkBrowse: filteredData,
+                listGardenWorkBrowseFilter: filteredData || [],
                 badgeGardenWorkUnBrowse:
-                    filterByGroupId.filter(
+                    response.data.data.filter(
                         (item: {status: any}) =>
                             item.status === EStatus.REQUEST,
                     ).length || 0,
@@ -79,6 +107,108 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
             set({isLoading: false});
 
             const _error = error;
+
+            setTimeout(() => {
+                if (_error?.response?.data) {
+                    Snackbar.show({
+                        text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                } else {
+                    Snackbar.show({
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    getRequestAddingMaterials: async () => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.get<any>(
+                `${ENV.BACKEND_URL}/resources/schedules/list-request`,
+            );
+
+            set({
+                listMaterialsBrowse: response.data.data,
+                listMaterialsBrowseFilter: response.data.data || [],
+                badgeMaterialsUnBrowse:
+                    response.data.data.filter(
+                        (item: {status: any}) =>
+                            item.status === EStatus.REQUEST,
+                    ).length || 0,
+            });
+
+            set({isLoading: false});
+
+            return response.data.data;
+        } catch (error: any) {
+            set({isLoading: false});
+
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error?.response?.data) {
+                    Snackbar.show({
+                        text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                } else {
+                    Snackbar.show({
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    filterAddMaterialsByStatus: status => {
+        set({isLoadingCreate: true});
+
+        set(state => ({
+            listMaterialsBrowseFilter: state.listMaterialsBrowse.filter(
+                item => item.status === status,
+            ),
+        }));
+
+        setTimeout(() => {
+            set({isLoadingCreate: false});
+        }, 1000);
+    },
+
+    createAddingMaterials: async (
+        materialId: string,
+        scheduleId: string,
+        formRateReport: IRateReportHarvest,
+    ) => {
+        set({isLoadingCreate: true});
+        try {
+            const response = await axiosClient.post(
+                `${ENV.BACKEND_URL}/resources/schedules/confirm/${scheduleId}/${materialId}`,
+                formRateReport,
+            );
+
+            set({isLoadingCreate: false});
+
+            if (response.data?.data) {
+                setTimeout(() => {
+                    Snackbar.show({
+                        text: response.data.message,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }, 500);
+            }
+
+            return response.data;
+        } catch (error: any) {
+            set({isLoadingCreate: false});
+
+            const _error = error;
+
+            console.log(_error.response);
 
             setTimeout(() => {
                 if (_error?.response?.data) {
@@ -110,11 +240,6 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
             set({isLoadingCreate: false});
 
             if (response.data?.data) {
-                // ToastAndroid.show(
-                //     `${response.data.message}`,
-                //     ToastAndroid.SHORT,
-                // );
-
                 setTimeout(() => {
                     Snackbar.show({
                         text: `${response.data.message}`,
@@ -128,6 +253,8 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
             set({isLoadingCreate: false});
 
             const _error = error;
+
+            console.log(_error);
 
             setTimeout(() => {
                 if (_error?.response?.data) {

@@ -22,6 +22,8 @@ import Loading from '@/screens/subscreen/Loading';
 import colors from '@/assets/colors';
 import {Dropdown} from 'react-native-element-dropdown';
 import Snackbar from 'react-native-snackbar';
+import {useAuthStore} from '../../../stores/authStore';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 const WorkSchedule = ({navigation}: any) => {
     const {
@@ -36,6 +38,8 @@ const WorkSchedule = ({navigation}: any) => {
         listProductType,
         listProduct,
     } = useWorkScheduleStore();
+
+    const {userInfo} = useAuthStore();
 
     const statusList = [
         {label: 'Tất cả', value: 1},
@@ -104,6 +108,29 @@ const WorkSchedule = ({navigation}: any) => {
     //     }
     // };
 
+    const handleNavigate = (itemWorkSchedule: any) => {
+        if (userInfo.userType.level === EOrganization.WORKER) {
+            navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
+                _id: itemWorkSchedule._id,
+            });
+        } else {
+            if (
+                userInfo.functions.some(
+                    (item: any) => item._id === 'SCHEDULE' && item.detail,
+                )
+            ) {
+                navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
+                    _id: itemWorkSchedule._id,
+                });
+            } else {
+                Snackbar.show({
+                    text: 'Bạn không có quyền xem chi tiết lịch sử quy trình',
+                    duration: Snackbar.LENGTH_SHORT,
+                });
+            }
+        }
+    };
+
     const renderStatusTitle = (status: string) => {
         switch (status) {
             case EScheduleStatus.PENDING:
@@ -135,7 +162,7 @@ const WorkSchedule = ({navigation}: any) => {
 
             case EScheduleStatus.CANCELED:
                 return (
-                    <Text style={styles.expiredAndCanceledText}>Đã hủy</Text>
+                    <Text style={styles.expiredAndCanceledText}>Từ chối</Text>
                 );
 
             default:
@@ -290,7 +317,7 @@ const WorkSchedule = ({navigation}: any) => {
                         />
 
                         <Text style={styles.expiredAndCancelTextTime}>
-                            {`Đã hủy lúc ${hour}, ${day}`}
+                            {`Đã từ chối lúc ${hour}, ${day}`}
                         </Text>
                     </View>
                 );
@@ -414,11 +441,7 @@ const WorkSchedule = ({navigation}: any) => {
     const renderItemWorkSchedule = (itemWorkSchedule: any) => (
         <TouchableOpacity
             style={styles.workCard}
-            onPress={() =>
-                navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
-                    _id: itemWorkSchedule._id,
-                })
-            }>
+            onPress={() => handleNavigate(itemWorkSchedule)}>
             <View>
                 {/* <Progress.Circle
                     size={40}

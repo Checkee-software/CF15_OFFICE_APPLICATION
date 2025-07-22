@@ -27,6 +27,7 @@ import ScheduleDetail from '@/screens/home/WorkSchedule/ScheduleDetail';
 import GardenInfoWorker from '@/screens/home/Garden/GardenInfoWorker';
 import ActiveMachine from '@/screens/home/Garden/ActiveMachine';
 import GardenInfoWorker1 from '@/screens/home/Garden/GardenInfoWorker1';
+import BrowseAddMaterials from '@/screens/home/BrowseAddMaterials';
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -80,6 +81,13 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: GardenInfo1,
         options: {
             title: SCREEN_INFO.GARDENINFO1.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.BROWSEADDMATERIALS.key,
+        component: BrowseAddMaterials,
+        options: {
+            title: SCREEN_INFO.BROWSEADDMATERIALS.headerTitle,
         },
     },
     //khu vườn cho worker

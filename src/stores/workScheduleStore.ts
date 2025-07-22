@@ -121,7 +121,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
         set({isLoading: true});
         try {
             await axiosClient.post(
-                `${ENV.BACKEND_URL}/resources/schedules/add-marterials-by-staff/${scheduleId}`,
+                `${ENV.BACKEND_URL}/resources/schedules/request/${scheduleId}`,
                 data,
             );
             Snackbar.show({
@@ -149,25 +149,42 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 `${ENV.BACKEND_URL}/resources/schedules/detail-with-schedule/${id}`,
             );
 
-            console.log('📦 Response schedule:', response?.data);
+            //console.log('📦 Response schedule:', response?.data);
 
             if (response?.data?.data) {
                 const schedule: ISchedule = response.data.data;
 
-                if (schedule?.employees?.length) {
-                    schedule.employees = schedule.employees.map((emp: any) => {
-                        if (emp.avatar) {
-                            emp.avatar = fixAvatarPath(emp.avatar);
-                        }
-                        return emp;
-                    });
-                }
+                //if()
 
                 const filteredData = filterStaffByUserId(schedule, userId);
 
-                console.log(filteredData);
+                const hasMachineTask = filteredData.childTasks.some(
+                    (task: any) => task.machines.length > 0,
+                );
 
-                set({detailWorkSchedule: filteredData});
+                if (hasMachineTask) {
+                    const updatedFilteredData = {
+                        ...filteredData,
+                        childTasks: filteredData.childTasks.map(
+                            (task: any) => ({
+                                ...task,
+                                staff: task.staff.map((staffItem: any) => ({
+                                    ...staffItem,
+                                    gardens: staffItem.gardens.map(
+                                        (garden: any) => ({
+                                            ...garden,
+                                            name: `${garden.name} - ${garden.groupName}`,
+                                        }),
+                                    ),
+                                })),
+                            }),
+                        ),
+                    };
+
+                    set({detailWorkSchedule: updatedFilteredData});
+                } else {
+                    set({detailWorkSchedule: filteredData});
+                }
             } else {
                 set({detailWorkSchedule: null});
             }

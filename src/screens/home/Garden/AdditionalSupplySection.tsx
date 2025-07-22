@@ -17,7 +17,7 @@ type AdditionalSupply = {
 };
 
 type Props = {
-    supplies: AdditionalSupply[];
+    supplies: any;
     onAdd: () => void;
     onChange: (
         index: number,
@@ -48,7 +48,7 @@ const AdditionalSupplySection = ({
     onSubmit,
 }: Props) => {
     const allValid = supplies.every(
-        s => s.name && s.unit && s.value && s.price,
+        (s: any) => s.name && s.unit && s.value && s.price,
     );
 
     return (
@@ -60,7 +60,7 @@ const AdditionalSupplySection = ({
                 </TouchableOpacity>
             </View>
 
-            {supplies.map((item, index) => (
+            {supplies.map((item: any, index: number) => (
                 <View key={index} style={{marginBottom: 28}}>
                     <TextInput
                         style={styles.input}

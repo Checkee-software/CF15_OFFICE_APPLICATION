@@ -15,7 +15,7 @@ interface IStatisticResponse {
     totalProduct?: number;
     list: IWorkList[];
     chart: IChartData[];
-    //pieChart: []
+    pieChart: any[];
 }
 
 interface IListSelection {
@@ -159,6 +159,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}&targetId=${targetId}`,
             );
+
             if (response.data.data) {
                 const chartData = response.data.data.map((item: any) => {
                     const notComplete = 100 - item.percentage;

@@ -10,6 +10,7 @@ import {
     ScrollView,
 } from 'react-native';
 import StatisticResult from './StatisticResult';
+import StatisticResultWorker from './StatisticResultWorker';
 import {useStatisticStore} from '../../../stores/statisticStore';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import moment from 'moment';
@@ -19,6 +20,7 @@ import {EType} from '@/shared-types/form-data/StatisticFormData/StatisticFormDat
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {useAuthStore} from '@/stores/authStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import Loading from '@/screens/subscreen/Loading';
 
 const Statistic = () => {
     const listStatisticTypeDefault = [
@@ -36,45 +38,87 @@ const Statistic = () => {
         clearStatisticData,
         clearListSelection,
         isLoading,
-        statisticData,
         listSelection,
     } = useStatisticStore();
 
     const {userInfo} = useAuthStore();
 
+    const [firstAccess, setFirstAcess] = useState(true);
+
     const [listStatisticType, setListStatisticType] = useState<
         {_id: string; name: string}[]
     >([]);
+
     const [showForm, setShowForm] = useState(false);
     const [selectedType, setSelectedType] = useState<EType | ''>('');
+    const [currentSelectedType, setCurrentSelectedType] = useState<EType | ''>(
+        '',
+    );
     const [selectedTarget, setSelectedTarget] = useState('');
+    const [currentSelectedTarget, setCurrentSelectedTarget] = useState('');
     const [selectedTargetName, setSelectedTargetName] = useState('');
-
+    const [currentSelectedTargetName, setCurrentSelectedTargetName] =
+        useState('');
     const [selectedTimeOption, setSelectedTimeOption] = useState<string | null>(
         null,
     );
+    const [currentSelectedTimeOption, setCurrentSelectedTimeOption] = useState<
+        string | null
+    >(null);
     const [startDate, setStartDate] = useState<string | null>(null);
+    const [currentStartDate, setCurrentStartDate] = useState<string | null>(
+        moment()
+            .startOf('month')
+            .set({
+                hour: 0,
+                minute: 0,
+                second: 0,
+                millisecond: 0,
+            })
+            .add(7, 'hours')
+            .toISOString(),
+    );
     const [endDate, setEndDate] = useState<string | null>(null);
-
+    const [currentEndDate, setCurrentEndDate] = useState<string | null>(
+        moment()
+            .endOf('month')
+            .set({
+                hour: 23,
+                minute: 59,
+                second: 59,
+                millisecond: 999,
+            })
+            .add(7, 'hours')
+            .toISOString(),
+    );
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
+    const closeModalFilter = () => {
+        setShowForm(!showForm);
+        setSelectedType(currentSelectedType);
+        setSelectedTarget(currentSelectedTarget);
+        setSelectedTargetName(currentSelectedTargetName);
+        setSelectedTimeOption(currentSelectedTimeOption);
+        setStartDate(currentStartDate);
+        setCurrentEndDate(currentEndDate);
+    };
+
     const renderTimeStatistic = () => {
-        if (selectedTimeOption === 'month') {
+        if (currentSelectedTimeOption === 'month') {
             return 'Tháng này';
-        } else if (selectedTimeOption === 'quarter') {
+        } else if (currentSelectedTimeOption === 'quarter') {
             return 'Theo quý';
-        } else if (selectedTimeOption === 'year') {
+        } else if (currentSelectedTimeOption === 'year') {
             return 'Theo năm';
         } else {
-            return `${moment(startDate).format('DD/MM/YYYY')} - ${moment
-                .utc(endDate)
+            return `${moment(currentStartDate).format('DD/MM/YYYY')} - ${moment
+                .utc(currentEndDate)
                 .format('DD/MM/YYYY')}`;
         }
     };
 
     const onChangeSelectedType = async (value: EType) => {
-        console.log(value);
         if (
             value === 'GROUP' &&
             userInfo.userType.level === EOrganization.LEADER
@@ -88,7 +132,6 @@ const Statistic = () => {
             setSelectedTarget('');
             setSelectedTargetName('');
         } else {
-            console.log(value);
             await getListSelection('WORK');
             setSelectedType(value);
             setSelectedTarget('');
@@ -183,6 +226,14 @@ const Statistic = () => {
 
     const handleGetStatistic = async () => {
         setShowForm(!showForm);
+
+        setCurrentSelectedType(selectedType);
+        setCurrentSelectedTarget(selectedTarget);
+        setCurrentSelectedTargetName(selectedTargetName);
+        setCurrentSelectedTimeOption(selectedTimeOption);
+        setCurrentStartDate(startDate);
+        setCurrentEndDate(endDate);
+
         if (selectedType === 'DISPLAY') {
             await getStatisticProgress({
                 type: selectedType as EType,
@@ -213,6 +264,7 @@ const Statistic = () => {
                 );
 
                 setSelectedType('DISPLAY' as EType);
+                setCurrentSelectedType('DISPLAY' as EType);
                 await getListSelection('WORK');
 
                 const selectedStartDate = moment()
@@ -237,14 +289,17 @@ const Statistic = () => {
                     .toISOString();
 
                 setSelectedTimeOption('month');
+                setCurrentSelectedTimeOption('month');
                 setStartDate(selectedStartDate);
+                setCurrentStartDate(selectedStartDate);
                 setEndDate(selectedEndDate);
+                setCurrentEndDate(selectedEndDate);
 
                 await getStatisticProgress({
                     type: 'DISPLAY' as EType,
                     startDate: new Date(selectedStartDate),
                     endDate: new Date(selectedEndDate),
-                    targetId: selectedTarget,
+                    targetId: currentSelectedTarget,
                 });
             } else if (userInfo.userType.level === EOrganization.WORKER) {
                 setListStatisticType(
@@ -254,6 +309,8 @@ const Statistic = () => {
                     ),
                 );
                 setSelectedType('DISPLAY' as EType);
+                setCurrentSelectedType('DISPLAY' as EType);
+
                 await getListSelection('WORK');
 
                 const selectedStartDate = moment()
@@ -278,14 +335,17 @@ const Statistic = () => {
                     .toISOString();
 
                 setSelectedTimeOption('month');
+                setCurrentSelectedTimeOption('month');
                 setStartDate(selectedStartDate);
+                setCurrentStartDate(selectedStartDate);
                 setEndDate(selectedEndDate);
+                setCurrentEndDate(selectedEndDate);
 
                 await getStatisticProgress({
                     type: 'DISPLAY' as EType,
                     startDate: new Date(selectedStartDate),
                     endDate: new Date(selectedEndDate),
-                    targetId: selectedTarget,
+                    targetId: currentSelectedTarget,
                 });
             } else {
                 setListStatisticType(
@@ -295,10 +355,9 @@ const Statistic = () => {
                 );
 
                 setSelectedType('WORK' as EType);
-                await getListSelection('WORK');
+                setCurrentSelectedType('DISPLAY' as EType);
 
-                setSelectedTarget('');
-                setSelectedTargetName('');
+                await getListSelection('WORK');
 
                 const selectedStartDate = moment()
                     .startOf('month')
@@ -322,99 +381,89 @@ const Statistic = () => {
                     .toISOString();
 
                 setSelectedTimeOption('month');
+                setCurrentSelectedTimeOption('month');
                 setStartDate(selectedStartDate);
+                setCurrentStartDate(selectedStartDate);
                 setEndDate(selectedEndDate);
+                setCurrentEndDate(selectedEndDate);
 
                 await getStatistic({
                     type: 'WORK' as EType,
                     startDate: new Date(selectedStartDate),
                     endDate: new Date(selectedEndDate),
-                    targetId: selectedTarget,
+                    targetId: currentSelectedTarget,
                 });
             }
+
+            setFirstAcess(!firstAccess);
         };
 
         fetchData();
     }, []);
 
+    if (firstAccess) {
+        return <Loading />;
+    }
+
     return (
         <View style={styles.container}>
-            {statisticData === null ? (
-                <View style={styles.emptyStatisticData}>
+            <ScrollView>
+                <View style={styles.listStatistic}>
                     <TouchableOpacity
-                        style={styles.btnQueryStatistic}
+                        style={styles.btnCurrentStatistic}
                         onPress={() => setShowForm(!showForm)}>
-                        <View style={styles.warpIconText}>
-                            <MaterialIcons
-                                name='search'
-                                size={22}
-                                color={'#808080'}
-                            />
-                            <Text style={styles.btnQueryStatisticText}>
-                                Nhấn để truy vấn thống kê
-                            </Text>
-                        </View>
+                        <Text style={styles.statisticTypeText}>
+                            {currentSelectedType === 'WORK'
+                                ? 'Quy trình'
+                                : selectedType === 'PRODUCT'
+                                ? 'Cây trồng'
+                                : selectedType === 'GROUP'
+                                ? 'Đội sản xuất'
+                                : 'Tiến độ'}
+                        </Text>
+                        <View style={styles.warpIconTextStatistic}>
+                            <View style={{flexDirection: 'row', gap: 10}}>
+                                <MaterialIcons
+                                    name='search'
+                                    size={20}
+                                    color={'#808080'}
+                                />
+                                <Text style={styles.statisticTargetText}>
+                                    {currentSelectedTargetName === ''
+                                        ? 'Tất cả'
+                                        : currentSelectedTargetName}
+                                </Text>
+                            </View>
 
-                        <View style={styles.btnFilter}>
-                            <MaterialIcons name='manage-search' size={22} />
+                            <View
+                                style={[
+                                    styles.btnFilter,
+                                    {backgroundColor: '#4CAF50'},
+                                ]}>
+                                <MaterialIcons
+                                    name='manage-search'
+                                    size={22}
+                                    color={'#F5F5F5'}
+                                />
+                            </View>
                         </View>
+                        <Text
+                            style={
+                                styles.statisticTimeText
+                            }>{`Thời gian: ${renderTimeStatistic()}`}</Text>
                     </TouchableOpacity>
 
-                    <Text style={styles.emptyStatisticDataText}>
-                        Hãy truy vấn thông tin để xem thống kê!
-                    </Text>
-                </View>
-            ) : (
-                <ScrollView>
-                    <View style={styles.listStatistic}>
-                        <TouchableOpacity
-                            style={styles.btnCurrentStatistic}
-                            onPress={() => setShowForm(!showForm)}>
-                            <Text style={styles.statisticTypeText}>
-                                {selectedType === 'WORK'
-                                    ? 'Công việc'
-                                    : selectedType === 'PRODUCT'
-                                    ? 'Cây trồng'
-                                    : selectedType === 'GROUP'
-                                    ? 'Đội sản xuất'
-                                    : 'Tiến độ'}
-                            </Text>
-                            <View style={styles.warpIconTextStatistic}>
-                                <View style={{flexDirection: 'row', gap: 10}}>
-                                    <MaterialIcons
-                                        name='search'
-                                        size={20}
-                                        color={'#808080'}
-                                    />
-                                    <Text style={styles.statisticTargetText}>
-                                        {selectedTargetName === ''
-                                            ? 'Tất cả'
-                                            : selectedTargetName}
-                                    </Text>
-                                </View>
-
-                                <View
-                                    style={[
-                                        styles.btnFilter,
-                                        {backgroundColor: '#4CAF50'},
-                                    ]}>
-                                    <MaterialIcons
-                                        name='manage-search'
-                                        size={22}
-                                        color={'#F5F5F5'}
-                                    />
-                                </View>
-                            </View>
-                            <Text
-                                style={
-                                    styles.statisticTimeText
-                                }>{`Thời gian: ${renderTimeStatistic()}`}</Text>
-                        </TouchableOpacity>
-
-                        <StatisticResult selectedType={selectedType} />
+                    <View style={styles.statisticContent}>
+                        {userInfo.userType.level !== EOrganization.WORKER ? (
+                            <StatisticResult selectedType={selectedType} />
+                        ) : (
+                            <StatisticResultWorker
+                                selectedType={selectedType}
+                            />
+                        )}
                     </View>
-                </ScrollView>
-            )}
+                </View>
+            </ScrollView>
 
             <Modal visible={showForm} animationType='fade' transparent={true}>
                 <View style={styles.modalBackdrop}>
@@ -491,6 +540,7 @@ const Statistic = () => {
                                     Tháng này
                                 </Text>
                             </TouchableOpacity>
+
                             <TouchableOpacity
                                 style={[
                                     styles.selectDateBtnModal,
@@ -544,6 +594,7 @@ const Statistic = () => {
                                     Theo năm
                                 </Text>
                             </TouchableOpacity>
+
                             <TouchableOpacity
                                 style={[
                                     styles.selectDateBtnModal,
@@ -617,7 +668,7 @@ const Statistic = () => {
                         <View style={[styles.warpButton, {marginTop: 10}]}>
                             <TouchableOpacity
                                 style={styles.btnModal}
-                                onPress={() => setShowForm(!showForm)}>
+                                onPress={closeModalFilter}>
                                 <Text style={styles.btnCloseModalText}>
                                     Đóng
                                 </Text>
@@ -831,6 +882,11 @@ const styles = StyleSheet.create({
         color: '#4CAF50',
         fontWeight: 500,
         fontSize: 13,
+    },
+    statisticContent: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
     },
 });
 

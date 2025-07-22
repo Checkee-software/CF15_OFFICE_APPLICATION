@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect} from 'react';
 import {
     View,
@@ -56,10 +58,8 @@ const GardenWorker = () => {
 
     const [showLocationInfo, setShowLocationInfo] = React.useState(false);
     const [showInfo, setShowInfo] = React.useState(false);
-    const [showManagementAreaInfo, setShowManagementAreaInfo] =
-        React.useState(false);
 
-    const {gardens, isLoading, harvestHistory} = useGardenStore();
+    const {gardenDetail, isLoading, harvestHistory} = useGardenStore();
 
     const fixEncoding = (input: string): string => {
         try {
@@ -153,20 +153,18 @@ const GardenWorker = () => {
     }, [code]);
 
     useEffect(() => {
-        if (!gardens) return;
+        if (!gardenDetail) return;
 
-        if (gardens.code && !harvestHistory) {
-            useGardenStore.getState().fetchHarvestCollection(gardens._id);
-        } else if (gardens.code) {
-            useGardenStore.getState().fetchHarvestCollection(gardens._id);
+        if (gardenDetail.code && !harvestHistory) {
+            useGardenStore.getState().fetchHarvestCollection(gardenDetail._id);
+        } else if (gardenDetail.code) {
+            useGardenStore.getState().fetchHarvestCollection(gardenDetail._id);
         }
-    }, [gardens]);
+    }, [gardenDetail]);
 
-    if (isLoading || !gardens) {
+    if (isLoading || !gardenDetail) {
         return <Loading />;
     }
-
-    console.log(gardens);
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -188,15 +186,15 @@ const GardenWorker = () => {
                                 textAlign: 'right',
                             })
                         }>
-                        {!gardens.gardenNickname
-                            ? gardens.name
-                            : gardens.gardenNickname}
+                        {!gardenDetail.gardenNickname
+                            ? gardenDetail.name
+                            : gardenDetail.gardenNickname}
                     </Text>
                 </View>
                 <View style={styles.row}>
                     <Text style={styles.label}>Mã khu vườn</Text>
                     <Text style={[styles.value, {color: 'green'}]}>
-                        {gardens.code}
+                        {gardenDetail.code}
                     </Text>
                 </View>
 
@@ -204,18 +202,24 @@ const GardenWorker = () => {
                     label='Vị trí khu vườn'
                     expanded={showLocationInfo}
                     onToggle={() => setShowLocationInfo(!showLocationInfo)}>
-                    <Row label='Kinh độ' value={gardens.location?.latitude} />
-                    <Row label='Vĩ độ' value={gardens.location?.longitude} />
+                    <Row
+                        label='Kinh độ'
+                        value={gardenDetail.location?.latitude}
+                    />
+                    <Row
+                        label='Vĩ độ'
+                        value={gardenDetail.location?.longitude}
+                    />
                 </CollapsibleRow>
 
                 <CollapsibleRow
                     label='Người quản lý'
-                    value={(gardens as any).manager}
+                    value={(gardenDetail as any).manager}
                     expanded={showInfo}
                     onToggle={() => setShowInfo(!showInfo)}>
                     <Row
                         label='Đơn vị'
-                        value={(gardens as any).unit || 'Không xác định'}
+                        value={(gardenDetail as any).unit || 'Không xác định'}
                     />
 
                     <View
@@ -231,7 +235,7 @@ const GardenWorker = () => {
                                 width: '30%',
                                 textAlign: 'right',
                             }}>
-                            {gardens.management?.area?.totalSquare}
+                            {gardenDetail.management?.area?.totalSquare}
                         </Text>
                     </View>
                 </CollapsibleRow>
@@ -241,7 +245,7 @@ const GardenWorker = () => {
                 <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Tên giống</Text>
                     <Text style={styles.infoValue}>
-                        {(gardens as any).productName}
+                        {(gardenDetail as any).productName}
                     </Text>
                 </View>
                 <View style={styles.infoRow}>
@@ -249,10 +253,10 @@ const GardenWorker = () => {
                     <Text
                         style={
                             styles.infoValue
-                        }>{`${gardens.productQuantity} cây`}</Text>
+                        }>{`${gardenDetail.productQuantity} cây`}</Text>
                 </View>
 
-                {gardens.totalProductByYear?.map(item => (
+                {gardenDetail.totalProductByYear?.map(item => (
                     <View key={item._id} style={styles.yearBox}>
                         <View style={styles.yearTitleRow}>
                             <Text
@@ -260,8 +264,8 @@ const GardenWorker = () => {
                                     styles.yearTitle
                                 }>{`Năm ${item.year}`}</Text>
                             <Text style={styles.plantedText}>{`Trồng ${
-                                gardens.totalProductByYear[
-                                    gardens.totalProductByYear.length - 1
+                                gardenDetail.totalProductByYear[
+                                    gardenDetail.totalProductByYear.length - 1
                                 ].quantity
                             } cây`}</Text>
                         </View>
@@ -298,13 +302,13 @@ const GardenWorker = () => {
                 ))}
             </Section>
 
-            {gardens.sidePlants?.length > 0 && (
+            {gardenDetail.sidePlants?.length > 0 && (
                 <Section title='Thông tin cây trồng xen'>
                     <Row
                         label='Số loại cây trồng xen'
-                        value={gardens?.sidePlants?.length}
+                        value={gardenDetail?.sidePlants?.length}
                     />
-                    {gardens?.sidePlants?.map(plant => (
+                    {gardenDetail?.sidePlants?.map(plant => (
                         <Row
                             key={plant._id}
                             label={plant.name}
@@ -314,18 +318,18 @@ const GardenWorker = () => {
                 </Section>
             )}
 
-            {gardens.management?.files.length !== 0 ? (
+            {gardenDetail.management?.files.length !== 0 ? (
                 <Section title='Tệp đính kèm'>
                     <FlatList
                         scrollEnabled={false}
-                        data={gardens.management?.files}
+                        data={gardenDetail.management?.files}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({item}) => renderItemAttachedFiles(item)}
                     />
                 </Section>
             ) : null}
 
-            {gardens.note && <Text>{gardens.note}</Text>}
+            {gardenDetail.note && <Text>{gardenDetail.note}</Text>}
         </ScrollView>
     );
 };

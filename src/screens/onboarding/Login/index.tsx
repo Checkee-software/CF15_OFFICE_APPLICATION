@@ -10,8 +10,6 @@ import {
     ImageBackground,
     Platform,
     KeyboardAvoidingView,
-    // PermissionsAndroid,
-    // ToastAndroid,
 } from 'react-native';
 import images from '../../../assets/images';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';

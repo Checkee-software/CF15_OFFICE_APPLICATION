@@ -17,8 +17,11 @@ import {
 } from 'react-native-vision-camera';
 import useGardenStore from '@/stores/gardenStore';
 import images from '../../../assets/images';
+import {useAuthStore} from '../../../stores/authStore';
 
 const GardenScan = ({navigation, route}: any) => {
+    const {userInfo} = useAuthStore();
+
     const [notFound, setNotFound] = useState(false);
     const [codeInput, setCodeInput] = useState('');
     const [hasScanned, setHasScanned] = useState(false);
@@ -29,11 +32,11 @@ const GardenScan = ({navigation, route}: any) => {
     const handleSearch = async (code: string) => {
         if (!code) return;
 
-        console.log('[SEARCH] Searching for garden with code:', code);
-        await searchGardens(code);
+        //console.log('[SEARCH] Searching for garden with code:', code);
+        await searchGardens(code, userInfo._id);
 
         const updatedGardens = useGardenStore.getState().gardens;
-        console.log('[RESULT] Garden found:', updatedGardens);
+        //console.log('[RESULT] Garden found:', updatedGardens);
 
         if (updatedGardens) {
             setNotFound(false);

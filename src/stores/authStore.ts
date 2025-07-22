@@ -109,8 +109,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     userData.avatar = '';
                 }
 
-                const getTasks = await get().getScheduleCollection();
-                userData.tasks = getTasks;
+                if (
+                    response.data.data.userType.level ===
+                        EOrganization.DEPARTMENT ||
+                    response.data.data.userType.level ===
+                        EOrganization.LEADER ||
+                    response.data.data.userType.level === EOrganization.WORKER
+                ) {
+                    const getTasks = await get().getScheduleCollection();
+                    userData.tasks = getTasks;
+                }
 
                 if (
                     response.data.data.userType.level ===
@@ -214,6 +222,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                 if (
                     response.data.data.userType.level ===
+                        EOrganization.DEPARTMENT ||
+                    response.data.data.userType.level ===
+                        EOrganization.LEADER ||
+                    response.data.data.userType.level === EOrganization.WORKER
+                ) {
+                    const getTasks = await get().getScheduleCollection();
+                    userData.tasks = getTasks;
+                }
+
+                if (
+                    response.data.data.userType.level ===
                         EOrganization.LEADER ||
                     response.data.data.userType.level === EOrganization.WORKER
                 ) {
@@ -227,9 +246,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                     userData.groupName = findGroupName.name;
                 }
-
-                const getTasks = await get().getScheduleCollection();
-                userData.tasks = getTasks;
 
                 set({userInfo: userData, isLogin: true});
             }

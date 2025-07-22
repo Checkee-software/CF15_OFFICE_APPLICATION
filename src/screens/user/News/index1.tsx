@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {
@@ -13,7 +14,6 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import useNewsStore from '../../../stores/newsStore';
-import {INews} from '../../../shared-types/Response/NewsResponse/NewsResponse';
 import images from '../../../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

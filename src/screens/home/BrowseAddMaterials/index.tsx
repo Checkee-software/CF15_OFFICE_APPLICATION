@@ -21,9 +21,8 @@ import Loading from '@/screens/subscreen/Loading';
 import Snackbar from 'react-native-snackbar';
 import {EStatus} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
-import {useIsFocused} from '@react-navigation/native';
 
-const WorkScreen = () => {
+const BrowseAddMaterials = () => {
     interface listRadioBtn {
         _id: string;
         radioSelectedType: number;
@@ -31,22 +30,17 @@ const WorkScreen = () => {
 
     type initialRadioState = listRadioBtn[];
 
-    const isFocused = useIsFocused();
-
     const {
-        listGardenWorkBrowseFilter,
-        badgeGardenWorkUnBrowse,
         isLoading,
         isLoadingCreate,
-        getRequestDataGarden,
-        filterByStatus,
-        createRateReportHarvest,
+        listMaterialsBrowseFilter,
+        badgeMaterialsUnBrowse,
+        getRequestAddingMaterials,
+        filterAddMaterialsByStatus,
+        createAddingMaterials,
     } = useGardenWorkStore();
 
-    console.log(listGardenWorkBrowseFilter);
-
-    const {userInfo, redirectDataRequestSchedule, clearRedirectData} =
-        useAuthStore();
+    const {userInfo} = useAuthStore();
 
     const statusList = [
         {label: 'Đang chờ', value: 1},
@@ -62,17 +56,13 @@ const WorkScreen = () => {
     const selectBrowseType = (value: number) => {
         if (value === 1) {
             //resetData();
-            filterByStatus(EStatus.REQUEST);
+            filterAddMaterialsByStatus(EStatus.REQUEST);
         } else if (value === 2) {
-            filterByStatus(EStatus.CONFIRMED);
+            filterAddMaterialsByStatus(EStatus.CONFIRMED);
         } else if (value === 3) {
-            filterByStatus(EStatus.DENIDED);
+            filterAddMaterialsByStatus(EStatus.DENIDED);
         }
         setSelectedStatus(value);
-    };
-
-    const formatNumber = (num: number) => {
-        return new Intl.NumberFormat('vi-VN').format(num);
     };
 
     const onChangeReasonCancel = (requestId: string, reason: string) => {
@@ -94,81 +84,39 @@ const WorkScreen = () => {
                             : '#000000',
                 },
             ]}>
-            <View style={styles.gardenTitleSection}>
-                <Text style={styles.gardenName}>
-                    {itemGardenWork.productName}
-                </Text>
-            </View>
-
             <View style={styles.gardenContentSection}>
                 <View style={styles.warpLabelAndValue}>
-                    <Text style={styles.label}>Thực hiện lúc</Text>
+                    <Text style={styles.label}>Tên vật tư</Text>
+                    <Text style={styles.workValue}>{itemGardenWork.name}</Text>
+                </View>
 
+                <View style={styles.warpLabelAndValue}>
+                    <Text style={styles.label}>Khối lượng</Text>
+                    <Text
+                        style={
+                            styles.value
+                        }>{`${itemGardenWork.value} ${itemGardenWork.unit}`}</Text>
+                </View>
+
+                <View style={styles.warpLabelAndValue}>
+                    <Text style={styles.label}>Giá tiền</Text>
                     <Text style={styles.value}>
-                        {itemGardenWork.createdAt}
-                        {/* {moment(itemGardenWork.createdAt).format(
-                            'HH:mm DD/MM/YYYY',
-                        )} */}
+                        {new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND',
+                        }).format(itemGardenWork.price ?? 0)}
                     </Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
-                    <Text style={styles.label}>Người thực hiện</Text>
-                    <Text style={styles.value}>{itemGardenWork.worker}</Text>
+                    <Text style={styles.label}>Người gửi</Text>
+                    <Text style={styles.value}>{itemGardenWork.staffName}</Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
-                    <Text style={styles.label}>Công việc</Text>
-                    <Text style={styles.workValue}>
-                        {itemGardenWork.taskName}
-                    </Text>
-                </View>
+                    <Text style={styles.label}>Thời gian gửi</Text>
 
-                {itemGardenWork.type === 'CA_MAY' && (
-                    <View style={styles.warpLabelAndValue}>
-                        <Text style={styles.label}>Ca máy</Text>
-                        <Text style={styles.workValue}>
-                            {itemGardenWork.machineName}
-                        </Text>
-                    </View>
-                )}
-
-                <View style={styles.warpLabelAndValue}>
-                    <Text style={styles.label}>Diện tích đã làm</Text>
-                    <Text style={styles.value}>
-                        {`${
-                            selectedStatus !== 1
-                                ? itemGardenWork.processingRate
-                                : itemGardenWork.area
-                        } ha \n`}
-
-                        <Text style={styles.valueRemaining}>
-                            {selectedStatus !== 1
-                                ? `(còn: ${formatNumber(
-                                      Math.max(
-                                          itemGardenWork.gardenSquare -
-                                              itemGardenWork.processingRate,
-                                          0,
-                                      ),
-                                  )} ha)`
-                                : itemGardenWork.processingRate !== 0
-                                ? `(còn: ${formatNumber(
-                                      Math.max(
-                                          itemGardenWork.gardenSquare -
-                                              (itemGardenWork.processingRate +
-                                                  itemGardenWork.area),
-                                          0,
-                                      ),
-                                  )} ha)`
-                                : `(còn: ${formatNumber(
-                                      Math.max(
-                                          itemGardenWork.gardenSquare -
-                                              itemGardenWork.area,
-                                          0,
-                                      ),
-                                  )} ha)`}
-                        </Text>
-                    </Text>
+                    <Text style={styles.value}>{itemGardenWork.createdAt}</Text>
                 </View>
             </View>
 
@@ -234,8 +182,8 @@ const WorkScreen = () => {
                                     <View style={styles.comfirmContent}>
                                         <Text style={styles.comfirmText}>
                                             {itemComfirm.radioSelectedType === 2
-                                                ? 'Bạn chắc chắn muốn duyệt công việc này?'
-                                                : 'Bạn chắc chắn muốn huỷ bỏ công việc này?'}
+                                                ? 'Bạn chắc chắn muốn duyệt vật tư này?'
+                                                : 'Bạn chắc chắn muốn từ chối vật tư này?'}
                                         </Text>
 
                                         {itemComfirm.radioSelectedType === 3 ? (
@@ -337,16 +285,14 @@ const WorkScreen = () => {
                                         Người duyệt
                                     </Text>
                                     <Text style={styles.value}>
-                                        {itemGardenWork.requesterName}
+                                        {itemGardenWork.confirmerName}
                                     </Text>
                                 </View>
                             </View>
                         ) : (
                             <>
                                 <View style={styles.warpLabelAndValue}>
-                                    <Text style={styles.label}>
-                                        Từ chối lúc
-                                    </Text>
+                                    <Text style={styles.label}>Hủy bỏ lúc</Text>
 
                                     <Text style={styles.value}>
                                         {itemGardenWork.updatedAt}
@@ -354,7 +300,9 @@ const WorkScreen = () => {
                                 </View>
 
                                 <View style={styles.warpLabelAndValue}>
-                                    <Text style={styles.label}>Lý do hủy</Text>
+                                    <Text style={styles.label}>
+                                        Lý do từ chối
+                                    </Text>
 
                                     <Text style={styles.reasonValue}>
                                         {itemGardenWork.message}
@@ -379,9 +327,9 @@ const WorkScreen = () => {
     };
 
     const handleGetRequestGardenData = async () => {
-        const responseData = await getRequestDataGarden();
+        const responseData = await getRequestAddingMaterials();
 
-        filterByStatus(EStatus.REQUEST);
+        filterAddMaterialsByStatus(EStatus.REQUEST);
 
         const requestData = responseData.filter(
             (item: {status: EStatus}) => item.status === EStatus.REQUEST,
@@ -390,19 +338,16 @@ const WorkScreen = () => {
         const initialRadioState = requestData.map(
             (item: {
                 _id: string;
+                materialId: string;
                 gardenId: string;
-                gardenSquare: any;
-                area: any;
-                processingRate: any;
                 message: string;
+                scheduleId: string;
             }) => ({
                 _id: item._id,
+                materialId: item.materialId,
                 gardenId: item.gardenId,
+                scheduleId: item.scheduleId,
                 radioSelectedType: 1,
-                completeRequest:
-                    item.gardenSquare === item.area + item.processingRate
-                        ? true
-                        : false,
                 message: item.message || '',
             }),
         );
@@ -419,8 +364,9 @@ const WorkScreen = () => {
                 message: '',
             };
 
-            const result = await createRateReportHarvest(
-                itemRadioState._id,
+            const result = await createAddingMaterials(
+                itemRadioState.materialId,
+                itemRadioState.scheduleId,
                 formRateReport,
             );
 
@@ -440,8 +386,9 @@ const WorkScreen = () => {
                     message: itemRadioState.message,
                 };
 
-                const result = await createRateReportHarvest(
-                    itemRadioState._id,
+                const result = await createAddingMaterials(
+                    itemRadioState.materialId,
+                    itemRadioState.scheduleId,
                     formRateReport,
                 );
 
@@ -451,12 +398,6 @@ const WorkScreen = () => {
             }
         }
     };
-
-    useEffect(() => {
-        if (!isFocused && redirectDataRequestSchedule) {
-            clearRedirectData();
-        }
-    }, [isFocused, redirectDataRequestSchedule]);
 
     useEffect(() => {
         if (userInfo.userType.level === EOrganization.LEADER) {
@@ -498,15 +439,15 @@ const WorkScreen = () => {
                                         </Text>
 
                                         {item.value === 1 &&
-                                        badgeGardenWorkUnBrowse !== 0 ? (
+                                        badgeMaterialsUnBrowse !== 0 ? (
                                             <View style={styles.newBrowseWork}>
                                                 <Text
                                                     style={
                                                         styles.newBrowseWorkText
                                                     }>
-                                                    {badgeGardenWorkUnBrowse > 9
+                                                    {badgeMaterialsUnBrowse > 9
                                                         ? '9+'
-                                                        : badgeGardenWorkUnBrowse}
+                                                        : badgeMaterialsUnBrowse}
                                                 </Text>
                                             </View>
                                         ) : null}
@@ -529,8 +470,8 @@ const WorkScreen = () => {
                                 contentContainerStyle={
                                     styles.flatListGardenWork
                                 }
-                                data={listGardenWorkBrowseFilter}
-                                keyExtractor={item => item._id}
+                                data={listMaterialsBrowseFilter}
+                                keyExtractor={item => item.materialId}
                                 renderItem={({item}) => renderGardenWork(item)}
                                 onRefresh={handleGetRequestGardenData}
                                 refreshing={isLoading}
@@ -551,8 +492,8 @@ const WorkScreen = () => {
                                                     resizeMode='contain'
                                                 />
                                                 <Text style={styles.emptyText}>
-                                                    Hiện tại không có công việc
-                                                    để thực hiện!
+                                                    Hiện tại không có vật tư để
+                                                    duyệt!
                                                 </Text>
                                             </>
                                         ) : (
@@ -813,4 +754,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default WorkScreen;
+export default BrowseAddMaterials;

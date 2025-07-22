@@ -5,6 +5,7 @@ export type ScreenName =
     | 'AUTOMATIC_TRACING'
     /* HOME */
     | 'MAIN'
+    | 'BROWSEADDMATERIALS'
     | 'LISTNOTIFICATION'
     | 'DOCUMENT'
     | 'DETAILDOCUMENTS'
