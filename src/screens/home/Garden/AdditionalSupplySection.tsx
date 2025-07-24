@@ -17,6 +17,7 @@ type AdditionalSupply = {
 };
 
 type Props = {
+    gardenId: string;
     supplies: any;
     onAdd: () => void;
     onChange: (
@@ -42,6 +43,7 @@ const formatMoney = (value: string | undefined | null) => {
 };
 
 const AdditionalSupplySection = ({
+    gardenId,
     supplies,
     onAdd,
     onChange,
@@ -52,78 +54,83 @@ const AdditionalSupplySection = ({
     );
 
     return (
-        <View style={{marginTop: 16}}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Đầu tư tăng thêm</Text>
-                <TouchableOpacity onPress={onAdd}>
-                    <Icon name='add' size={20} color='blue' />
+        gardenId !== '' && (
+            <View style={{marginTop: 16}}>
+                <View style={styles.header}>
+                    <Text style={styles.title}>Đầu tư tăng thêm</Text>
+                    <TouchableOpacity onPress={onAdd}>
+                        <Icon name='add' size={20} color='blue' />
+                    </TouchableOpacity>
+                </View>
+
+                {supplies.map((item: any, index: number) => (
+                    <View key={index} style={{marginBottom: 28}}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Tên vật tư'
+                            placeholderTextColor={'gray'}
+                            value={item.name}
+                            onChangeText={text => onChange(index, 'name', text)}
+                        />
+
+                        <Dropdown
+                            mode='modal'
+                            style={styles.dropdown}
+                            data={unitOptions}
+                            labelField='label'
+                            valueField='value'
+                            placeholder='Đơn vị tính'
+                            placeholderStyle={{color: 'gray'}}
+                            search
+                            searchPlaceholder='Tìm kiếm'
+                            value={item.unit}
+                            onChange={value =>
+                                onChange(index, 'unit', value.value)
+                            }
+                        />
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Khối lượng'
+                            placeholderTextColor={'gray'}
+                            keyboardType='numeric'
+                            value={item.value?.toString() ?? ''}
+                            onChangeText={text => {
+                                const normalizedText = text.replace(',', '.');
+                                const dotCount = (
+                                    normalizedText.match(/\./g) || []
+                                ).length;
+                                if (dotCount > 1) return;
+
+                                onChange(index, 'value', normalizedText);
+                            }}
+                        />
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Thành tiền (VNĐ)'
+                            placeholderTextColor='gray'
+                            keyboardType='numeric'
+                            value={formatMoney(item.price?.toString())}
+                            onChangeText={text => {
+                                const raw = text.replace(/\s/g, '');
+                                onChange(index, 'price', raw);
+                            }}
+                        />
+                    </View>
+                ))}
+
+                <TouchableOpacity
+                    style={[
+                        styles.saveButton,
+                        !allValid && {backgroundColor: '#ccc'},
+                    ]}
+                    disabled={!allValid}
+                    onPress={onSubmit}>
+                    <Text style={styles.saveButtonText}>Lưu</Text>
                 </TouchableOpacity>
             </View>
-
-            {supplies.map((item: any, index: number) => (
-                <View key={index} style={{marginBottom: 28}}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Tên vật tư'
-                        placeholderTextColor={'gray'}
-                        value={item.name}
-                        onChangeText={text => onChange(index, 'name', text)}
-                    />
-
-                    <Dropdown
-                        mode='modal'
-                        style={styles.dropdown}
-                        data={unitOptions}
-                        labelField='label'
-                        valueField='value'
-                        placeholder='Đơn vị tính'
-                        placeholderStyle={{color: 'gray'}}
-                        search
-                        searchPlaceholder='Tìm kiếm'
-                        value={item.unit}
-                        onChange={value => onChange(index, 'unit', value.value)}
-                    />
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Khối lượng'
-                        placeholderTextColor={'gray'}
-                        keyboardType='numeric'
-                        value={item.value?.toString() ?? ''}
-                        onChangeText={text => {
-                            const normalizedText = text.replace(',', '.');
-                            const dotCount = (normalizedText.match(/\./g) || [])
-                                .length;
-                            if (dotCount > 1) return;
-
-                            onChange(index, 'value', normalizedText);
-                        }}
-                    />
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Thành tiền (VNĐ)'
-                        placeholderTextColor='gray'
-                        keyboardType='numeric'
-                        value={formatMoney(item.price?.toString())}
-                        onChangeText={text => {
-                            const raw = text.replace(/\s/g, '');
-                            onChange(index, 'price', raw);
-                        }}
-                    />
-                </View>
-            ))}
-
-            <TouchableOpacity
-                style={[
-                    styles.saveButton,
-                    !allValid && {backgroundColor: '#ccc'},
-                ]}
-                disabled={!allValid}
-                onPress={onSubmit}>
-                <Text style={styles.saveButtonText}>Lưu</Text>
-            </TouchableOpacity>
-        </View>
+        )
     );
 };
 

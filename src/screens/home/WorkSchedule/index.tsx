@@ -66,7 +66,7 @@ const WorkSchedule = ({navigation}: any) => {
         {_id: '12', name: 'Tháng 12'},
     ];
 
-    const generateYears = (startYear = 2020) => {
+    const generateYears = (startYear = 2025) => {
         const currentYear = new Date().getFullYear();
         const years = [];
 

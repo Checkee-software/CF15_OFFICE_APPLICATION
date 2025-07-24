@@ -114,7 +114,7 @@ const StatisticResultWorker = (props: any) => {
                         </View>
                     ) : (
                         <Text style={styles.emptyDataText}>
-                            Thời gian bạn chọn hiện không có tiến độ để thống kê
+                            Không có dữ liệu thống kê
                         </Text>
                     )
                 ) : statisticData?.list.length !== 0 &&
@@ -282,7 +282,7 @@ const StatisticResultWorker = (props: any) => {
                     </View>
                 ) : (
                     <Text style={styles.emptyDataText}>
-                        Thời gian bạn chọn hiện không có quy trình để thống kê
+                        Không có dữ liệu thống kê
                     </Text>
                 )}
             </View>

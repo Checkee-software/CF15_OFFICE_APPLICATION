@@ -429,6 +429,7 @@ const GardenDeclare = () => {
                 />
 
                 <AdditionalSupplySection
+                    gardenId={selectedGarden.gardenId}
                     supplies={additionalSupplies}
                     onAdd={handleAddSupply}
                     onChange={handleChangeSupplyField}

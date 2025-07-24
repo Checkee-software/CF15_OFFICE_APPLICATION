@@ -9,6 +9,7 @@ import {
 import ENV from '@/config/ENV';
 import {IProductType} from '@/shared-types/Response/ProductTypeResponse/ProductTypeResponse';
 import moment from 'moment';
+import asyncStorageHelper from '../utils/localStorageHelper/index';
 
 interface IList {
     _id: string;
@@ -154,37 +155,41 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             if (response?.data?.data) {
                 const schedule: ISchedule = response.data.data;
 
-                //if()
-
                 const filteredData = filterStaffByUserId(schedule, userId);
 
-                const hasMachineTask = filteredData.childTasks.some(
-                    (task: any) => task.machines.length > 0,
+                const hasManyGarden = filteredData.childTasks.some(
+                    (task: any) =>
+                        task.staff.some(
+                            (staff: any) => staff.gardens.length >= 2,
+                        ),
                 );
 
-                if (hasMachineTask) {
-                    const updatedFilteredData = {
-                        ...filteredData,
-                        childTasks: filteredData.childTasks.map(
-                            (task: any) => ({
-                                ...task,
-                                staff: task.staff.map((staffItem: any) => ({
-                                    ...staffItem,
-                                    gardens: staffItem.gardens.map(
-                                        (garden: any) => ({
-                                            ...garden,
-                                            name: `${garden.name} - ${garden.groupName}`,
-                                        }),
-                                    ),
-                                })),
-                            }),
-                        ),
-                    };
+                if (hasManyGarden) {
+                    const userGardenNickname =
+                        asyncStorageHelper.userGardenNickname;
 
-                    set({detailWorkSchedule: updatedFilteredData});
-                } else {
-                    set({detailWorkSchedule: filteredData});
+                    filteredData.childTasks.forEach((task: any) => {
+                        task.staff.forEach((staff: any) => {
+                            const userGarden = userGardenNickname.find(
+                                u => u.userId === staff.userId,
+                            );
+
+                            staff.gardens = staff.gardens.map((garden: any) => {
+                                const nickName = userGarden?.garden?.find(
+                                    g => g.gardenId === garden.gardenId,
+                                )?.gardenNickname;
+                                return {
+                                    ...garden,
+                                    name: `${nickName || garden.name} - ${
+                                        garden.groupName
+                                    }`,
+                                };
+                            });
+                        });
+                    });
                 }
+
+                set({detailWorkSchedule: filteredData});
             } else {
                 set({detailWorkSchedule: null});
             }

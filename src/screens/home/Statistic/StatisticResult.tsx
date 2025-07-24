@@ -114,7 +114,7 @@ const StatisticResult = (props: any) => {
                         </View>
                     ) : (
                         <Text style={styles.emptyDataText}>
-                            Thời gian bạn chọn hiện không có tiến độ để thống kê
+                            Không có dữ liệu thống kê
                         </Text>
                     )
                 ) : statisticData?.list.length !== 0 &&
@@ -312,17 +312,9 @@ const StatisticResult = (props: any) => {
                             ))}
                         </View>
                     </View>
-                ) : props.selectedType === 'GROUP' ? (
-                    <Text style={styles.emptyDataText}>
-                        Không có thống kê của đội sản xuất trong thời gian này
-                    </Text>
                 ) : (
                     <Text style={styles.emptyDataText}>
-                        {`Thời gian bạn chọn hiện không có ${
-                            props.selectedType === 'WORK'
-                                ? 'quy trình'
-                                : 'sản phẩm'
-                        } để thống kê`}
+                        Không có dữ liệu thống kê
                     </Text>
                 )}
             </View>

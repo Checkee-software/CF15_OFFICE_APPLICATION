@@ -241,7 +241,9 @@ export default function Main({navigation}: any) {
                         </Text>
                     </View>
 
-                    <View style={MainStyles.avatarUser}>
+                    <TouchableOpacity
+                        style={MainStyles.avatarUser}
+                        onPress={() => navigation.navigate('Hồ sơ')}>
                         <Image
                             source={
                                 userInfo.avatar
@@ -252,7 +254,7 @@ export default function Main({navigation}: any) {
                             }
                             style={MainStyles.avatar}
                         />
-                    </View>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={MainStyles.mainMenu}>
