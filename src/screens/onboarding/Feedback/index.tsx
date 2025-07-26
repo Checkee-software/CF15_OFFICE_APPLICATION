@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback} from 'react';
 import {
     View,
     Text,
@@ -13,13 +13,21 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useFeedbackStore from '../../../stores/feedbackStore';
 import dayjs from 'dayjs';
 import images from '../../../assets/images';
-// import {useAuthStore} from '../../../stores/authStore';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import {useAuthStore} from '../../../stores/authStore';
 
 export default function FeedbackScreen({navigation}: any) {
-    // const {userInfo} = useAuthStore();
+    const {userInfo} = useAuthStore();
 
     const {feedbacks, fetchFeedbacks, isLoading, getFullAvatarUrl} =
         useFeedbackStore();
+
+    let hasFeedbackEditPermission = true;
+    if (userInfo.userType.level !== EOrganization.WORKER) {
+        hasFeedbackEditPermission = userInfo.functions.some(
+            (item: any) => item._id === 'FEEDBACK' && item.edit,
+        );
+    }
 
     const fetchData = async () => {
         try {
@@ -35,10 +43,6 @@ export default function FeedbackScreen({navigation}: any) {
             // eslint-disable-next-line
         }, []),
     );
-
-    useEffect(() => {
-        console.log('FEEDBACKS_RECEIVED:', feedbacks);
-    }, [feedbacks]);
 
     const renderItem = ({item}: any) => {
         const avatarUrl = getFullAvatarUrl(item.avatar) || images.avatar;
@@ -56,10 +60,7 @@ export default function FeedbackScreen({navigation}: any) {
                         <Text style={styles.name}>
                             {item.fullName || 'Không rõ tên'}
                         </Text>
-                        <Text style={styles.role}>
-                            {item.roleName || 'Không rõ vai trò'}
-                            
-                        </Text>
+                        <Text style={styles.role}>{item.roleName}</Text>
                     </View>
                 </View>
                 <Text style={styles.title}>{item.title}</Text>
@@ -89,17 +90,22 @@ export default function FeedbackScreen({navigation}: any) {
                 }
             />
 
-            <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate(SCREEN_INFO.FEEDBACK1.key)}>
-                <MaterialCommunityIcons
-                    name='pencil'
-                    size={18}
-                    color='#fff'
-                    style={styles.icon}
-                />
-                <Text style={styles.buttonText}>Tạo góp ý</Text>
-            </TouchableOpacity>
+            {userInfo.userType.level !== EOrganization.MANAGEMENT &&
+                hasFeedbackEditPermission && (
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() =>
+                            navigation.navigate(SCREEN_INFO.FEEDBACK1.key)
+                        }>
+                        <MaterialCommunityIcons
+                            name='pencil'
+                            size={18}
+                            color='#fff'
+                            style={styles.icon}
+                        />
+                        <Text style={styles.buttonText}>Tạo góp ý</Text>
+                    </TouchableOpacity>
+                )}
         </View>
     );
 }

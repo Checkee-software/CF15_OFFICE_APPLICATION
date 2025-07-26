@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import {useAuthStore} from './authStore';
+//import {useAuthStore} from './authStore';
 import {ICreate as ICreateFormData} from '../shared-types/form-data/FeedbackFormData/FeedbackFormData';
 import {IFeedback} from '../shared-types/Response/FeedbackResponse/FeedbackResponse';
 import ENV from '@/config/ENV';
@@ -35,8 +35,7 @@ const useFeedbackStore = create<FeedbackStore>(set => ({
     submitFeedback: async (
         data: Pick<ICreateFormData, 'title' | 'content'>,
     ) => {
-        const {userInfo} = useAuthStore.getState();
-        const departmentCode = userInfo?.userType?.department;
+        //const {userInfo} = useAuthStore.getState();
 
         set({isLoading: true});
 
@@ -88,7 +87,7 @@ const useFeedbackStore = create<FeedbackStore>(set => ({
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/feedbacks/collection?code=&createdAt=-1&from=1748710800000&to=4115817600000`,
             );
-            console.log('FETCH_FEEDBACKS_RESPONSE:', res.data);
+            //console.log('FETCH_FEEDBACKS_RESPONSE:', res.data);
             set({feedbacks: res.data?.data || []});
         } catch (error: unknown) {
             const err = error as any;

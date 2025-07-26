@@ -15,6 +15,7 @@ import Snackbar from 'react-native-snackbar';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import AutoHeightWebView from 'react-native-autoheight-webview';
 import ENV from '@/config/ENV';
+import {Dimensions} from 'react-native';
 
 const DetailDocuments = ({route}: any) => {
     const [loadingDownload, setLoadingDownload] = useState(false);
@@ -194,37 +195,31 @@ const DetailDocuments = ({route}: any) => {
                         scrollEnabled={false}
                     />
 
-                    {/* list file đính kèm */}
-                    <View style={DetailDocumentsStyles.attachedDocuments}>
-                        <Text
-                            style={DetailDocumentsStyles.attachedDocumentsText}>
-                            Tài liệu đính kèm
-                        </Text>
-                        <View
-                            style={DetailDocumentsStyles.listAttachedDocuments}>
-                            <FlatList
-                                scrollEnabled={false}
-                                data={route.params.itemDocument.files}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={({item}) =>
-                                    renderItemAttachedFiles(item)
-                                }
-                                ListEmptyComponent={
-                                    <View
-                                        style={
-                                            DetailDocumentsStyles.emptyContainer
-                                        }>
-                                        <Text
-                                            style={
-                                                DetailDocumentsStyles.emptyText
-                                            }>
-                                            Không có tài liệu nào được đính kèm
-                                        </Text>
-                                    </View>
-                                }
-                            />
+                    {route.params.itemDocument.files.length !== 0 && (
+                        <View style={DetailDocumentsStyles.attachedDocuments}>
+                            <Text
+                                style={
+                                    DetailDocumentsStyles.attachedDocumentsText
+                                }>
+                                Tài liệu đính kèm
+                            </Text>
+                            <View
+                                style={
+                                    DetailDocumentsStyles.listAttachedDocuments
+                                }>
+                                <FlatList
+                                    scrollEnabled={false}
+                                    data={route.params.itemDocument.files}
+                                    keyExtractor={(item, index) =>
+                                        index.toString()
+                                    }
+                                    renderItem={({item}) =>
+                                        renderItemAttachedFiles(item)
+                                    }
+                                />
+                            </View>
                         </View>
-                    </View>
+                    )}
                 </View>
             </ScrollView>
             <Backdrop open={loadingDownload} />
@@ -251,7 +246,7 @@ const DetailDocumentsStyles = StyleSheet.create({
     },
     creator: {
         color: 'rgba(33, 150, 243, 1)',
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: 300,
         marginBottom: 6,
     },
@@ -276,7 +271,8 @@ const DetailDocumentsStyles = StyleSheet.create({
         textAlign: 'right',
     },
     documentContent: {
-        marginVertical: 5,
+        marginVertical: 10,
+        width: Dimensions.get('window').width - 15,
     },
     attachedDocuments: {
         //marginBottom: 15,

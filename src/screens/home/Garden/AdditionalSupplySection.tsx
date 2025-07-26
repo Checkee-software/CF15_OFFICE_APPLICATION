@@ -7,15 +7,18 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Picker} from '@react-native-picker/picker';
+import {Dropdown} from 'react-native-element-dropdown';
 
 type AdditionalSupply = {
     name: string;
-    value: string;
+    unit: string;
+    value: number;
+    price: number;
 };
 
 type Props = {
-    supplies: AdditionalSupply[];
+    gardenId: string;
+    supplies: any;
     onAdd: () => void;
     onChange: (
         index: number,
@@ -25,53 +28,109 @@ type Props = {
     onSubmit: () => void;
 };
 
+const unitOptions = [
+    {label: 'kg', value: 'kg'},
+    {label: 'g', value: 'g'},
+    {label: 'lít', value: 'lít'},
+    {label: 'ml', value: 'ml'},
+    {label: 'tấn', value: 'tấn'},
+    {label: 'tạ', value: 'tạ'},
+    {label: 'yến', value: 'yến'},
+];
+const formatMoney = (value: string | undefined | null) => {
+    const numeric = (value || '').replace(/\D/g, '');
+    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+};
+
 const AdditionalSupplySection = ({
+    gardenId,
     supplies,
     onAdd,
     onChange,
     onSubmit,
 }: Props) => {
-    const allValid = supplies.every(s => s.name && s.value);
+    const allValid = supplies.every(
+        (s: any) => s.name && s.unit && s.value && s.price,
+    );
 
     return (
-        <View style={{marginTop: 16}}>
-            <View style={styles.header}>
-                <Text style={styles.title}>Đầu tư tăng thêm</Text>
-                <TouchableOpacity onPress={onAdd}>
-                    <Icon name='add' size={20} color='blue' />
+        gardenId !== '' && (
+            <View style={{marginTop: 16}}>
+                <View style={styles.header}>
+                    <Text style={styles.title}>Đầu tư tăng thêm</Text>
+                    <TouchableOpacity onPress={onAdd}>
+                        <Icon name='add' size={20} color='blue' />
+                    </TouchableOpacity>
+                </View>
+
+                {supplies.map((item: any, index: number) => (
+                    <View key={index} style={{marginBottom: 28}}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Tên vật tư'
+                            placeholderTextColor={'gray'}
+                            value={item.name}
+                            onChangeText={text => onChange(index, 'name', text)}
+                        />
+
+                        <Dropdown
+                            mode='modal'
+                            style={styles.dropdown}
+                            data={unitOptions}
+                            labelField='label'
+                            valueField='value'
+                            placeholder='Đơn vị tính'
+                            placeholderStyle={{color: 'gray'}}
+                            search
+                            searchPlaceholder='Tìm kiếm'
+                            value={item.unit}
+                            onChange={value =>
+                                onChange(index, 'unit', value.value)
+                            }
+                        />
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Khối lượng'
+                            placeholderTextColor={'gray'}
+                            keyboardType='numeric'
+                            value={item.value?.toString() ?? ''}
+                            onChangeText={text => {
+                                const normalizedText = text.replace(',', '.');
+                                const dotCount = (
+                                    normalizedText.match(/\./g) || []
+                                ).length;
+                                if (dotCount > 1) return;
+
+                                onChange(index, 'value', normalizedText);
+                            }}
+                        />
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder='Thành tiền (VNĐ)'
+                            placeholderTextColor='gray'
+                            keyboardType='numeric'
+                            value={formatMoney(item.price?.toString())}
+                            onChangeText={text => {
+                                const raw = text.replace(/\s/g, '');
+                                onChange(index, 'price', raw);
+                            }}
+                        />
+                    </View>
+                ))}
+
+                <TouchableOpacity
+                    style={[
+                        styles.saveButton,
+                        !allValid && {backgroundColor: '#ccc'},
+                    ]}
+                    disabled={!allValid}
+                    onPress={onSubmit}>
+                    <Text style={styles.saveButtonText}>Lưu</Text>
                 </TouchableOpacity>
             </View>
-
-            {supplies.map((item, index) => (
-                <View key={index} style={{marginBottom: 28}}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Tên vật tư'
-                        placeholderTextColor={'black'}
-                        value={item.name}
-                        onChangeText={text => onChange(index, 'name', text)}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder='Giá trị (kg)'
-                        placeholderTextColor={'black'}
-                        keyboardType='numeric'
-                        value={item.value}
-                        onChangeText={text => onChange(index, 'value', text)}
-                    />
-                </View>
-            ))}
-
-            <TouchableOpacity
-                style={[
-                    styles.saveButton,
-                    !allValid && {backgroundColor: '#ccc'},
-                ]}
-                disabled={!allValid}
-                onPress={onSubmit}>
-                <Text style={styles.saveButtonText}>Lưu</Text>
-            </TouchableOpacity>
-        </View>
+        )
     );
 };
 
@@ -96,11 +155,14 @@ const styles = StyleSheet.create({
         height: 55,
         color: 'black',
     },
-    dropdownContainer: {
+    dropdown: {
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 6,
-        backgroundColor: '#fff',
+        paddingHorizontal: 8,
+        marginBottom: 8,
+        height: 55,
+        justifyContent: 'center',
     },
     saveButton: {
         backgroundColor: '#4CAF50',

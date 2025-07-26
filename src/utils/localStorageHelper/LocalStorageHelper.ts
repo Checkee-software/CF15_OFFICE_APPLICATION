@@ -1,7 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+interface garden {
+    gardenId: string;
+    gardenNickname: string;
+}
+
+interface userGardenNickname {
+    userId: string;
+    garden: garden[];
+}
+
 interface IClientStorage {
     token?: string;
+    userGardenNickname: userGardenNickname[];
 }
 
 const STORAGE_KEY = 'checkee';
@@ -21,6 +32,7 @@ export default class LocalStorageHelper {
     // ☣️ Khai báo field cần lưu ở đây
     private data: IClientStorage = {
         token: '',
+        userGardenNickname: [],
     };
 
     protected constructor() {
@@ -30,11 +42,11 @@ export default class LocalStorageHelper {
     private save = async () => {
         try {
             const data = JSON.stringify(this.data);
-            console.log('token-data: ', data);
+            //console.log('token-data: ', data);
             await AsyncStorage.setItem(STORAGE_KEY, data);
-            console.log('💾 LocalStorageHelper saved');
+            //console.log('💾 LocalStorageHelper saved');
         } catch (e) {
-            console.log(e);
+            //console.log(e);
         }
     };
 
@@ -60,7 +72,7 @@ export default class LocalStorageHelper {
     };
 
     private load = async () => {
-        console.log('💾 LocalStorageHelper loading');
+        //console.log('💾 LocalStorageHelper loading');
         this._isLoad = true;
         const strData = await AsyncStorage.getItem(STORAGE_KEY);
 
@@ -75,7 +87,7 @@ export default class LocalStorageHelper {
 
             this.data = _data;
             this._isLoad = false;
-            console.log('💾 LocalStorageHelper loaded');
+            //console.log('💾 LocalStorageHelper loaded');
             return;
         } catch {
             this._isLoad = false;
@@ -100,5 +112,50 @@ export default class LocalStorageHelper {
     public async clearToken() {
         this.data.token = '';
         await this.save();
+    }
+
+    public get userGardenNickname() {
+        return this.data.userGardenNickname;
+    }
+
+    public setStorageUserGardens(
+        userId: string,
+        gardenId: string,
+        newGardenName: string,
+    ) {
+        // Tìm user có userId tương ứng
+
+        const user = this.data.userGardenNickname.find(
+            u => u.userId === userId,
+        );
+
+        if (user) {
+            // Nếu có user, tìm garden theo gardenId
+            const garden = user.garden.find(g => g.gardenId === gardenId);
+
+            if (garden) {
+                // Nếu có garden → cập nhật tên
+                garden.gardenNickname = newGardenName;
+            } else {
+                // Nếu không có garden → thêm mới
+                user.garden.push({
+                    gardenId,
+                    gardenNickname: newGardenName,
+                });
+            }
+        } else {
+            // Nếu không có user → thêm mới
+            this.data.userGardenNickname.push({
+                userId,
+                garden: [
+                    {
+                        gardenId,
+                        gardenNickname: newGardenName,
+                    },
+                ],
+            });
+        }
+
+        this.save();
     }
 }

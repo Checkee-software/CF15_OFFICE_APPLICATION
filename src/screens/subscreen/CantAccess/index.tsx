@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 
-export default function Error() {
+export default function Error(props: any) {
     return (
         <View style={styles.container}>
-            <Text>Hello world error</Text>
+            <Text>{props.detail}</Text>
         </View>
     );
 }
@@ -12,7 +12,7 @@ export default function Error() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'pink',
+        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
     },

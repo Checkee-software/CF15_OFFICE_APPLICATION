@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useCallback, useEffect, useState} from 'react';
 import {
     View,
@@ -19,12 +21,10 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Loading from '../../subscreen/Loading';
 import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
 import {IJob} from '../../../shared-types/Response/ScheduleResponse/ScheduleResponse';
-import {useAuthStore} from '../../../stores/authStore';
 
 const JobListWorker = () => {
     const navigation = useNavigation() as any;
     const route = useRoute<any>();
-    const {userInfo} = useAuthStore();
     const navigateNext =
         route.params?.navigateNext ?? SCREEN_INFO.GARDENDECLAREWORKER.key;
 
@@ -49,23 +49,14 @@ const JobListWorker = () => {
         );
 
         if (searchText === '') {
-            setFilteredJobs(processingJobs);
+            setFilteredJobs(processingJobs as any);
         } else {
             const filtered = processingJobs.filter(job =>
                 job.title.toLowerCase().includes(searchText.toLowerCase()),
             );
-            setFilteredJobs(filtered);
+            setFilteredJobs(filtered as any);
         }
     }, [searchText, listJobs]);
-
-    const formatDate = (dateStr: string | Date) => {
-        const date = new Date(dateStr);
-        return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-    };
-
-    const formatDateRange = (start: string, end: string) => {
-        return `${formatDate(start)} → ${formatDate(end)}`;
-    };
 
     const formatRemainingTime = (endDateStr: string | Date) => {
         const now = new Date();
@@ -104,7 +95,7 @@ const JobListWorker = () => {
             <View style={styles.cardContent}>
                 <View style={styles.cardTextContainer}>
                     <Text style={styles.cardTitle}>{item.title}</Text>
-                    <Text style={styles.cardSubtitle}>{item.gardenName}</Text>
+                    <Text style={styles.cardSubtitle}>{item.productName}</Text>
                     <View
                         style={{
                             flexDirection: 'row',
@@ -155,7 +146,7 @@ const JobListWorker = () => {
                             />
                             <TextInput
                                 style={styles.searchInput}
-                                placeholder='Tìm kiếm công việc'
+                                placeholder='Tìm quy trình'
                                 value={searchText}
                                 onChangeText={setSearchText}
                                 placeholderTextColor='#888'

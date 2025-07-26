@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
 import {
     View,
@@ -5,25 +7,115 @@ import {
     StyleSheet,
     TouchableOpacity,
     Image,
-    FlatList,
     TextInput,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
-import {IGarden} from '@/shared-types/Response/GardenResponse/GardenResponse';
+import {IGarden} from '../../../stores/gardenStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useAuthStore} from '../../../stores/authStore';
+import Snackbar from 'react-native-snackbar';
+import asyncStorageHelper from '../../../utils/localStorageHelper/index';
+import Backdrop from '@/screens/subscreen/Loading/index2';
+import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
 const GardenInfo = () => {
     const navigation = useNavigation() as any;
 
-    const {gardens, fetchGardens, isLoading} = useGardenStore();
+    const {gardens, fetchGardens, isLoading, setGardenData, isLoading2} =
+        useGardenStore();
+    const {userInfo} = useAuthStore();
+
+    const [gardenNameInput, setGardenNameInput] = useState({_id: '', name: ''});
+    const [showInputGardenName, setShowInputGardenName] = useState({
+        _id: '',
+        check: false,
+    });
+
     const [searchText, setSearchText] = useState('');
     const [filteredGardens, setFilteredGardens] = useState<IGarden[]>([]);
 
+    const handleNavigate = (item: any) => {
+        if (
+            userInfo.functions.some(
+                (itemUser: any) => itemUser._id === 'GARDEN' && itemUser.detail,
+            )
+        ) {
+            setGardenNameInput({
+                _id: '',
+                name: '',
+            });
+            setShowInputGardenName({_id: '', check: false});
+
+            navigation.navigate(SCREEN_INFO.GARDENINFO1.key, {id: item._id});
+        } else {
+            setGardenNameInput({
+                _id: '',
+                name: '',
+            });
+            setShowInputGardenName({_id: '', check: false});
+
+            Snackbar.show({
+                text: 'Bạn không có quyền xem chi tiết khu vườn',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+        }
+    };
+
+    const getStorageUserGardens = () => {
+        const newGardens = gardens;
+        const userGardenNickname = asyncStorageHelper.userGardenNickname;
+
+        const user = userGardenNickname.find(u => u.userId === userInfo._id);
+        return newGardens?.map((item: any) => {
+            let gardenNickname = '';
+
+            if (user) {
+                const matchedGarden = user.garden.find(
+                    g => g.gardenId === item._id,
+                );
+                if (matchedGarden) {
+                    gardenNickname = matchedGarden.gardenNickname;
+                }
+            }
+
+            // Trả về object gốc + thêm gardenNickname
+            return {
+                ...item,
+                gardenNickname,
+            };
+        });
+    };
+
+    const saveGardenName = () => {
+        if (gardenNameInput.name !== '') {
+            asyncStorageHelper.setStorageUserGardens(
+                userInfo._id,
+                gardenNameInput._id,
+                gardenNameInput.name,
+            );
+            const newGardenNickname = getStorageUserGardens();
+            setGardenData(newGardenNickname);
+
+            setGardenNameInput({
+                _id: '',
+                name: '',
+            });
+            setShowInputGardenName({_id: '', check: false});
+        } else {
+            setGardenNameInput({
+                _id: '',
+                name: '',
+            });
+            setShowInputGardenName({_id: '', check: false});
+        }
+    };
+
     useEffect(() => {
-        fetchGardens();
+        fetchGardens(userInfo._id);
     }, []);
 
     useEffect(() => {
@@ -39,6 +131,9 @@ const GardenInfo = () => {
                         .includes(searchText.toLowerCase()) ||
                     garden.code
                         .toLowerCase()
+                        .includes(searchText.toLowerCase()) ||
+                    (garden.gardenNickname ?? '')
+                        .toLowerCase()
                         .includes(searchText.toLowerCase()),
             );
             setFilteredGardens(filtered);
@@ -48,9 +143,7 @@ const GardenInfo = () => {
     const renderItem = ({item}: {item: IGarden}) => (
         <TouchableOpacity
             style={styles.card}
-            onPress={() =>
-                navigation.navigate(SCREEN_INFO.GARDENINFO1.key, {id: item._id})
-            }>
+            onPress={() => handleNavigate(item)}>
             <Image
                 source={require('../../../assets/images/garden.png')}
                 style={styles.image}
@@ -59,9 +152,60 @@ const GardenInfo = () => {
             <View style={styles.cardContent}>
                 <View style={styles.cardTextContainer}>
                     <Text style={styles.cardTitle}>{item.name}</Text>
+
+                    {showInputGardenName._id === item._id ? (
+                        <TextInput
+                            style={{
+                                width: '90%',
+                                padding: 0,
+                                margin: 0,
+                            }}
+                            placeholder='Hãy đặt tên khu vườn'
+                            placeholderTextColor={'black'}
+                            autoFocus={
+                                gardenNameInput._id === item._id ? true : false
+                            }
+                            onChangeText={value =>
+                                setGardenNameInput({
+                                    ...gardenNameInput,
+                                    name: value,
+                                })
+                            }
+                            value={gardenNameInput.name}
+                        />
+                    ) : (
+                        item.gardenNickname !== '' && (
+                            <Text style={styles.cardTitle}>
+                                {item.gardenNickname}
+                            </Text>
+                        )
+                    )}
+
                     <Text style={styles.cardSubtitle}>{item.code}</Text>
                 </View>
             </View>
+
+            {showInputGardenName._id === item._id ? (
+                <TouchableOpacity onPress={saveGardenName}>
+                    <FontAwesome name='check' size={28} color={'#2196F3'} />
+                </TouchableOpacity>
+            ) : (
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowInputGardenName({
+                            _id: item._id,
+                            check: true,
+                        }),
+                            setGardenNameInput({
+                                _id: item._id,
+                                name: item.gardenNickname
+                                    ? item.gardenNickname
+                                    : '',
+                            });
+                    }}>
+                    <FontAwesome name='pencil' size={28} color={'#FF4E45'} />
+                </TouchableOpacity>
+            )}
         </TouchableOpacity>
     );
 
@@ -97,11 +241,15 @@ const GardenInfo = () => {
                 </View>
             </View>
 
-            <FlatList
+            <KeyboardAwareFlatList
                 data={filteredGardens}
+                extraHeight={100}
                 renderItem={renderItem}
+                keyboardShouldPersistTaps='handled'
                 keyExtractor={item => item._id}
                 contentContainerStyle={styles.listContainer}
+                scrollEnabled={false}
+                enableOnAndroid
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         {searchText.trim() ? (
@@ -121,6 +269,8 @@ const GardenInfo = () => {
                     </View>
                 }
             />
+
+            <Backdrop open={isLoading2} />
         </View>
     );
 };

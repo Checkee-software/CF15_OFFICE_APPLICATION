@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import {View, Text, StyleSheet, Animated, Easing} from 'react-native';
 import images from '../../../assets/images';

@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     title: {
         fontWeight: '600',
         fontSize: 16,
+        width: '90%',
     },
     body: {
         gap: 12,

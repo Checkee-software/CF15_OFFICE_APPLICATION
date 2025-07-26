@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
 import {
     View,
@@ -6,6 +7,7 @@ import {
     ScrollView,
     TouchableOpacity,
     Linking,
+    FlatList,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import QRCode from 'react-native-qrcode-svg';
@@ -14,6 +16,10 @@ import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useAuthStore} from '../../../stores/authStore';
 import ENV from '@/config/ENV';
+import RNFS from 'react-native-fs';
+import Snackbar from 'react-native-snackbar';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Feather from 'react-native-vector-icons/Feather';
 
 const CollapsibleRow = ({
     label,
@@ -54,19 +60,95 @@ const GardenDetailScreen = () => {
     const [showAreaInfo, setShowAreaInfo] = React.useState(false);
     const [showLocationInfo, setShowLocationInfo] = React.useState(false);
     const [showInfo, setShowInfo] = React.useState(false);
-    const [showManagementAreaInfo, setShowManagementAreaInfo] =
-        React.useState(false);
 
-    const {
-        selectedGarden,
-        fetchGardenDetail,
-        isLoading,
-        postHarvestStatus,
-        fetchHarvestHistory,
-        harvestHistory,
-    } = useGardenStore();
+    const {selectedGarden, fetchGardenDetail, isLoading} = useGardenStore();
 
     const [contractExpanded, setContractExpanded] = React.useState(false);
+
+    const fixEncoding = (input: string): string => {
+        try {
+            return decodeURIComponent(escape(input));
+        } catch (error) {
+            return input;
+        }
+    };
+
+    const fixFilePath = (path: string) => {
+        const updatedPath = path.replace(/\\/g, '/');
+        return `${ENV.BACKEND_URL}${updatedPath}`;
+    };
+
+    const formatFileSize = (size: number) => {
+        if (size >= 1024 * 1024) {
+            return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+        } else if (size >= 1024) {
+            return `${(size / 1024).toFixed(2)} KB`;
+        } else {
+            return `${size} Bytes`;
+        }
+    };
+
+    const downloadFile = async (fileUrl: string, fileName: string) => {
+        const updatedFileUrl = fixFilePath(fileUrl);
+        try {
+            const downloadDest = `${RNFS.DownloadDirectoryPath}/${fileName}`;
+            const options = {
+                fromUrl: updatedFileUrl,
+                toFile: downloadDest,
+            };
+            const result = await RNFS.downloadFile(options).promise;
+            if (result.statusCode === 200) {
+                Snackbar.show({
+                    text: 'Đã tải tập tin về điện thoại của bạn!',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            } else {
+                Snackbar.show({
+                    text: 'Tải file không thành công!',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            }
+        } catch (error) {
+            Snackbar.show({
+                text: 'Có lỗi xảy ra khi tải file.',
+                duration: Snackbar.LENGTH_LONG,
+            });
+        }
+    };
+
+    const renderItemAttachedFiles = (itemAttachedFiles: any) => (
+        <View style={styles.cardDocument}>
+            <View style={styles.leftCardDocument}>
+                <MaterialCommunityIcons
+                    name='text-box'
+                    color={'rgba(255, 78, 69, 1)'}
+                    size={28}
+                />
+                <View style={styles.infoDocument}>
+                    <Text style={styles.infoDocumentText}>
+                        {fixEncoding(itemAttachedFiles.originalname)}
+                    </Text>
+                    <Text style={styles.infoDocumentSizeText}>
+                        Kích cỡ: {formatFileSize(itemAttachedFiles.size)}
+                    </Text>
+                </View>
+            </View>
+
+            <TouchableOpacity
+                onPress={() =>
+                    downloadFile(
+                        itemAttachedFiles.path,
+                        itemAttachedFiles.filename,
+                    )
+                }>
+                <Feather
+                    name='download'
+                    color={'rgba(33, 150, 243, 1)'}
+                    size={22}
+                />
+            </TouchableOpacity>
+        </View>
+    );
 
     useEffect(() => {
         if (id) {
@@ -102,20 +184,20 @@ const GardenDetailScreen = () => {
                     </Text>
                 </View>
 
-                <CollapsibleRow
-                    label='Diện tích (m2)'
-                    value={selectedGarden.area?.totalSquare}
-                    expanded={showAreaInfo}
-                    onToggle={() => setShowAreaInfo(!showAreaInfo)}>
-                    <Row
-                        label='Chiều dài'
-                        value={`${selectedGarden.area?.length} m`}
-                    />
-                    <Row
-                        label='Chiều rộng'
-                        value={`${selectedGarden.area?.width} m`}
-                    />
-                </CollapsibleRow>
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                    }}>
+                    <Text style={{width: '65%'}}>Diện tích (ha)</Text>
+                    <Text
+                        style={{
+                            width: '30%',
+                            textAlign: 'right',
+                        }}>
+                        {selectedGarden.management?.area?.totalSquare}
+                    </Text>
+                </View>
 
                 <CollapsibleRow
                     label='Vị trí khu vườn'
@@ -180,22 +262,22 @@ const GardenDetailScreen = () => {
                         </CollapsibleRow>
                     )}
 
-                    <CollapsibleRow
-                        label='Diện tích giao khoán (m2)'
-                        value={selectedGarden.management?.area?.totalSquare}
-                        expanded={showManagementAreaInfo}
-                        onToggle={() =>
-                            setShowManagementAreaInfo(!showManagementAreaInfo)
-                        }>
-                        <Row
-                            label='Chiều dài'
-                            value={`${selectedGarden.management?.area?.length} m`}
-                        />
-                        <Row
-                            label='Chiều rộng'
-                            value={`${selectedGarden.management?.area?.width} m`}
-                        />
-                    </CollapsibleRow>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                        }}>
+                        <Text style={{width: '65%'}}>
+                            Diện tích giao khoán (ha)
+                        </Text>
+                        <Text
+                            style={{
+                                width: '30%',
+                                textAlign: 'right',
+                            }}>
+                            {selectedGarden.management?.area?.totalSquare}
+                        </Text>
+                    </View>
                 </CollapsibleRow>
             </Section>
 
@@ -207,7 +289,7 @@ const GardenDetailScreen = () => {
                     </Text>
                 </View>
                 <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Số lượng giống cây</Text>
+                    <Text style={styles.infoLabel}>Số lượng cây trồng</Text>
                     <Text
                         style={
                             styles.infoValue
@@ -221,10 +303,11 @@ const GardenDetailScreen = () => {
                                 style={
                                     styles.yearTitle
                                 }>{`Năm ${item.year}`}</Text>
-                            <Text
-                                style={
-                                    styles.plantedText
-                                }>{`Trồng ${item.quantity} cây`}</Text>
+                            <Text style={styles.plantedText}>{`Trồng ${
+                                selectedGarden.totalProductByYear[
+                                    selectedGarden.totalProductByYear.length - 1
+                                ].quantity
+                            } cây`}</Text>
                         </View>
 
                         <View style={styles.qualityRow}>
@@ -243,6 +326,17 @@ const GardenDetailScreen = () => {
                             <Text style={styles.qualityText}>{`D: ${
                                 item.qualities?.[3] ?? 0
                             }`}</Text>
+                        </View>
+
+                        <View style={styles.warpNewTreeDead}>
+                            <Text style={styles.labelTree}>{`Cây trồng mới: ${
+                                item.newTree || 0
+                            }`}</Text>
+                            <Text
+                                style={[
+                                    styles.labelTree,
+                                    {textAlign: 'right'},
+                                ]}>{`Cây chết: ${item.deadTree || 0}`}</Text>
                         </View>
                     </View>
                 ))}
@@ -263,6 +357,19 @@ const GardenDetailScreen = () => {
                     ))}
                 </Section>
             )}
+
+            {selectedGarden.management?.files.length !== 0 ? (
+                <Section title='Tệp đính kèm'>
+                    <FlatList
+                        scrollEnabled={false}
+                        data={selectedGarden.management?.files}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({item}) => renderItemAttachedFiles(item)}
+                    />
+                </Section>
+            ) : null}
+
+            {selectedGarden.note && <Text>{selectedGarden.note}</Text>}
         </ScrollView>
     );
 };
@@ -397,6 +504,15 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#ddd',
     },
+    warpNewTreeDead: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    labelTree: {
+        flex: 1,
+        flexShrink: 1,
+    },
     harvestRow: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -431,5 +547,32 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+
+    cardDocument: {
+        borderRadius: 8,
+        padding: 10,
+        flex: 1,
+        backgroundColor: 'rgba(128, 128, 128, 0.15)',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+    },
+    leftCardDocument: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+        gap: 10,
+    },
+    infoDocument: {
+        width: '85%',
+    },
+    infoDocumentText: {
+        fontSize: 11,
+    },
+    infoDocumentSizeText: {
+        fontSize: 11,
+        color: 'rgba(128, 128, 128, 1)',
     },
 });

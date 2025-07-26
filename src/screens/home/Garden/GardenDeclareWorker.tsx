@@ -1,11 +1,7 @@
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useRef, useState} from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    ScrollView,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import ActionButtons from './ActionButtons';
@@ -15,7 +11,11 @@ import TaskListSection from './TaskListSection';
 import AdditionalSupplySection from './AdditionalSupplySection';
 import MachineShiftSelector from './MachineShiftSelector';
 import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/ProcessesFormData';
-import MachineShiftHistorySection from './ActiveMachine';
+import Backdrop from '../../subscreen/Loading/index2';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {Dropdown} from 'react-native-element-dropdown';
+import Snackbar from 'react-native-snackbar';
+
 type TaskInput = {
     taskId: string;
     taskName: string;
@@ -26,29 +26,49 @@ type TaskInput = {
 
 type AdditionalSupply = {
     name: string;
+    unit: string;
     value: string;
+    price: string;
 };
 
 const GardenDeclare = () => {
-    const [machineShifts, setMachineShifts] = useState<MachineShiftInput[]>([]);
-    const [availableMachines, setAvailableMachines] = useState<INorm[]>([]);
+    const [machineShifts, setMachineShifts] = useState<any[]>([
+        {processId: '', area: ''},
+    ]);
+    const [availableMachines, setAvailableMachines] = useState<any[]>([]); //! fix type later
+    const [loading, setLoading] = useState(false);
+    const [selectedGarden, setSelectedGarden] = useState({
+        gardenId: '',
+        totalSquare: 0,
+        area: 0,
+    });
 
     const handleMachineShiftChange = (
         index: number,
-        field: 'machineId' | 'hours',
+        field: 'processId' | 'area',
         value: string,
     ) => {
         setMachineShifts(prev => {
+            if (!prev[index]) {
+                // If prev[index] doesn't exist, you should initialize it as a new object
+                const updated = [...prev];
+                updated[index] = {...updated[index], [field]: value}; // Add the field if it's undefined
+                //console.log('Updated with new object at index:', updated);
+                return updated;
+            }
+
+            // Proceed with updating if prev[index] exists
             const updated = [...prev];
             updated[index][field] = value;
+            //console.log('Updated:', updated);
+
             return updated;
         });
     };
-
     const [taskInputs, setTaskInputs] = useState<TaskInput[]>([]);
     const [additionalSupplies, setAdditionalSupplies] = useState<
         AdditionalSupply[]
-    >([{name: '', value: ''}]);
+    >([{name: '', unit: '', value: '', price: ''}]);
 
     const {userInfo} = useAuthStore();
     const {
@@ -68,57 +88,64 @@ const GardenDeclare = () => {
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
 
     useEffect(() => {
-        if (id) getDetailWorkSchedule(id);
-    }, [id]);
+        if (id) getDetailWorkSchedule(id, userInfo._id);
+    }, []);
 
     useEffect(() => {
         if (detailWorkSchedule && !hasLogged.current) {
-            console.log('📦 Chi tiết công việc:', detailWorkSchedule);
+            //console.log('📦 Chi tiết công việc:', detailWorkSchedule);
             hasLogged.current = true;
+        }
+
+        if (
+            detailWorkSchedule?.childTasks[0]?.staff[0]?.gardens?.length === 1
+        ) {
+            setSelectedGarden({
+                gardenId:
+                    detailWorkSchedule.childTasks[0]?.staff[0]?.gardens[0]
+                        ?.gardenId,
+                totalSquare:
+                    detailWorkSchedule.childTasks[0]?.staff[0].gardens[0]
+                        ?.square,
+                area: detailWorkSchedule.childTasks[0]?.staff[0].gardens[0]
+                    ?.area,
+            });
         }
     }, [detailWorkSchedule]);
 
     useEffect(() => {
-        if (detailWorkSchedule?.childTasks?.length && userInfo?._id) {
+        if (detailWorkSchedule?.childTasks?.length) {
             const inputs = detailWorkSchedule.childTasks.map((task: any) => {
                 const userInTask = task.staff?.find(
-                    (s: any) => s.userId === userInfo._id,
+                    (s: any) => s.userId === userInfo?._id,
                 );
-                const isCanceled = userInTask?.status === 'CANCELED';
 
                 return {
                     taskId: task._id,
                     taskName: task.name,
                     area: '',
-                    disabled: isCanceled,
-                    taskStatus: task.status,
+                    taskStatus: userInTask?.status || task.status,
                 };
             });
+
             setTaskInputs(inputs);
+
+            const allMachinesWithTaskInfo =
+                detailWorkSchedule.childTasks.flatMap(task =>
+                    (task.machines || []).map(machine => ({
+                        ...machine,
+                        childTaskId: task._id,
+                        childTaskStatus: task.status,
+                        childTaskName: task.name,
+                        childTaskStaff: task.staff,
+                    })),
+                );
+
+            //console.log(allMachinesWithTaskInfo);
+
+            setAvailableMachines(allMachinesWithTaskInfo);
         }
     }, [detailWorkSchedule, userInfo]);
-    useEffect(() => {
-        if (detailWorkSchedule?.childTasks?.length) {
-            const taskWithMachines = detailWorkSchedule.childTasks.find(
-                (task: any) => task.machines && task.machines.length > 0,
-            );
-
-            if (taskWithMachines) {
-                const shifts = [
-                    {
-                        machineId: '',
-                        hours: '',
-                        taskName: taskWithMachines.name,
-                        gardenAreaType:
-                            detailWorkSchedule.gardenAreaType || 'm²',
-                    },
-                ];
-                setMachineShifts(shifts);
-
-                setAvailableMachines(taskWithMachines.machines);
-            }
-        }
-    }, [detailWorkSchedule]);
 
     const handleInputChange = (index: number, field: 'area', value: string) => {
         setTaskInputs(prev => {
@@ -147,8 +174,8 @@ const GardenDeclare = () => {
 
     const handleCancelReport = () => setShowReportConfirmation(false);
 
-    const isMachineShiftValid = (shift: MachineShiftInput) => {
-        return shift.machineId.trim() !== '' && shift.hours.trim() !== '';
+    const isMachineShiftValid = (shift: any) => {
+        return shift?.processId?.trim() !== '' && shift?.area?.trim() !== '';
     };
 
     const hasDeclarations =
@@ -159,16 +186,19 @@ const GardenDeclare = () => {
         if (!detailWorkSchedule?._id) return;
 
         try {
+            setLoading(true);
+
             const requests = taskInputs.filter(isTaskValid);
             for (const task of requests) {
                 const payload = {
                     area: parseFloat(task.area),
+                    gardenId: selectedGarden.gardenId,
                 };
-                console.log('📤 Gửi lao động:', {
-                    scheduleId: detailWorkSchedule._id,
-                    taskId: task.taskId,
-                    payload,
-                });
+                // console.log('📤 Gửi lao động:', {
+                //     scheduleId: detailWorkSchedule._id,
+                //     taskId: task.taskId,
+                //     payload,
+                // });
 
                 await requestPersonalTask(
                     detailWorkSchedule._id,
@@ -176,29 +206,38 @@ const GardenDeclare = () => {
                     payload,
                 );
             }
+            //console.log(isMachineShiftValid);
             for (const shift of machineShifts.filter(isMachineShiftValid)) {
                 const matchingTask = detailWorkSchedule.childTasks.find(
-                    (task: any) => task.name === shift.taskName,
+                    (task: any) =>
+                        task.machines?.some(
+                            (machine: any) => machine._id === shift.processId,
+                        ),
                 );
+
                 if (!matchingTask) continue;
 
                 const payload = {
-                    area: parseFloat(shift.hours),
-                    machineId: shift.machineId,
+                    area: parseFloat(shift.area),
+                    gardenId: selectedGarden.gardenId,
+                    machineId: shift.processId,
                     type: EProcessesType.CA_MAY,
                 };
-                console.log('📤 Gửi ca máy:', {
-                    scheduleId: detailWorkSchedule._id,
-                    taskId: matchingTask._id,
-                    payload,
-                });
+                // console.log('📤 Gửi ca máy:', {
+                //     scheduleId: detailWorkSchedule._id,
+                //     taskId: matchingTask._id,
+                //     payload,
+                // });
 
-                await requestPersonalTask(
-                    detailWorkSchedule._id,
-                    matchingTask._id,
-                    payload,
-                );
+                if (matchingTask._id) {
+                    await requestPersonalTask(
+                        detailWorkSchedule._id,
+                        matchingTask._id,
+                        payload,
+                    );
+                }
             }
+
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 1000);
 
@@ -212,17 +251,24 @@ const GardenDeclare = () => {
             setMachineShifts(prev =>
                 prev.map(shift => ({
                     ...shift,
-                    machineId: '',
-                    hours: '',
+                    processId: '',
+                    area: '',
                 })),
             );
         } catch (err) {
             console.error('❌ Lỗi khi gửi báo cáo:', err);
+        } finally {
+            setTimeout(() => {
+                setLoading(false);
+            }, 700);
         }
     };
 
     const handleAddSupply = () => {
-        setAdditionalSupplies(prev => [...prev, {name: '', value: ''}]);
+        setAdditionalSupplies(prev => [
+            ...prev,
+            {name: '', unit: '', value: '', price: ''},
+        ]);
     };
 
     const handleChangeSupplyField = (
@@ -239,20 +285,35 @@ const GardenDeclare = () => {
 
     const handleSubmitAdditionalSupplies = async () => {
         if (!detailWorkSchedule?._id) return;
-        try {
-            for (const supply of additionalSupplies) {
-                await requestAdditionalMaterial(
-                    detailWorkSchedule._id,
 
-                    {
-                        name: supply.name,
-                        value: Number(supply.value),
-                    },
-                );
+        if (selectedGarden.gardenId === '') {
+            Snackbar.show({
+                text: 'Bạn chưa chọn khu vườn cần gửi đầu tư tăng thêm',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            for (const supply of additionalSupplies) {
+                await requestAdditionalMaterial(detailWorkSchedule._id, {
+                    name: supply.name,
+                    unit: supply.unit,
+                    value: Number(supply.value),
+                    price: Number(supply.price),
+                    gardenId: selectedGarden.gardenId,
+                });
             }
-            setAdditionalSupplies([{name: '', value: ''}]);
+
+            setAdditionalSupplies([{name: '', unit: '', value: '', price: ''}]);
         } catch (err) {
             console.error('❌ Lỗi khi gửi vật tư thêm:', err);
+        } finally {
+            setTimeout(() => {
+                setLoading(false);
+            }, 700);
         }
     };
 
@@ -263,95 +324,11 @@ const GardenDeclare = () => {
             </View>
         );
     }
-    const machineShiftHistories = detailWorkSchedule.childTasks.flatMap(
-        (task: any) =>
-            (task.machines || []).flatMap((machine: any) =>
-                (machine.history || []).map((h: any, index: number) => ({
-                    _id: `${machine._id}-${index}`,
-                    title: task.name || 'Chưa có tên công việc',
-                    createdBy: h.staffName || 'Không rõ',
-                    name: machine.name,
-                    totalTime: h.area || 0,
-                })),
-            ),
-    );
 
-    const uniqueMachines = Array.from(
-        new Map(
-            detailWorkSchedule.childTasks
-                .flatMap((task: any) => task.machines || [])
-                .map(machine => [machine._id, machine]),
-        ).values(),
-    );
+    //console.log(detailWorkSchedule);
 
     return (
         <View style={{flex: 1}}>
-            <ScrollView contentContainerStyle={styles.container}>
-                <View style={styles.infoContainer}>
-                    <Text style={styles.gardenName}>
-                        {detailWorkSchedule.gardenName}
-                    </Text>
-                    <Text style={styles.gardenCode}>
-                        {(detailWorkSchedule as any).gardenCode}
-                    </Text>
-                    <View style={styles.productBox}>
-                        <Text style={styles.productLabel}>
-                            Sản phẩm/cây trồng
-                        </Text>
-                        <View style={styles.productRow}>
-                            <Icon name='group-work' color='green' size={20} />
-                            <Text style={styles.productText}>
-                                {detailWorkSchedule.productName}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-
-                <MachineShiftHistorySection
-                    shifts={machineShiftHistories}
-                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
-                />
-
-                <TaskListSection
-                    taskInputs={taskInputs}
-                    handleInputChange={handleInputChange}
-                    styles={styles}
-                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
-                    gardenArea={detailWorkSchedule?.gardenArea || 0}
-                />
-
-                <MachineShiftSelector
-                    machines={availableMachines}
-                    machineShifts={machineShifts}
-                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'm²'}
-                    onChange={handleMachineShiftChange}
-                    gardenArea={detailWorkSchedule?.gardenArea || 0}
-                />
-
-                <AdditionalSupplySection
-                    supplies={additionalSupplies}
-                    onAdd={handleAddSupply}
-                    onChange={handleChangeSupplyField}
-                    onSubmit={handleSubmitAdditionalSupplies}
-                />
-            </ScrollView>
-
-            <View style={styles.footer}>
-                <TouchableOpacity
-                    style={styles.exitButton1}
-                    onPress={handleExit}>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Icon
-                            name='arrow-circle-left'
-                            size={22}
-                            color='white'
-                            style={{marginRight: 10}}
-                        />
-                        <Text style={styles.exitText1}>Thoát ra</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-
             <ActionButtons
                 visible={hasDeclarations}
                 showAlert={showExitAlert}
@@ -363,12 +340,130 @@ const GardenDeclare = () => {
                 onCancelReport={handleCancelReport}
                 onlyShowReportButton={onlyShowReportButton}
             />
+            <KeyboardAwareScrollView
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                overScrollMode='never'
+                contentContainerStyle={styles.container}
+                enableOnAndroid
+                extraHeight={150}>
+                <View
+                    style={[
+                        styles.infoContainer,
+                        hasDeclarations ? {marginTop: 80} : {marginTop: 0},
+                    ]}>
+                    <View style={styles.productBox}>
+                        <Text style={styles.productLabel}>
+                            Cây trồng/Loại cây trồng
+                        </Text>
+                        <View style={styles.productRow}>
+                            <Icon name='group-work' color='green' size={20} />
+                            <Text style={styles.productText}>
+                                {detailWorkSchedule.productName}
+                            </Text>
+                        </View>
+                    </View>
+
+                    {detailWorkSchedule?.childTasks[0]?.staff[0]?.gardens
+                        ?.length > 1 && (
+                        <Dropdown
+                            mode='modal'
+                            style={styles.dropdown}
+                            search
+                            searchPlaceholder='Tìm khu vườn'
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            iconStyle={styles.iconStyle}
+                            data={
+                                detailWorkSchedule?.childTasks[0].staff[0]
+                                    .gardens
+                            }
+                            maxHeight={300}
+                            labelField='name'
+                            valueField='gardenId'
+                            placeholder='Chọn khu vườn cần làm'
+                            value={selectedGarden.gardenId}
+                            onChange={itemValue =>
+                                setSelectedGarden({
+                                    gardenId: itemValue.gardenId,
+                                    totalSquare: itemValue.square,
+                                    area: itemValue.area,
+                                })
+                            }
+                        />
+                    )}
+                </View>
+
+                {/* <MachineShiftHistorySection
+                    shifts={machineShiftHistories}
+                    gardenAreaType={detailWorkSchedule?.gardenAreaType || 'ha'}
+                /> */}
+
+                <TaskListSection
+                    gardenId={selectedGarden.gardenId}
+                    taskInputs={taskInputs}
+                    handleInputChange={handleInputChange}
+                    styles={styles}
+                    gardenAreaType={'ha'}
+                    gardenArea={
+                        //detailWorkSchedule?.childTasks[0].staff[0].totalSquare
+
+                        selectedGarden.totalSquare
+                    }
+                    processingRate={
+                        selectedGarden.area
+
+                        // detailWorkSchedule?.childTasks[0].staff[0]
+                        //     .processingRate
+                    }
+                />
+
+                <MachineShiftSelector
+                    gardenId={selectedGarden.gardenId}
+                    machines={availableMachines}
+                    machineShifts={machineShifts}
+                    gardenAreaType={'ha'}
+                    onChange={handleMachineShiftChange}
+                    gardenArea={selectedGarden.totalSquare}
+                    processingRate={selectedGarden.area}
+                />
+
+                <AdditionalSupplySection
+                    gardenId={selectedGarden.gardenId}
+                    supplies={additionalSupplies}
+                    onAdd={handleAddSupply}
+                    onChange={handleChangeSupplyField}
+                    onSubmit={handleSubmitAdditionalSupplies}
+                />
+            </KeyboardAwareScrollView>
+
+            <View style={styles.footer}>
+                <TouchableOpacity
+                    style={styles.exitButton1}
+                    onPress={handleExit}>
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                        }}>
+                        <Icon
+                            name='arrow-circle-left'
+                            size={22}
+                            color='white'
+                            style={{marginRight: 10}}
+                        />
+                        <Text style={styles.exitText1}>Thoát ra</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+
+            <Backdrop open={loading} />
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {padding: 16, backgroundColor: 'white'},
+    container: {paddingHorizontal: 16, backgroundColor: 'white'},
     centered: {flex: 1, justifyContent: 'center', alignItems: 'center'},
     infoContainer: {marginBottom: 16},
     gardenName: {fontSize: 20, fontWeight: 'bold'},
@@ -423,6 +518,28 @@ const styles = StyleSheet.create({
         color: 'red',
         fontSize: 12,
         marginTop: 4,
+    },
+    dropdown: {
+        height: 52,
+        minWidth: '100%',
+        borderColor: '#9A9A9A',
+        borderWidth: 1,
+        paddingHorizontal: 8,
+        borderRadius: 8,
+        marginTop: 15,
+    },
+    placeholderStyle: {
+        fontSize: 15,
+        color: '#666666',
+        fontWeight: 400,
+    },
+    selectedTextStyle: {
+        fontSize: 15,
+        fontWeight: 400,
+    },
+    iconStyle: {
+        width: 20,
+        height: 20,
     },
 });
 

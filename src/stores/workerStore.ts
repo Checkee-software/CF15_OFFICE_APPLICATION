@@ -27,7 +27,10 @@ interface DocumentStore {
     isLoading: boolean;
     listWorker: IUser[];
     listWorkerFilterByRole: listWorkerFilterByRole[];
-    getListWorkerByDepartment: () => Promise<void>;
+    getListWorkerByDepartment: (
+        userId: string,
+        userLevel: string,
+    ) => Promise<void>;
     getListWorkerByLeader: () => Promise<void>;
     resetStateWhenLogout: () => void;
 }
@@ -42,7 +45,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
     listWorker: [],
     listWorkerFilterByRole: [],
 
-    getListWorkerByDepartment: async () => {
+    getListWorkerByDepartment: async (userId: string, userLevel: string) => {
         set({isLoading: true});
         //await new Promise(resolve => setTimeout(resolve, 1 * 10000));
         try {
@@ -62,43 +65,102 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     },
                 );
 
-                const filterLeaders = updateImgPathListWorker.filter(
-                    (user: {userType: {level: string}}) =>
-                        user.userType.level === 'LEADER',
-                );
+                if (userLevel === 'DEPARTMENT') {
+                    const filterManagements = updateImgPathListWorker.filter(
+                        (item: {userType: {level: string}}) =>
+                            item.userType.level !== 'MANAGEMENT',
+                    );
 
-                const filterWorkers = updateImgPathListWorker.filter(
-                    (user: {userType: {level: string}}) =>
-                        user.userType.level !== 'LEADER',
-                );
+                    const filterLeaders = filterManagements.filter(
+                        (user: {userType: {level: string}}) =>
+                            user.userType.level === 'LEADER',
+                    );
 
-                //thêm order cho 2 mảng
-                let order = 0;
-                filterLeaders.forEach((item: {order: number}) => {
-                    item.order = order += 1;
-                });
+                    const filterWorkers = filterManagements.filter(
+                        (user: {
+                            _id: string;
+                            userType: {_id: string; level: string};
+                        }) =>
+                            user.userType.level === 'DEPARTMENT' &&
+                            user._id !== userId,
+                    );
 
-                order = 0;
+                    //thêm order cho 2 mảng
+                    let order = 0;
+                    filterLeaders.forEach((item: {order: number}) => {
+                        item.order = order += 1;
+                    });
 
-                filterWorkers.forEach((item: {order: number}) => {
-                    item.order = order += 1;
-                });
+                    order = 0;
 
-                const newListWorker = [
-                    {
-                        title: 'Cán bộ quản lý',
-                        data: filterLeaders,
-                    },
-                    {
-                        title: 'Người lao động',
-                        data: filterWorkers,
-                    },
-                ];
+                    filterWorkers.forEach((item: {order: number}) => {
+                        item.order = order += 1;
+                    });
 
-                set({
-                    listWorker: updateImgPathListWorker,
-                    listWorkerFilterByRole: newListWorker,
-                });
+                    const newListWorker = [
+                        {
+                            title: 'Cán bộ quản lý',
+                            data: filterLeaders,
+                        },
+                        {
+                            title: 'Phòng ban',
+                            data: filterWorkers,
+                        },
+                    ];
+
+                    set({
+                        listWorker: filterManagements,
+                        listWorkerFilterByRole: newListWorker,
+                    });
+                } else {
+                    const filterLeaders = updateImgPathListWorker.filter(
+                        (item: {userType: {level: string}}) =>
+                            item.userType.level !== 'LEADER',
+                    );
+
+                    const filterManagements = filterLeaders.filter(
+                        (user: {_id: string; userType: {level: string}}) =>
+                            user.userType.level === 'MANAGEMENT' &&
+                            user._id !== userId,
+                    );
+
+                    const filterDepartment = filterLeaders.filter(
+                        (user: {
+                            _id: string;
+                            userType: {_id: string; level: string};
+                        }) =>
+                            user.userType.level === 'DEPARTMENT' &&
+                            user._id !== userId,
+                    );
+
+                    //thêm order cho 2 mảng
+                    let order = 0;
+                    filterManagements.forEach((item: {order: number}) => {
+                        item.order = order += 1;
+                    });
+
+                    order = 0;
+
+                    filterDepartment.forEach((item: {order: number}) => {
+                        item.order = order += 1;
+                    });
+
+                    const newListWorker = [
+                        {
+                            title: 'Ban lãnh đạo',
+                            data: filterManagements,
+                        },
+                        {
+                            title: 'Phòng ban',
+                            data: filterDepartment,
+                        },
+                    ];
+
+                    set({
+                        listWorker: filterLeaders,
+                        listWorkerFilterByRole: newListWorker,
+                    });
+                }
             } else {
                 set({listWorker: [], listWorkerFilterByRole: []});
             }
@@ -138,20 +200,20 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     },
                 );
 
-                const filterRole = updateImgPathListWorker.filter(
-                    (user: {userType: {level: string}}) =>
-                        user.userType.level === 'WORKER',
-                );
+                // const filterRole = updateImgPathListWorker.filter(
+                //     (user: {userType: {level: string}}) =>
+                //         user.userType.level === 'WORKER',
+                // );
 
                 //thêm order cho mảng
                 let order = 0;
-                filterRole.forEach((item: {order: number}) => {
+                updateImgPathListWorker.forEach((item: {order: number}) => {
                     item.order = order += 1;
                 });
 
                 set({
-                    listWorker: filterRole,
-                    listWorkerFilterByRole: filterRole,
+                    listWorker: updateImgPathListWorker,
+                    listWorkerFilterByRole: updateImgPathListWorker,
                 });
 
                 //đoạn code dưới này dùng khi nó đẻ ra thêm nhiều unit

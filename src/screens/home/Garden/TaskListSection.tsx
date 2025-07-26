@@ -1,6 +1,8 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {Text, TextInput, View} from 'react-native';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
+import Snackbar from 'react-native-snackbar';
 
 type TaskInput = {
     taskId: string;
@@ -11,51 +13,86 @@ type TaskInput = {
 };
 
 type Props = {
+    gardenId: string;
     taskInputs: TaskInput[];
     handleInputChange: (index: number, field: 'area', value: string) => void;
     styles: any;
     gardenAreaType: string;
     gardenArea: number;
+    processingRate: number;
 };
 
 const TaskListSection = ({
+    gardenId,
     taskInputs,
     handleInputChange,
     styles,
     gardenAreaType,
     gardenArea,
+    processingRate,
 }: Props) => {
     const [tempInputValues, setTempInputValues] = useState<
         Record<string, string>
     >({});
 
     const handleAreaChange = (index: number, text: string) => {
-        const numericValue = parseFloat(text);
+        if (gardenId === '') {
+            Snackbar.show({
+                text: 'Bạn chưa chọn khu vườn cần làm',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+            return;
+        }
+
+        // Không cho bắt đầu bằng . hoặc ,
+        if (text.startsWith('.') || text.startsWith(',')) {
+            return;
+        }
+
+        if (text.includes('-') || text.includes(' ')) {
+            return;
+        }
+
+        const currentText = tempInputValues[index] || taskInputs[index].area;
+        const isAdding = text.length > currentText.length;
+        const endsWithDotOrComma = /[.,]$/.test(text);
+        const alreadyHasDotOrComma =
+            currentText.includes('.') || currentText.includes(',');
+
+        if (isAdding && alreadyHasDotOrComma && endsWithDotOrComma) {
+            return;
+        }
+
+        const normalizedText = text.replace(',', '.');
+        const numericValue = parseFloat(normalizedText);
 
         if (isNaN(numericValue) || numericValue <= gardenArea) {
-            handleInputChange(index, 'area', text);
+            handleInputChange(index, 'area', normalizedText);
             setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
-            setTempInputValues(prev => ({...prev, [index]: text}));
+            setTempInputValues(prev => ({
+                ...prev,
+                [index]: normalizedText,
+            }));
         }
     };
 
     return (
         <View>
             <Text style={styles.sectionTitle}>
-                Quy trình ({taskInputs.length})
+                Báo cáo quy trình ({taskInputs.length})
             </Text>
             <View style={{gap: 12}}>
                 {taskInputs.map((task, index) => {
                     const isCompleted = task.taskStatus === 'COMPELETED';
-                    const isDisabled = task.disabled || isCompleted;
+                    const isDisabled = isCompleted;
                     const currentInputValue =
                         tempInputValues[index] || task.area;
                     const areaValue = parseFloat(currentInputValue);
                     const showWarning =
                         !isDisabled &&
                         !isNaN(areaValue) &&
-                        areaValue > gardenArea;
+                        areaValue + processingRate > gardenArea;
 
                     return (
                         <CollapsibleTaskBlock
@@ -64,44 +101,76 @@ const TaskListSection = ({
                             backgroundColor={
                                 isCompleted ? '#d4edda' : '#e6f3ff'
                             }>
-                            {isDisabled && (
+                            {isCompleted && (
                                 <Text
                                     style={{
                                         color: 'red',
                                         fontStyle: 'italic',
                                         marginBottom: 8,
                                     }}>
-                                    {task.disabled
-                                        ? 'Công việc này đã bị huỷ, bạn không thể chỉnh sửa.'
-                                        : 'Công việc này đã hoàn thành, bạn không thể chỉnh sửa.'}
+                                    Quy trình này đã hoàn thành, bạn không thể
+                                    chỉnh sửa.
                                 </Text>
                             )}
 
-                            <Text style={styles.label}>
-                                Diện tích đã làm ({gardenAreaType}){' '}
-                                <Text style={{color: 'red'}}>*</Text>
-                            </Text>
+                            {!isCompleted &&
+                            gardenArea === processingRate &&
+                            gardenId !== '' ? (
+                                <Text
+                                    style={{
+                                        color: 'red',
+                                        fontStyle: 'italic',
+                                        marginBottom: 8,
+                                    }}>
+                                    Bạn đã làm đủ diện tích của quy trình này.
+                                    Chờ cán bộ duyệt để hoàn thành.
+                                </Text>
+                            ) : gardenId === '' ? (
+                                <Text
+                                    style={{
+                                        color: 'red',
+                                        fontStyle: 'italic',
+                                        marginBottom: 8,
+                                    }}>
+                                    Hãy chọn khu vườn cần làm
+                                </Text>
+                            ) : (
+                                <>
+                                    <Text style={styles.label}>
+                                        Diện tích đã làm ({gardenAreaType}){' '}
+                                        <Text style={{color: 'red'}}>*</Text>
+                                    </Text>
 
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    showWarning && {borderColor: 'red'},
-                                ]}
-                                keyboardType='numeric'
-                                placeholder='Nhập diện tích'
-                                placeholderTextColor='black'
-                                value={task.area}
-                                onChangeText={text =>
-                                    handleAreaChange(index, text)
-                                }
-                                editable={!isDisabled}
-                            />
+                                    <TextInput
+                                        style={[
+                                            styles.input,
+                                            showWarning && {borderColor: 'red'},
+                                        ]}
+                                        keyboardType='numeric'
+                                        placeholder='Nhập diện tích'
+                                        placeholderTextColor='black'
+                                        maxLength={6}
+                                        value={task.area}
+                                        onChangeText={text =>
+                                            handleAreaChange(index, text)
+                                        }
+                                        editable={!isDisabled}
+                                    />
+                                </>
+                            )}
 
                             {showWarning && (
-                                <Text style={styles.warningText}>
-                                    Diện tích không được vượt quá {gardenArea}{' '}
-                                    {gardenAreaType}
-                                </Text>
+                                <View style={{gap: 0, marginBottom: 10}}>
+                                    <Text style={styles.warningText}>
+                                        Diện tích không được vượt quá{' '}
+                                        {gardenArea} {gardenAreaType}
+                                    </Text>
+
+                                    <Text style={styles.warningText}>
+                                        Diện tích đã làm: {processingRate}{' '}
+                                        {gardenAreaType}
+                                    </Text>
+                                </View>
                             )}
                         </CollapsibleTaskBlock>
                     );

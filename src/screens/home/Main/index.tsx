@@ -16,6 +16,90 @@ import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
 
+    //console.log(userInfo);
+
+    const menuItems = [
+        {
+            function: 'GARDEN',
+            key: 'gardenForWorker',
+            label: 'Khu vườn',
+            buttonImage: images.garden,
+            navigateTo: SCREEN_INFO.GARDENINFOWORKER.key,
+            navigateNext: SCREEN_INFO.GARDENWORKER.key,
+        },
+        {
+            function: '',
+            key: 'gardenDeclareForWorker',
+            label: 'Báo cáo quy trình',
+            buttonImage: images.gardener,
+            navigateTo: SCREEN_INFO.GARDENINFOWORKER1.key,
+            navigateNext: SCREEN_INFO.GARDENDECLAREWORKER.key,
+        },
+        {
+            function: 'GARDEN',
+            key: 'gardenInfo',
+            label: 'Thông tin khu vườn',
+            buttonImage: images.garden,
+            navigateTo: SCREEN_INFO.GARDENINFO.key,
+        },
+        {
+            function: 'EMPLOYEES',
+            key: 'unit',
+            label: 'Nhân sự',
+            buttonImage: images.workers,
+            navigateTo: SCREEN_INFO.UNIT.key,
+        },
+        {
+            function: 'EMPLOYEES',
+            key: 'employee',
+            label: 'Nhân sự',
+            buttonImage: images.workers,
+            navigateTo: SCREEN_INFO.WORKER.key,
+        },
+        {
+            function: 'SCHEDULE',
+            key: 'workschedule',
+            label: 'Lịch sử quy trình',
+            buttonImage: images.toDoList,
+            navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
+        },
+        {
+            function: 'STATISTIC',
+            key: 'statistic',
+            label: 'Báo cáo thống kê',
+            buttonImage: images.pieChart,
+            navigateTo: SCREEN_INFO.STATISTIC.key,
+        },
+        {
+            function: '',
+            key: 'browseaddmaterial',
+            label: 'Duyệt đầu tư tăng thêm',
+            buttonImage: images.approve,
+            navigateTo: SCREEN_INFO.BROWSEADDMATERIALS.key,
+        },
+        {
+            function: 'FEEDBACK',
+            key: 'feedback',
+            label: 'Góp ý',
+            buttonImage: images.feedBack,
+            navigateTo: SCREEN_INFO.FEEDBACK.key,
+        },
+        {
+            function: 'DOCUMENT',
+            key: 'document',
+            label: 'Tài liệu',
+            buttonImage: images.document,
+            navigateTo: SCREEN_INFO.DOCUMENT.key,
+        },
+        {
+            function: '',
+            key: 'news',
+            label: 'Tin tức',
+            buttonImage: images.megaphone,
+            navigateTo: SCREEN_INFO.NEWS.key,
+        },
+    ];
+
     const getGreeting = () => {
         const hour = new Date().getHours();
         if (hour >= 5 && hour < 13) {
@@ -49,88 +133,50 @@ export default function Main({navigation}: any) {
         }
     };
 
-    const menuItems = [
-        {
-            key: 'gardenForWorker',
-            label: 'Khu vườn',
-            buttonImage: images.garden,
-            navigateTo: SCREEN_INFO.GARDENINFOWORKER.key,
-            navigateNext: SCREEN_INFO.GARDENWORKER.key,
-        },
-        {
-            key: 'gardenDeclareForWorker',
-            label: 'Khai báo quy trình',
-            buttonImage: images.gardener,
-            navigateTo: SCREEN_INFO.GARDENINFOWORKER1.key,
-            navigateNext: SCREEN_INFO.GARDENDECLAREWORKER.key,
-        },
-        {
-            key: 'gardenInfo',
-            label: 'Thông tin khu vườn',
-            buttonImage: images.garden,
-            navigateTo: SCREEN_INFO.GARDENINFO.key,
-        },
-        {
-            key: 'unit',
-            label: 'Đơn vị',
-            buttonImage: images.workers,
-            navigateTo: SCREEN_INFO.UNIT.key,
-        },
-        {
-            key: 'employee',
-            label: 'Nhân sự',
-            buttonImage: images.workers,
-            navigateTo: SCREEN_INFO.WORKER.key,
-        },
-        {
-            key: 'workschedule',
-            label: 'Quy trình',
-            buttonImage: images.toDoList,
-            navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
-        },
-        {
-            key: 'feedback',
-            label: 'Góp ý',
-            buttonImage: images.feedBack,
-            navigateTo: SCREEN_INFO.FEEDBACK.key,
-        },
-        {
-            key: 'news',
-            label: 'Tin tức',
-            buttonImage: images.megaphone,
-            navigateTo: SCREEN_INFO.NEWS.key,
-        },
-        {
-            key: 'document',
-            label: 'Tài liệu',
-            buttonImage: images.document,
-            navigateTo: SCREEN_INFO.DOCUMENT.key,
-        },
-        {
-            key: 'statistic',
-            label: 'Báo cáo thống kê',
-            buttonImage: images.pieChart,
-            navigateTo: SCREEN_INFO.STATISTIC.key,
-        },
-    ];
-
     const filterMenuByRole = (role: string) => {
-        if (role === EOrganization.ADMIN || role === EOrganization.MANAGEMENT) {
-            return menuItems.filter(item => item.key === 'statistic');
-        }
+        const hasAccessToFunction = (functionKey: string) => {
+            return userInfo.functions.some(
+                func => func._id === functionKey && func.access,
+            );
+        };
 
-        if (role === EOrganization.DEPARTMENT) {
-            return menuItems.filter(
+        let filteredMenu: typeof menuItems = [];
+
+        if (role === EOrganization.MANAGEMENT) {
+            filteredMenu = menuItems.filter(
                 item =>
                     item.key !== 'gardenForWorker' &&
                     item.key !== 'gardenDeclareForWorker' &&
-                    item.key !== 'unit',
+                    item.key !== 'gardenInfo' &&
+                    item.key !== 'unit' &&
+                    item.key !== 'workschedule' &&
+                    item.key !== 'browseaddmaterial',
+            );
+            const reorderedMenu = [
+                ...filteredMenu.filter(item => item.key === 'statistic'),
+                ...filteredMenu.filter(item => item.key !== 'statistic'),
+            ];
+            return reorderedMenu.filter(
+                item => !item.function || hasAccessToFunction(item.function),
+            );
+        }
+
+        if (role === EOrganization.DEPARTMENT) {
+            filteredMenu = menuItems.filter(
+                item =>
+                    item.key !== 'gardenForWorker' &&
+                    item.key !== 'gardenDeclareForWorker' &&
+                    item.key !== 'unit' &&
+                    item.key !== 'browseaddmaterial',
+            );
+            return filteredMenu.filter(
+                item => !item.function || hasAccessToFunction(item.function),
             );
         }
 
         if (role === EOrganization.LEADER) {
-            return menuItems.filter(item => {
-                const excludeForLeader =
+            filteredMenu = menuItems.filter(item => {
+                const excludeKeys =
                     item.key !== 'gardenForWorker' &&
                     item.key !== 'gardenDeclareForWorker' &&
                     item.key !== 'employee';
@@ -138,20 +184,33 @@ export default function Main({navigation}: any) {
                 const excludeStatistic =
                     userInfo.groupId === '' ? item.key !== 'statistic' : true;
 
-                return excludeForLeader && excludeStatistic;
+                return excludeKeys && excludeStatistic;
             });
-        }
 
-        if (role === EOrganization.WORKER) {
-            return menuItems.filter(
-                item =>
-                    item.key !== 'unit' &&
-                    item.key !== 'employee' &&
-                    item.key !== 'gardenInfo',
+            return filteredMenu.filter(
+                item => !item.function || hasAccessToFunction(item.function),
             );
         }
 
-        return []; // Nếu không hợp lệ, trả mảng trống
+        if (role === EOrganization.WORKER) {
+            filteredMenu = menuItems.filter(
+                item =>
+                    item.key !== 'unit' &&
+                    item.key !== 'employee' &&
+                    item.key !== 'gardenInfo' &&
+                    item.key !== 'browseaddmaterial',
+            );
+
+            return filteredMenu.filter(item => {
+                // Chỉ kiểm tra quyền access đối với STATISTIC
+                if (item.function === 'STATISTIC') {
+                    return hasAccessToFunction(item.function);
+                }
+                return true;
+            });
+        }
+
+        return [];
     };
 
     const menuList = filterMenuByRole(userInfo.userType.level);
@@ -160,7 +219,10 @@ export default function Main({navigation}: any) {
 
     return (
         <View style={MainStyles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                overScrollMode='never'>
                 <View style={MainStyles.welcomeUser}>
                     <View style={MainStyles.helloTime}>
                         <Text
@@ -179,7 +241,9 @@ export default function Main({navigation}: any) {
                         </Text>
                     </View>
 
-                    <View style={MainStyles.avatarUser}>
+                    <TouchableOpacity
+                        style={MainStyles.avatarUser}
+                        onPress={() => navigation.navigate('Hồ sơ')}>
                         <Image
                             source={
                                 userInfo.avatar
@@ -190,7 +254,7 @@ export default function Main({navigation}: any) {
                             }
                             style={MainStyles.avatar}
                         />
-                    </View>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={MainStyles.mainMenu}>
@@ -273,7 +337,9 @@ const MainStyles = StyleSheet.create({
     },
     menuButton: {
         width: '48%',
+        gap: 10,
         paddingVertical: 24,
+        paddingHorizontal: 15,
         borderRadius: 18,
         alignItems: 'center',
         justifyContent: 'center',
@@ -285,7 +351,8 @@ const MainStyles = StyleSheet.create({
         aspectRatio: 1,
     },
     menuButtonText: {
-        marginTop: 10,
         fontSize: 12,
+        flexShrink: 1,
+        textAlign: 'center',
     },
 });

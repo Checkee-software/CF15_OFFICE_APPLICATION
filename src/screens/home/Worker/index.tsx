@@ -14,6 +14,9 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import images from '../../../assets/images';
 import {useWorkerStore} from '../../../stores/workerStore';
 import Loading from '@/screens/subscreen/Loading';
+import {useAuthStore} from '../../../stores/authStore';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import Snackbar from 'react-native-snackbar';
 
 const Woker = ({navigation}: any) => {
     const {
@@ -23,28 +26,43 @@ const Woker = ({navigation}: any) => {
         isLoading,
     } = useWorkerStore();
 
+    const {userInfo} = useAuthStore();
+
     const [searchWorker, setSearchWorker] = useState('');
 
     const filterWorkerBySearch = listWorker.filter(user =>
         user?.fullName.toLowerCase().includes(searchWorker.toLowerCase()),
     );
 
+    const handleNavigate = (itemListWorker: any) => {
+        if (
+            userInfo.functions.some(
+                (item: any) => item._id === 'EMPLOYEES' && item.detail,
+            )
+        ) {
+            navigation.navigate(SCREEN_INFO.WORKERINFO.key, {
+                itemListWorker,
+            });
+        } else {
+            Snackbar.show({
+                text: 'Bạn không có quyền xem chi tiết nhân sự',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+        }
+    };
+
     const handleReFetch = () => {
         if (searchWorker.length !== 0) {
             setSearchWorker('');
         }
-        getListWorkerByDepartment();
+        getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
     };
 
     const renderWorkerBySearch = (itemWorkerBySearch: any) => (
         <View style={WokerStyles.listWorkerMargin}>
             <TouchableOpacity
                 style={WokerStyles.workerCard}
-                onPress={() =>
-                    navigation.navigate(SCREEN_INFO.WORKERINFO.key, {
-                        itemWorkerBySearch,
-                    })
-                }>
+                onPress={() => handleNavigate(itemWorkerBySearch)}>
                 <View style={WokerStyles.leftWorkerCard}>
                     <View style={WokerStyles.workerAvatar}>
                         <Image
@@ -64,7 +82,10 @@ const Woker = ({navigation}: any) => {
                             {itemWorkerBySearch.fullName}
                         </Text>
                         <Text style={WokerStyles.workerUnit}>
-                            {itemWorkerBySearch.userType.unit}
+                            {itemWorkerBySearch.userType.level ===
+                            EOrganization.LEADER
+                                ? ''
+                                : itemWorkerBySearch.roleName}
                         </Text>
                     </View>
                 </View>
@@ -82,11 +103,7 @@ const Woker = ({navigation}: any) => {
         <View style={WokerStyles.listWorkerMargin}>
             <TouchableOpacity
                 style={WokerStyles.workerCard}
-                onPress={() =>
-                    navigation.navigate(SCREEN_INFO.WORKERINFO.key, {
-                        itemListWorker,
-                    })
-                }>
+                onPress={() => handleNavigate(itemListWorker)}>
                 <View style={WokerStyles.leftWorkerCard}>
                     <View style={WokerStyles.workerAvatar}>
                         <Image
@@ -106,22 +123,25 @@ const Woker = ({navigation}: any) => {
                             {itemListWorker.fullName}
                         </Text>
                         <Text style={WokerStyles.workerUnit}>
-                            {itemListWorker.userType.unit}
+                            {itemListWorker.userType.level ===
+                            EOrganization.LEADER
+                                ? ''
+                                : itemListWorker.roleName}
                         </Text>
                     </View>
                 </View>
 
-                <View>
+                {/* <View>
                     <Text style={WokerStyles.workerOrder}>
                         {itemListWorker.order}
                     </Text>
-                </View>
+                </View> */}
             </TouchableOpacity>
         </View>
     );
 
     useEffect(() => {
-        getListWorkerByDepartment();
+        getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
         // eslint-disable-next-line
     }, []);
 
@@ -147,6 +167,7 @@ const Woker = ({navigation}: any) => {
             {searchWorker !== '' ? (
                 <View style={WokerStyles.searchListWorker}>
                     <FlatList
+                        keyboardShouldPersistTaps='handled'
                         contentContainerStyle={WokerStyles.sectionListWorker}
                         data={filterWorkerBySearch}
                         renderItem={({item}) => renderWorkerBySearch(item)}
@@ -170,6 +191,7 @@ const Woker = ({navigation}: any) => {
             ) : (
                 <View style={WokerStyles.listWorker}>
                     <SectionList
+                        keyboardShouldPersistTaps='handled'
                         contentContainerStyle={WokerStyles.sectionListWorker}
                         sections={listWorkerFilterByRole}
                         keyExtractor={item => item._id}

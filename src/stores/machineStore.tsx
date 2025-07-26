@@ -39,9 +39,6 @@ export const useMachineStore = create<MachineStore>(set => ({
                 startAt: startAt.toISOString(),
             };
 
-            console.log(' URL:', url);
-            console.log(' Payload:', payload);
-
             await axiosClient.post(url, payload, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,8 +72,6 @@ export const useMachineStore = create<MachineStore>(set => ({
                 machineId,
                 endAt: endAt.toISOString(),
             };
-            console.log(' URL:', url);
-            console.log(' Payload:', payload);
 
             await axiosClient.post(url, payload, {
                 headers: {
@@ -105,13 +100,15 @@ export const useMachineStore = create<MachineStore>(set => ({
     getActiveMachine: async (scheduleId: string) => {
         try {
             const url = `${ENV.BACKEND_URL}/resources/schedules/machine-active/${scheduleId}`;
-            console.log('GET ACTIVE MACHINE - URL:', url);
 
-            const response = await axiosClient.get<IActiveMachineResponse>(url, {
-                headers: {
-                    'Content-Type': 'application/json',
+            const response = await axiosClient.get<IActiveMachineResponse>(
+                url,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                 },
-            });
+            );
 
             return response.data.data;
         } catch (error: any) {

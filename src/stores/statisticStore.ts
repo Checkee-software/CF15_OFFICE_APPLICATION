@@ -15,6 +15,7 @@ interface IStatisticResponse {
     totalProduct?: number;
     list: IWorkList[];
     chart: IChartData[];
+    pieChart: any[];
 }
 
 interface IListSelection {
@@ -27,6 +28,7 @@ type StatisticStore = {
     listSelection: IListSelection[];
     isLoading: boolean;
     getStatistic: (data: IStatisticFormData) => Promise<void>;
+    getStatisticProgress: (data: IStatisticFormData) => Promise<void>;
     getListSelection: (selection: string) => Promise<void>;
     getGroupName: (groupId: string) => Promise<void>;
     clearStatisticData: () => void;
@@ -115,10 +117,87 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     totalMember: response.data.data.totalMember,
                     totalWork: response.data.data.totalWork,
                     chart: convertToChartData(response.data.data.chart || []),
+                    pieChart: [],
                 };
                 set({statisticData: mainStatisticData});
                 set({isLoading: false});
+            } else {
+                set({isLoading: false});
             }
+        } catch (error: any) {
+            console.log(error);
+            set({isLoading: false});
+
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error?.response?.data) {
+                    Snackbar.show({
+                        text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                } else {
+                    Snackbar.show({
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    getStatisticProgress: async ({
+        type,
+        targetId,
+        startDate,
+        endDate,
+    }: IStatisticFormData) => {
+        const formattedStartDate = moment(startDate).toISOString();
+        const formattedEndDate = moment(endDate).toISOString();
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.get(
+                `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}&targetId=${targetId}`,
+            );
+
+            if (response.data.data) {
+                const chartData = response.data.data.map((item: any) => {
+                    const notComplete = 100 - item.percentage;
+
+                    return {
+                        ...item,
+                        pieChart: [
+                            {
+                                value: item.percentage,
+                                color: '#4CAF50',
+                                text: `${item.percentage}%`,
+                            },
+                            {
+                                value: notComplete,
+                                color: '#FF4E45',
+                                text: notComplete > 0 ? `${notComplete}%` : '',
+                            },
+                        ],
+                    };
+                });
+
+                const mainStatisticData = {
+                    list: [],
+                    totalCost: 0,
+                    totalGarden: 0,
+                    totalGroup: 0,
+                    totalMember: 0,
+                    totalWork: '0',
+                    chart: [],
+                    pieChart: chartData,
+                };
+                set({statisticData: mainStatisticData});
+                set({isLoading: false});
+            } else {
+                set({isLoading: false});
+            }
+
+            set({isLoading: false});
         } catch (error: any) {
             console.log(error);
             set({isLoading: false});

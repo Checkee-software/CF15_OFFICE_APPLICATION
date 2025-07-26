@@ -5,11 +5,10 @@ import {
     TextInput,
     TouchableOpacity,
     StyleSheet,
-    SafeAreaView,
     ActivityIndicator,
+    ScrollView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import useFeedbackStore from '../../../stores/feedbackStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 export default function Feedback1() {
@@ -50,7 +49,7 @@ export default function Feedback1() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.form}>
                 <Text style={styles.label}>
                     Tiêu đề <Text style={styles.required}>*</Text>
@@ -62,7 +61,7 @@ export default function Feedback1() {
                     ]}>
                     <TextInput
                         style={styles.inputWithIcon}
-                        placeholder='Nhập tiêu đề'
+                        placeholderTextColor={'black'}
                         value={title}
                         onChangeText={text => {
                             setTitle(text);
@@ -79,7 +78,7 @@ export default function Feedback1() {
                     <Text style={styles.errorText}>{errorTitle}</Text>
                 ) : null}
 
-                <Text style={styles.label}>
+                <Text style={[styles.label, {marginTop: 10}]}>
                     Nội dung góp ý <Text style={styles.required}>*</Text>
                 </Text>
                 <TextInput
@@ -111,20 +110,20 @@ export default function Feedback1() {
                     <Text style={styles.buttonText}>Xác nhận</Text>
                 )}
             </TouchableOpacity>
-        </SafeAreaView>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 16,
+        paddingHorizontal: 16,
         backgroundColor: '#fff',
         justifyContent: 'space-between',
     },
     form: {
         flex: 1,
-        marginTop: 20,
+        marginTop: 10,
     },
     label: {
         fontSize: 16,

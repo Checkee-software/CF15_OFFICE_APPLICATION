@@ -2,7 +2,13 @@
 /* eslint-disable jsx-quotes */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect} from 'react';
-import {StyleSheet, View, TouchableOpacity, Alert} from 'react-native';
+import {
+    StyleSheet,
+    View,
+    TouchableOpacity,
+    Alert,
+    Platform,
+} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Work from '../screens/home/Work';
 import AutomaticTracing from '../screens/onboarding/AutomaticTracing';
@@ -15,14 +21,14 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import {useAuthStore} from '@/stores/authStore';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const BottomTabsNavigator = ({navigation}: any) => {
     const {redirectData, redirectDataRequestSchedule, clearRedirectData} =
         useAuthStore();
 
+    const insets = useSafeAreaInsets();
     const Tab = createBottomTabNavigator();
-
-    console.log(redirectDataRequestSchedule);
 
     useEffect(() => {
         if (redirectData) {
@@ -45,13 +51,15 @@ const BottomTabsNavigator = ({navigation}: any) => {
             }
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: 'white',
+                    backgroundColor: '#fff',
                 },
                 tabBarStyle: {
-                    height: 55,
                     borderColor: '#D3D3D3',
                     borderTopWidth: 1,
                     boxShadow: '-1 2 0 #00000040',
+                    height: Platform.OS === 'android' ? 60 + insets.bottom : 60,
+                    paddingBottom:
+                        Platform.OS === 'android' ? insets.bottom : 0,
                 },
                 headerShown: false,
                 tabBarHideOnKeyboard: true,

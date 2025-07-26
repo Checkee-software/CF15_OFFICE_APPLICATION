@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {
     View,
@@ -7,11 +9,11 @@ import {
     ScrollView,
     ActivityIndicator,
     TouchableOpacity,
+    Linking,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import useNewsStore from '../../../stores/newsStore';
-import {INews} from '../../../shared-types/Response/NewsResponse/NewsResponse';
 import images from '../../../assets/images';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -112,6 +114,21 @@ export default function NewsDetail() {
                 <Text style={styles.content}>
                     {selectedNews.content || 'Không có nội dung'}
                 </Text>
+
+                {selectedNews.link !== '' && (
+                    <Text style={styles.author}>
+                        Nguồn:{' '}
+                        <Text
+                            style={{
+                                fontSize: 13,
+                                color: 'blue',
+                                textDecorationLine: 'underline',
+                            }}
+                            onPress={() => Linking.openURL(selectedNews.link)}>
+                            {selectedNews.link}
+                        </Text>
+                    </Text>
+                )}
             </View>
         </ScrollView>
     );

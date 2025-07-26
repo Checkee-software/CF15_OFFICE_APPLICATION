@@ -52,19 +52,36 @@ export default function Profile({navigation}: any) {
                             )}
                         </Text>
 
-                        <View style={styles.divider} />
+                        {userInfo.userType.level !== EOrganization.ADMIN &&
+                            userInfo.userType.level !==
+                                EOrganization.MANAGEMENT && (
+                                <>
+                                    <View style={styles.divider} />
 
-                        <Text style={styles.sectionLabel}>Công việc</Text>
+                                    <Text style={styles.sectionLabel}>
+                                        Công việc
+                                    </Text>
 
-                        <View style={styles.jobStats}>
-                            {renderStat('Tổng', userInfo.tasks.total)}
-                            {renderStat(
-                                'Hoàn thành',
-                                userInfo.tasks.compeleted,
+                                    <View style={styles.jobStats}>
+                                        {renderStat(
+                                            'Tổng',
+                                            userInfo.tasks.total,
+                                        )}
+                                        {renderStat(
+                                            'Hoàn thành',
+                                            userInfo.tasks.compeleted,
+                                        )}
+                                        {renderStat(
+                                            'Đang làm',
+                                            userInfo.tasks.processing,
+                                        )}
+                                        {renderStat(
+                                            'Thất bại',
+                                            userInfo.tasks.expired,
+                                        )}
+                                    </View>
+                                </>
                             )}
-                            {renderStat('Đang làm', userInfo.tasks.processing)}
-                            {renderStat('Thất bại', userInfo.tasks.expired)}
-                        </View>
                     </View>
 
                     <View style={styles.buttonGroup}>
@@ -100,13 +117,30 @@ export default function Profile({navigation}: any) {
                                     {userInfo.userType.level !==
                                     EOrganization.WORKER
                                         ? renderInfoRow(
-                                              'Phòng ban',
+                                              'Cấp đơn vị',
                                               `${userInfo.departmentName}`,
                                           )
                                         : null}
 
-                                    {userInfo.userType.level !==
-                                    EOrganization.DEPARTMENT
+                                    {userInfo.userType.level ===
+                                        EOrganization.LEADER ||
+                                    userInfo.userType.level ===
+                                        EOrganization.WORKER
+                                        ? renderInfoRow(
+                                              'Đội sản xuất',
+                                              //{userInfo.userType.unit}
+                                              `${
+                                                  userInfo.groupName === ''
+                                                      ? 'Chưa cập nhật'
+                                                      : userInfo.groupName
+                                              }`,
+                                          )
+                                        : null}
+
+                                    {userInfo.userType.level ===
+                                        EOrganization.LEADER ||
+                                    userInfo.userType.level ===
+                                        EOrganization.WORKER
                                         ? renderInfoRow(
                                               'Tổ',
                                               //{userInfo.userType.unit}
@@ -138,7 +172,6 @@ export default function Profile({navigation}: any) {
                                     {renderInfoRow(
                                         'Loại hợp đồng',
                                         `${userInfo.contract}`,
-                                        true,
                                     )}
                                 </View>
                             )}
@@ -219,26 +252,11 @@ const renderOption = (
         />
     </TouchableOpacity>
 );
-const renderInfoRow = (
-    label: string,
-    value: string,
-    hasDownloadIcon = false,
-) => (
+const renderInfoRow = (label: string, value: string) => (
     <View style={styles.infoRow}>
         <Text style={styles.infoLabel}>{label}</Text>
         <View style={styles.infoValueContainer}>
             <Text style={styles.infoValue}>{value}</Text>
-            {hasDownloadIcon && (
-                <TouchableOpacity
-                    onPress={() => console.log('Download tapped')}>
-                    <Icon
-                        name='download'
-                        size={16}
-                        color='#fff'
-                        style={{marginLeft: 6}}
-                    />
-                </TouchableOpacity>
-            )}
         </View>
     </View>
 );

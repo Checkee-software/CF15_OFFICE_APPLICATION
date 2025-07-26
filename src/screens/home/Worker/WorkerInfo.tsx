@@ -15,19 +15,6 @@ const WorkerInfo = ({route}: any) => {
 
     const item = itemListWorker ?? itemWorkerBySearch;
 
-    const formatPhoneNumber = (phoneNumber: string) => {
-        const cleaned = phoneNumber.startsWith('0')
-            ? phoneNumber.slice(1)
-            : phoneNumber;
-
-        // Cắt thành từng phần: 3-3-3
-        const part1 = cleaned.slice(0, 3);
-        const part2 = cleaned.slice(3, 6);
-        const part3 = cleaned.slice(6);
-
-        return `(+84) ${part1} ${part2} ${part3}`;
-    };
-
     const renderLevelUser = (level: string) => {
         const levelUser = organizations.find(items => items.code === level);
         return levelUser?.label;

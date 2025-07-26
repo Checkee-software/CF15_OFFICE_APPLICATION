@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 
@@ -6,12 +7,13 @@ import asyncStorageHelper from './src/utils/localStorageHelper/index';
 import {useAuthStore} from './src/stores/authStore';
 
 /* packages */
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {OneSignal, LogLevel} from 'react-native-onesignal';
 
 /* screens */
 import Router from './src/router';
 import Loading from './src/screens/subscreen/Loading';
+import {StatusBar} from 'react-native';
 
 const InitApp = () => {
     const {autoLogin, setRedirectData} = useAuthStore();
@@ -42,11 +44,9 @@ const InitApp = () => {
         const handleNotificationClick = (event: any) => {
             const data = event.notification.additionalData;
 
-            console.log(data);
-
-            if (data?._id !== '') {
+            if (data?._id && data._id !== '') {
                 setRedirectData('schdule', data?._id);
-            } else {
+            } else if (data?.requestId && data.requestId !== '') {
                 setRedirectData('request', data?.requestId);
             }
         };
@@ -73,9 +73,12 @@ const InitApp = () => {
 };
 
 export default function App() {
+    const {isLogin} = useAuthStore();
+
     return (
-        <SafeAreaProvider>
+        <SafeAreaView style={{flex: 1}} edges={['bottom']}>
+            <StatusBar barStyle={isLogin ? 'dark-content' : 'light-content'} />
             <InitApp />
-        </SafeAreaProvider>
+        </SafeAreaView>
     );
 }
