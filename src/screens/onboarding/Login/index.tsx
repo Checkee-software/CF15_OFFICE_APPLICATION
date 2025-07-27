@@ -251,7 +251,7 @@ const LoginStyles = StyleSheet.create({
         flex: 1,
     },
     welcomeSceen: {
-        padding: 10,
+        padding: 16,
         borderWidth: 1,
         borderColor: 'rgba(245, 245, 245, 1)',
         backgroundColor: 'rgba(245, 245, 245, 0.25)',
@@ -261,24 +261,23 @@ const LoginStyles = StyleSheet.create({
     blurImageStyle: {
         overflow: 'hidden',
         borderRadius: 16,
-        width: width * 0.82,
+        width: width - 48,
         resizeMode: 'contain',
         justifyContent: 'center',
     },
     logo: {
-        width: 76,
-        height: 76,
+        width: 92,
+        height: 92,
         aspectRatio: 1,
-        marginTop: 4,
     },
     labelBrand: {
         marginTop: 6,
         color: 'rgba(255, 255, 255, 1)',
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: 24,
     },
     welcomeContainer: {
-        marginTop: 25,
+        marginTop: 20,
         justifyContent: 'flex-start',
     },
     welcomeTitle: {
@@ -341,12 +340,13 @@ const LoginStyles = StyleSheet.create({
     warpInputAndIcon: {
         borderBottomColor: 'rgba(245, 245, 245, 1)',
         borderBottomWidth: 1,
-        marginBottom: 15,
+        marginBottom: 16,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 10,
-        gap: 5,
+        paddingHorizontal: 0,
+        gap: 8,
         position: 'relative',
+        minHeight: 44,
     },
     loginInput: {
         flex: 1,
@@ -354,7 +354,7 @@ const LoginStyles = StyleSheet.create({
     },
     hidePasswordIcon: {
         position: 'absolute',
-        right: 10,
+        right: 0,
     },
     manual: {
         // flex: 1,
