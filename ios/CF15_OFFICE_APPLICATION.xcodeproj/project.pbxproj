@@ -19,6 +19,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = CF15_OFFICE_APPLICATION/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = CF15_OFFICE_APPLICATION/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = CF15_OFFICE_APPLICATION/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		1E0BDC612E35C9460060CF25 /* CF15_OFFICE_APPLICATION.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = CF15_OFFICE_APPLICATION.entitlements; path = CF15_OFFICE_APPLICATION/CF15_OFFICE_APPLICATION.entitlements; sourceTree = "<group>"; };
 		6A971C94D1C725611A19CCE0 /* libPods-CF15_OFFICE_APPLICATION.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CF15_OFFICE_APPLICATION.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = CF15_OFFICE_APPLICATION/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = CF15_OFFICE_APPLICATION/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -42,6 +43,7 @@
 		13B07FAE1A68108700A75B9A /* CF15_OFFICE_APPLICATION */ = {
 			isa = PBXGroup;
 			children = (
+				1E0BDC612E35C9460060CF25 /* CF15_OFFICE_APPLICATION.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -267,7 +269,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = CF15_OFFICE_APPLICATION/CF15_OFFICE_APPLICATION.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2J7X37J3K2;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = CF15_OFFICE_APPLICATION/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CF15 Office";
@@ -283,7 +287,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = vn.checkee.cf15office;
 				PRODUCT_NAME = CF15_OFFICE_APPLICATION;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -297,7 +301,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = CF15_OFFICE_APPLICATION/CF15_OFFICE_APPLICATION.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2J7X37J3K2;
 				INFOPLIST_FILE = CF15_OFFICE_APPLICATION/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CF15 Office";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -312,7 +318,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = vn.checkee.cf15office;
 				PRODUCT_NAME = CF15_OFFICE_APPLICATION;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
