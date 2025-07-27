@@ -172,6 +172,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         elevation: 3,
+        minWidth: '20%', 
+        flex: 1
     },
     icon: {
         marginRight: 8,
