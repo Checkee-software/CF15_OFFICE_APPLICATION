@@ -305,11 +305,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 12,
+        minWidth: 100
     },
     inputContainer: {
         position: 'relative',
         flexDirection: 'row',
         alignItems: 'center',
+        minWidth: 100
     },
     inputWithIcon: {
         flex: 1,
@@ -334,6 +336,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: '#fff',
         color: '#000',
+        minWidth: 100
     },
     passwordRules: {
         marginTop: 10,
@@ -354,6 +357,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 22,
         alignItems: 'center',
+        minWidth: '100%'
     },
     confirmButtonDisabled: {
         backgroundColor: '#ccc',

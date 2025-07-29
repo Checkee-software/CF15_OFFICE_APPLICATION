@@ -308,5 +308,6 @@ const styles = StyleSheet.create({
     },
     bookmarkButton: {
         padding: 5,
+        minWidth: "10%"
     },
 });
