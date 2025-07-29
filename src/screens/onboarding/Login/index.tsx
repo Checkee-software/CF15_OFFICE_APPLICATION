@@ -210,6 +210,12 @@ export default function Login() {
                                         </TouchableOpacity>
 
                                         <TouchableOpacity
+                                            onPress={() =>
+                                                Alert.alert(
+                                                    'Thông báo',
+                                                    'Chức năng đang bảo trì, vui lòng thử lại sau!',
+                                                )
+                                            }
                                             style={LoginStyles.btnRetriveInfo}>
                                             <MaterialIcons
                                                 name='qr-code-scanner'

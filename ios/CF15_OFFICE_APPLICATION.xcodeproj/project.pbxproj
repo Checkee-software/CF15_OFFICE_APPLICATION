@@ -270,7 +270,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CF15_OFFICE_APPLICATION/CF15_OFFICE_APPLICATION.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2J7X37J3K2;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = CF15_OFFICE_APPLICATION/Info.plist;
@@ -281,7 +283,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -289,6 +291,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = vn.checkee.cf15office;
 				PRODUCT_NAME = CF15_OFFICE_APPLICATION;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -302,7 +305,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = CF15_OFFICE_APPLICATION/CF15_OFFICE_APPLICATION.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 2J7X37J3K2;
 				INFOPLIST_FILE = CF15_OFFICE_APPLICATION/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CF15 Office";
@@ -312,7 +317,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -320,6 +325,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = vn.checkee.cf15office;
 				PRODUCT_NAME = CF15_OFFICE_APPLICATION;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
