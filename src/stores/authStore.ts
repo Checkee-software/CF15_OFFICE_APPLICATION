@@ -85,8 +85,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     isLogin: false,
 
     login: async (userAccount: ILogin) => {
-        set({isLoading: true});
         try {
+            set({ isLoading: true });
             const response = await axiosClient.post(
                 `${ENV.BACKEND_URL}/login/sign-in`,
                 userAccount,
@@ -139,8 +139,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     userData.groupName = findGroupName.name;
                 }
                 set({userInfo: userData, isLogin: true});
-                set({isLoading: false});
             }
+            set({ isLoading: false });
         } catch (error: any) {
             set({isLoading: false});
 

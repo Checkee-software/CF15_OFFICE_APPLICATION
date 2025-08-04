@@ -272,7 +272,7 @@
 				CODE_SIGN_ENTITLEMENTS = CF15_OFFICE_APPLICATION/CF15_OFFICE_APPLICATION.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 2J7X37J3K2;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = CF15_OFFICE_APPLICATION/Info.plist;
@@ -283,7 +283,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -307,7 +307,7 @@
 				CODE_SIGN_ENTITLEMENTS = CF15_OFFICE_APPLICATION/CF15_OFFICE_APPLICATION.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 2J7X37J3K2;
 				INFOPLIST_FILE = CF15_OFFICE_APPLICATION/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CF15 Office";
@@ -317,7 +317,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
