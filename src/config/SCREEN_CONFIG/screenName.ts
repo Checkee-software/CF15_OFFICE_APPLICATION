@@ -3,6 +3,7 @@ export type ScreenName =
     | 'INDEX'
     | 'LOGIN'
     | 'AUTOMATIC_TRACING'
+    | 'DETAIL_TRACKING'
     /* HOME */
     | 'MAIN'
     | 'BROWSEADDMATERIALS'

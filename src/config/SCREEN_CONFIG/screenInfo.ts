@@ -15,7 +15,7 @@ const SCREEN_INFO: Screens = Object.assign(
     GLOBAL_SCREENS,
     SUBSCREENS,
     ONBOARDING_SCREENS,
-)
+);
 
 Object.freeze(SCREEN_INFO);
 

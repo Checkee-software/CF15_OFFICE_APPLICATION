@@ -3,6 +3,7 @@ import {ScreenRegistry} from './types';
 
 /* screens */
 import Login from '../../screens/onboarding/Login';
+import DetailTracking from '@/screens/onboarding/DetailTracking';
 import AutomaticTracing from '../../screens/onboarding/AutomaticTracing';
 /**
  * Declare user's screens before signing in
@@ -22,6 +23,13 @@ export const UNAUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: AutomaticTracing,
         options: {
             title: SCREEN_INFO.CAMERA_SCANNER.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.DETAIL_TRACKING.key,
+        component: DetailTracking,
+        options: {
+            title: SCREEN_INFO.DETAIL_TRACKING.headerTitle,
         },
     },
 ];

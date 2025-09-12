@@ -459,6 +459,7 @@ const styles = StyleSheet.create({
         margin: 'auto',
         textAlign: 'center',
         fontWeight: 500,
+        padding: 12
     },
 });
 

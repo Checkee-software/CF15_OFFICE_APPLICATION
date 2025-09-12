@@ -1,12 +1,12 @@
 type TAPIResponse<DataResponse> = Promise<
     | {
-          status: 'failure';
+          status: "failure";
           statusCode?: number;
           data?: DataResponse;
           message?: string;
       }
     | {
-          status: 'successfully';
+          status: "successfully";
           statusCode?: number;
           data: DataResponse;
           message?: string;

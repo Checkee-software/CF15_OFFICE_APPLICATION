@@ -223,5 +223,3 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
 ];
 
 Object.freeze(AUTHENTICATION_SCREENS);
-
-Object.freeze(AUTHENTICATION_SCREENS);

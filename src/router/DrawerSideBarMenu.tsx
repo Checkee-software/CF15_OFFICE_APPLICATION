@@ -1,18 +1,18 @@
-import React from 'react';
+import React from "react";
 
 /* configurations */
-import colors from '../assets/colors';
-import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
+import colors from "../assets/colors";
+import SCREEN_INFO from "../config/SCREEN_CONFIG/screenInfo";
 
 /* packages */
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import {createDrawerNavigator} from '@react-navigation/drawer';
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 
 /* screens */
-import DrawerPanel from './DrawerPanel';
-import Main from '../screens/home/Main';
+import DrawerPanel from "./DrawerPanel";
+import Main from "../screens/home/Main";
 
-export default function DrawerSideBarMenu({navigation}: {navigation: any}) {
+export default function DrawerSideBarMenu({ navigation }: { navigation: any }) {
     const Drawer = createDrawerNavigator();
 
     const goToScan = () => navigation.navigate(SCREEN_INFO.CAMERA_SCANNER.key);
@@ -26,7 +26,7 @@ export default function DrawerSideBarMenu({navigation}: {navigation: any}) {
                 headerStyle: {
                     backgroundColor: colors.white,
                 },
-                headerTitleAlign: 'center',
+                headerTitleAlign: "center",
                 headerTintColor: colors.white,
             }}>
             <Drawer.Screen
@@ -38,9 +38,9 @@ export default function DrawerSideBarMenu({navigation}: {navigation: any}) {
                     headerRight: () => (
                         // eslint-disable-next-line react-native/no-inline-styles
                         <AntDesign
-                            style={{marginRight: 16}}
+                            style={{ marginRight: 16 }}
                             onPress={goToScan}
-                            name={'scan1'}
+                            name={"scan1"}
                             color={colors.white}
                             size={24}
                         />
