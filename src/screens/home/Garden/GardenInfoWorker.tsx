@@ -268,7 +268,6 @@ const GardenInfoWorker = () => {
                 keyboardShouldPersistTaps='handled'
                 keyExtractor={item => item._id}
                 contentContainerStyle={styles.listContainer}
-                scrollEnabled={false}
                 enableOnAndroid
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>

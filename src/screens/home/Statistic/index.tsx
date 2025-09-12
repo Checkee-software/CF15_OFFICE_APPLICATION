@@ -225,8 +225,6 @@ const Statistic = () => {
     };
 
     const handleGetStatistic = async () => {
-        setShowForm(!showForm);
-
         setCurrentSelectedType(selectedType);
         setCurrentSelectedTarget(selectedTarget);
         setCurrentSelectedTargetName(selectedTargetName);
@@ -249,6 +247,7 @@ const Statistic = () => {
                 targetId: selectedTarget,
             });
         }
+        setShowForm(!showForm);
     };
 
     useEffect(() => {

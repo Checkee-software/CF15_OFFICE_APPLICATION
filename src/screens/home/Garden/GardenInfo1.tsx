@@ -222,46 +222,6 @@ const GardenDetailScreen = () => {
                         label='Đơn vị'
                         value={(selectedGarden as any).unit || 'Không xác định'}
                     />
-                    {userInfo?.userType?.level !== 'LEADER' && (
-                        <CollapsibleRow
-                            label='Hợp đồng'
-                            expanded={contractExpanded}
-                            onToggle={() =>
-                                setContractExpanded(!contractExpanded)
-                            }>
-                            {selectedGarden.management?.files?.length > 0 ? (
-                                selectedGarden.management?.files?.map(
-                                    (file, index) => (
-                                        <TouchableOpacity
-                                            key={index}
-                                            onPress={() =>
-                                                Linking.openURL(
-                                                    `${
-                                                        ENV.BACKEND_URL
-                                                    }${file.path.replace(
-                                                        /\\/g,
-                                                        '/',
-                                                    )}`,
-                                                )
-                                            }>
-                                            <Text
-                                                style={{
-                                                    color: 'green',
-                                                    marginBottom: 6,
-                                                }}>
-                                                {file.filename}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ),
-                                )
-                            ) : (
-                                <Text style={{color: '#888'}}>
-                                    Không có hợp đồng nào
-                                </Text>
-                            )}
-                        </CollapsibleRow>
-                    )}
-
                     <View
                         style={{
                             flexDirection: 'row',

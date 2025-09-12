@@ -10,6 +10,7 @@ import {
     ImageBackground,
     Platform,
     KeyboardAvoidingView,
+    ActivityIndicator,
 } from 'react-native';
 import images from '../../../assets/images';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -17,7 +18,6 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
 import {useAuthStore} from '../../../stores/authStore';
 import {Dimensions} from 'react-native';
-import Backdrop from '../../subscreen/Loading/index2';
 // import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import colors from '@/assets/colors';
 
@@ -178,11 +178,16 @@ export default function Login() {
                                     </View>
 
                                     <TouchableOpacity
+                                        disabled={isLoading}
                                         style={LoginStyles.btnLogin}
                                         onPress={handleLogin}>
-                                        <Text style={LoginStyles.btnText}>
-                                            BẮT ĐẦU
-                                        </Text>
+                                        {isLoading ? (
+                                            <ActivityIndicator color='#fff' />
+                                        ) : (
+                                            <Text style={LoginStyles.btnText}>
+                                                BẮT ĐẦU
+                                            </Text>
+                                        )}
                                     </TouchableOpacity>
                                 </View>
                             ) : (
@@ -237,8 +242,6 @@ export default function Login() {
             <View style={LoginStyles.version}>
                 <Text style={LoginStyles.textVersion}>Version 1.0.0</Text>
             </View>
-
-            <Backdrop open={isLoading} />
         </View>
     );
 }
