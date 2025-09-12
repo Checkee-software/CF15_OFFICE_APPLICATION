@@ -132,13 +132,6 @@ const styles = StyleSheet.create({
     required: {
         color: 'red',
     },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 6,
-        padding: 10,
-        marginBottom: 8,
-    },
     textArea: {
         borderWidth: 1,
         borderColor: '#ccc',
@@ -162,6 +155,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         alignItems: 'center',
         marginBottom: 16,
+        minWidth: '100%',
     },
     buttonText: {
         color: '#fff',
@@ -175,10 +169,12 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         paddingHorizontal: 10,
         marginBottom: 8,
+        minWidth: '100%',
     },
 
     inputWithIcon: {
         flex: 1,
         height: 40,
+        minWidth: '100%',
     },
 });
