@@ -11,6 +11,7 @@ import {
     Platform,
     KeyboardAvoidingView,
 } from 'react-native';
+import deviceInfo from "react-native-device-info";
 import images from '../../../assets/images';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -20,51 +21,74 @@ import {Dimensions} from 'react-native';
 import Backdrop from '../../subscreen/Loading/index2';
 // import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import colors from '@/assets/colors';
+import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
+
+import LicenseModal from './Components/LicenseModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
 
-export default function Login() {
+export default function Login({ navigation }: any) {
+    /* store */
     const {login, isLoading} = useAuthStore();
+    console.log("device infor: ", deviceInfo);
 
-    const [showLoginForm, setShowLoginForm] = useState(false);
+    /* create storage */
+
+    /* create state */
     const [showPassword, setShowPassword] = useState(false);
+    const [showLoginForm, setShowLoginForm] = useState(false);
+    const [isChecked, setIsChecked] = useState<boolean>(false);
+    const [isShowLicense, setIsShowLicense] = useState<boolean>(false);
+    const [isLicenseLoading, setIsLicenseLoading] = useState<boolean>(false);
+    const [license, setLicense] = useState<string>("");
     const [userAccount, setUserAccount] = useState({
         username: '', //cf15office lamphucf15
         phoneNumber: '',
         password: '', //CF15@FFICE2025 123456789A@
     });
 
+    // useEffect(() => {
+    //     const clear = async () => await AsyncStorage.removeItem("LICENSE");
+    //     clear();
+    // }, [])
+
     useEffect(() => {
-        // getNotificationPermission();
-    }, []);
+        const makeLicense = async (): Promise<void> => {
+            const isAccept = await AsyncStorage.getItem("LICENSE");
+            if (!isAccept) {
+                setLicense("");     
+                onShowLicense();
+                return;
+            }
 
-    // const getNotificationPermission = async () => {
-    //     if (Platform.OS === 'android' && Platform.Version >= 33) {
-    //         const status = await PermissionsAndroid.request(
-    //             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-    //         );
+            setLicense(isAccept);
+        }
 
-    //         if (status === RESULTS.GRANTED) {
-    //             console.log('✅ Đã được cấp quyền thông báo');
-    //         } else if (status === RESULTS.DENIED) {
-    //             const requestStatus = await PermissionsAndroid.request(
-    //                 PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-    //             );
-    //             if (requestStatus === RESULTS.GRANTED) {
-    //                 console.log('✅ Cấp quyền sau khi request thành công');
-    //             } else {
-    //                 console.log('❌ Người dùng từ chối quyền thông báo');
-    //             }
-    //         } else {
-    //             ToastAndroid.show(
-    //                 'Thông báo bị từ chối, vui lòng truy cập ứng dụng để bật thủ công!',
-    //                 3000,
-    //             );
-    //             setManualNotification(true);
-    //         }
-    //     } else if (Platform.OS === 'ios') {
-    //     }
-    // };
+        makeLicense();
+    }, [license]);
+
+    const onShowLicense = () => setIsShowLicense(true);
+
+    const onHideLicense = () => setIsShowLicense(false);
+
+    const onChecked = () => setIsChecked(!isChecked);
+
+    const onSubmitLicense = async () => {
+        try {
+            setIsLicenseLoading(true);
+
+            await AsyncStorage.setItem("LICENSE", "1");
+            setTimeout(() => {
+                setLicense("1");
+                setIsLicenseLoading(false);
+                setIsChecked(false);
+                onHideLicense();
+            }, 1000);
+        } catch (error) {
+            console.log("submit-license-error: ", error);
+        }
+    };
 
     const onChangeUserName = (value: string) => {
         setUserAccount({...userAccount, username: value});
@@ -90,6 +114,10 @@ export default function Login() {
 
             login(_userAccount);
         }
+    };
+
+    const navigateToTracking = () => {
+        return navigation.navigate(SCREEN_INFO.AUTOMATIC_TRACING.key);
     };
 
     return (
@@ -201,21 +229,20 @@ export default function Login() {
                                     <View style={LoginStyles.welcomeWarpButton}>
                                         <TouchableOpacity
                                             style={LoginStyles.btnLogin}
-                                            onPress={() =>
-                                                setShowLoginForm(!showLoginForm)
-                                            }>
+                                            onPress={() => {
+                                                if (!license) {
+                                                    onShowLicense();
+                                                    return;
+                                                }
+                                                setShowLoginForm(!showLoginForm);
+                                            }}>
                                             <Text style={LoginStyles.btnText}>
                                                 ĐĂNG NHẬP
                                             </Text>
                                         </TouchableOpacity>
 
                                         <TouchableOpacity
-                                            onPress={() =>
-                                                Alert.alert(
-                                                    'Thông báo',
-                                                    'Chức năng đang bảo trì, vui lòng thử lại sau!',
-                                                )
-                                            }
+                                            onPress={navigateToTracking}
                                             style={LoginStyles.btnRetriveInfo}>
                                             <MaterialIcons
                                                 name='qr-code-scanner'
@@ -235,10 +262,22 @@ export default function Login() {
             </ImageBackground>
 
             <View style={LoginStyles.version}>
-                <Text style={LoginStyles.textVersion}>Version 1.0.0</Text>
+                <Text style={LoginStyles.textVersion}>Version {deviceInfo.getVersion()}</Text>
             </View>
 
             <Backdrop open={isLoading} />
+            { 
+                isShowLicense && 
+                    <LicenseModal 
+                        visible 
+                        onClose={onHideLicense} 
+                        onShow={onShowLicense} 
+                        onChecked={onChecked} 
+                        isChecked={isChecked}
+                        onSubmit={onSubmitLicense}
+                        isLoading={isLicenseLoading}
+                    /> 
+            }
         </View>
     );
 }

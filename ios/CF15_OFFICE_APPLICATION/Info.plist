@@ -43,8 +43,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>$(PMG_MANAGER_APPLICATION) needs your permission to use the camera for scan QR.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<!-- <key>NSLocationWhenInUseUsageDescription</key>
+	<string></string> -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Photo access needed</string>
 	<key>UIAppFonts</key>

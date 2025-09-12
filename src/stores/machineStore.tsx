@@ -1,11 +1,11 @@
-import {create} from 'zustand';
-import Snackbar from 'react-native-snackbar';
-import axiosClient from '@/utils/axiosClient';
+import { create } from "zustand";
+import Snackbar from "react-native-snackbar";
+import axiosClient from "@/utils/axiosClient";
 import {
     IRequestStartMachine,
     IRequestStopMachine,
-} from '@/shared-types/form-data/ScheduleFormData/ScheduleFormData';
-import ENV from '@/config/ENV';
+} from "@/shared-types/form-data/ScheduleFormData/ScheduleFormData";
+import ENV from "@/config/ENV";
 
 interface IActiveMachineItem {
     _id: string;
@@ -26,11 +26,11 @@ interface MachineStore {
     getActiveMachine: (scheduleId: string) => Promise<IActiveMachineItem[]>;
 }
 
-export const useMachineStore = create<MachineStore>(set => ({
+export const useMachineStore = create<MachineStore>((set) => ({
     isStarting: false,
 
-    startMachine: async ({scheduleId, machineId, startAt}) => {
-        set({isStarting: true});
+    startMachine: async ({ scheduleId, machineId, startAt }) => {
+        set({ isStarting: true });
 
         try {
             const url = `${ENV.BACKEND_URL}/resources/schedules/machine-start/${scheduleId}`;
@@ -41,30 +41,30 @@ export const useMachineStore = create<MachineStore>(set => ({
 
             await axiosClient.post(url, payload, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
             });
 
             Snackbar.show({
-                text: 'Bắt đầu ca máy thành công!',
+                text: "Bắt đầu ca máy thành công!",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
             console.error(
-                ' Error starting machine:',
+                " Error starting machine:",
                 error.response?.data || error.message,
             );
             Snackbar.show({
-                text: 'Bắt đầu ca máy thất bại!',
+                text: "Bắt đầu ca máy thất bại!",
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
-            set({isStarting: false});
+            set({ isStarting: false });
         }
     },
 
-    stopMachine: async ({scheduleId, machineId, endAt}) => {
-        set({isStarting: true});
+    stopMachine: async ({ scheduleId, machineId, endAt }) => {
+        set({ isStarting: true });
 
         try {
             const url = `${ENV.BACKEND_URL}/resources/schedules/machine-end/${scheduleId}`;
@@ -75,25 +75,25 @@ export const useMachineStore = create<MachineStore>(set => ({
 
             await axiosClient.post(url, payload, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
             });
 
             Snackbar.show({
-                text: 'Kết thúc ca máy thành công!',
+                text: "Kết thúc ca máy thành công!",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
             console.error(
-                'Error stopping machine:',
+                "Error stopping machine:",
                 error.response?.data || error.message,
             );
             Snackbar.show({
-                text: 'Kết thúc ca máy thất bại!',
+                text: "Kết thúc ca máy thất bại!",
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
-            set({isStarting: false});
+            set({ isStarting: false });
         }
     },
 
@@ -105,7 +105,7 @@ export const useMachineStore = create<MachineStore>(set => ({
                 url,
                 {
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                 },
             );
@@ -113,11 +113,11 @@ export const useMachineStore = create<MachineStore>(set => ({
             return response.data.data;
         } catch (error: any) {
             console.error(
-                'Error getting active machine:',
+                "Error getting active machine:",
                 error.response?.data || error.message,
             );
             Snackbar.show({
-                text: 'Lấy thông tin ca máy thất bại!',
+                text: "Lấy thông tin ca máy thất bại!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return [];

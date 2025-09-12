@@ -225,7 +225,7 @@ const Statistic = () => {
     };
 
     const handleGetStatistic = async () => {
-        setShowForm(!showForm);
+        
 
         setCurrentSelectedType(selectedType);
         setCurrentSelectedTarget(selectedTarget);
@@ -249,6 +249,7 @@ const Statistic = () => {
                 targetId: selectedTarget,
             });
         }
+        setShowForm(!showForm);
     };
 
     useEffect(() => {
@@ -465,7 +466,7 @@ const Statistic = () => {
                 </View>
             </ScrollView>
 
-            <Modal visible={showForm} animationType='fade' transparent={true}>
+            <Modal visible={showForm} animationType='fade' transparent={true} onRequestClose={closeModalFilter}>
                 <View style={styles.modalBackdrop}>
                     <View style={styles.modalContent}>
                         <Text style={styles.text1}>Thống kê</Text>
@@ -678,7 +679,7 @@ const Statistic = () => {
                                     styles.btnModal,
                                     {backgroundColor: '#4CAF50'},
                                 ]}
-                                onPress={() => handleGetStatistic()}>
+                                onPress={handleGetStatistic}>
                                 <Text
                                     style={[
                                         styles.btnCloseModalText,
