@@ -28,6 +28,7 @@ import GardenInfoWorker from '@/screens/home/Garden/GardenInfoWorker';
 import ActiveMachine from '@/screens/home/Garden/ActiveMachine';
 import GardenInfoWorker1 from '@/screens/home/Garden/GardenInfoWorker1';
 import BrowseAddMaterials from '@/screens/home/BrowseAddMaterials';
+import BrowseHarvest from '@/screens/home/BrowseHarvest';
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -88,6 +89,13 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: BrowseAddMaterials,
         options: {
             title: SCREEN_INFO.BROWSEADDMATERIALS.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.BROWSE_HARVEST.key,
+        component: BrowseHarvest,
+        options: {
+            title: SCREEN_INFO.BROWSE_HARVEST.headerTitle,
         },
     },
     //khu vườn cho worker
