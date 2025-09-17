@@ -1,5 +1,5 @@
 import SCREEN_INFO from './screenInfo';
-import {ScreenRegistry} from './types';
+import { ScreenRegistry } from './types';
 
 /* screens */
 import Main from '../../screens/home/Main';
@@ -28,6 +28,10 @@ import GardenInfoWorker from '@/screens/home/Garden/GardenInfoWorker';
 import ActiveMachine from '@/screens/home/Garden/ActiveMachine';
 import GardenInfoWorker1 from '@/screens/home/Garden/GardenInfoWorker1';
 import BrowseAddMaterials from '@/screens/home/BrowseAddMaterials';
+import BrowseHarvest from '@/screens/home/BrowseHarvest';
+import HarvestList from '@/screens/home/Garden/Harvest/HarvestList';
+import HarvestDetail from '@/screens/home/Garden/Harvest/HarvestDetail';
+import HarvestHistory from '@/screens/home/Garden/Harvest/HarvestHistory';
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -90,12 +94,40 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
             title: SCREEN_INFO.BROWSEADDMATERIALS.headerTitle,
         },
     },
+    {
+        name: SCREEN_INFO.BROWSE_HARVEST.key,
+        component: BrowseHarvest,
+        options: {
+            title: SCREEN_INFO.BROWSE_HARVEST.headerTitle,
+        },
+    },
     //khu vườn cho worker
     {
         name: SCREEN_INFO.ACTIVEMACHINE.key,
         component: ActiveMachine,
         options: {
             title: SCREEN_INFO.ACTIVEMACHINE.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.HARVEST.key,
+        component: HarvestList,
+        options: {
+            title: SCREEN_INFO.HARVEST.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.HARVEST_DETAIL.key,
+        component: HarvestDetail,
+        options: {
+            title: SCREEN_INFO.HARVEST_DETAIL.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.HARVEST_HISTORY.key,
+        component: HarvestHistory,
+        options: {
+            title: SCREEN_INFO.HARVEST_HISTORY.headerTitle,
         },
     },
     {

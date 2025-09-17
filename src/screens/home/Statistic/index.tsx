@@ -95,13 +95,13 @@ const Statistic = () => {
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
     const closeModalFilter = () => {
-        setShowForm(!showForm);
         setSelectedType(currentSelectedType);
         setSelectedTarget(currentSelectedTarget);
         setSelectedTargetName(currentSelectedTargetName);
         setSelectedTimeOption(currentSelectedTimeOption);
         setStartDate(currentStartDate);
         setCurrentEndDate(currentEndDate);
+        setShowForm(!showForm);
     };
 
     const renderTimeStatistic = () => {
@@ -225,8 +225,6 @@ const Statistic = () => {
     };
 
     const handleGetStatistic = async () => {
-        
-
         setCurrentSelectedType(selectedType);
         setCurrentSelectedTarget(selectedTarget);
         setCurrentSelectedTargetName(selectedTargetName);

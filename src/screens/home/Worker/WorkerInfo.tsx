@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, ScrollView} from 'react-native';
 import React from 'react';
 import moment from 'moment';
 import {useAuthStore} from '@/stores/authStore';
@@ -22,129 +22,143 @@ const WorkerInfo = ({route}: any) => {
 
     return (
         <View style={WorkerInfoStyles.container}>
-            <View style={WorkerInfoStyles.workerNameSection}>
-                <View
-                    style={
-                        userInfo.userType.level === EOrganization.DEPARTMENT
-                            ? WorkerInfoStyles.workerAvatar
-                            : WorkerInfoStyles.workerAvatar2
-                    }>
-                    <Image
-                        source={
-                            item.avatar
-                                ? {
-                                      uri: item.avatar,
-                                  }
-                                : images.avatar
-                        }
-                        style={WorkerInfoStyles.avatar}
-                    />
-                </View>
+            <ScrollView>
+                <View style={WorkerInfoStyles.workerNameSection}>
+                    <View
+                        style={
+                            userInfo.userType.level === EOrganization.DEPARTMENT
+                                ? WorkerInfoStyles.workerAvatar
+                                : WorkerInfoStyles.workerAvatar2
+                        }>
+                        <Image
+                            source={
+                                item.avatar
+                                    ? {
+                                          uri: item.avatar,
+                                      }
+                                    : images.avatar
+                            }
+                            style={WorkerInfoStyles.avatar}
+                        />
+                    </View>
 
-                <View style={WorkerInfoStyles.warpWorkerNameAndRole}>
-                    <Text style={WorkerInfoStyles.workerName}>
-                        {item.fullName}
-                    </Text>
-                    <Text style={WorkerInfoStyles.workerRole}>{item.unit}</Text>
-                </View>
-            </View>
-
-            <View style={WorkerInfoStyles.workerContactSection}>
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>Tài khoản</Text>
-                    <Text style={WorkerInfoStyles.valueText}>
-                        {item.username}
-                    </Text>
-                </View>
-
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>
-                        Số điện thoại
-                    </Text>
-                    <Text style={WorkerInfoStyles.valueText}>
-                        {item.phoneNumber}
-                    </Text>
-                </View>
-
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>CCCD</Text>
-                    <Text style={WorkerInfoStyles.valueText}>{item.ID}</Text>
-                </View>
-
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>Ngày sinh</Text>
-                    <Text style={WorkerInfoStyles.valueText}>
-                        {moment(item.dateOfBirth).format('l')}
-                    </Text>
-                </View>
-            </View>
-
-            <View style={WorkerInfoStyles.workerOtherInfoSection}>
-                <Text style={WorkerInfoStyles.otherInfoText}>
-                    Thông tin khác
-                </Text>
-
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>
-                        Cấp tài khoản
-                    </Text>
-
-                    <Text style={WorkerInfoStyles.valueText}>
-                        {renderLevelUser(item.userType.level)}
-                    </Text>
-                </View>
-
-                {userInfo.userType.level === EOrganization.DEPARTMENT ? (
-                    <View style={WorkerInfoStyles.warpLabelAndValue}>
-                        <Text style={WorkerInfoStyles.labelText}>Vai trò</Text>
-
-                        <Text style={WorkerInfoStyles.valueText}>
-                            {item.userType.role}
+                    <View style={WorkerInfoStyles.warpWorkerNameAndRole}>
+                        <Text style={WorkerInfoStyles.workerName}>
+                            {item.fullName}
+                        </Text>
+                        <Text style={WorkerInfoStyles.workerRole}>
+                            {item.unit}
                         </Text>
                     </View>
-                ) : null}
-
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>Dân tộc</Text>
-                    <Text style={WorkerInfoStyles.valueText}>
-                        {item.nation}
-                    </Text>
                 </View>
 
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>
-                        Ngày tuyển dụng
-                    </Text>
-                    <Text style={WorkerInfoStyles.valueText}>
-                        {moment(item.recruimentDate).format('l')}
-                    </Text>
+                <View style={WorkerInfoStyles.workerContactSection}>
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>
+                            Tài khoản
+                        </Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {item.username}
+                        </Text>
+                    </View>
+
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>
+                            Số điện thoại
+                        </Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {item.phoneNumber}
+                        </Text>
+                    </View>
+
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>CCCD</Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {item.ID}
+                        </Text>
+                    </View>
+
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>
+                            Ngày sinh
+                        </Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {moment(item.dateOfBirth).format('l')}
+                        </Text>
+                    </View>
                 </View>
 
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>Đối tượng</Text>
-                    <Text style={WorkerInfoStyles.valueText}>
-                        {item.contract}
+                <View style={WorkerInfoStyles.workerOtherInfoSection}>
+                    <Text style={WorkerInfoStyles.otherInfoText}>
+                        Thông tin khác
                     </Text>
-                </View>
 
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>
-                        Địa chỉ thường trú
-                    </Text>
-                    <Text style={WorkerInfoStyles.valueText}>
-                        {item.address.resident}
-                    </Text>
-                </View>
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>
+                            Cấp tài khoản
+                        </Text>
 
-                <View style={WorkerInfoStyles.warpLabelAndValue}>
-                    <Text style={WorkerInfoStyles.labelText}>
-                        Địa chỉ tạm trú
-                    </Text>
-                    <Text style={WorkerInfoStyles.valueText}>
-                        {item.address.temporary}
-                    </Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {renderLevelUser(item.userType.level)}
+                        </Text>
+                    </View>
+
+                    {userInfo.userType.level === EOrganization.DEPARTMENT ? (
+                        <View style={WorkerInfoStyles.warpLabelAndValue}>
+                            <Text style={WorkerInfoStyles.labelText}>
+                                Vai trò
+                            </Text>
+
+                            <Text style={WorkerInfoStyles.valueText}>
+                                {item.userType.role}
+                            </Text>
+                        </View>
+                    ) : null}
+
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>Dân tộc</Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {item.nation}
+                        </Text>
+                    </View>
+
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>
+                            Ngày tuyển dụng
+                        </Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {moment(item.recruimentDate).format('l')}
+                        </Text>
+                    </View>
+
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>
+                            Đối tượng
+                        </Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {item.contract}
+                        </Text>
+                    </View>
+
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>
+                            Địa chỉ thường trú
+                        </Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {item.address.resident}
+                        </Text>
+                    </View>
+
+                    <View style={WorkerInfoStyles.warpLabelAndValue}>
+                        <Text style={WorkerInfoStyles.labelText}>
+                            Địa chỉ tạm trú
+                        </Text>
+                        <Text style={WorkerInfoStyles.valueText}>
+                            {item.address.temporary}
+                        </Text>
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         </View>
     );
 };

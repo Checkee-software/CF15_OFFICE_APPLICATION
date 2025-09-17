@@ -138,7 +138,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                     userData.groupName = findGroupName.name;
                 }
-                set({ userInfo: userData, isLogin: true });
+                set({isLoading: false});
+                set({userInfo: userData, isLogin: true});
             }
             set({ isLoading: false });
         } catch (error: any) {

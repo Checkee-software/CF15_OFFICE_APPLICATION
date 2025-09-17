@@ -8,7 +8,8 @@ import {
     Image,
     ViewStyle,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
+import React, {useEffect, useState, useCallback} from 'react';
 import {
     useCameraDevice,
     Camera,
@@ -29,19 +30,25 @@ const GardenScan = ({navigation, route}: any) => {
     const {navigateNext} = route.params || {};
     const {searchGardens} = useGardenStore();
 
+    useFocusEffect(
+        useCallback(() => {
+            setNotFound(false);
+            setCodeInput('');
+            setHasScanned(false);
+        }, []),
+    );
+
     const handleSearch = async (code: string) => {
         if (!code) return;
 
-        //console.log('[SEARCH] Searching for garden with code:', code);
         await searchGardens(code, userInfo._id);
 
         const updatedGardens = useGardenStore.getState().gardens;
-        //console.log('[RESULT] Garden found:', updatedGardens);
 
-        if (updatedGardens) {
+        if (updatedGardens && updatedGardens.length > 0) {
             setNotFound(false);
             navigation.navigate(navigateNext, {
-                garden: updatedGardens,
+                garden: updatedGardens[0],
             });
         } else {
             setNotFound(true);
