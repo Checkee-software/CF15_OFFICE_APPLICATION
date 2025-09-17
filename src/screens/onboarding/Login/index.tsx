@@ -29,9 +29,9 @@ export default function Login() {
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [userAccount, setUserAccount] = useState({
-        username: '', //cf15office lamphucf15
+        username: 'tranngocthach', //cf15office lamphucf15
         phoneNumber: '',
-        password: '', //CF15@FFICE2025 123456789A@
+        password: '00000000', //CF15@FFICE2025 123456789A@
     });
 
     useEffect(() => {

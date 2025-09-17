@@ -85,6 +85,13 @@ export default function Main({navigation}: any) {
             navigateTo: SCREEN_INFO.BROWSE_HARVEST.key,
         },
         {
+            function: '',
+            key: 'harvest',
+            label: 'Thu hoạch',
+            buttonImage: images.approveHarvest,
+            navigateTo: SCREEN_INFO.HARVEST.key,
+        },
+        {
             function: 'FEEDBACK',
             key: 'feedback',
             label: 'Góp ý',

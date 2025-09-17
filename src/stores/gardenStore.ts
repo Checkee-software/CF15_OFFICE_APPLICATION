@@ -74,6 +74,7 @@ const useGardenStore = create<GardenState>(set => ({
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/gardens/collection`,
             );
+            console.log(res)
 
             if (res.data.data.length !== 0) {
                 const userGardenNickname =
@@ -119,6 +120,7 @@ const useGardenStore = create<GardenState>(set => ({
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/gardens/detail/${id}`,
             );
+            console.log(res)
             set({selectedGarden: res.data?.data || null});
         } catch (error: any) {
             Snackbar.show({
@@ -136,6 +138,7 @@ const useGardenStore = create<GardenState>(set => ({
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/gardens/find?code=${code}`,
             );
+            console.log(res)
 
             const userGardenNickname = asyncStorageHelper.userGardenNickname;
             const user = userGardenNickname.find(u => u.userId === userId);
@@ -192,6 +195,7 @@ const useGardenStore = create<GardenState>(set => ({
         try {
             const url = `${ENV.BACKEND_URL}/resources/gardens/harvest/report/${_id}/${amount}`;
             const res = await axiosClient.post(url);
+            console.log(res)
 
             Snackbar.show({
                 text: 'Báo cáo thu hoạch thành công',
@@ -213,15 +217,14 @@ const useGardenStore = create<GardenState>(set => ({
             const res = await axiosClient.get<THarvestHistory>(
                 `${ENV.BACKEND_URL}/resources/gardens/harvest/history?_id=${_id}`,
             );
+            console.log(res)
             set({harvestHistory: res.data?.data || []});
         } catch (error: any) {
-            // Snackbar.show({
-            //     text: 'Không thể tải lịch sử thu hoạch',
-            //     duration: Snackbar.LENGTH_SHORT,
-            // });
-        } finally {
-            set({isLoading: false});
-        }
+        set({ harvestHistory: [] }); 
+        
+    } finally {
+        set({ isLoading: false });
+    }
     },
 
     fetchHarvestCollection: async (_id: string) => {

@@ -16,6 +16,21 @@ const HOME_SCREENS = {
         headerTitle: 'DUYỆT THU HOẠCH',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    HARVEST: {
+        key: 'HARVEST',
+        headerTitle: 'DANH SÁCH KHU VƯỜN THU HOẠCH',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    HARVEST_DETAIL: {
+        key: 'HARVEST_DETAIL',
+        headerTitle: 'CHI TIẾT THU HOẠCH',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    HARVEST_HISTORY: {
+        key: 'HARVEST_HISTORY',
+        headerTitle: 'LỊCH SỬ THU HOẠCH',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     NOTIFICATION: {
         key: 'NOTIFICATION',
         headerTitle: 'THÔNG BÁO',
