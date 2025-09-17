@@ -225,8 +225,6 @@ const Statistic = () => {
     };
 
     const handleGetStatistic = async () => {
-        
-
         setCurrentSelectedType(selectedType);
         setCurrentSelectedTarget(selectedTarget);
         setCurrentSelectedTargetName(selectedTargetName);

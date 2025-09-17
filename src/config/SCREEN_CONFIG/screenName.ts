@@ -7,6 +7,10 @@ export type ScreenName =
     /* HOME */
     | 'MAIN'
     | 'BROWSEADDMATERIALS'
+    | 'BROWSE_HARVEST'
+    | 'HARVEST'
+    | 'HARVEST_DETAIL'
+    | 'HARVEST_HISTORY'
     | 'LISTNOTIFICATION'
     | 'DOCUMENT'
     | 'DETAILDOCUMENTS'

@@ -7,6 +7,9 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
+    Modal,
+    ActivityIndicator,
+    Dimensions,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import useGardenStore from '../../../stores/gardenStore';
@@ -19,6 +22,8 @@ import Feather from 'react-native-vector-icons/Feather';
 import ENV from '@/config/ENV';
 import RNFS from 'react-native-fs';
 import Snackbar from 'react-native-snackbar';
+import WebView from 'react-native-webview';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const CollapsibleRow = ({
     label,
@@ -58,6 +63,7 @@ const GardenWorker = () => {
 
     const [showLocationInfo, setShowLocationInfo] = React.useState(false);
     const [showInfo, setShowInfo] = React.useState(false);
+    const [showForm, setShowForm] = React.useState(false);
 
     const {gardenDetail, isLoading, harvestHistory} = useGardenStore();
 
@@ -73,6 +79,10 @@ const GardenWorker = () => {
         const updatedPath = path.replace(/\\/g, '/');
         return `${ENV.BACKEND_URL}${updatedPath}`;
     };
+
+    const pdfFilePath = gardenDetail?.management?.files?.[0]?.path
+        ? fixFilePath(gardenDetail.management.files[0].path)
+        : '';
 
     const formatFileSize = (size: number) => {
         if (size >= 1024 * 1024) {
@@ -130,19 +140,29 @@ const GardenWorker = () => {
                 </View>
             </View>
 
-            <TouchableOpacity
-                onPress={() =>
-                    downloadFile(
-                        itemAttachedFiles.path,
-                        itemAttachedFiles.filename,
-                    )
-                }>
-                <Feather
-                    name='download'
-                    color={'rgba(33, 150, 243, 1)'}
-                    size={22}
-                />
-            </TouchableOpacity>
+            <View style={styles.rightCardDocument}>
+                <TouchableOpacity onPress={() => setShowForm(true)}>
+                    <FontAwesome
+                        name='eye'
+                        color={'rgba(33, 150, 243, 1)'}
+                        size={22}
+                    />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    onPress={() =>
+                        downloadFile(
+                            itemAttachedFiles.path,
+                            itemAttachedFiles.filename,
+                        )
+                    }>
+                    <Feather
+                        name='download'
+                        color={'rgba(33, 150, 243, 1)'}
+                        size={22}
+                    />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 
@@ -166,171 +186,204 @@ const GardenWorker = () => {
         return <Loading />;
     }
 
+    console.log(gardenDetail);
+
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Section title='Thông tin khu vườn'>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        width: '100%',
-                        justifyContent: 'space-between',
-                    }}>
-                    <Text style={(styles.label, {width: '45%'})}>
-                        Tên khu vườn
-                    </Text>
-                    <Text
-                        style={
-                            (styles.value,
-                            {
-                                width: '52%',
-                                textAlign: 'right',
-                            })
-                        }>
-                        {!gardenDetail.gardenNickname
-                            ? gardenDetail.name
-                            : gardenDetail.gardenNickname}
-                    </Text>
-                </View>
-                <View style={styles.row}>
-                    <Text style={styles.label}>Mã khu vườn</Text>
-                    <Text style={[styles.value, {color: 'green'}]}>
-                        {gardenDetail.code}
-                    </Text>
-                </View>
-
-                <CollapsibleRow
-                    label='Vị trí khu vườn'
-                    expanded={showLocationInfo}
-                    onToggle={() => setShowLocationInfo(!showLocationInfo)}>
-                    <Row
-                        label='Kinh độ'
-                        value={gardenDetail.location?.latitude}
-                    />
-                    <Row
-                        label='Vĩ độ'
-                        value={gardenDetail.location?.longitude}
-                    />
-                </CollapsibleRow>
-
-                <CollapsibleRow
-                    label='Người quản lý'
-                    value={(gardenDetail as any).manager}
-                    expanded={showInfo}
-                    onToggle={() => setShowInfo(!showInfo)}>
-                    <Row
-                        label='Đơn vị'
-                        value={(gardenDetail as any).unit || 'Không xác định'}
-                    />
-
+        <>
+            <ScrollView contentContainerStyle={styles.container}>
+                <Section title='Thông tin khu vườn'>
                     <View
                         style={{
                             flexDirection: 'row',
+                            width: '100%',
                             justifyContent: 'space-between',
                         }}>
-                        <Text style={{width: '65%'}}>
-                            Diện tích giao khoán (ha)
+                        <Text style={(styles.label, {width: '45%'})}>
+                            Tên khu vườn
                         </Text>
                         <Text
-                            style={{
-                                width: '30%',
-                                textAlign: 'right',
-                            }}>
-                            {gardenDetail.management?.area?.totalSquare}
+                            style={
+                                (styles.value,
+                                {
+                                    width: '52%',
+                                    textAlign: 'right',
+                                })
+                            }>
+                            {!gardenDetail.gardenNickname
+                                ? gardenDetail.name
+                                : gardenDetail.gardenNickname}
                         </Text>
                     </View>
-                </CollapsibleRow>
-            </Section>
-
-            <Section title='Thông tin cây trồng'>
-                <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Tên giống</Text>
-                    <Text style={styles.infoValue}>
-                        {(gardenDetail as any).productName}
-                    </Text>
-                </View>
-                <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Số lượng cây trồng</Text>
-                    <Text
-                        style={
-                            styles.infoValue
-                        }>{`${gardenDetail.productQuantity} cây`}</Text>
-                </View>
-
-                {gardenDetail.totalProductByYear?.map(item => (
-                    <View key={item._id} style={styles.yearBox}>
-                        <View style={styles.yearTitleRow}>
-                            <Text
-                                style={
-                                    styles.yearTitle
-                                }>{`Năm ${item.year}`}</Text>
-                            <Text style={styles.plantedText}>{`Trồng ${
-                                gardenDetail.totalProductByYear[
-                                    gardenDetail.totalProductByYear.length - 1
-                                ].quantity
-                            } cây`}</Text>
-                        </View>
-
-                        <View style={styles.qualityRow}>
-                            <Text style={styles.qualityText}>{`A: ${
-                                item.qualities?.[0] ?? 0
-                            }`}</Text>
-                            <Text style={styles.separator}></Text>
-                            <Text style={styles.qualityText}>{`B: ${
-                                item.qualities?.[1] ?? 0
-                            }`}</Text>
-                            <Text style={styles.separator}></Text>
-                            <Text style={styles.qualityText}>{`C: ${
-                                item.qualities?.[2] ?? 0
-                            }`}</Text>
-                            <Text style={styles.separator}></Text>
-                            <Text style={styles.qualityText}>{`D: ${
-                                item.qualities?.[3] ?? 0
-                            }`}</Text>
-                        </View>
-
-                        <View style={styles.warpNewTreeDead}>
-                            <Text style={styles.labelTree}>{`Cây trồng mới: ${
-                                item.newTree || 0
-                            }`}</Text>
-                            <Text
-                                style={[
-                                    styles.labelTree,
-                                    {textAlign: 'right'},
-                                ]}>{`Cây chết: ${item.deadTree || 0}`}</Text>
-                        </View>
+                    <View style={styles.row}>
+                        <Text style={styles.label}>Mã khu vườn</Text>
+                        <Text style={[styles.value, {color: 'green'}]}>
+                            {gardenDetail.code}
+                        </Text>
                     </View>
-                ))}
-            </Section>
 
-            {gardenDetail.sidePlants?.length > 0 && (
-                <Section title='Thông tin cây trồng xen'>
-                    <Row
-                        label='Số loại cây trồng xen'
-                        value={gardenDetail?.sidePlants?.length}
-                    />
-                    {gardenDetail?.sidePlants?.map(plant => (
+                    <CollapsibleRow
+                        label='Vị trí khu vườn'
+                        expanded={showLocationInfo}
+                        onToggle={() => setShowLocationInfo(!showLocationInfo)}>
                         <Row
-                            key={plant._id}
-                            label={plant.name}
-                            value={`${plant.value} cây`}
+                            label='Kinh độ'
+                            value={gardenDetail.location?.latitude}
                         />
+                        <Row
+                            label='Vĩ độ'
+                            value={gardenDetail.location?.longitude}
+                        />
+                    </CollapsibleRow>
+
+                    <CollapsibleRow
+                        label='Người quản lý'
+                        value={(gardenDetail as any).manager}
+                        expanded={showInfo}
+                        onToggle={() => setShowInfo(!showInfo)}>
+                        <Row
+                            label='Đơn vị'
+                            value={
+                                (gardenDetail as any).unit || 'Không xác định'
+                            }
+                        />
+
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                            }}>
+                            <Text style={{width: '65%'}}>
+                                Diện tích giao khoán (ha)
+                            </Text>
+                            <Text
+                                style={{
+                                    width: '30%',
+                                    textAlign: 'right',
+                                }}>
+                                {gardenDetail.management?.area?.totalSquare}
+                            </Text>
+                        </View>
+                    </CollapsibleRow>
+                </Section>
+
+                <Section title='Thông tin cây trồng'>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>Tên giống</Text>
+                        <Text style={styles.infoValue}>
+                            {(gardenDetail as any).productName}
+                        </Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>Số lượng cây trồng</Text>
+                        <Text
+                            style={
+                                styles.infoValue
+                            }>{`${gardenDetail.productQuantity} cây`}</Text>
+                    </View>
+
+                    {gardenDetail.totalProductByYear?.map(item => (
+                        <View key={item._id} style={styles.yearBox}>
+                            <View style={styles.yearTitleRow}>
+                                <Text
+                                    style={
+                                        styles.yearTitle
+                                    }>{`Năm ${item.year}`}</Text>
+                                <Text style={styles.plantedText}>{`Trồng ${
+                                    gardenDetail.totalProductByYear[
+                                        gardenDetail.totalProductByYear.length -
+                                            1
+                                    ].quantity
+                                } cây`}</Text>
+                            </View>
+
+                            <View style={styles.qualityRow}>
+                                <Text style={styles.qualityText}>{`A: ${
+                                    item.qualities?.[0] ?? 0
+                                }`}</Text>
+                                <Text style={styles.separator}></Text>
+                                <Text style={styles.qualityText}>{`B: ${
+                                    item.qualities?.[1] ?? 0
+                                }`}</Text>
+                                <Text style={styles.separator}></Text>
+                                <Text style={styles.qualityText}>{`C: ${
+                                    item.qualities?.[2] ?? 0
+                                }`}</Text>
+                                <Text style={styles.separator}></Text>
+                                <Text style={styles.qualityText}>{`D: ${
+                                    item.qualities?.[3] ?? 0
+                                }`}</Text>
+                            </View>
+
+                            <View style={styles.warpNewTreeDead}>
+                                <Text
+                                    style={styles.labelTree}>{`Cây trồng mới: ${
+                                    item.newTree || 0
+                                }`}</Text>
+                                <Text
+                                    style={[
+                                        styles.labelTree,
+                                        {textAlign: 'right'},
+                                    ]}>{`Cây chết: ${
+                                    item.deadTree || 0
+                                }`}</Text>
+                            </View>
+                        </View>
                     ))}
                 </Section>
-            )}
 
-            {gardenDetail.management?.files.length !== 0 ? (
-                <Section title='Tệp đính kèm'>
-                    <FlatList
-                        scrollEnabled={false}
-                        data={gardenDetail.management?.files}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({item}) => renderItemAttachedFiles(item)}
+                {gardenDetail.sidePlants?.length > 0 && (
+                    <Section title='Thông tin cây trồng xen'>
+                        <Row
+                            label='Số loại cây trồng xen'
+                            value={gardenDetail?.sidePlants?.length}
+                        />
+                        {gardenDetail?.sidePlants?.map(plant => (
+                            <Row
+                                key={plant._id}
+                                label={plant.name}
+                                value={`${plant.value} cây`}
+                            />
+                        ))}
+                    </Section>
+                )}
+
+                {gardenDetail.management?.files.length !== 0 ? (
+                    <Section title='Tệp đính kèm'>
+                        <FlatList
+                            scrollEnabled={false}
+                            data={gardenDetail.management?.files}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({item}) =>
+                                renderItemAttachedFiles(item)
+                            }
+                        />
+                    </Section>
+                ) : null}
+
+                {gardenDetail.note && <Text>{gardenDetail.note}</Text>}
+            </ScrollView>
+
+            <Modal visible={showForm} animationType='fade'>
+                <View style={styles.modalContent}>
+                    <TouchableOpacity
+                        style={styles.button2}
+                        onPress={() => setShowForm(false)}>
+                        <Text style={styles.buttonText2}>Đóng</Text>
+                    </TouchableOpacity>
+
+                    <WebView
+                        style={{flex: 1}}
+                        source={{
+                            uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
+                                pdfFilePath,
+                            )}`,
+                        }}
+                        contentMode='mobile'
+                        startInLoadingState
                     />
-                </Section>
-            ) : null}
-
-            {gardenDetail.note && <Text>{gardenDetail.note}</Text>}
-        </ScrollView>
+                </View>
+            </Modal>
+        </>
     );
 };
 
@@ -479,7 +532,12 @@ const styles = StyleSheet.create({
     leftCardDocument: {
         flexDirection: 'row',
         alignItems: 'center',
-        flex: 1,
+        flex: 0.96,
+        gap: 10,
+    },
+    rightCardDocument: {
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 10,
     },
     infoDocument: {
@@ -491,5 +549,28 @@ const styles = StyleSheet.create({
     infoDocumentSizeText: {
         fontSize: 11,
         color: 'rgba(128, 128, 128, 1)',
+    },
+    modalContent: {
+        flex: 1,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+    },
+    loadingPdf: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    loadingPdfText: {
+        marginTop: 10,
+        textAlign: 'center',
+    },
+    button2: {
+        alignSelf: 'flex-end',
+        marginRight: 10,
+        paddingVertical: 8,
+    },
+    buttonText2: {
+        color: 'red',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });

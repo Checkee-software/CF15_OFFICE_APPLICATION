@@ -10,15 +10,15 @@ import {
     ImageBackground,
     Platform,
     KeyboardAvoidingView,
+    ActivityIndicator,
 } from 'react-native';
-import deviceInfo from "react-native-device-info";
+import deviceInfo from 'react-native-device-info';
 import images from '../../../assets/images';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Feather from 'react-native-vector-icons/Feather';
 import {useAuthStore} from '../../../stores/authStore';
 import {Dimensions} from 'react-native';
-import Backdrop from '../../subscreen/Loading/index2';
 // import {request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import colors from '@/assets/colors';
 import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
@@ -28,10 +28,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
 
-export default function Login({ navigation }: any) {
+export default function Login({navigation}: any) {
     /* store */
     const {login, isLoading} = useAuthStore();
-    console.log("device infor: ", deviceInfo);
+    console.log('device infor: ', deviceInfo);
 
     /* create storage */
 
@@ -41,11 +41,11 @@ export default function Login({ navigation }: any) {
     const [isChecked, setIsChecked] = useState<boolean>(false);
     const [isShowLicense, setIsShowLicense] = useState<boolean>(false);
     const [isLicenseLoading, setIsLicenseLoading] = useState<boolean>(false);
-    const [license, setLicense] = useState<string>("");
+    const [license, setLicense] = useState<string>('');
     const [userAccount, setUserAccount] = useState({
-        username: '', //cf15office lamphucf15
+        username: 'tranngocthach', //cf15office lamphucf15
         phoneNumber: '',
-        password: '', //CF15@FFICE2025 123456789A@
+        password: '00000000', //CF15@FFICE2025 123456789A@
     });
 
     // useEffect(() => {
@@ -55,15 +55,15 @@ export default function Login({ navigation }: any) {
 
     useEffect(() => {
         const makeLicense = async (): Promise<void> => {
-            const isAccept = await AsyncStorage.getItem("LICENSE");
+            const isAccept = await AsyncStorage.getItem('LICENSE');
             if (!isAccept) {
-                setLicense("");     
+                setLicense('');
                 onShowLicense();
                 return;
             }
 
             setLicense(isAccept);
-        }
+        };
 
         makeLicense();
     }, [license]);
@@ -78,15 +78,15 @@ export default function Login({ navigation }: any) {
         try {
             setIsLicenseLoading(true);
 
-            await AsyncStorage.setItem("LICENSE", "1");
+            await AsyncStorage.setItem('LICENSE', '1');
             setTimeout(() => {
-                setLicense("1");
+                setLicense('1');
                 setIsLicenseLoading(false);
                 setIsChecked(false);
                 onHideLicense();
             }, 1000);
         } catch (error) {
-            console.log("submit-license-error: ", error);
+            console.log('submit-license-error: ', error);
         }
     };
 
@@ -206,11 +206,16 @@ export default function Login({ navigation }: any) {
                                     </View>
 
                                     <TouchableOpacity
+                                        disabled={isLoading}
                                         style={LoginStyles.btnLogin}
                                         onPress={handleLogin}>
-                                        <Text style={LoginStyles.btnText}>
-                                            BẮT ĐẦU
-                                        </Text>
+                                        {isLoading ? (
+                                            <ActivityIndicator color='#fff' />
+                                        ) : (
+                                            <Text style={LoginStyles.btnText}>
+                                                BẮT ĐẦU
+                                            </Text>
+                                        )}
                                     </TouchableOpacity>
                                 </View>
                             ) : (
@@ -234,7 +239,9 @@ export default function Login({ navigation }: any) {
                                                     onShowLicense();
                                                     return;
                                                 }
-                                                setShowLoginForm(!showLoginForm);
+                                                setShowLoginForm(
+                                                    !showLoginForm,
+                                                );
                                             }}>
                                             <Text style={LoginStyles.btnText}>
                                                 ĐĂNG NHẬP
@@ -262,22 +269,22 @@ export default function Login({ navigation }: any) {
             </ImageBackground>
 
             <View style={LoginStyles.version}>
-                <Text style={LoginStyles.textVersion}>Version {deviceInfo.getVersion()}</Text>
+                <Text style={LoginStyles.textVersion}>
+                    Version {deviceInfo.getVersion()}
+                </Text>
             </View>
 
-            <Backdrop open={isLoading} />
-            { 
-                isShowLicense && 
-                    <LicenseModal 
-                        visible 
-                        onClose={onHideLicense} 
-                        onShow={onShowLicense} 
-                        onChecked={onChecked} 
-                        isChecked={isChecked}
-                        onSubmit={onSubmitLicense}
-                        isLoading={isLicenseLoading}
-                    /> 
-            }
+            {isShowLicense && (
+                <LicenseModal
+                    visible
+                    onClose={onHideLicense}
+                    onShow={onShowLicense}
+                    onChecked={onChecked}
+                    isChecked={isChecked}
+                    onSubmit={onSubmitLicense}
+                    isLoading={isLicenseLoading}
+                />
+            )}
         </View>
     );
 }
