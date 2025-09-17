@@ -3,8 +3,8 @@ import React from 'react';
 
 const BrowseHarvest = () => {
     return (
-        <View>
-            <Text>harvest</Text>
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <Text>Không có yêu cầu duyệt thu hoạch!</Text>
         </View>
     );
 };
