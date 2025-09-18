@@ -103,6 +103,7 @@ const HarvestDetail = () => {
 
                             setWeight(formatted);
                         }}
+                        placeholderTextColor="#000" 
                     />
 
                 </View>
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
     inputLabel: { fontSize: 14, fontWeight: '500', marginBottom: 6 },
     input: {
         borderWidth: 1, borderColor: '#bbb', borderRadius: 6, padding: 8, fontSize: 14,
-        backgroundColor: '#E3F2FD', textAlign: 'center',
+        backgroundColor: '#E3F2FD', textAlign: 'center', color: '#000',
     },
     footer: {
         position: 'absolute', bottom: 0, left: 0, right: 0,

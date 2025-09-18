@@ -51,52 +51,51 @@ const HarvestList = () => {
     useEffect(() => {
         const gardenList = gardens ?? [];
 
-        if (searchText === '') {
-            setFilteredGardens(gardenList as IGarden[]);
-        } else {
-            const filtered = (gardenList as IGarden[]).filter(
+        let filtered = gardenList.filter((garden: IGarden) => garden.isHarvest);
+
+        if (searchText !== '') {
+            filtered = filtered.filter(
                 (garden: IGarden) =>
-                    garden.name
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase()) ||
-                    garden.code
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase()) ||
+                    garden.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                    garden.code.toLowerCase().includes(searchText.toLowerCase()) ||
                     (garden.gardenNickname ?? '')
                         .toLowerCase()
                         .includes(searchText.toLowerCase()),
             );
-            setFilteredGardens(filtered);
         }
+
+        setFilteredGardens(filtered);
     }, [searchText, gardens]);
 
+
     const renderItem = ({ item }: { item: IGarden }) => (
-        <View style={styles.card}>
+        <TouchableOpacity
+            style={styles.card}
+            onPress={() => handleNavigate(item.code)}
+            activeOpacity={0.7}
+        >
             <Image
                 source={require('../../../../assets/images/garden.png')}
                 style={styles.image}
-                resizeMode='contain'
+                resizeMode="contain"
             />
             <View style={styles.cardContent}>
                 <View style={styles.cardTextContainer}>
                     <Text style={styles.cardTitle}>{item.name}</Text>
                     <Text style={styles.cardSubtitle}>{item.code}</Text>
                 </View>
-
-                {item.isHarvest && (
-                    <TouchableOpacity
-                        onPress={() => handleNavigate(item.code)}>
-                        <MaterialCommunityIcons
-                            name="cart-outline"
-                            size={24}
-                            style={styles.harvestIcon}
-                        />
-                    </TouchableOpacity>
-                )}
-
+                <TouchableOpacity
+                    onPress={() => handleNavigate(item.code)}>
+                    <MaterialCommunityIcons
+                        name="cart-outline"
+                        size={24}
+                        style={styles.harvestIcon}
+                    />
+                </TouchableOpacity>
             </View>
-        </View>
+        </TouchableOpacity>
     );
+
 
     if (isLoading) return <Loading />;
 
