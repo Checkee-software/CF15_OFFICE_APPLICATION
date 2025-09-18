@@ -165,7 +165,8 @@ export default function Main({navigation}: any) {
                     item.key !== 'unit' &&
                     item.key !== 'workschedule' &&
                     item.key !== 'browseaddmaterial' &&
-                    item.key !== 'browseharvest',
+                    item.key !== 'browseharvest' &&
+                    item.key !== 'harvest',
             );
             const reorderedMenu = [
                 ...filteredMenu.filter(item => item.key === 'statistic'),
@@ -183,7 +184,8 @@ export default function Main({navigation}: any) {
                     item.key !== 'gardenDeclareForWorker' &&
                     item.key !== 'unit' &&
                     item.key !== 'browseaddmaterial' &&
-                    item.key !== 'browseharvest',
+                    item.key !== 'browseharvest' &&
+                    item.key !== 'harvest',
             );
             return filteredMenu.filter(
                 item => !item.function || hasAccessToFunction(item.function),
@@ -195,7 +197,8 @@ export default function Main({navigation}: any) {
                 const excludeKeys =
                     item.key !== 'gardenForWorker' &&
                     item.key !== 'gardenDeclareForWorker' &&
-                    item.key !== 'employee';
+                    item.key !== 'employee' &&
+                    item.key !== 'harvest';
 
                 const excludeStatistic =
                     userInfo.groupId === '' ? item.key !== 'statistic' : true;
