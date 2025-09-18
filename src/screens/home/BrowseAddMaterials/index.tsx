@@ -474,7 +474,7 @@ const BrowseAddMaterials = () => {
                             onRefresh={handleGetRequestGardenData}
                             refreshing={isLoading}
                             showsVerticalScrollIndicator={false}
-                            //removeClippedSubviews={false}
+                            removeClippedSubviews={false}
                             enableOnAndroid={true}
                             extraHeight={250}
                             keyboardShouldPersistTaps='handled'

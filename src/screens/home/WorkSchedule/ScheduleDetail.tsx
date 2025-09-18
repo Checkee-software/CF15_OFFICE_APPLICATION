@@ -158,6 +158,8 @@ const ScheduleDetail = ({route}: any) => {
         }
     };
 
+    console.log(scheduleDetail);
+
     const fixFilePath = (path: string) => {
         const updatedPath = path.replace(/\\/g, '/');
         return `${ENV.BACKEND_URL}${updatedPath}`;

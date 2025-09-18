@@ -9,7 +9,7 @@ import {
     Image,
     TextInput,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {IGardenHarvest, useGardenWorkStore} from '@/stores/gardenWorkStore';
 import Loading from '@/screens/subscreen/Loading';
 import {
@@ -38,11 +38,13 @@ const BrowseHarvest = () => {
         createBrowseHarvest,
     } = useGardenWorkStore();
 
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState('NONE');
     const [showComfirmView, setShowComfirmView] = useState<initialRadioState>(
         [],
     );
+
+    const inputRefs = useRef<{[key: string]: TextInput | null}>({});
 
     const listHarvestsBrowseFilter: IGardenHarvest[] =
         listHarvestsBrowse.filter(
@@ -68,6 +70,7 @@ const BrowseHarvest = () => {
     };
 
     const getBrowseHarvest = async () => {
+        setIsLoading(true);
         const responseData = await getRequestBrowseHarvest();
         const initialRadioState = responseData
             .filter(
@@ -95,7 +98,6 @@ const BrowseHarvest = () => {
             );
 
         setShowComfirmView(initialRadioState);
-
         setIsLoading(false);
     };
 
@@ -209,7 +211,10 @@ const BrowseHarvest = () => {
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Sản lượng thu hoạch</Text>
                     <Text style={styles.value}>
-                        {itemGardenWork.amount || ''} (KG)
+                        {Number.isInteger(itemGardenWork.amount)
+                            ? itemGardenWork.amount
+                            : itemGardenWork.amount.toFixed(2) || ''}{' '}
+                        (KG)
                     </Text>
                 </View>
             </View>
@@ -220,6 +225,7 @@ const BrowseHarvest = () => {
                         itemComfirm._id === itemGardenWork._id ? (
                             <React.Fragment key={itemComfirm._id}>
                                 <View style={styles.listRadioButton}>
+                                    {/* Phê duyệt */}
                                     <TouchableOpacity
                                         style={styles.warpRadioText}
                                         onPress={() =>
@@ -245,11 +251,22 @@ const BrowseHarvest = () => {
                                         </Text>
                                     </TouchableOpacity>
 
+                                    {/* Từ chối */}
                                     <TouchableOpacity
                                         style={styles.warpRadioText}
-                                        onPress={() =>
-                                            selectRadioType(itemComfirm._id, 3)
-                                        }>
+                                        onPress={() => {
+                                            Object.values(
+                                                inputRefs.current,
+                                            ).forEach(input => input?.blur());
+
+                                            selectRadioType(itemComfirm._id, 3);
+
+                                            setTimeout(() => {
+                                                inputRefs.current[
+                                                    itemComfirm._id
+                                                ]?.focus();
+                                            }, 150);
+                                        }}>
                                         <MaterialIcons
                                             name={
                                                 itemComfirm.radioSelectedType ===
@@ -271,8 +288,9 @@ const BrowseHarvest = () => {
                                     </TouchableOpacity>
                                 </View>
 
-                                {itemComfirm.radioSelectedType === 2 ||
-                                itemComfirm.radioSelectedType === 3 ? (
+                                {/* Input lý do từ chối */}
+                                {(itemComfirm.radioSelectedType === 2 ||
+                                    itemComfirm.radioSelectedType === 3) && (
                                     <View style={styles.comfirmContent}>
                                         <Text style={styles.comfirmText}>
                                             {itemComfirm.radioSelectedType === 2
@@ -280,8 +298,14 @@ const BrowseHarvest = () => {
                                                 : 'Bạn chắc chắn muốn từ chối thu hoạch này?'}
                                         </Text>
 
-                                        {itemComfirm.radioSelectedType === 3 ? (
+                                        {itemComfirm.radioSelectedType ===
+                                            3 && (
                                             <TextInput
+                                                ref={ref => {
+                                                    inputRefs.current[
+                                                        itemComfirm._id
+                                                    ] = ref;
+                                                }}
                                                 style={
                                                     styles.cancelProgressInput
                                                 }
@@ -297,7 +321,7 @@ const BrowseHarvest = () => {
                                                     )
                                                 }
                                             />
-                                        ) : null}
+                                        )}
 
                                         <View style={styles.listComfirmButton}>
                                             <TouchableOpacity
@@ -318,9 +342,22 @@ const BrowseHarvest = () => {
 
                                             <TouchableOpacity
                                                 style={styles.approveRequestBtn}
-                                                onPress={() =>
-                                                    comfirmBrowse(itemComfirm)
-                                                }>
+                                                onPress={() => {
+                                                    // 1. Blur tất cả input cũ
+                                                    Object.values(
+                                                        inputRefs.current,
+                                                    ).forEach(input =>
+                                                        input?.blur(),
+                                                    );
+
+                                                    // 2. Focus vào input của item hiện tại
+
+                                                    inputRefs.current[
+                                                        itemComfirm._id
+                                                    ]?.focus();
+
+                                                    comfirmBrowse(itemComfirm);
+                                                }}>
                                                 <Text
                                                     style={
                                                         styles.approveRequestText
@@ -333,52 +370,12 @@ const BrowseHarvest = () => {
                                             </TouchableOpacity>
                                         </View>
                                     </View>
-                                ) : null}
+                                )}
                             </React.Fragment>
                         ) : null,
                     )}
                 </View>
-            ) : (
-                <View style={styles.statusBrowse}>
-                    <View style={styles.browseInfo}>
-                        {itemGardenWork.status === EStatusData.VERIFIED ? (
-                            <View style={styles.warpComfirmedView}>
-                                <View style={styles.warpValueComfirmed}>
-                                    <Text style={styles.label}>Duyệt lúc</Text>
-
-                                    <Text style={styles.value}>
-                                        {moment(
-                                            itemGardenWork.updatedAt,
-                                        ).format('HH:mm DD/MM/YYYY')}
-                                    </Text>
-                                </View>
-                            </View>
-                        ) : (
-                            <>
-                                <View style={styles.warpLabelAndValue}>
-                                    <Text style={styles.label}>Hủy bỏ lúc</Text>
-
-                                    <Text style={styles.value}>
-                                        {moment(
-                                            itemGardenWork.updatedAt,
-                                        ).format('HH:mm DD/MM/YYYY')}
-                                    </Text>
-                                </View>
-
-                                <View style={styles.warpLabelAndValue}>
-                                    <Text style={styles.label}>
-                                        Lý do từ chối
-                                    </Text>
-
-                                    <Text style={styles.reasonValue}>
-                                        {itemGardenWork.message}
-                                    </Text>
-                                </View>
-                            </>
-                        )}
-                    </View>
-                </View>
-            )}
+            ) : null}
         </View>
     );
 
@@ -413,7 +410,9 @@ const BrowseHarvest = () => {
                                         selectedStatus === item.code &&
                                             styles.selectedStatusBtnText,
                                     ]}>
-                                    {item.name}
+                                    {item.name === 'Tất cả'
+                                        ? 'Đang chờ'
+                                        : item.name}
                                 </Text>
 
                                 {item._id === '00001' &&
@@ -443,7 +442,7 @@ const BrowseHarvest = () => {
                     onRefresh={getBrowseHarvest}
                     refreshing={isLoading}
                     showsVerticalScrollIndicator={false}
-                    //removeClippedSubviews={false}
+                    removeClippedSubviews={false}
                     enableOnAndroid={true}
                     extraHeight={250}
                     keyboardShouldPersistTaps='handled'

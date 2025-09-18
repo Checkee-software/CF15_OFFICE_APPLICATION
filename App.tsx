@@ -45,9 +45,14 @@ const InitApp = () => {
             const data = event.notification.additionalData;
 
             if (data?._id && data._id !== '') {
+                //điều hướng xem chi tiết quy trình
                 setRedirectData('schdule', data?._id);
             } else if (data?.requestId && data.requestId !== '') {
+                //điều hướng duyệt quy trình khi người ld gửi lên
                 setRedirectData('request', data?.requestId);
+            } else if (data.gardenId && data.gardenId !== '') {
+                //điều hướng duyệt thu hoạch khi người ld gửi lên
+                setRedirectData('harvest', data?.gardenId);
             }
         };
 
