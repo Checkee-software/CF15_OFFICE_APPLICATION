@@ -5,6 +5,8 @@ import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormDat
 import {EStatus} from '@/shared-types/Response/ScheduleRequestResponse/ScheduleRequestResponse';
 import ENV from '@/config/ENV';
 import {IMaterialsByStaff} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
+import {EStatusData} from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
+import {EGardenData} from '@/shared-types/Response/GardenResponse/GardenResponse';
 
 type IGardenData = {
     _id: string;
@@ -25,6 +27,26 @@ type IGardenData = {
     firstRequested: boolean;
 };
 
+export type IGardenHarvest = {
+    amount: number;
+    createdAt: string;
+    currentLifeParent: number;
+    gardenCode: string;
+    gardenId: string;
+    gardenName: string;
+    harvestId: string;
+    message: string;
+    name: string;
+    status: EStatusData;
+    type: EGardenData;
+    updatedAt: string;
+    verifier: string;
+    _id: string;
+    ownerName: string;
+    productName: string;
+    productTypeName: string;
+};
+
 interface gardenWorkStore {
     isLoading: boolean;
     isLoadingCreate: boolean;
@@ -34,6 +56,8 @@ interface gardenWorkStore {
     listMaterialsBrowse: IMaterialsByStaff[];
     listMaterialsBrowseFilter: IMaterialsByStaff[];
     badgeMaterialsUnBrowse: number;
+    badgeHarvestsUnBrowse: number;
+    listHarvestsBrowse: IGardenHarvest[];
     getRequestDataGarden: () => Promise<any>;
     createRateReportHarvest: (
         harvestReportId: string,
@@ -44,10 +68,15 @@ interface gardenWorkStore {
     setBadgeUnBrowse: () => void;
     filterAddMaterialsByStatus: (status: string) => void;
     getRequestAddingMaterials: () => Promise<any>;
+    getRequestBrowseHarvest: () => Promise<any>;
     createAddingMaterials: (
         materialId: string,
         scheduleId: string,
         formRateReport: IRateReportHarvest,
+    ) => Promise<void | undefined>;
+    createBrowseHarvest: (
+        gardenId: string,
+        formBrowseHarvest: IRateReportHarvest,
     ) => Promise<void | undefined>;
 }
 
@@ -59,7 +88,9 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
     listGardenWorkBrowseFilter: [],
     listMaterialsBrowse: [],
     listMaterialsBrowseFilter: [],
+    listHarvestsBrowse: [],
     badgeMaterialsUnBrowse: 0,
+    badgeHarvestsUnBrowse: 0,
 
     getRequestDataGarden: async () => {
         set({isLoading: true});
@@ -147,6 +178,44 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
         } catch (error: any) {
             set({isLoading: false});
 
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error?.response?.data) {
+                    Snackbar.show({
+                        text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                } else {
+                    Snackbar.show({
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    getRequestBrowseHarvest: async () => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.get<any>(
+                `${ENV.BACKEND_URL}/resources/gardens/harvest/request-data`,
+            );
+
+            console.log(response);
+
+            set({
+                listHarvestsBrowse: response.data.data,
+                badgeHarvestsUnBrowse:
+                    response.data.data.filter(
+                        (item: {status: any}) =>
+                            item.status === EStatusData.NONE,
+                    ).length || 0,
+            });
+
+            return response.data.data;
+        } catch (error: any) {
             const _error = error;
 
             setTimeout(() => {
@@ -269,6 +338,42 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 }
             }, 100);
+        }
+    },
+
+    createBrowseHarvest: async (
+        gardenId: string,
+        formBrowseHarvest: IRateReportHarvest,
+    ) => {
+        try {
+            const response = await axiosClient.post(
+                `${ENV.BACKEND_URL}/resources/gardens/harvest/rate-report/${gardenId}`,
+                formBrowseHarvest,
+            );
+
+            if (response.data?.data) {
+                Snackbar.show({
+                    text: `${response.data.message}`,
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            }
+
+            return response.data;
+        } catch (error: any) {
+            const _error = error;
+            console.log(_error);
+
+            if (_error?.response?.data) {
+                Snackbar.show({
+                    text: _error.response.data,
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            } else {
+                Snackbar.show({
+                    text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            }
         }
     },
 
