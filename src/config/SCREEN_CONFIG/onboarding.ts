@@ -15,6 +15,11 @@ const ONBOARDING_SCREENS = {
         headerTitle: 'TRUY XUẤT TỰ ĐỘNG',
         isOpenQRCamera: false,
     } as ScreenInformation,
-}
+    DETAIL_TRACKING: {
+        key: 'DETAIL_TRACKING',
+        headerTitle: 'THÔNG TIN TRUY XUẤT',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+};
 
 export default ONBOARDING_SCREENS;

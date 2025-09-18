@@ -1,5 +1,5 @@
-import axios from 'axios';
-import asyncStorageHelper from './localStorageHelper/index';
+import axios from "axios";
+import asyncStorageHelper from "./localStorageHelper/index";
 
 const axiosClient = axios;
 
@@ -18,15 +18,15 @@ axiosClient.interceptors.request.use(async function (config) {
 });
 
 axiosClient.interceptors.response.use(function (res) {
-    if (res.headers['remove-token'] === 'all') {
-        asyncStorageHelper.token = '';
+    if (res.headers["remove-token"] === "all") {
+        asyncStorageHelper.token = "";
     }
 
-    if (!res.headers['set-token']) {
+    if (!res.headers["set-token"]) {
         return res;
     }
 
-    asyncStorageHelper.token = res.headers['set-token'];
+    asyncStorageHelper.token = res.headers["set-token"];
     return res;
 });
 

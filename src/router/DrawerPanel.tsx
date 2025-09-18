@@ -1,45 +1,45 @@
-import React from 'react';
+import React from "react";
 import {
     View,
     Text,
     TouchableOpacity,
     StyleSheet,
     useWindowDimensions,
-} from 'react-native';
+} from "react-native";
 
 /* components */
 
 /* configurations */
-import colors from '../assets/colors';
+import colors from "../assets/colors";
 
 /* packages */
-import {DrawerContentScrollView} from '@react-navigation/drawer';
+import { DrawerContentScrollView } from "@react-navigation/drawer";
 
 /* screens */
-import FeatherIcon from 'react-native-vector-icons/Feather';
-import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
+import FeatherIcon from "react-native-vector-icons/Feather";
+import SCREEN_INFO from "../config/SCREEN_CONFIG/screenInfo";
 
-const DrawerPanel = ({navigation}: {navigation: any}) => {
-    const {height} = useWindowDimensions();
+const DrawerPanel = ({ navigation }: { navigation: any }) => {
+    const { height } = useWindowDimensions();
 
     const menuButtons = [
         {
-            colorScheme: 'orange',
-            title: 'Thông tin tài khoản',
-            icon: 'user',
+            colorScheme: "orange",
+            title: "Thông tin tài khoản",
+            icon: "user",
             handleOnPress: () => navigation.navigate(SCREEN_INFO.PROFILE.key),
         },
         {
-            colorScheme: 'orange',
-            title: 'Đổi mật khẩu',
-            icon: 'lock',
+            colorScheme: "orange",
+            title: "Đổi mật khẩu",
+            icon: "lock",
             handleOnPress: () =>
                 navigation.navigate(SCREEN_INFO.UPDATE_PASSWORD.key),
         },
         {
-            title: 'Đăng xuất',
-            colorScheme: 'blue',
-            icon: 'chevrons-right',
+            title: "Đăng xuất",
+            colorScheme: "blue",
+            icon: "chevrons-right",
             handleOnPress: () => {
                 // dispatch(processingFacilitySliceActions.Remove_Customer_Receipt()) // reset state when logout
                 // dispatch(processingFacilitySliceActions.Remove_Customer_Issue()) // reset state when logout
@@ -50,9 +50,9 @@ const DrawerPanel = ({navigation}: {navigation: any}) => {
 
     return (
         <DrawerContentScrollView
-            style={{flex: 1, backgroundColor: colors.white}}>
-            <View style={[styles.container, {height: height}]}>
-                <View style={{flex: 1, flexDirection: 'column'}}>
+            style={{ flex: 1, backgroundColor: colors.white }}>
+            <View style={[styles.container, { height: height }]}>
+                <View style={{ flex: 1, flexDirection: "column" }}>
                     {menuButtons
                         .filter((item, index) => index < 3)
                         .map((item, index) => (
@@ -70,14 +70,14 @@ const DrawerPanel = ({navigation}: {navigation: any}) => {
 
                                 <Text style={styles.title}>{item.title}</Text>
                                 <FeatherIcon
-                                    name={'chevron-right'}
+                                    name={"chevron-right"}
                                     size={24}
                                     color={colors.black}
                                 />
                             </TouchableOpacity>
                         ))}
                 </View>
-                <View style={{height: height * 0.12}}>
+                <View style={{ height: height * 0.12 }}>
                     {menuButtons
                         .filter((_, index) => index > 1)
                         .map((item, index) => (
@@ -95,7 +95,7 @@ const DrawerPanel = ({navigation}: {navigation: any}) => {
 
                                 <Text style={styles.title}>{item.title}</Text>
                                 <FeatherIcon
-                                    name={'chevron-right'}
+                                    name={"chevron-right"}
                                     size={24}
                                     color={colors.black}
                                 />
@@ -118,13 +118,13 @@ const styles = StyleSheet.create({
         padding: 8,
         elevation: 2,
         borderRadius: 32,
-        flexDirection: 'row',
-        width: '100%',
+        flexDirection: "row",
+        width: "100%",
         height: 64,
         backgroundColor: colors.white,
-        alignItems: 'center',
-        shadowOffset: {width: 0, height: 1},
-        shadowColor: 'rgba(0, 0, 0, 0.25)',
+        alignItems: "center",
+        shadowOffset: { width: 0, height: 1 },
+        shadowColor: "rgba(0, 0, 0, 0.25)",
         shadowOpacity: 0.25,
         shadowRadius: 2,
     },
@@ -133,8 +133,8 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         backgroundColor: colors.white,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     icon: {
         width: 48,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     title: {
         flex: 1,
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: "500",
         marginHorizontal: 8,
         color: colors.black,
     },

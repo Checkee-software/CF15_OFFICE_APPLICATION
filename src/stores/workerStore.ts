@@ -1,8 +1,8 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import {IUser} from '../shared-types/Response/UserResponse/UserResponse';
-import ENV from '@/config/ENV';
+import { create } from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import { IUser } from "../shared-types/Response/UserResponse/UserResponse";
+import ENV from "@/config/ENV";
 
 interface listWorkerFilterByRole {
     title: string;
@@ -36,17 +36,17 @@ interface DocumentStore {
 }
 
 const fixAvatarPath = (path: string) => {
-    const updatedPath = path.replace(/\\/g, '/');
+    const updatedPath = path.replace(/\\/g, "/");
     return `${ENV.BACKEND_URL}${updatedPath}`;
 };
 
-export const useWorkerStore = create<DocumentStore>(set => ({
+export const useWorkerStore = create<DocumentStore>((set) => ({
     isLoading: false,
     listWorker: [],
     listWorkerFilterByRole: [],
 
     getListWorkerByDepartment: async (userId: string, userLevel: string) => {
-        set({isLoading: true});
+        set({ isLoading: true });
         //await new Promise(resolve => setTimeout(resolve, 1 * 10000));
         try {
             const response = await axiosClient.get(
@@ -55,7 +55,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
 
             if (response) {
                 const updateImgPathListWorker = response.data.data.map(
-                    (item: {avatar: string}) => {
+                    (item: { avatar: string }) => {
                         if (item.avatar) {
                             item.avatar = fixAvatarPath(item.avatar);
                         }
@@ -65,45 +65,45 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     },
                 );
 
-                if (userLevel === 'DEPARTMENT') {
+                if (userLevel === "DEPARTMENT") {
                     const filterManagements = updateImgPathListWorker.filter(
-                        (item: {userType: {level: string}}) =>
-                            item.userType.level !== 'MANAGEMENT',
+                        (item: { userType: { level: string } }) =>
+                            item.userType.level !== "MANAGEMENT",
                     );
 
                     const filterLeaders = filterManagements.filter(
-                        (user: {userType: {level: string}}) =>
-                            user.userType.level === 'LEADER',
+                        (user: { userType: { level: string } }) =>
+                            user.userType.level === "LEADER",
                     );
 
                     const filterWorkers = filterManagements.filter(
                         (user: {
                             _id: string;
-                            userType: {_id: string; level: string};
+                            userType: { _id: string; level: string };
                         }) =>
-                            user.userType.level === 'DEPARTMENT' &&
+                            user.userType.level === "DEPARTMENT" &&
                             user._id !== userId,
                     );
 
                     //thêm order cho 2 mảng
                     let order = 0;
-                    filterLeaders.forEach((item: {order: number}) => {
+                    filterLeaders.forEach((item: { order: number }) => {
                         item.order = order += 1;
                     });
 
                     order = 0;
 
-                    filterWorkers.forEach((item: {order: number}) => {
+                    filterWorkers.forEach((item: { order: number }) => {
                         item.order = order += 1;
                     });
 
                     const newListWorker = [
                         {
-                            title: 'Cán bộ quản lý',
+                            title: "Cán bộ quản lý",
                             data: filterLeaders,
                         },
                         {
-                            title: 'Phòng ban',
+                            title: "Phòng ban",
                             data: filterWorkers,
                         },
                     ];
@@ -114,44 +114,44 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     });
                 } else {
                     const filterLeaders = updateImgPathListWorker.filter(
-                        (item: {userType: {level: string}}) =>
-                            item.userType.level !== 'LEADER',
+                        (item: { userType: { level: string } }) =>
+                            item.userType.level !== "LEADER",
                     );
 
                     const filterManagements = filterLeaders.filter(
-                        (user: {_id: string; userType: {level: string}}) =>
-                            user.userType.level === 'MANAGEMENT' &&
+                        (user: { _id: string; userType: { level: string } }) =>
+                            user.userType.level === "MANAGEMENT" &&
                             user._id !== userId,
                     );
 
                     const filterDepartment = filterLeaders.filter(
                         (user: {
                             _id: string;
-                            userType: {_id: string; level: string};
+                            userType: { _id: string; level: string };
                         }) =>
-                            user.userType.level === 'DEPARTMENT' &&
+                            user.userType.level === "DEPARTMENT" &&
                             user._id !== userId,
                     );
 
                     //thêm order cho 2 mảng
                     let order = 0;
-                    filterManagements.forEach((item: {order: number}) => {
+                    filterManagements.forEach((item: { order: number }) => {
                         item.order = order += 1;
                     });
 
                     order = 0;
 
-                    filterDepartment.forEach((item: {order: number}) => {
+                    filterDepartment.forEach((item: { order: number }) => {
                         item.order = order += 1;
                     });
 
                     const newListWorker = [
                         {
-                            title: 'Ban lãnh đạo',
+                            title: "Ban lãnh đạo",
                             data: filterManagements,
                         },
                         {
-                            title: 'Phòng ban',
+                            title: "Phòng ban",
                             data: filterDepartment,
                         },
                     ];
@@ -162,18 +162,18 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     });
                 }
             } else {
-                set({listWorker: [], listWorkerFilterByRole: []});
+                set({ listWorker: [], listWorkerFilterByRole: [] });
             }
 
-            set({isLoading: false});
+            set({ isLoading: false });
         } catch (error: any) {
             const _error = error;
-            set({isLoading: false});
+            set({ isLoading: false });
 
             setTimeout(() => {
                 if (_error.response?.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -182,7 +182,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
     },
 
     getListWorkerByLeader: async () => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/users/collection`,
@@ -190,7 +190,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
 
             if (response) {
                 const updateImgPathListWorker = response.data.data.map(
-                    (item: {avatar: string}) => {
+                    (item: { avatar: string }) => {
                         if (item.avatar) {
                             item.avatar = fixAvatarPath(item.avatar);
                         }
@@ -207,7 +207,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
 
                 //thêm order cho mảng
                 let order = 0;
-                updateImgPathListWorker.forEach((item: {order: number}) => {
+                updateImgPathListWorker.forEach((item: { order: number }) => {
                     item.order = order += 1;
                 });
 
@@ -252,18 +252,18 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                 //     listWorkerFilterByRole: newListWorker,
                 // });
             } else {
-                set({listWorker: [], listWorkerFilterByRole: []});
+                set({ listWorker: [], listWorkerFilterByRole: [] });
             }
 
-            set({isLoading: false});
+            set({ isLoading: false });
         } catch (error: any) {
             const _error = error;
-            set({isLoading: false});
+            set({ isLoading: false });
 
             setTimeout(() => {
                 if (_error.response?.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -272,6 +272,6 @@ export const useWorkerStore = create<DocumentStore>(set => ({
     },
 
     resetStateWhenLogout: () => {
-        set({listWorker: [], listWorkerFilterByRole: []});
+        set({ listWorker: [], listWorkerFilterByRole: [] });
     },
 }));

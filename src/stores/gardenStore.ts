@@ -1,20 +1,20 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
+import { create } from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
 import {
     THarvestHistory,
     TCollection,
     IHavestHistory,
-} from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
-import ENV from '@/config/ENV';
-import asyncStorageHelper from '../utils/localStorageHelper/index';
+} from "@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse";
+import ENV from "@/config/ENV";
+import asyncStorageHelper from "../utils/localStorageHelper/index";
 import {
     IArea,
     ILocation,
     IManagement,
     ISidePlant,
     ITotalProductByYear,
-} from '@/shared-types/Response/GardenResponse/GardenResponse';
+} from "@/shared-types/Response/GardenResponse/GardenResponse";
 
 export interface IGarden {
     _id: string /* Id khu vườn */;
@@ -50,7 +50,7 @@ type GardenState = {
     searchGardens: (id: string, userId: string) => Promise<void>;
     postHarvestStatus: (
         _id: string,
-        status: '0' | '1',
+        status: "0" | "1",
         harvestId?: string,
     ) => Promise<void>;
     postHarvestReport: (_id: string, amount: number) => Promise<void>;
@@ -60,7 +60,7 @@ type GardenState = {
     setGardenData: (newGardens: any) => void;
 };
 
-const useGardenStore = create<GardenState>(set => ({
+const useGardenStore = create<GardenState>((set) => ({
     gardens: [],
     gardenDetail: null,
     selectedGarden: null,
@@ -69,23 +69,26 @@ const useGardenStore = create<GardenState>(set => ({
     harvestHistory: [],
 
     fetchGardens: async (userId: string) => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/gardens/collection`,
             );
+            console.log(res)
 
             if (res.data.data.length !== 0) {
                 const userGardenNickname =
                     asyncStorageHelper.userGardenNickname;
 
-                const user = userGardenNickname.find(u => u.userId === userId);
+                const user = userGardenNickname.find(
+                    (u) => u.userId === userId,
+                );
                 const newGardenNickname = res.data.data?.map((item: any) => {
-                    let gardenNickname = '';
+                    let gardenNickname = "";
 
                     if (user) {
                         const matchedGarden = user.garden.find(
-                            g => g.gardenId === item._id,
+                            (g) => g.gardenId === item._id,
                         );
                         if (matchedGarden) {
                             gardenNickname = matchedGarden.gardenNickname;
@@ -99,48 +102,50 @@ const useGardenStore = create<GardenState>(set => ({
                     };
                 });
 
-                set({gardens: newGardenNickname});
+                set({ gardens: newGardenNickname });
             } else {
-                set({gardens: []});
+                set({ gardens: [] });
             }
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể tải danh sách khu vườn',
+                text: "Không thể tải danh sách khu vườn",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
-            set({isLoading: false});
+            set({ isLoading: false });
         }
     },
 
     fetchGardenDetail: async (id: string) => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/gardens/detail/${id}`,
             );
+            console.log(res)
             set({selectedGarden: res.data?.data || null});
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể tải chi tiết khu vườn',
+                text: "Không thể tải chi tiết khu vườn",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
-            set({isLoading: false});
+            set({ isLoading: false });
         }
     },
 
     searchGardens: async (code: string, userId: string) => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/gardens/find?code=${code}`,
             );
+            console.log(res)
 
             const userGardenNickname = asyncStorageHelper.userGardenNickname;
-            const user = userGardenNickname.find(u => u.userId === userId);
+            const user = userGardenNickname.find((u) => u.userId === userId);
             const findGarden = user?.garden.find(
-                garden => garden.gardenId === res.data.data._id,
+                (garden) => garden.gardenId === res.data.data._id,
             );
 
             const newDetailGardenNickname = {
@@ -148,108 +153,108 @@ const useGardenStore = create<GardenState>(set => ({
                 gardenNickname: findGarden?.gardenNickname,
             };
 
-            set({gardenDetail: newDetailGardenNickname || null});
+            set({ gardenDetail: newDetailGardenNickname || null });
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể tìm thấy khu vườn',
+                text: "Không thể tìm thấy khu vườn",
                 duration: Snackbar.LENGTH_SHORT,
             });
-            set({gardens: []});
+            set({ gardens: [] });
         } finally {
-            set({isLoading: false});
+            set({ isLoading: false });
         }
     },
 
     postHarvestStatus: async (
         _id: string,
-        status: '0' | '1',
+        status: "0" | "1",
         harvestId?: string,
     ) => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             let url = `${ENV.BACKEND_URL}/resources/gardens/harvest?_id=${_id}&status=${status}`;
-            if (status === '0' && harvestId) {
+            if (status === "0" && harvestId) {
                 url += `&harvestId=${harvestId}`;
             }
             const res = await axiosClient.post(url);
 
             Snackbar.show({
-                text: 'Cập nhật trạng thái thu hoạch thành công',
+                text: "Cập nhật trạng thái thu hoạch thành công",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể cập nhật trạng thái thu hoạch',
+                text: "Không thể cập nhật trạng thái thu hoạch",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
-            set({isLoading: false});
+            set({ isLoading: false });
         }
     },
 
     postHarvestReport: async (_id: string, amount: number) => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             const url = `${ENV.BACKEND_URL}/resources/gardens/harvest/report/${_id}/${amount}`;
             const res = await axiosClient.post(url);
+            console.log(res)
 
             Snackbar.show({
-                text: 'Báo cáo thu hoạch thành công',
+                text: "Báo cáo thu hoạch thành công",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể báo cáo thu hoạch',
+                text: "Không thể báo cáo thu hoạch",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
-            set({isLoading: false});
+            set({ isLoading: false });
         }
     },
 
     fetchHarvestHistory: async (_id: string) => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             const res = await axiosClient.get<THarvestHistory>(
                 `${ENV.BACKEND_URL}/resources/gardens/harvest/history?_id=${_id}`,
             );
+            console.log(res)
             set({harvestHistory: res.data?.data || []});
         } catch (error: any) {
-            // Snackbar.show({
-            //     text: 'Không thể tải lịch sử thu hoạch',
-            //     duration: Snackbar.LENGTH_SHORT,
-            // });
-        } finally {
-            set({isLoading: false});
-        }
+        set({ harvestHistory: [] }); 
+        
+    } finally {
+        set({ isLoading: false });
+    }
     },
 
     fetchHarvestCollection: async (_id: string) => {
-        set({isLoading: true});
+        set({ isLoading: true });
         try {
             const res = await axiosClient.get<TCollection>(
                 `${ENV.BACKEND_URL}/resources/gardens/harvest/collection?_id=${_id}`,
             );
-            set({harvestHistory: res.data?.data || []});
+            set({ harvestHistory: res.data?.data || [] });
         } catch (error: any) {
             // Snackbar.show({
             //     text: 'Không thể tải lịch sử thu hoạch',
             //     duration: Snackbar.LENGTH_SHORT,
             // });
         } finally {
-            set({isLoading: false});
+            set({ isLoading: false });
         }
     },
 
     setGardenData: (newGardens: any) => {
-        set({isLoading2: true});
-        set({gardens: newGardens});
+        set({ isLoading2: true });
+        set({ gardens: newGardens });
         setTimeout(() => {
-            set({isLoading2: false});
+            set({ isLoading2: false });
         }, 500);
         setTimeout(() => {
             Snackbar.show({
-                text: 'Đổi tên khu vườn thành công',
+                text: "Đổi tên khu vườn thành công",
                 duration: Snackbar.LENGTH_SHORT,
             });
         }, 600);

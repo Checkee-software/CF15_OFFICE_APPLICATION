@@ -1,4 +1,4 @@
-import SCREEN_INFO from './SCREEN_CONFIG/screenInfo';
+import SCREEN_INFO from "./SCREEN_CONFIG/screenInfo";
 
 const ROLE_BASED: any = Object.freeze({
     MANAGEMENT: [
