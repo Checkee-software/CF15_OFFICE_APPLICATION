@@ -286,11 +286,11 @@ const styles = StyleSheet.create({
     },
 
     searchBoxWrapper: {
-        flex: 8,
+        flex: 9,
     },
 
     qrButtonWrapper: {
-        flex: 2,
+        flex: 1.5,
         alignItems: 'flex-end',
         justifyContent: 'center',
     },
