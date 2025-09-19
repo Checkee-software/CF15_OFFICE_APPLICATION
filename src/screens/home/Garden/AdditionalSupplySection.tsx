@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Dropdown} from 'react-native-element-dropdown';
+import { Dropdown } from 'react-native-element-dropdown';
 
 type AdditionalSupply = {
     name: string;
@@ -29,13 +29,13 @@ type Props = {
 };
 
 const unitOptions = [
-    {label: 'kg', value: 'kg'},
-    {label: 'g', value: 'g'},
-    {label: 'lít', value: 'lít'},
-    {label: 'ml', value: 'ml'},
-    {label: 'tấn', value: 'tấn'},
-    {label: 'tạ', value: 'tạ'},
-    {label: 'yến', value: 'yến'},
+    { label: 'kg', value: 'kg' },
+    { label: 'g', value: 'g' },
+    { label: 'lít', value: 'lít' },
+    { label: 'ml', value: 'ml' },
+    { label: 'tấn', value: 'tấn' },
+    { label: 'tạ', value: 'tạ' },
+    { label: 'yến', value: 'yến' },
 ];
 const formatMoney = (value: string | undefined | null) => {
     const numeric = (value || '').replace(/\D/g, '');
@@ -55,7 +55,7 @@ const AdditionalSupplySection = ({
 
     return (
         gardenId !== '' && (
-            <View style={{marginTop: 16}}>
+            <View style={{ marginTop: 16 }}>
                 <View style={styles.header}>
                     <Text style={styles.title}>Đầu tư tăng thêm</Text>
                     <TouchableOpacity onPress={onAdd}>
@@ -64,7 +64,7 @@ const AdditionalSupplySection = ({
                 </View>
 
                 {supplies.map((item: any, index: number) => (
-                    <View key={index} style={{marginBottom: 28}}>
+                    <View key={index} style={{ marginBottom: 28 }}>
                         <TextInput
                             style={styles.input}
                             placeholder='Tên vật tư'
@@ -80,7 +80,7 @@ const AdditionalSupplySection = ({
                             labelField='label'
                             valueField='value'
                             placeholder='Đơn vị tính'
-                            placeholderStyle={{color: 'gray'}}
+                            placeholderStyle={{ color: 'gray' }}
                             search
                             searchPlaceholder='Tìm kiếm'
                             value={item.unit}
@@ -91,17 +91,24 @@ const AdditionalSupplySection = ({
 
                         <TextInput
                             style={styles.input}
-                            placeholder='Khối lượng'
-                            placeholderTextColor={'gray'}
-                            keyboardType='numeric'
+                            placeholder="Khối lượng"
+                            placeholderTextColor="gray"
+                            keyboardType="numeric"
                             value={item.value?.toString() ?? ''}
                             onChangeText={text => {
-                                const normalizedText = text.replace(',', '.');
-                                const dotCount = (
-                                    normalizedText.match(/\./g) || []
-                                ).length;
-                                if (dotCount > 1) return;
-
+                                let normalizedText = text.replace(',', '.');
+                                normalizedText = normalizedText.replace(/[^0-9.]/g, '');
+                                const parts = normalizedText.split('.');
+                                if (parts.length > 2) {
+                                    normalizedText = parts[0] + '.' + parts.slice(1).join('');
+                                }
+                                if (normalizedText.startsWith('.')) {
+                                    normalizedText = '0' + normalizedText;
+                                }
+                                const [intPart, decimalPart] = normalizedText.split('.');
+                                if (decimalPart !== undefined) {
+                                    normalizedText = intPart + '.' + decimalPart.slice(0, 2);
+                                }
                                 onChange(index, 'value', normalizedText);
                             }}
                         />
@@ -123,7 +130,7 @@ const AdditionalSupplySection = ({
                 <TouchableOpacity
                     style={[
                         styles.saveButton,
-                        !allValid && {backgroundColor: '#ccc'},
+                        !allValid && { backgroundColor: '#ccc' },
                     ]}
                     disabled={!allValid}
                     onPress={onSubmit}>

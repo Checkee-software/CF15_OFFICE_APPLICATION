@@ -92,20 +92,27 @@ const HarvestDetail = () => {
                         value={weight}
                         onChangeText={(text) => {
                             let formatted = text.replace(/,/g, '.');
+                            formatted = formatted.replace(/[^0-9.]/g, '');
+
                             const parts = formatted.split('.');
+
                             if (parts.length > 2) {
                                 formatted = parts[0] + '.' + parts.slice(1).join('');
                             }
+
                             if (formatted.startsWith('.')) {
                                 formatted = '0' + formatted;
                             }
-                            formatted = formatted.replace(/[^0-9.]/g, '');
+
+                            const [intPart, decimalPart] = formatted.split('.');
+                            if (decimalPart !== undefined) {
+                                formatted = intPart + '.' + decimalPart.slice(0, 2);
+                            }
 
                             setWeight(formatted);
                         }}
-                        placeholderTextColor="#000" 
+                        placeholderTextColor="#000"
                     />
-
                 </View>
             </ScrollView>
 
