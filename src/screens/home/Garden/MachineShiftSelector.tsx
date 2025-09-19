@@ -101,6 +101,7 @@ const MachineShiftSelector: React.FC<Props> = ({
 
             <View style={{gap: 12}}>
                 {machines.map((shift, index) => {
+                    console.log(shift);
                     const currentInputValue =
                         tempInputValues[index] ||
                         machineShifts[index]?.area ||
@@ -193,6 +194,18 @@ const MachineShiftSelector: React.FC<Props> = ({
                                                         Diện tích không được
                                                         vượt quá {gardenArea}{' '}
                                                         {gardenAreaType}
+                                                    </Text>
+
+                                                    <Text
+                                                        style={
+                                                            styles.warningText
+                                                        }>
+                                                        Diện tích đã làm:{' '}
+                                                        {
+                                                            shift
+                                                                .childTaskStaff[0]
+                                                                .processingRate
+                                                        }
                                                     </Text>
                                                 </View>
                                             )}
