@@ -145,12 +145,12 @@ const TaskListSection = ({
                                 </Text>
                             ) : (
                                 <>
-                                    <Text style={styles.label}>
+                                    {/* <Text style={styles.label}>
                                         Diện tích đã làm{' '}
                                         <Text style={{ color: 'red' }}>
                                             {task.currentArea} ha
                                         </Text>
-                                    </Text>
+                                    </Text> */}
 
                                     <TextInput
                                         style={[

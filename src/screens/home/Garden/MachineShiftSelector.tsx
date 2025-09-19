@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, TextInput} from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 import Snackbar from 'react-native-snackbar';
 
@@ -47,7 +47,6 @@ const MachineShiftSelector: React.FC<Props> = ({
                 text: 'Bạn chưa chọn khu vườn cần làm',
                 duration: Snackbar.LENGTH_SHORT,
             });
-
             return;
         }
 
@@ -56,7 +55,14 @@ const MachineShiftSelector: React.FC<Props> = ({
             return;
         }
 
+        // Không cho nhập dấu - hoặc khoảng trắng
         if (text.includes('-') || text.includes(' ')) {
+            return;
+        }
+
+        // Giới hạn tối đa 2 số sau dấu chấm
+        const regex = /^\d*(\.\d{0,2})?$/;
+        if (!regex.test(text.replace(',', '.'))) {
             return;
         }
 
@@ -77,9 +83,9 @@ const MachineShiftSelector: React.FC<Props> = ({
 
         if (isNaN(numericValue) || numericValue <= gardenArea) {
             onChange(index, 'area', normalizedText);
-            setTempInputValues(prev => ({...prev, [index]: ''}));
+            setTempInputValues(prev => ({ ...prev, [index]: '' }));
         } else {
-            setTempInputValues(prev => ({...prev, [index]: normalizedText}));
+            setTempInputValues(prev => ({ ...prev, [index]: normalizedText }));
         }
     };
 
@@ -87,27 +93,28 @@ const MachineShiftSelector: React.FC<Props> = ({
         <View>
             <Text style={styles.sectionTitle}>Ca máy</Text>
 
-            <View style={{gap: 12}}>
+            <View style={{ gap: 12 }}>
                 {machines.map((shift, index) => {
-                    const currentInputValue = tempInputValues[index];
+                    const currentInputValue =
+                        tempInputValues[index] || machineShifts[index]?.area || '';
                     const areaValue = parseFloat(currentInputValue);
                     const showWarning =
                         !isNaN(areaValue) && areaValue > gardenArea;
-                    //console.log('1', shift.processId);
+
                     return (
                         <CollapsibleTaskBlock
                             key={index}
                             title={shift.childTaskName}
                             backgroundColor='#FF98004D'>
                             {gardenId !== '' ? (
-                                <View style={{gap: 8}}>
+                                <View style={{ gap: 8 }}>
                                     <Text style={styles.label}>
                                         Loại ca máy{' '}
-                                        <Text style={{color: 'red'}}>*</Text>
+                                        <Text style={{ color: 'red' }}>*</Text>
                                     </Text>
                                     <View style={styles.pickerWrapper}>
                                         <Picker
-                                            selectedValue={shift.processId}
+                                            selectedValue={machineShifts[index]?.processId || ''}
                                             onValueChange={value =>
                                                 onChange(
                                                     index,
@@ -132,11 +139,8 @@ const MachineShiftSelector: React.FC<Props> = ({
                                     {machineShifts[index]?.processId ? (
                                         <>
                                             <Text style={styles.label}>
-                                                Diện tích đã làm (
-                                                {gardenAreaType}){' '}
-                                                <Text style={{color: 'red'}}>
-                                                    *
-                                                </Text>
+                                                Diện tích đã làm ({gardenAreaType}){' '}
+                                                <Text style={{ color: 'red' }}>*</Text>
                                             </Text>
                                             <TextInput
                                                 style={[
@@ -149,12 +153,9 @@ const MachineShiftSelector: React.FC<Props> = ({
                                                 placeholder='Nhập diện tích'
                                                 placeholderTextColor='black'
                                                 maxLength={6}
-                                                value={machineShifts.area}
+                                                value={machineShifts[index]?.area || ''}
                                                 onChangeText={text =>
-                                                    handleHoursChange(
-                                                        index,
-                                                        text,
-                                                    )
+                                                    handleHoursChange(index, text)
                                                 }
                                             />
                                             {showWarning && (
@@ -164,23 +165,11 @@ const MachineShiftSelector: React.FC<Props> = ({
                                                         marginBottom: 10,
                                                     }}>
                                                     <Text
-                                                        style={
-                                                            styles.warningText
-                                                        }>
+                                                        style={styles.warningText}>
                                                         Diện tích không được
                                                         vượt quá {gardenArea}{' '}
                                                         {gardenAreaType}
                                                     </Text>
-
-                                                    {/* <Text
-                                                    style={[
-                                                        styles.warningText,
-                                                        {marginTop: 0},
-                                                    ]}>
-                                                    Diện tích đã làm:{' '}
-                                                    {processingRate}{' '}
-                                                    {gardenAreaType}
-                                                </Text> */}
                                                 </View>
                                             )}
                                         </>
