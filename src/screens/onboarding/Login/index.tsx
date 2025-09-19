@@ -42,7 +42,7 @@ export default function Login({navigation}: any) {
     const [isLicenseLoading, setIsLicenseLoading] = useState<boolean>(false);
     const [license, setLicense] = useState<string>('');
     const [userAccount, setUserAccount] = useState({
-        username: 'd9nguyenhuuhoa', //cf15office lamphucf15
+        username: 'd1dothihoa', //cf15office lamphucf15
         phoneNumber: '',
         password: '00000000', //CF15@FFICE2025 123456789A@
     });

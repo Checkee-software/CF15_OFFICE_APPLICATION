@@ -136,6 +136,7 @@ const GardenDeclare = () => {
                 detailWorkSchedule.childTasks.flatMap(task =>
                     (task.machines || []).map(machine => ({
                         ...machine,
+                        childTaskCurrentArea: task.staff[0].processingRate,
                         childTaskId: task._id,
                         childTaskStatus: task.status,
                         childTaskName: task.name,

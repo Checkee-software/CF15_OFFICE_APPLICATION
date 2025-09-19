@@ -41,7 +41,13 @@ const MachineShiftSelector: React.FC<Props> = ({
 
     if (!machines.length) return null;
 
-    const handleHoursChange = (index: number, text: string) => {
+    console.log(machineShifts);
+
+    const handleHoursChange = (
+        index: number,
+        text: string,
+        childTaskCurrentArea: number,
+    ) => {
         if (gardenId === '') {
             Snackbar.show({
                 text: 'Bạn chưa chọn khu vườn cần làm',
@@ -92,8 +98,9 @@ const MachineShiftSelector: React.FC<Props> = ({
                     const currentInputValue = tempInputValues[index];
                     const areaValue = parseFloat(currentInputValue);
                     const showWarning =
-                        !isNaN(areaValue) && areaValue > gardenArea;
-                    //console.log('1', shift.processId);
+                        !isNaN(areaValue) &&
+                        areaValue + shift.childTaskCurrentArea > gardenArea;
+
                     return (
                         <CollapsibleTaskBlock
                             key={index}
@@ -132,8 +139,8 @@ const MachineShiftSelector: React.FC<Props> = ({
                                     {machineShifts[index]?.processId ? (
                                         <>
                                             <Text style={styles.label}>
-                                                Diện tích đã làm (
-                                                {gardenAreaType}){' '}
+                                                Diện tích đã làm
+                                                {` (${gardenAreaType})`} {''}
                                                 <Text style={{color: 'red'}}>
                                                     *
                                                 </Text>
@@ -154,6 +161,7 @@ const MachineShiftSelector: React.FC<Props> = ({
                                                     handleHoursChange(
                                                         index,
                                                         text,
+                                                        shift.childTaskCurrentArea,
                                                     )
                                                 }
                                             />
@@ -172,15 +180,17 @@ const MachineShiftSelector: React.FC<Props> = ({
                                                         {gardenAreaType}
                                                     </Text>
 
-                                                    {/* <Text
-                                                    style={[
-                                                        styles.warningText,
-                                                        {marginTop: 0},
-                                                    ]}>
-                                                    Diện tích đã làm:{' '}
-                                                    {processingRate}{' '}
-                                                    {gardenAreaType}
-                                                </Text> */}
+                                                    <Text
+                                                        style={[
+                                                            styles.warningText,
+                                                            {marginTop: 4},
+                                                        ]}>
+                                                        Diện tích đã làm:{' '}
+                                                        {
+                                                            shift.childTaskCurrentArea
+                                                        }{' '}
+                                                        {gardenAreaType}
+                                                    </Text>
                                                 </View>
                                             )}
                                         </>
