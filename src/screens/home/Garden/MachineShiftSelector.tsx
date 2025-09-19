@@ -41,8 +41,6 @@ const MachineShiftSelector: React.FC<Props> = ({
 
     if (!machines.length) return null;
 
-    console.log(machineShifts);
-
     const handleHoursChange = (
         index: number,
         text: string,
@@ -59,10 +57,20 @@ const MachineShiftSelector: React.FC<Props> = ({
 
         // Không cho bắt đầu bằng . hoặc ,
         if (text.startsWith('.') || text.startsWith(',')) {
+            console.log(text.startsWith('.'));
             return;
         }
 
+        console.log('zxcvzxcvxzc');
+
         if (text.includes('-') || text.includes(' ')) {
+            return;
+        }
+
+        //tối đa 2 số sau dấu chấm
+        const regex = /^\d*(\.\d{0,2})?$/;
+        console.log(regex);
+        if (!regex.test(text.replace(',', '.'))) {
             return;
         }
 
@@ -81,12 +89,19 @@ const MachineShiftSelector: React.FC<Props> = ({
         const normalizedText = text.replace(',', '.');
         const numericValue = parseFloat(normalizedText);
 
-        if (isNaN(numericValue) || numericValue <= gardenArea) {
-            onChange(index, 'area', normalizedText);
-            setTempInputValues(prev => ({...prev, [index]: ''}));
-        } else {
-            setTempInputValues(prev => ({...prev, [index]: normalizedText}));
+        console.log(numericValue);
+        console.log(childTaskCurrentArea);
+        console.log(gardenArea);
+
+        if (numericValue + childTaskCurrentArea > gardenArea) {
+            console.log('vượt quá');
+            onChange(index, 'area', '');
+            return setTempInputValues(prev => ({...prev, [index]: ''}));
         }
+
+        console.log('zxcvzxcv');
+        onChange(index, 'area', normalizedText);
+        // setTempInputValues(prev => ({...prev, [index]: ''}));
     };
 
     return (
@@ -155,7 +170,6 @@ const MachineShiftSelector: React.FC<Props> = ({
                                                 keyboardType='numeric'
                                                 placeholder='Nhập diện tích'
                                                 placeholderTextColor='black'
-                                                maxLength={6}
                                                 value={machineShifts.area}
                                                 onChangeText={text =>
                                                     handleHoursChange(

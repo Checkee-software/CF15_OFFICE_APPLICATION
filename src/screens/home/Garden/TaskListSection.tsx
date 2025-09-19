@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import React, {useState} from 'react';
+import {Text, TextInput, View} from 'react-native';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 import Snackbar from 'react-native-snackbar';
 
@@ -36,9 +36,11 @@ const TaskListSection = ({
         Record<string, string>
     >({});
 
-    console.log(gardenArea);
-
-    const handleAreaChange = (index: number, text: string, currentArea: number) => {
+    const handleAreaChange = (
+        index: number,
+        text: string,
+        currentArea: number,
+    ) => {
         if (gardenId === '') {
             Snackbar.show({
                 text: 'Bạn chưa chọn khu vườn cần làm',
@@ -73,7 +75,7 @@ const TaskListSection = ({
 
         if (isNaN(numericValue) || totalCurrentArea <= gardenArea) {
             handleInputChange(index, 'area', normalizedText);
-            setTempInputValues(prev => ({ ...prev, [index]: '' }));
+            setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
             setTempInputValues(prev => ({
                 ...prev,
@@ -81,7 +83,6 @@ const TaskListSection = ({
             }));
         }
     };
-
 
     console.log(taskInputs);
     console.log(gardenAreaType);
@@ -91,7 +92,7 @@ const TaskListSection = ({
             <Text style={styles.sectionTitle}>
                 Báo cáo quy trình ({taskInputs.length})
             </Text>
-            <View style={{ gap: 12 }}>
+            <View style={{gap: 12}}>
                 {taskInputs.map((task, index) => {
                     const isCompleted = task.taskStatus === 'COMPELETED';
                     const isDisabled = isCompleted;
@@ -123,8 +124,8 @@ const TaskListSection = ({
                             )}
 
                             {!isCompleted &&
-                                gardenArea === task.currentArea &&
-                                gardenId !== '' ? (
+                            gardenArea === task.currentArea &&
+                            gardenId !== '' ? (
                                 <Text
                                     style={{
                                         color: 'red',
@@ -147,7 +148,7 @@ const TaskListSection = ({
                                 <>
                                     <Text style={styles.label}>
                                         Diện tích đã làm{' '}
-                                        <Text style={{ color: 'red' }}>
+                                        <Text style={{color: 'red'}}>
                                             {task.currentArea} ha
                                         </Text>
                                     </Text>
@@ -155,7 +156,7 @@ const TaskListSection = ({
                                     <TextInput
                                         style={[
                                             styles.input,
-                                            showWarning && { borderColor: 'red' },
+                                            showWarning && {borderColor: 'red'},
                                         ]}
                                         keyboardType='numeric'
                                         placeholder='Nhập diện tích'
@@ -163,7 +164,11 @@ const TaskListSection = ({
                                         maxLength={6}
                                         value={task.area}
                                         onChangeText={text =>
-                                            handleAreaChange(index, text, task.currentArea)
+                                            handleAreaChange(
+                                                index,
+                                                text,
+                                                task.currentArea,
+                                            )
                                         }
                                         editable={!isDisabled}
                                     />
@@ -171,7 +176,7 @@ const TaskListSection = ({
                             )}
 
                             {showWarning && (
-                                <View style={{ gap: 0, marginBottom: 10 }}>
+                                <View style={{gap: 0, marginBottom: 10}}>
                                     <Text style={styles.warningText}>
                                         Diện tích không được vượt quá{' '}
                                         {gardenArea} {gardenAreaType}
