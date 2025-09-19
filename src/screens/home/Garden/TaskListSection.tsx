@@ -147,10 +147,8 @@ const TaskListSection = ({
                             ) : (
                                 <>
                                     <Text style={styles.label}>
-                                        Diện tích đã làm{' '}
-                                        <Text style={{color: 'red'}}>
-                                            {task.currentArea} ha
-                                        </Text>
+                                        Diện tích đã làm ({gardenAreaType}) {''}
+                                        <Text style={{color: 'red'}}>*</Text>
                                     </Text>
 
                                     <TextInput
