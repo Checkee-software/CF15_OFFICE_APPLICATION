@@ -8,6 +8,7 @@ type TaskInput = {
     taskId: string;
     taskName: string;
     area: string;
+    currentArea: number;
     disabled?: boolean;
     taskStatus?: string;
 };
@@ -34,6 +35,8 @@ const TaskListSection = ({
     const [tempInputValues, setTempInputValues] = useState<
         Record<string, string>
     >({});
+
+    console.log(gardenArea);
 
     const handleAreaChange = (index: number, text: string) => {
         if (gardenId === '') {
@@ -77,6 +80,9 @@ const TaskListSection = ({
         }
     };
 
+    console.log(taskInputs);
+    console.log(gardenAreaType);
+
     return (
         <View>
             <Text style={styles.sectionTitle}>
@@ -114,7 +120,7 @@ const TaskListSection = ({
                             )}
 
                             {!isCompleted &&
-                            gardenArea === processingRate &&
+                            gardenArea === task.currentArea &&
                             gardenId !== '' ? (
                                 <Text
                                     style={{
@@ -137,8 +143,10 @@ const TaskListSection = ({
                             ) : (
                                 <>
                                     <Text style={styles.label}>
-                                        Diện tích đã làm ({gardenAreaType}){' '}
-                                        <Text style={{color: 'red'}}>*</Text>
+                                        Diện tích đã làm{' '}
+                                        <Text style={{color: 'red'}}>
+                                            {task.currentArea} ha
+                                        </Text>
                                     </Text>
 
                                     <TextInput
@@ -167,7 +175,7 @@ const TaskListSection = ({
                                     </Text>
 
                                     <Text style={styles.warningText}>
-                                        Diện tích đã làm: {processingRate}{' '}
+                                        Diện tích đã làm: {task.currentArea}{' '}
                                         {gardenAreaType}
                                     </Text>
                                 </View>

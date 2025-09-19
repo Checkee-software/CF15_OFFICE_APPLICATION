@@ -92,6 +92,7 @@ const GardenDeclare = () => {
     }, []);
 
     useEffect(() => {
+        console.log(detailWorkSchedule);
         if (detailWorkSchedule && !hasLogged.current) {
             //console.log('📦 Chi tiết công việc:', detailWorkSchedule);
             hasLogged.current = true;
@@ -124,6 +125,7 @@ const GardenDeclare = () => {
                     taskId: task._id,
                     taskName: task.name,
                     area: '',
+                    currentArea: task.staff[0].processingRate,
                     taskStatus: userInTask?.status || task.status,
                 };
             });
