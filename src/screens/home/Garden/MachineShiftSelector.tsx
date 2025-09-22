@@ -1,61 +1,61 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useState, useMemo} from 'react';
+import {View, Text, StyleSheet, TextInput} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 import Snackbar from 'react-native-snackbar';
 
 const fakeMachine = {
-    _id: "68ccd850d903fbcc071aba6f",
-    processId: "6873c1da7e989d517bc0a7c7",
-    processName: "Ca máy 15",
+    _id: '68ccd850d903fbcc071aba6f',
+    processId: '6873c1da7e989d517bc0a7c7',
+    processName: 'Ca máy 15',
     value: 1,
     cost: 200000,
     history: [
         {
             area: 0.02,
-            createdBy: "68960024b354a6b7f2e26bf3",
-            staffName: "ĐỖ THỊ HOÀ",
+            createdBy: '68960024b354a6b7f2e26bf3',
+            staffName: 'ĐỖ THỊ HOÀ',
         },
         {
             area: 0.25,
-            createdBy: "68960024b354a6b7f2e26bf3",
-            staffName: "TRẦN VĂN A",
+            createdBy: '68960024b354a6b7f2e26bf3',
+            staffName: 'TRẦN VĂN A',
         },
         {
             area: 0.03,
-            createdBy: "68960024b354a6b7f2e26bf3",
-            staffName: "NGUYỄN THỊ B",
+            createdBy: '68960024b354a6b7f2e26bf3',
+            staffName: 'NGUYỄN THỊ B',
         },
     ],
     childTaskCurrentArea: 0,
-    childTaskId: "68ccd850d903fbcc071aba6c",
-    childTaskStatus: "WAITING",
-    childTaskName: "làm vườn",
+    childTaskId: '68ccd850d903fbcc071aba6c',
+    childTaskStatus: 'WAITING',
+    childTaskName: 'làm vườn',
     childTaskStaff: [
         {
-            userId: "68960024b354a6b7f2e26bf3",
-            name: "ĐỖ THỊ HOÀ",
-            status: "WAITING",
-            groupId: "6888202dce5cc80ae09bc755",
+            userId: '68960024b354a6b7f2e26bf3',
+            name: 'ĐỖ THỊ HOÀ',
+            status: 'WAITING',
+            groupId: '6888202dce5cc80ae09bc755',
             processingRate: 0,
             totalSquare: 0.88,
             completedTime: null,
             canceledTime: null,
-            canceledNote: "",
+            canceledNote: '',
             gardens: [
                 {
-                    gardenId: "68afb8a642a7b51ff7daa34c",
+                    gardenId: '68afb8a642a7b51ff7daa34c',
                     square: 0.88,
                     area: 0,
-                    name: "Đ01CP88HC04",
-                    groupId: "6888202dce5cc80ae09bc755",
-                    groupName: "Đội sản xuất số 1",
+                    name: 'Đ01CP88HC04',
+                    groupId: '6888202dce5cc80ae09bc755',
+                    groupName: 'Đội sản xuất số 1',
                 },
             ],
         },
     ],
 };
-
 
 interface MachineShiftInput {
     machineId: string;
@@ -63,7 +63,7 @@ interface MachineShiftInput {
     taskName: string;
     gardenAreaType: string;
     processId: string;
-    history?: { area: number }[];
+    history?: {area: number}[];
 }
 
 interface Props {
@@ -105,7 +105,10 @@ const MachineShiftSelector: React.FC<Props> = ({
     const historyAreas = useMemo(() => {
         return machines.map(m => {
             const total = m.history
-                ? m.history.reduce((sum: number, h: any) => sum + (h.area || 0), 0)
+                ? m.history.reduce(
+                      (sum: number, h: any) => sum + (h.area || 0),
+                      0,
+                  )
                 : 0;
             return total;
         });
@@ -142,13 +145,13 @@ const MachineShiftSelector: React.FC<Props> = ({
         const numericValue = parseFloat(normalizedText);
 
         const totalArea = numericValue + historyAreas[index];
-        console.log(historyAreas[index])
+        console.log(historyAreas[index]);
 
         if (isNaN(numericValue) || totalArea <= gardenArea) {
             onChange(index, 'area', normalizedText);
-            setTempInputValues(prev => ({ ...prev, [index]: '' }));
+            setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
-            setTempInputValues(prev => ({ ...prev, [index]: normalizedText }));
+            setTempInputValues(prev => ({...prev, [index]: normalizedText}));
         }
     };
 
@@ -156,35 +159,51 @@ const MachineShiftSelector: React.FC<Props> = ({
         <View>
             <Text style={styles.sectionTitle}>Ca máy</Text>
 
-            <View style={{ gap: 12 }}>
+            <View style={{gap: 12}}>
                 {/* {debugMachines.map((shift, index) => { */}
                 {machines.map((shift, index) => {
                     console.log(shift);
                     const currentInputValue =
-                        tempInputValues[index] || machineShifts[index]?.area || '';
+                        tempInputValues[index] ||
+                        machineShifts[index]?.area ||
+                        '';
                     const areaValue = parseFloat(currentInputValue);
-                    const warnArea = Number((gardenArea - historyAreas[index]).toFixed(2));
+                    const warnArea = Number(
+                        (gardenArea - historyAreas[index]).toFixed(2),
+                    );
                     const showWarning =
-                        !isNaN(areaValue) && areaValue + historyAreas[index] > gardenArea;
+                        !isNaN(areaValue) &&
+                        areaValue + historyAreas[index] > gardenArea;
 
                     return (
                         <CollapsibleTaskBlock
                             key={index}
                             title={shift.childTaskName}
-                            backgroundColor="#FF98004D">
+                            backgroundColor='#FF98004D'>
                             {gardenId !== '' ? (
-                                <View style={{ gap: 8 }}>
+                                <View style={{gap: 8}}>
                                     <Text style={styles.label}>
-                                        Loại ca máy <Text style={{ color: 'red' }}>*</Text>
+                                        Loại ca máy{' '}
+                                        <Text style={{color: 'red'}}>*</Text>
                                     </Text>
                                     <View style={styles.pickerWrapper}>
                                         <Picker
-                                            selectedValue={machineShifts[index]?.processId || ''}
+                                            selectedValue={
+                                                machineShifts[index]
+                                                    ?.processId || ''
+                                            }
                                             onValueChange={value =>
-                                                onChange(index, 'processId', value)
+                                                onChange(
+                                                    index,
+                                                    'processId',
+                                                    value,
+                                                )
                                             }
                                             style={styles.picker}>
-                                            <Picker.Item label="Chọn" value="" />
+                                            <Picker.Item
+                                                label='Chọn'
+                                                value=''
+                                            />
                                             <Picker.Item
                                                 key={shift._id}
                                                 label={shift.processName}
@@ -196,21 +215,32 @@ const MachineShiftSelector: React.FC<Props> = ({
                                     {machineShifts[index]?.processId ? (
                                         <>
                                             <Text style={styles.label}>
-                                                Diện tích đã làm ({gardenAreaType}){' '}
-                                                <Text style={{ color: 'red' }}>*</Text>
+                                                Diện tích đã làm (
+                                                {gardenAreaType}){' '}
+                                                <Text style={{color: 'red'}}>
+                                                    *
+                                                </Text>
                                             </Text>
                                             <TextInput
                                                 style={[
                                                     styles.input,
-                                                    showWarning && { borderColor: 'red' },
+                                                    showWarning && {
+                                                        borderColor: 'red',
+                                                    },
                                                 ]}
-                                                keyboardType="numeric"
-                                                placeholder="Nhập diện tích"
-                                                placeholderTextColor="black"
+                                                keyboardType='numeric'
+                                                placeholder='Nhập diện tích'
+                                                placeholderTextColor='black'
                                                 maxLength={6}
-                                                value={machineShifts[index]?.area || ''}
+                                                value={
+                                                    machineShifts[index]
+                                                        ?.area || ''
+                                                }
                                                 onChangeText={text =>
-                                                    handleHoursChange(index, text)
+                                                    handleHoursChange(
+                                                        index,
+                                                        text,
+                                                    )
                                                 }
                                             />
                                             {showWarning && (
@@ -219,29 +249,21 @@ const MachineShiftSelector: React.FC<Props> = ({
                                                         gap: 0,
                                                         marginBottom: 10,
                                                     }}>
-                                                    <Text style={styles.warningText}>
-                                                        Diện tích không được vượt quá {gardenArea}{' '}
+                                                    <Text
+                                                        style={
+                                                            styles.warningText
+                                                        }>
+                                                        Diện tích không được
+                                                        vượt quá {gardenArea}{' '}
                                                         {gardenAreaType}
                                                     </Text>
-                                                    {/* <Text style={styles.warningText}>
-                                                        Diện tích không được vượt quá {warnArea}{' '}
-                                                        {gardenAreaType}
-                                                    </Text> */}
-                                                    <Text style={styles.warningText}>
-                                                        Diện tích đã làm: {historyAreas[index]}{' '}
-                                                        {gardenAreaType}
-                                                    </Text>
-
                                                     <Text
                                                         style={
                                                             styles.warningText
                                                         }>
                                                         Diện tích đã làm:{' '}
-                                                        {
-                                                            shift
-                                                                .childTaskStaff[0]
-                                                                .processingRate
-                                                        }
+                                                        {historyAreas[index]}{' '}
+                                                        {gardenAreaType}
                                                     </Text>
                                                 </View>
                                             )}

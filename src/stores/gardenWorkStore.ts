@@ -308,14 +308,10 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
 
             set({isLoadingCreate: false});
 
-            if (response.data?.data) {
-                setTimeout(() => {
-                    Snackbar.show({
-                        text: `${response.data.message}`,
-                        duration: Snackbar.LENGTH_LONG,
-                    });
-                }, 500);
-            }
+            Snackbar.show({
+                text: `${response.data.message}`,
+                duration: Snackbar.LENGTH_LONG,
+            });
 
             return response.data;
         } catch (error: any) {

@@ -15,7 +15,6 @@ import {useAuthStore} from '@/stores/authStore';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import {useGardenWorkStore} from '../../../stores/gardenWorkStore';
-import Backdrop from '@/screens/subscreen/Loading/index2';
 import Loading from '@/screens/subscreen/Loading';
 import Snackbar from 'react-native-snackbar';
 import {EStatus} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
@@ -36,7 +35,6 @@ const WorkScreen = () => {
         listGardenWorkBrowseFilter,
         badgeGardenWorkUnBrowse,
         isLoading,
-        isLoadingCreate,
         getRequestDataGarden,
         filterByStatus,
         createRateReportHarvest,
@@ -464,7 +462,6 @@ const WorkScreen = () => {
         if (userInfo.userType.level === EOrganization.LEADER) {
             handleGetRequestGardenData();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (isLoading) {
@@ -563,8 +560,6 @@ const WorkScreen = () => {
                         <Text style={styles.emptyText}>Danh sách trống!</Text>
                     </View>
                 )}
-
-                <Backdrop open={isLoadingCreate} />
             </>
         </View>
     );

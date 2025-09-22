@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {
     View,
     Text,
@@ -11,12 +11,12 @@ import {
     ActivityIndicator,
     Dimensions,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useAuthStore } from '../../../stores/authStore';
-import { FlatList } from 'react-native';
+import {useAuthStore} from '../../../stores/authStore';
+import {FlatList} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import ENV from '@/config/ENV';
@@ -41,7 +41,7 @@ const CollapsibleRow = ({
     <>
         <TouchableOpacity onPress={onToggle} style={styles.row}>
             <Text style={styles.label}>{label}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Text style={styles.value}>{value}</Text>
                 <Icon
                     name={
@@ -57,7 +57,7 @@ const CollapsibleRow = ({
 );
 
 const GardenWorker = () => {
-    const { userInfo } = useAuthStore();
+    const {userInfo} = useAuthStore();
     const route = useRoute<any>();
     const code = route.params?.code;
 
@@ -65,7 +65,7 @@ const GardenWorker = () => {
     const [showInfo, setShowInfo] = React.useState(false);
     const [showForm, setShowForm] = React.useState(false);
 
-    const { gardenDetail, isLoading, harvestHistory } = useGardenStore();
+    const {gardenDetail, isLoading, harvestHistory} = useGardenStore();
 
     const fixEncoding = (input: string): string => {
         try {
@@ -198,7 +198,7 @@ const GardenWorker = () => {
                             width: '100%',
                             justifyContent: 'space-between',
                         }}>
-                        <Text style={(styles.label, { width: '45%' })}>
+                        <Text style={(styles.label, {width: '45%'})}>
                             Tên khu vườn
                         </Text>
                         <Text
@@ -216,7 +216,7 @@ const GardenWorker = () => {
                     </View>
                     <View style={styles.row}>
                         <Text style={styles.label}>Mã khu vườn</Text>
-                        <Text style={[styles.value, { color: 'green' }]}>
+                        <Text style={[styles.value, {color: 'green'}]}>
                             {gardenDetail.code}
                         </Text>
                     </View>
@@ -245,14 +245,14 @@ const GardenWorker = () => {
                     <View style={styles.row}>
                         <Text style={styles.label}>Đơn vị</Text>
                         <Text style={[styles.value]}>
-                            {
-                                (gardenDetail as any).unit || 'Không xác định'
-                            }
+                            {(gardenDetail as any).unit || 'Không xác định'}
                         </Text>
                     </View>
 
                     <View style={styles.row}>
-                        <Text style={styles.label}>Diện tích giao khoán (ha)</Text>
+                        <Text style={styles.label}>
+                            Diện tích giao khoán (ha)
+                        </Text>
                         <Text style={[styles.value]}>
                             {gardenDetail.management?.area?.totalSquare}
                         </Text>
@@ -311,37 +311,44 @@ const GardenWorker = () => {
                                     style={
                                         styles.yearTitle
                                     }>{`Năm ${item.year}`}</Text>
-                                <Text style={styles.plantedText}>{`Trồng ${gardenDetail.totalProductByYear[
+                                <Text style={styles.plantedText}>{`Trồng ${
+                                    gardenDetail.totalProductByYear[
                                         gardenDetail.totalProductByYear.length -
-                                        1
+                                            1
                                     ].quantity
-                                    } cây`}</Text>
+                                } cây`}</Text>
                             </View>
 
                             <View style={styles.qualityRow}>
-                                <Text style={styles.qualityText}>{`A: ${item.qualities?.[0] ?? 0
-                                    }`}</Text>
+                                <Text style={styles.qualityText}>{`A: ${
+                                    item.qualities?.[0] ?? 0
+                                }`}</Text>
                                 <Text style={styles.separator}></Text>
-                                <Text style={styles.qualityText}>{`B: ${item.qualities?.[1] ?? 0
-                                    }`}</Text>
+                                <Text style={styles.qualityText}>{`B: ${
+                                    item.qualities?.[1] ?? 0
+                                }`}</Text>
                                 <Text style={styles.separator}></Text>
-                                <Text style={styles.qualityText}>{`C: ${item.qualities?.[2] ?? 0
-                                    }`}</Text>
+                                <Text style={styles.qualityText}>{`C: ${
+                                    item.qualities?.[2] ?? 0
+                                }`}</Text>
                                 <Text style={styles.separator}></Text>
-                                <Text style={styles.qualityText}>{`D: ${item.qualities?.[3] ?? 0
-                                    }`}</Text>
+                                <Text style={styles.qualityText}>{`D: ${
+                                    item.qualities?.[3] ?? 0
+                                }`}</Text>
                             </View>
 
                             <View style={styles.warpNewTreeDead}>
                                 <Text
-                                    style={styles.labelTree}>{`Cây trồng mới: ${item.newTree || 0
-                                        }`}</Text>
+                                    style={styles.labelTree}>{`Cây trồng mới: ${
+                                    item.newTree || 0
+                                }`}</Text>
                                 <Text
                                     style={[
                                         styles.labelTree,
-                                        { textAlign: 'right' },
-                                    ]}>{`Cây chết: ${item.deadTree || 0
-                                        }`}</Text>
+                                        {textAlign: 'right'},
+                                    ]}>{`Cây chết: ${
+                                    item.deadTree || 0
+                                }`}</Text>
                             </View>
                         </View>
                     ))}
@@ -369,7 +376,7 @@ const GardenWorker = () => {
                             scrollEnabled={false}
                             data={gardenDetail.management?.files}
                             keyExtractor={(item, index) => index.toString()}
-                            renderItem={({ item }) =>
+                            renderItem={({item}) =>
                                 renderItemAttachedFiles(item)
                             }
                         />
@@ -388,7 +395,7 @@ const GardenWorker = () => {
                     </TouchableOpacity>
 
                     <WebView
-                        style={{ flex: 1 }}
+                        style={{flex: 1}}
                         source={{
                             uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
                                 pdfFilePath,
@@ -416,7 +423,7 @@ const Section = ({
     </View>
 );
 
-const Row = ({ label, value }: { label: string; value?: string | number }) => (
+const Row = ({label, value}: {label: string; value?: string | number}) => (
     <View style={styles.row}>
         <Text style={styles.label}>{label}</Text>
         <Text style={styles.value}>{value}</Text>
