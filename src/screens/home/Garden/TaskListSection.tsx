@@ -8,6 +8,7 @@ type TaskInput = {
     taskId: string;
     taskName: string;
     area: string;
+    currentArea: number;
     disabled?: boolean;
     taskStatus?: string;
 };
@@ -35,7 +36,11 @@ const TaskListSection = ({
         Record<string, string>
     >({});
 
-    const handleAreaChange = (index: number, text: string) => {
+    const handleAreaChange = (
+        index: number,
+        text: string,
+        currentArea: number,
+    ) => {
         if (gardenId === '') {
             Snackbar.show({
                 text: 'Bạn chưa chọn khu vườn cần làm',
@@ -43,16 +48,17 @@ const TaskListSection = ({
             });
             return;
         }
-
-        // Không cho bắt đầu bằng . hoặc ,
         if (text.startsWith('.') || text.startsWith(',')) {
             return;
         }
-
         if (text.includes('-') || text.includes(' ')) {
             return;
         }
-
+        //tối đa 2 số sau dấu chấm
+        const regex = /^\d*(\.\d{0,2})?$/;
+        if (!regex.test(text.replace(',', '.'))) {
+            return;
+        }
         const currentText = tempInputValues[index] || taskInputs[index].area;
         const isAdding = text.length > currentText.length;
         const endsWithDotOrComma = /[.,]$/.test(text);
@@ -62,11 +68,12 @@ const TaskListSection = ({
         if (isAdding && alreadyHasDotOrComma && endsWithDotOrComma) {
             return;
         }
-
         const normalizedText = text.replace(',', '.');
         const numericValue = parseFloat(normalizedText);
 
-        if (isNaN(numericValue) || numericValue <= gardenArea) {
+        const totalCurrentArea = numericValue + currentArea;
+
+        if (isNaN(numericValue) || totalCurrentArea <= gardenArea) {
             handleInputChange(index, 'area', normalizedText);
             setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
@@ -76,6 +83,9 @@ const TaskListSection = ({
             }));
         }
     };
+
+    console.log(taskInputs);
+    console.log(gardenAreaType);
 
     return (
         <View>
@@ -114,7 +124,7 @@ const TaskListSection = ({
                             )}
 
                             {!isCompleted &&
-                            gardenArea === processingRate &&
+                            gardenArea === task.currentArea &&
                             gardenId !== '' ? (
                                 <Text
                                     style={{
@@ -137,7 +147,7 @@ const TaskListSection = ({
                             ) : (
                                 <>
                                     <Text style={styles.label}>
-                                        Diện tích đã làm ({gardenAreaType}){' '}
+                                        Diện tích đã làm ({gardenAreaType}) {''}
                                         <Text style={{color: 'red'}}>*</Text>
                                     </Text>
 
@@ -152,7 +162,11 @@ const TaskListSection = ({
                                         maxLength={6}
                                         value={task.area}
                                         onChangeText={text =>
-                                            handleAreaChange(index, text)
+                                            handleAreaChange(
+                                                index,
+                                                text,
+                                                task.currentArea,
+                                            )
                                         }
                                         editable={!isDisabled}
                                     />
@@ -167,7 +181,7 @@ const TaskListSection = ({
                                     </Text>
 
                                     <Text style={styles.warningText}>
-                                        Diện tích đã làm: {processingRate}{' '}
+                                        Diện tích đã làm: {task.currentArea}{' '}
                                         {gardenAreaType}
                                     </Text>
                                 </View>

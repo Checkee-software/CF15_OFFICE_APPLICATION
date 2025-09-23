@@ -1,10 +1,10 @@
-import ENV from "@/config/ENV";
-import { IStatisticFormData } from "@/shared-types/form-data/StatisticFormData/StatisticFormData";
-import { IWorkList } from "@/shared-types/Response/StatisticResponse/StatisticResponse";
-import axiosClient from "@/utils/axiosClient";
-import moment from "moment";
-import Snackbar from "react-native-snackbar";
-import { create } from "zustand";
+import ENV from '@/config/ENV';
+import {IStatisticFormData} from '@/shared-types/form-data/StatisticFormData/StatisticFormData';
+import {IWorkList} from '@/shared-types/Response/StatisticResponse/StatisticResponse';
+import axiosClient from '@/utils/axiosClient';
+import moment from 'moment';
+import Snackbar from 'react-native-snackbar';
+import {create} from 'zustand';
 
 interface IStatisticResponse {
     totalCost: number;
@@ -47,14 +47,14 @@ type IChartData = {
 const convertToChartData = (data: any[]): IChartData[] => {
     const result: IChartData[] = [];
 
-    const allValues = data.flatMap((item) => [
+    const allValues = data.flatMap(item => [
         item.labourCost ?? 0,
         item.materialCost ?? 0,
         item.machineCost ?? 0,
     ]);
     const maxRealValue = Math.max(...allValues, 1);
 
-    data.forEach((item) => {
+    data.forEach(item => {
         const pushColumn = (
             realValue: number,
             color: string,
@@ -75,14 +75,14 @@ const convertToChartData = (data: any[]): IChartData[] => {
             });
         };
 
-        pushColumn(item.labourCost ?? 0, "#FF4C4C", item.label);
-        pushColumn(item.materialCost ?? 0, "#4CAF50");
-        pushColumn(item.machineCost ?? 0, "#2196F3");
+        pushColumn(item.labourCost ?? 0, '#FF4C4C', item.label);
+        pushColumn(item.materialCost ?? 0, '#4CAF50');
+        pushColumn(item.machineCost ?? 0, '#2196F3');
 
         result.push({
             value: 0,
             spacing: 70,
-            frontColor: "transparent",
+            frontColor: 'transparent',
             _realValue: 0,
         });
     });
@@ -90,7 +90,7 @@ const convertToChartData = (data: any[]): IChartData[] => {
     return result;
 };
 
-export const useStatisticStore = create<StatisticStore>((set) => ({
+export const useStatisticStore = create<StatisticStore>(set => ({
     statisticData: null,
     listSelection: [],
     isLoading: false,
@@ -103,7 +103,7 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
     }: IStatisticFormData) => {
         const formattedStartDate = moment(startDate).toISOString();
         const formattedEndDate = moment(endDate).toISOString();
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}&targetId=${targetId}`,
@@ -119,14 +119,14 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
                     chart: convertToChartData(response.data.data.chart || []),
                     pieChart: [],
                 };
-                set({ statisticData: mainStatisticData });
-                set({ isLoading: false });
+                set({statisticData: mainStatisticData});
+                set({isLoading: false});
             } else {
-                set({ isLoading: false });
+                set({isLoading: false});
             }
         } catch (error: any) {
             console.log(error);
-            set({ isLoading: false });
+            set({isLoading: false});
 
             const _error = error;
 
@@ -138,7 +138,7 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -154,7 +154,7 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
     }: IStatisticFormData) => {
         const formattedStartDate = moment(startDate).toISOString();
         const formattedEndDate = moment(endDate).toISOString();
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}&targetId=${targetId}`,
@@ -169,13 +169,13 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
                         pieChart: [
                             {
                                 value: item.percentage,
-                                color: "#4CAF50",
+                                color: '#4CAF50',
                                 text: `${item.percentage}%`,
                             },
                             {
                                 value: notComplete,
-                                color: "#FF4E45",
-                                text: notComplete > 0 ? `${notComplete}%` : "",
+                                color: '#FF4E45',
+                                text: notComplete > 0 ? `${notComplete}%` : '',
                             },
                         ],
                     };
@@ -187,20 +187,20 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
                     totalGarden: 0,
                     totalGroup: 0,
                     totalMember: 0,
-                    totalWork: "0",
+                    totalWork: '0',
                     chart: [],
                     pieChart: chartData,
                 };
-                set({ statisticData: mainStatisticData });
-                set({ isLoading: false });
+                set({statisticData: mainStatisticData});
+                set({isLoading: false});
             } else {
-                set({ isLoading: false });
+                set({isLoading: false});
             }
 
-            set({ isLoading: false });
+            set({isLoading: false});
         } catch (error: any) {
             console.log(error);
-            set({ isLoading: false });
+            set({isLoading: false});
 
             const _error = error;
 
@@ -212,7 +212,7 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -221,14 +221,14 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
     },
 
     getListSelection: async (selection: string) => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response =
-                selection === "WORK"
+                selection === 'WORK'
                     ? await axiosClient.get(
                           `${ENV.BACKEND_URL}/resources/schedules/selection-schedule`,
                       )
-                    : selection === "PRODUCT"
+                    : selection === 'PRODUCT'
                     ? await axiosClient.get(
                           `${ENV.BACKEND_URL}/resources/products/selection`,
                       )
@@ -243,18 +243,18 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
                 }));
 
                 const selectionAll = {
-                    _id: "",
-                    name: "Tất cả",
+                    _id: '',
+                    name: 'Tất cả',
                 };
 
                 selections.unshift(selectionAll);
 
-                set({ listSelection: selections });
-                set({ isLoading: false });
+                set({listSelection: selections});
+                set({isLoading: false});
             }
         } catch (error: any) {
             console.log(error);
-            set({ isLoading: false });
+            set({isLoading: false});
 
             const _error = error;
 
@@ -266,7 +266,7 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -275,7 +275,7 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
     },
 
     getGroupName: async (groupId: string) => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/units/selection`,
@@ -286,12 +286,12 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
                     (item: any) => item._id === groupId,
                 );
 
-                set({ listSelection: findGroup });
-                set({ isLoading: false });
+                set({listSelection: findGroup});
+                set({isLoading: false});
             }
         } catch (error: any) {
             console.log(error);
-            set({ isLoading: false });
+            set({isLoading: false});
 
             const _error = error;
 
@@ -303,7 +303,7 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -311,7 +311,7 @@ export const useStatisticStore = create<StatisticStore>((set) => ({
         }
     },
 
-    clearStatisticData: () => set({ statisticData: null }),
-    clearListSelection: () => set({ listSelection: [] }),
+    clearStatisticData: () => set({statisticData: null}),
+    clearListSelection: () => set({listSelection: []}),
     convertToChartData: (data: any[]) => convertToChartData(data),
 }));

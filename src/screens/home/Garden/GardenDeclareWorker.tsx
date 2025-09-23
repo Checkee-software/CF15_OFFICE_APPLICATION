@@ -92,6 +92,7 @@ const GardenDeclare = () => {
     }, []);
 
     useEffect(() => {
+        console.log(detailWorkSchedule);
         if (detailWorkSchedule && !hasLogged.current) {
             //console.log('📦 Chi tiết công việc:', detailWorkSchedule);
             hasLogged.current = true;
@@ -124,6 +125,7 @@ const GardenDeclare = () => {
                     taskId: task._id,
                     taskName: task.name,
                     area: '',
+                    currentArea: task.staff[0].processingRate,
                     taskStatus: userInTask?.status || task.status,
                 };
             });
@@ -134,6 +136,7 @@ const GardenDeclare = () => {
                 detailWorkSchedule.childTasks.flatMap(task =>
                     (task.machines || []).map(machine => ({
                         ...machine,
+                        childTaskCurrentArea: task.staff[0].processingRate,
                         childTaskId: task._id,
                         childTaskStatus: task.status,
                         childTaskName: task.name,

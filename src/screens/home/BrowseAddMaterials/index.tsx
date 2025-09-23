@@ -9,7 +9,6 @@ import {
     TouchableOpacity,
     FlatList,
     TextInput,
-    KeyboardAvoidingView,
 } from 'react-native';
 import images from '../../../assets/images';
 import {useAuthStore} from '@/stores/authStore';
@@ -73,7 +72,7 @@ const BrowseAddMaterials = () => {
         );
     };
 
-    const renderGardenWork = (itemGardenWork: any) => (
+    const renderGardenWork = (itemGardenWork: any, index: number) => (
         <View
             style={[
                 styles.gardenCard,
@@ -82,6 +81,11 @@ const BrowseAddMaterials = () => {
                         itemGardenWork.status === EStatus.DENIDED
                             ? '#FF4E45'
                             : '#000000',
+                    marginBottom:
+                        index + 1 === listMaterialsBrowseFilter.length &&
+                        selectedStatus === 1
+                            ? 220
+                            : 0,
                 },
             ]}>
             <View style={styles.gardenContentSection}>
@@ -460,51 +464,42 @@ const BrowseAddMaterials = () => {
 
                 {userInfo.userType.level === EOrganization.LEADER ? (
                     <View style={styles.gardenWorkList}>
-                        <KeyboardAvoidingView
-                            style={{flex: 1}}
-                            // keyboardVerticalOffset={
-                            //     Platform.OS === 'ios' ? 60 : 20
-                            // }
-                            behavior='padding'>
-                            <KeyboardAwareFlatList
-                                contentContainerStyle={
-                                    styles.flatListGardenWork
-                                }
-                                data={listMaterialsBrowseFilter}
-                                keyExtractor={item => item.materialId}
-                                renderItem={({item}) => renderGardenWork(item)}
-                                onRefresh={handleGetRequestGardenData}
-                                refreshing={isLoading}
-                                showsVerticalScrollIndicator={false}
-                                //removeClippedSubviews={false}
-                                enableOnAndroid
-                                extraHeight={300}
-                                keyboardShouldPersistTaps='handled'
-                                ListEmptyComponent={
-                                    <View style={styles.emptyContainer}>
-                                        {selectedStatus === 1 ? (
-                                            <>
-                                                <Image
-                                                    source={
-                                                        images.emptyWorkList
-                                                    }
-                                                    style={styles.emptyImage}
-                                                    resizeMode='contain'
-                                                />
-                                                <Text style={styles.emptyText}>
-                                                    Hiện tại không có vật tư để
-                                                    duyệt!
-                                                </Text>
-                                            </>
-                                        ) : (
+                        <KeyboardAwareFlatList
+                            contentContainerStyle={styles.flatListGardenWork}
+                            data={listMaterialsBrowseFilter}
+                            keyExtractor={item => item.materialId}
+                            renderItem={({item, index}) =>
+                                renderGardenWork(item, index)
+                            }
+                            onRefresh={handleGetRequestGardenData}
+                            refreshing={isLoading}
+                            showsVerticalScrollIndicator={false}
+                            removeClippedSubviews={false}
+                            enableOnAndroid={true}
+                            extraHeight={250}
+                            keyboardShouldPersistTaps='handled'
+                            ListEmptyComponent={
+                                <View style={styles.emptyContainer}>
+                                    {selectedStatus === 1 ? (
+                                        <>
+                                            <Image
+                                                source={images.emptyWorkList}
+                                                style={styles.emptyImage}
+                                                resizeMode='contain'
+                                            />
                                             <Text style={styles.emptyText}>
-                                                Danh sách trống!
+                                                Hiện tại không có vật tư để
+                                                duyệt!
                                             </Text>
-                                        )}
-                                    </View>
-                                }
-                            />
-                        </KeyboardAvoidingView>
+                                        </>
+                                    ) : (
+                                        <Text style={styles.emptyText}>
+                                            Danh sách trống!
+                                        </Text>
+                                    )}
+                                </View>
+                            }
+                        />
                     </View>
                 ) : (
                     <View style={styles.emptyContainer}>

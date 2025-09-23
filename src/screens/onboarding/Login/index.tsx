@@ -31,7 +31,6 @@ const {width} = Dimensions.get('window');
 export default function Login({navigation}: any) {
     /* store */
     const {login, isLoading} = useAuthStore();
-    console.log('device infor: ', deviceInfo);
 
     /* create storage */
 

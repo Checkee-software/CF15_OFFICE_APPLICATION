@@ -9,14 +9,12 @@ import {
     TouchableOpacity,
     FlatList,
     TextInput,
-    KeyboardAvoidingView,
 } from 'react-native';
 import images from '../../../assets/images';
 import {useAuthStore} from '@/stores/authStore';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import {useGardenWorkStore} from '../../../stores/gardenWorkStore';
-import Backdrop from '@/screens/subscreen/Loading/index2';
 import Loading from '@/screens/subscreen/Loading';
 import Snackbar from 'react-native-snackbar';
 import {EStatus} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
@@ -37,13 +35,10 @@ const WorkScreen = () => {
         listGardenWorkBrowseFilter,
         badgeGardenWorkUnBrowse,
         isLoading,
-        isLoadingCreate,
         getRequestDataGarden,
         filterByStatus,
         createRateReportHarvest,
     } = useGardenWorkStore();
-
-    console.log(listGardenWorkBrowseFilter);
 
     const {userInfo, redirectDataRequestSchedule, clearRedirectData} =
         useAuthStore();
@@ -83,7 +78,7 @@ const WorkScreen = () => {
         );
     };
 
-    const renderGardenWork = (itemGardenWork: any) => (
+    const renderGardenWork = (itemGardenWork: any, index: number) => (
         <View
             style={[
                 styles.gardenCard,
@@ -92,6 +87,11 @@ const WorkScreen = () => {
                         itemGardenWork.status === EStatus.DENIDED
                             ? '#FF4E45'
                             : '#000000',
+                    marginBottom:
+                        index + 1 === listGardenWorkBrowseFilter.length &&
+                        selectedStatus === 1
+                            ? 220
+                            : 0,
                 },
             ]}>
             <View style={styles.gardenTitleSection}>
@@ -462,7 +462,6 @@ const WorkScreen = () => {
         if (userInfo.userType.level === EOrganization.LEADER) {
             handleGetRequestGardenData();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (isLoading) {
@@ -519,59 +518,48 @@ const WorkScreen = () => {
 
                 {userInfo.userType.level === EOrganization.LEADER ? (
                     <View style={styles.gardenWorkList}>
-                        <KeyboardAvoidingView
-                            style={{flex: 1}}
-                            // keyboardVerticalOffset={
-                            //     Platform.OS === 'ios' ? 60 : 20
-                            // }
-                            behavior='padding'>
-                            <KeyboardAwareFlatList
-                                contentContainerStyle={
-                                    styles.flatListGardenWork
-                                }
-                                data={listGardenWorkBrowseFilter}
-                                keyExtractor={item => item._id}
-                                renderItem={({item}) => renderGardenWork(item)}
-                                onRefresh={handleGetRequestGardenData}
-                                refreshing={isLoading}
-                                showsVerticalScrollIndicator={false}
-                                //removeClippedSubviews={false}
-                                enableOnAndroid
-                                extraHeight={300}
-                                keyboardShouldPersistTaps='handled'
-                                ListEmptyComponent={
-                                    <View style={styles.emptyContainer}>
-                                        {selectedStatus === 1 ? (
-                                            <>
-                                                <Image
-                                                    source={
-                                                        images.emptyWorkList
-                                                    }
-                                                    style={styles.emptyImage}
-                                                    resizeMode='contain'
-                                                />
-                                                <Text style={styles.emptyText}>
-                                                    Hiện tại không có công việc
-                                                    để thực hiện!
-                                                </Text>
-                                            </>
-                                        ) : (
+                        <KeyboardAwareFlatList
+                            contentContainerStyle={styles.flatListGardenWork}
+                            data={listGardenWorkBrowseFilter}
+                            keyExtractor={item => item._id}
+                            renderItem={({item, index}) =>
+                                renderGardenWork(item, index)
+                            }
+                            onRefresh={handleGetRequestGardenData}
+                            refreshing={isLoading}
+                            showsVerticalScrollIndicator={false}
+                            removeClippedSubviews={false}
+                            enableOnAndroid={true}
+                            extraHeight={250}
+                            keyboardShouldPersistTaps='handled'
+                            ListEmptyComponent={
+                                <View style={styles.emptyContainer}>
+                                    {selectedStatus === 1 ? (
+                                        <>
+                                            <Image
+                                                source={images.emptyWorkList}
+                                                style={styles.emptyImage}
+                                                resizeMode='contain'
+                                            />
                                             <Text style={styles.emptyText}>
-                                                Danh sách trống!
+                                                Hiện tại không có công việc để
+                                                thực hiện!
                                             </Text>
-                                        )}
-                                    </View>
-                                }
-                            />
-                        </KeyboardAvoidingView>
+                                        </>
+                                    ) : (
+                                        <Text style={styles.emptyText}>
+                                            Danh sách trống!
+                                        </Text>
+                                    )}
+                                </View>
+                            }
+                        />
                     </View>
                 ) : (
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>Danh sách trống!</Text>
                     </View>
                 )}
-
-                <Backdrop open={isLoadingCreate} />
             </>
         </View>
     );

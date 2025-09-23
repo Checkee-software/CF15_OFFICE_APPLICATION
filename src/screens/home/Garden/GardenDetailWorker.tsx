@@ -235,7 +235,30 @@ const GardenWorker = () => {
                         />
                     </CollapsibleRow>
 
-                    <CollapsibleRow
+                    <View style={styles.row}>
+                        <Text style={styles.label}>Người quản lý</Text>
+                        <Text style={[styles.value]}>
+                            {(gardenDetail as any).manager}
+                        </Text>
+                    </View>
+
+                    <View style={styles.row}>
+                        <Text style={styles.label}>Đơn vị</Text>
+                        <Text style={[styles.value]}>
+                            {(gardenDetail as any).unit || 'Không xác định'}
+                        </Text>
+                    </View>
+
+                    <View style={styles.row}>
+                        <Text style={styles.label}>
+                            Diện tích giao khoán (ha)
+                        </Text>
+                        <Text style={[styles.value]}>
+                            {gardenDetail.management?.area?.totalSquare}
+                        </Text>
+                    </View>
+
+                    {/* <CollapsibleRow
                         label='Người quản lý'
                         value={(gardenDetail as any).manager}
                         expanded={showInfo}
@@ -263,7 +286,7 @@ const GardenWorker = () => {
                                 {gardenDetail.management?.area?.totalSquare}
                             </Text>
                         </View>
-                    </CollapsibleRow>
+                    </CollapsibleRow> */}
                 </Section>
 
                 <Section title='Thông tin cây trồng'>

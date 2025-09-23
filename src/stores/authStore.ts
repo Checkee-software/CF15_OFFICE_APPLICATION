@@ -1,20 +1,20 @@
-import { create } from "zustand";
-import axiosClient from "../utils/axiosClient";
-import Snackbar from "react-native-snackbar";
-import asyncStorageHelper from "../utils/localStorageHelper/index";
+import {create} from 'zustand';
+import axiosClient from '../utils/axiosClient';
+import Snackbar from 'react-native-snackbar';
+import asyncStorageHelper from '../utils/localStorageHelper/index';
 import {
     ILogin,
     IUpdatePassword,
-} from "../shared-types/form-data/UserFormData/UserFormData";
-import { EScheduleStatus } from "@/shared-types/Response/ScheduleResponse/ScheduleResponse";
-import UserType from "@/shared-types/common/UserType";
-import Address from "@/shared-types/common/Address";
-import { OneSignal } from "react-native-onesignal";
+} from '../shared-types/form-data/UserFormData/UserFormData';
+import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
+import UserType from '@/shared-types/common/UserType';
+import Address from '@/shared-types/common/Address';
+import {OneSignal} from 'react-native-onesignal';
 import {
     EOrganization,
     IFunction,
-} from "@/shared-types/common/Permissions/Permissions";
-import ENV from "@/config/ENV";
+} from '@/shared-types/common/Permissions/Permissions';
+import ENV from '@/config/ENV';
 
 type tasks = {
     compeleted: string;
@@ -53,6 +53,7 @@ type AuthStore = {
     isLogin: boolean;
     redirectData: string | null;
     redirectDataRequestSchedule: string | null;
+    otherRedirect: string | null;
     login: (userAccount: ILogin) => Promise<void>;
     autoLogin: () => Promise<void>;
     getScheduleCollection: () => Promise<
@@ -71,7 +72,7 @@ type AuthStore = {
 };
 
 const fixAvatarPath = (path: string) => {
-    const updatedPath = path.replace(/\\/g, "/");
+    const updatedPath = path.replace(/\\/g, '/');
     return updatedPath;
 };
 
@@ -81,12 +82,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     userPasswordUpdate: {} as IUpdatePassword,
     redirectData: null,
     redirectDataRequestSchedule: null,
+    otherRedirect: null,
     isLoading: false,
     isLogin: false,
 
     login: async (userAccount: ILogin) => {
         try {
-            set({ isLoading: true });
+            set({isLoading: true});
             const response = await axiosClient.post(
                 `${ENV.BACKEND_URL}/login/sign-in`,
                 userAccount,
@@ -97,7 +99,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     ...response.data.data,
                 };
 
-                OneSignal.User.addAlias("userId", userData._id);
+                OneSignal.User.addAlias('userId', userData._id);
 
                 if (response.data.data.avatar) {
                     userData.avatar = `${ENV.BACKEND_URL}${fixAvatarPath(
@@ -106,7 +108,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                             : response.data.data.avatar,
                     )}`;
                 } else {
-                    userData.avatar = "";
+                    userData.avatar = '';
                 }
 
                 if (
@@ -141,9 +143,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 set({isLoading: false});
                 set({userInfo: userData, isLogin: true});
             }
-            set({ isLoading: false });
+            set({isLoading: false});
         } catch (error: any) {
-            set({ isLoading: false });
+            set({isLoading: false});
 
             const _error = error;
 
@@ -155,7 +157,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -164,25 +166,25 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     },
 
     updatePassword: async (userPasswordUpdate: IUpdatePassword) => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response = await axiosClient.patch(
                 `${ENV.BACKEND_URL}/resources/update-password`,
                 userPasswordUpdate,
             );
 
-            set({ isLoading: false });
+            set({isLoading: false});
 
             return response.data.data;
         } catch (error: any) {
-            set({ isLoading: false });
+            set({isLoading: false});
 
             const _error = error;
 
             setTimeout(() => {
                 if (_error.response.status === 404) {
                     Snackbar.show({
-                        text: "Mật khẩu hiện tại không đúng! Hãy kiểm tra lại.",
+                        text: 'Mật khẩu hiện tại không đúng! Hãy kiểm tra lại.',
                         //dòng dưới dùng khi api sửa lại đúng lỗi (hiện tại là Không tìm thấy người dùng!)
                         //text: _error.response.data,
                         duration: Snackbar.LENGTH_LONG,
@@ -191,7 +193,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -218,7 +220,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                             : response.data.data.avatar,
                     )}`;
                 } else {
-                    userData.avatar = "";
+                    userData.avatar = '';
                 }
 
                 if (
@@ -248,7 +250,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     userData.groupName = findGroupName.name;
                 }
 
-                set({ userInfo: userData, isLogin: true });
+                set({userInfo: userData, isLogin: true});
             }
         } catch (error: any) {
             const _error = error;
@@ -261,7 +263,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -302,12 +304,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     setRedirectData: (type: string, data: string) =>
         set(
-            type === "schdule"
-                ? { redirectData: data }
-                : { redirectDataRequestSchedule: data },
+            type === 'schdule'
+                ? {redirectData: data}
+                : type === 'request'
+                ? {redirectDataRequestSchedule: data}
+                : {otherRedirect: type},
         ),
     clearRedirectData: () =>
-        set({ redirectData: null, redirectDataRequestSchedule: null }),
+        set({
+            redirectData: null,
+            redirectDataRequestSchedule: null,
+            otherRedirect: null,
+        }),
 
     logout: async () => {
         await asyncStorageHelper.clearToken();
@@ -319,6 +327,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             OneSignal.User.pushSubscription.optOut();
             OneSignal.logout();
         }
-        set({ userInfo: undefined, isLogin: false });
+        set({userInfo: undefined, isLogin: false});
     },
 }));

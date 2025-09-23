@@ -45,14 +45,14 @@ const HarvestHistory = () => {
                         <Text style={styles.emptyText}>Không có lịch sử thu hoạch</Text>
                     </View>
                 ) : (
-                    harvestHistory.map((item, index) => (
+                    (harvestHistory as any[]).map((item, index) => (
                         <View
                             key={index}
                             style={[
                                 styles.card,
                                 {
                                     borderColor:
-                                        STATUS_COLORS[item.status] || '#000',
+                                        (STATUS_COLORS as any)[item.status] || '#000',
                                 },
                             ]}>
                             <View style={styles.headerRow}>
@@ -62,7 +62,7 @@ const HarvestHistory = () => {
                                         styles.statusText,
                                         {
                                             color:
-                                                STATUS_COLORS[item.status] ||
+                                                (STATUS_COLORS as any)[item.status] ||
                                                 '#000',
                                         },
                                     ]}>
@@ -93,7 +93,7 @@ const HarvestHistory = () => {
                                             styles.valueRed,
                                             styles.reasonText,
                                         ]}>
-                                        {item.verifierName}
+                                        {item.message}
                                     </Text>
                                 </View>
                             )}
@@ -107,7 +107,7 @@ const HarvestHistory = () => {
                                 </Text>
                             </View>
                             <View style={styles.row}>
-                                <Text style={styles.label}>Khối lượng KG</Text>
+                                <Text style={styles.label}>Khối lượng (KG)</Text>
                                 <Text style={styles.value}>{item.amount}</Text>
                             </View>
                         </View>

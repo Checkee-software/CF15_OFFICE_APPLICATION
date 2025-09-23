@@ -1,10 +1,12 @@
-import { create } from "zustand";
-import axiosClient from "../utils/axiosClient";
-import Snackbar from "react-native-snackbar";
-import { IRateReportHarvest } from "@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData";
-import { EStatus } from "@/shared-types/Response/ScheduleRequestResponse/ScheduleRequestResponse";
-import ENV from "@/config/ENV";
-import { IMaterialsByStaff } from "@/shared-types/Response/ScheduleResponse/ScheduleResponse";
+import {create} from 'zustand';
+import axiosClient from '../utils/axiosClient';
+import Snackbar from 'react-native-snackbar';
+import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
+import {EStatus} from '@/shared-types/Response/ScheduleRequestResponse/ScheduleRequestResponse';
+import ENV from '@/config/ENV';
+import {IMaterialsByStaff} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
+import {EStatusData} from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
+import {EGardenData} from '@/shared-types/Response/GardenResponse/GardenResponse';
 
 type IGardenData = {
     _id: string;
@@ -25,6 +27,26 @@ type IGardenData = {
     firstRequested: boolean;
 };
 
+export type IGardenHarvest = {
+    amount: number;
+    createdAt: string;
+    currentLifeParent: number;
+    gardenCode: string;
+    gardenId: string;
+    gardenName: string;
+    harvestId: string;
+    message: string;
+    name: string;
+    status: EStatusData;
+    type: EGardenData;
+    updatedAt: string;
+    verifier: string;
+    _id: string;
+    ownerName: string;
+    productName: string;
+    productTypeName: string;
+};
+
 interface gardenWorkStore {
     isLoading: boolean;
     isLoadingCreate: boolean;
@@ -34,6 +56,8 @@ interface gardenWorkStore {
     listMaterialsBrowse: IMaterialsByStaff[];
     listMaterialsBrowseFilter: IMaterialsByStaff[];
     badgeMaterialsUnBrowse: number;
+    badgeHarvestsUnBrowse: number;
+    listHarvestsBrowse: IGardenHarvest[];
     getRequestDataGarden: () => Promise<any>;
     createRateReportHarvest: (
         harvestReportId: string,
@@ -44,10 +68,15 @@ interface gardenWorkStore {
     setBadgeUnBrowse: () => void;
     filterAddMaterialsByStatus: (status: string) => void;
     getRequestAddingMaterials: () => Promise<any>;
+    getRequestBrowseHarvest: () => Promise<any>;
     createAddingMaterials: (
         materialId: string,
         scheduleId: string,
         formRateReport: IRateReportHarvest,
+    ) => Promise<void | undefined>;
+    createBrowseHarvest: (
+        gardenId: string,
+        formBrowseHarvest: IRateReportHarvest,
     ) => Promise<void | undefined>;
 }
 
@@ -59,10 +88,12 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
     listGardenWorkBrowseFilter: [],
     listMaterialsBrowse: [],
     listMaterialsBrowseFilter: [],
+    listHarvestsBrowse: [],
     badgeMaterialsUnBrowse: 0,
+    badgeHarvestsUnBrowse: 0,
 
     getRequestDataGarden: async () => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response = await axiosClient.get<any>(
                 `${ENV.BACKEND_URL}/resources/schedule-requests/collection`,
@@ -75,7 +106,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                 for (let i = response.data.data.length - 1; i >= 0; i--) {
                     const item = response.data.data[i];
 
-                    if (item.status === "CONFIRMED") {
+                    if (item.status === 'CONFIRMED') {
                         const key = `${item.createdBy}-${item.childTaskId}`;
 
                         if (!map.has(key)) {
@@ -95,16 +126,16 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                 listGardenWorkBrowseFilter: filteredData || [],
                 badgeGardenWorkUnBrowse:
                     response.data.data.filter(
-                        (item: { status: any }) =>
+                        (item: {status: any}) =>
                             item.status === EStatus.REQUEST,
                     ).length || 0,
             });
 
-            set({ isLoading: false });
+            set({isLoading: false});
 
             return response.data.data;
         } catch (error: any) {
-            set({ isLoading: false });
+            set({isLoading: false});
 
             const _error = error;
 
@@ -116,7 +147,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -125,7 +156,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
     },
 
     getRequestAddingMaterials: async () => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response = await axiosClient.get<any>(
                 `${ENV.BACKEND_URL}/resources/schedules/list-request`,
@@ -136,16 +167,16 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                 listMaterialsBrowseFilter: response.data.data || [],
                 badgeMaterialsUnBrowse:
                     response.data.data.filter(
-                        (item: { status: any }) =>
+                        (item: {status: any}) =>
                             item.status === EStatus.REQUEST,
                     ).length || 0,
             });
 
-            set({ isLoading: false });
+            set({isLoading: false});
 
             return response.data.data;
         } catch (error: any) {
-            set({ isLoading: false });
+            set({isLoading: false});
 
             const _error = error;
 
@@ -157,7 +188,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -165,17 +196,55 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
         }
     },
 
-    filterAddMaterialsByStatus: (status) => {
-        set({ isLoadingCreate: true });
+    getRequestBrowseHarvest: async () => {
+        set({isLoading: true});
+        try {
+            const response = await axiosClient.get<any>(
+                `${ENV.BACKEND_URL}/resources/gardens/harvest/request-data`,
+            );
 
-        set((state) => ({
+            console.log(response);
+
+            set({
+                listHarvestsBrowse: response.data.data,
+                badgeHarvestsUnBrowse:
+                    response.data.data.filter(
+                        (item: {status: any}) =>
+                            item.status === EStatusData.NONE,
+                    ).length || 0,
+            });
+
+            return response.data.data;
+        } catch (error: any) {
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error?.response?.data) {
+                    Snackbar.show({
+                        text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                } else {
+                    Snackbar.show({
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    filterAddMaterialsByStatus: status => {
+        set({isLoadingCreate: true});
+
+        set(state => ({
             listMaterialsBrowseFilter: state.listMaterialsBrowse.filter(
-                (item) => item.status === status,
+                item => item.status === status,
             ),
         }));
 
         setTimeout(() => {
-            set({ isLoadingCreate: false });
+            set({isLoadingCreate: false});
         }, 1000);
     },
 
@@ -184,14 +253,14 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
         scheduleId: string,
         formRateReport: IRateReportHarvest,
     ) => {
-        set({ isLoadingCreate: true });
+        set({isLoadingCreate: true});
         try {
             const response = await axiosClient.post(
                 `${ENV.BACKEND_URL}/resources/schedules/confirm/${scheduleId}/${materialId}`,
                 formRateReport,
             );
 
-            set({ isLoadingCreate: false });
+            set({isLoadingCreate: false});
 
             if (response.data?.data) {
                 setTimeout(() => {
@@ -204,7 +273,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
 
             return response.data;
         } catch (error: any) {
-            set({ isLoadingCreate: false });
+            set({isLoadingCreate: false});
 
             const _error = error;
 
@@ -218,7 +287,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -230,27 +299,23 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
         harvestReportId: string,
         formRateReport: IRateReportHarvest,
     ) => {
-        set({ isLoadingCreate: true });
+        set({isLoadingCreate: true});
         try {
             const response = await axiosClient.post(
                 `${ENV.BACKEND_URL}/resources/schedule-requests/verify/${harvestReportId}`,
                 formRateReport,
             );
 
-            set({ isLoadingCreate: false });
+            set({isLoadingCreate: false});
 
-            if (response.data?.data) {
-                setTimeout(() => {
-                    Snackbar.show({
-                        text: `${response.data.message}`,
-                        duration: Snackbar.LENGTH_LONG,
-                    });
-                }, 500);
-            }
+            Snackbar.show({
+                text: `${response.data.message}`,
+                duration: Snackbar.LENGTH_LONG,
+            });
 
             return response.data;
         } catch (error: any) {
-            set({ isLoadingCreate: false });
+            set({isLoadingCreate: false});
 
             const _error = error;
 
@@ -264,7 +329,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -272,9 +337,45 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
         }
     },
 
-    filterByStatus: (status) => {
-        const { listGardenWorkBrowse } = get();
-        set({ isLoadingCreate: true });
+    createBrowseHarvest: async (
+        gardenId: string,
+        formBrowseHarvest: IRateReportHarvest,
+    ) => {
+        try {
+            const response = await axiosClient.post(
+                `${ENV.BACKEND_URL}/resources/gardens/harvest/rate-report/${gardenId}`,
+                formBrowseHarvest,
+            );
+
+            if (response.data?.data) {
+                Snackbar.show({
+                    text: `${response.data.message}`,
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            }
+
+            return response.data;
+        } catch (error: any) {
+            const _error = error;
+            console.log(_error);
+
+            if (_error?.response?.data) {
+                Snackbar.show({
+                    text: _error.response.data,
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            } else {
+                Snackbar.show({
+                    text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+            }
+        }
+    },
+
+    filterByStatus: status => {
+        const {listGardenWorkBrowse} = get();
+        set({isLoadingCreate: true});
 
         // sử dụng setTimeout để fake async (nếu data quá dài filter có thể bị delay)
         if (status !== EStatus.REQUEST) {
@@ -290,7 +391,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                 groupMap.get(key).push(index);
             });
 
-            groupMap.forEach((indexes) => {
+            groupMap.forEach(indexes => {
                 if (indexes.length > 1) {
                     dataFiltered[indexes[0]].firstRequested = true;
                 }
@@ -300,27 +401,27 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                 listGardenWorkBrowseFilter: dataFiltered,
             });
         } else {
-            set((state) => ({
+            set(state => ({
                 listGardenWorkBrowseFilter: state.listGardenWorkBrowse.filter(
-                    (item) => item.status === status,
+                    item => item.status === status,
                 ),
             }));
         }
 
         setTimeout(() => {
-            set({ isLoadingCreate: false });
+            set({isLoadingCreate: false});
         }, 1000);
     },
 
     setBadgeUnBrowse: () =>
-        set((state) => ({
+        set(state => ({
             badgeGardenWorkUnBrowse: state.listGardenWorkBrowse.filter(
-                (item) => item.status === EStatus.REQUEST,
+                item => item.status === EStatus.REQUEST,
             ).length,
         })),
 
     resetData: () =>
-        set((state) => ({
+        set(state => ({
             listGardenWorkBrowseFilter: state.listGardenWorkBrowse,
         })),
 }));

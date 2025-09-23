@@ -1,15 +1,15 @@
-import { create } from "zustand";
-import axiosClient from "../utils/axiosClient";
-import Snackbar from "react-native-snackbar";
-import { ISchedule } from "../shared-types/Response/ScheduleResponse/ScheduleResponse";
+import {create} from 'zustand';
+import axiosClient from '../utils/axiosClient';
+import Snackbar from 'react-native-snackbar';
+import {ISchedule} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {
     IRequest,
     IRequestMaterial,
-} from "@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData";
-import ENV from "@/config/ENV";
-import { IProductType } from "@/shared-types/Response/ProductTypeResponse/ProductTypeResponse";
-import moment from "moment";
-import asyncStorageHelper from "../utils/localStorageHelper/index";
+} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
+import ENV from '@/config/ENV';
+import {IProductType} from '@/shared-types/Response/ProductTypeResponse/ProductTypeResponse';
+import moment from 'moment';
+import asyncStorageHelper from '../utils/localStorageHelper/index';
 
 interface IList {
     _id: string;
@@ -56,18 +56,18 @@ interface workScheduleStore {
     requestPersonalTask: (
         scheduleId: string,
         childTaskId: string,
-        data: Omit<IRequest, "scheduleId" | "childTaskId">,
+        data: Omit<IRequest, 'scheduleId' | 'childTaskId'>,
     ) => Promise<void>;
     requestAdditionalMaterial: (
         scheduleId: string,
-        data: Omit<IRequestMaterial, "scheduleId">,
+        data: Omit<IRequestMaterial, 'scheduleId'>,
     ) => Promise<void>;
     getProductType: () => Promise<void>;
     getProduct: () => Promise<void>;
 }
 
 const fixAvatarPath = (path: string) => {
-    const updatedPath = path.replace(/\\/g, "/");
+    const updatedPath = path.replace(/\\/g, '/');
     return `${ENV.BACKEND_URL}${updatedPath}`;
 };
 
@@ -81,7 +81,7 @@ const filterStaffByUserId = (data: any, userId: string) => {
     };
 };
 
-export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
+export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     isLoading: false,
     isLoadingGet: false,
     listWorkSchedule: [],
@@ -95,56 +95,59 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
     requestPersonalTask: async (
         scheduleId: string,
         childTaskId: string,
-        data: Omit<IRequest, "scheduleId" | "childTaskId">,
+        data: Omit<IRequest, 'scheduleId' | 'childTaskId'>,
     ) => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             await axiosClient.post(
                 `${ENV.BACKEND_URL}/resources/schedule-requests/request/${scheduleId}/${childTaskId}`,
                 data,
             );
             Snackbar.show({
-                text: "Gửi yêu cầu thành công!",
+                text: 'Gửi yêu cầu thành công!',
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
-            console.error("❌ Error sending request:", error);
+            console.error('❌ Error sending request:', error);
+            console.log(error.response);
             Snackbar.show({
-                text: "Gửi yêu cầu thất bại!",
+                text: error.response.data
+                    ? error.response.data
+                    : 'Gửi yêu cầu thất bại!',
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
-            set({ isLoading: false });
+            set({isLoading: false});
         }
     },
 
     requestAdditionalMaterial: async (scheduleId, data) => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             await axiosClient.post(
                 `${ENV.BACKEND_URL}/resources/schedules/request/${scheduleId}`,
                 data,
             );
             Snackbar.show({
-                text: "Gửi yêu cầu cung ứng vật tư thành công!",
+                text: 'Gửi yêu cầu cung ứng vật tư thành công!',
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
             console.error(
-                "❌ Error sending additional material request:",
+                '❌ Error sending additional material request:',
                 error,
             );
             Snackbar.show({
-                text: "Gửi yêu cầu cung ứng vật tư thất bại!",
+                text: 'Gửi yêu cầu cung ứng vật tư thất bại!',
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
-            set({ isLoading: false });
+            set({isLoading: false});
         }
     },
 
     getDetailWorkSchedule: async (id: string, userId: string) => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/schedules/detail-with-schedule/${id}`,
@@ -171,12 +174,12 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
                     filteredData.childTasks.forEach((task: any) => {
                         task.staff.forEach((staff: any) => {
                             const userGarden = userGardenNickname.find(
-                                (u) => u.userId === staff.userId,
+                                u => u.userId === staff.userId,
                             );
 
                             staff.gardens = staff.gardens.map((garden: any) => {
                                 const nickName = userGarden?.garden?.find(
-                                    (g) => g.gardenId === garden.gardenId,
+                                    g => g.gardenId === garden.gardenId,
                                 )?.gardenNickname;
                                 return {
                                     ...garden,
@@ -189,40 +192,40 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
                     });
                 }
 
-                set({ detailWorkSchedule: filteredData });
+                set({detailWorkSchedule: filteredData});
             } else {
-                set({ detailWorkSchedule: null });
+                set({detailWorkSchedule: null});
             }
         } catch (error: any) {
             Snackbar.show({
-                text: "Không thể tải chi tiết công việc",
+                text: 'Không thể tải chi tiết công việc',
                 duration: Snackbar.LENGTH_LONG,
             });
-            set({ detailWorkSchedule: null });
+            set({detailWorkSchedule: null});
         } finally {
-            set({ isLoading: false });
+            set({isLoading: false});
         }
     },
 
     getListJobs: async () => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/schedules/jobs`,
             );
 
             if (response?.data?.data) {
-                set({ listJobs: response.data.data });
+                set({listJobs: response.data.data});
             } else {
-                set({ listJobs: [] });
+                set({listJobs: []});
             }
         } catch (error: any) {
             Snackbar.show({
-                text: "Không thể tải danh sách công việc khu vườn",
+                text: 'Không thể tải danh sách công việc khu vườn',
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
-            set({ isLoading: false });
+            set({isLoading: false});
         }
     },
 
@@ -232,16 +235,16 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
                 `${ENV.BACKEND_URL}/resources/product-types/selection`,
             );
 
-            set({ listProductType: response.data.data || [] });
+            set({listProductType: response.data.data || []});
         } catch (error: any) {
-            set({ isLoadingGet: false });
+            set({isLoadingGet: false});
 
             const _error = error;
 
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -255,14 +258,14 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
                 `${ENV.BACKEND_URL}/resources/products/selection`,
             );
 
-            set({ listProduct: response.data.data || [] });
+            set({listProduct: response.data.data || []});
         } catch (error: any) {
             const _error = error;
 
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -271,7 +274,7 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
     },
 
     getListWorkSchedule: async () => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/schedules/collection`,
@@ -281,10 +284,10 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
                 const convertedTime = response.data.data.map((item: any) => ({
                     ...item,
                     startedDateVN: moment(item.startedDate).format(
-                        "DD/MM/YYYY",
+                        'DD/MM/YYYY',
                     ),
                     finishedDateVN: moment(item.finishedDate).format(
-                        "DD/MM/YYYY",
+                        'DD/MM/YYYY',
                     ),
                 }));
 
@@ -299,16 +302,16 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
                 });
             }
 
-            set({ isLoading: false });
+            set({isLoading: false});
         } catch (error: any) {
-            set({ isLoading: false });
+            set({isLoading: false});
 
             const _error = error;
 
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -317,14 +320,14 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
     },
 
     getScheduleDetail: async (id: string) => {
-        set({ isLoadingGet: true });
+        set({isLoadingGet: true});
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/schedules/detail/${id}`,
             );
 
             if (response.data.data) {
-                const dataDetailSchedule = { ...response.data.data };
+                const dataDetailSchedule = {...response.data.data};
                 if (dataDetailSchedule.employees?.length) {
                     dataDetailSchedule.employees =
                         dataDetailSchedule.employees.map((employees: any) => {
@@ -347,17 +350,17 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
             }
 
             setTimeout(() => {
-                set({ isLoadingGet: false });
+                set({isLoadingGet: false});
             }, 200);
         } catch (error: any) {
-            set({ isLoadingGet: false });
+            set({isLoadingGet: false});
 
             const _error = error;
 
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
+                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -365,23 +368,23 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
         }
     },
 
-    filterByStatus: (status) =>
-        set((state) => ({
+    filterByStatus: status =>
+        set(state => ({
             listWorkScheduleFilter: state.listWorkSchedule.filter(
-                (task) => task.status === status,
+                task => task.status === status,
             ),
         })),
     filterWorkSchedule: (fromDate, toDate, productTypeId, productId) =>
-        set((state) => {
+        set(state => {
             const parseDate = (dateStr: string) => {
-                const [day, month, year] = dateStr.split("/").map(Number);
+                const [day, month, year] = dateStr.split('/').map(Number);
                 return new Date(year, month - 1, day);
             };
 
             const from = parseDate(fromDate);
             const to = parseDate(toDate);
 
-            const filtered = state.listWorkSchedule.filter((item) => {
+            const filtered = state.listWorkSchedule.filter(item => {
                 const itemStart = parseDate(item.startedDateVN);
                 const itemEnd = parseDate(item.finishedDateVN);
 
@@ -402,5 +405,5 @@ export const useWorkScheduleStore = create<workScheduleStore>((set) => ({
         }),
 
     resetData: () =>
-        set((state) => ({ listWorkScheduleFilter: state.listWorkSchedule })),
+        set(state => ({listWorkScheduleFilter: state.listWorkSchedule})),
 }));
