@@ -118,7 +118,7 @@ export default function Profile({navigation}: any) {
                                     EOrganization.WORKER
                                         ? renderInfoRow(
                                               'Cấp đơn vị',
-                                              `${userInfo.departmentName}`,
+                                              `${userInfo.departmentName || "Chưa cập nhật"}`,
                                           )
                                         : null}
 
