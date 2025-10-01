@@ -27,7 +27,7 @@ export default function Profile({navigation}: any) {
 
     return (
         <View style={styles.wrapper}>
-            <ScrollView contentContainerStyle={styles.scrollViewStyle}>
+            <ScrollView contentContainerStyle={styles.scrollViewStyle} showsVerticalScrollIndicator={false}>
                 <View style={styles.container}>
                     <View style={styles.avatarWrapper}>
                         <Image

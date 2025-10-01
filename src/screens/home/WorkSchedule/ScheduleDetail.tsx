@@ -106,7 +106,24 @@ const ScheduleDetail = ({route}: any) => {
             0,
         );
 
-        return `${totalSquareProcessing} / ${totalSquare} ha`;
+        /* Number.EPSILON là một hằng số được dùng để tránh lỗi làm tròn số thực (số chứa số thập phân) trong máy tính */
+        const roundedProcessing = Math.round((totalSquareProcessing + Number.EPSILON) * 1000) / 1000;
+
+        const formattedProcessing =
+            roundedProcessing % 1 === 0
+                ? formatNumber(roundedProcessing) // số nguyên
+                : formatNumber(
+                      Number(roundedProcessing.toFixed(3)),
+                  ); // số thực
+
+        const formattedTotalSquare =
+            Number(totalSquare) % 1 === 0
+                ? formatNumber(totalSquare ?? 0) // số nguyên
+                : formatNumber(Number(Number(totalSquare ?? 0).toFixed(3))); // số thực
+
+
+        return `${formattedProcessing} / ${formattedTotalSquare} ha`;
+        // return `${roundedProcessing} / ${totalSquare} ha`;
     };
 
     const calculatePercent = (staff: any) => {
