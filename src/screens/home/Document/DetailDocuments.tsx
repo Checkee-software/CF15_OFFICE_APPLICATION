@@ -8,17 +8,16 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Feather from 'react-native-vector-icons/Feather';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment';
-import RNFS from 'react-native-fs';
-import Snackbar from 'react-native-snackbar';
-import Backdrop from '@/screens/subscreen/Loading/index2';
 import AutoHeightWebView from 'react-native-autoheight-webview';
 import ENV from '@/config/ENV';
 import {Dimensions} from 'react-native';
+import ModalPdfView from '../../../utils/Modals/ModalPdfView';
 
 const DetailDocuments = ({route}: any) => {
-    const [loadingDownload, setLoadingDownload] = useState(false);
+    const [showModalPdf, setShowModalPdf] = useState<boolean>(false);
+    const [selectedPdf, setSelectedPdf] = useState<string | null>(null);
 
     const fixEncoding = (input: string): string => {
         try {
@@ -72,53 +71,10 @@ const DetailDocuments = ({route}: any) => {
         }
     };
 
-    const fixFilePath = (path: string) => {
-        const updatedPath = path.replace(/\\/g, '/');
-        return `${ENV.BACKEND_URL}${updatedPath}`;
-    };
-
-    const downloadFile = async (fileUrl: string, fileName: string) => {
-        setLoadingDownload(true);
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const updatedFileUrl = fixFilePath(fileUrl);
-        try {
-            const downloadDest = `${RNFS.DownloadDirectoryPath}/${fileName}`;
-            const options = {
-                fromUrl: updatedFileUrl,
-                toFile: downloadDest,
-            };
-            const result = await RNFS.downloadFile(options).promise;
-            if (result.statusCode === 200) {
-                setLoadingDownload(false);
-
-                setTimeout(() => {
-                    Snackbar.show({
-                        text: 'Đã tải tập tin về điện thoại của bạn!',
-                        duration: Snackbar.LENGTH_LONG,
-                    });
-                }, 100);
-            } else {
-                setLoadingDownload(false);
-
-                setTimeout(() => {
-                    Snackbar.show({
-                        text: 'Tải tập tin không thành công!',
-                        duration: Snackbar.LENGTH_LONG,
-                    });
-                }, 100);
-            }
-        } catch (error) {
-            setLoadingDownload(false);
-
-            setTimeout(() => {
-                Snackbar.show({
-                    text: 'Đã có lỗi xảy ra khi tải tập tin!',
-                    duration: Snackbar.LENGTH_LONG,
-                });
-            }, 100);
-        }
+    const handleOpenPdf = (path: string) => {
+        const fixedPath = path.replace(/\\/g, '/');
+        setSelectedPdf(`${ENV.BACKEND_URL}${fixedPath}`);
+        setShowModalPdf(true);
     };
 
     const renderItemAttachedFiles = (itemAttachedFiles: AttachedFiles) => (
@@ -140,14 +96,9 @@ const DetailDocuments = ({route}: any) => {
             </View>
 
             <TouchableOpacity
-                onPress={() =>
-                    downloadFile(
-                        itemAttachedFiles.path,
-                        itemAttachedFiles.filename,
-                    )
-                }>
-                <Feather
-                    name='download'
+                onPress={() => handleOpenPdf(itemAttachedFiles.path)}>
+                <FontAwesome
+                    name='eye'
                     color={'rgba(33, 150, 243, 1)'}
                     size={22}
                 />
@@ -222,7 +173,12 @@ const DetailDocuments = ({route}: any) => {
                     )}
                 </View>
             </ScrollView>
-            <Backdrop open={loadingDownload} />
+
+            <ModalPdfView
+                visible={showModalPdf}
+                pdfFilePath={selectedPdf || ''}
+                onClose={() => setShowModalPdf(false)}
+            />
         </View>
     );
 };

@@ -7,8 +7,6 @@ import {
     StyleSheet,
     ScrollView,
     TouchableOpacity,
-    Modal,
-    ActivityIndicator,
     Dimensions,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
@@ -22,8 +20,8 @@ import Feather from 'react-native-vector-icons/Feather';
 import ENV from '@/config/ENV';
 import RNFS from 'react-native-fs';
 import Snackbar from 'react-native-snackbar';
-import WebView from 'react-native-webview';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import ModalPdfView from '../../../utils/Modals/ModalPdfView';
 
 const CollapsibleRow = ({
     label,
@@ -62,8 +60,8 @@ const GardenWorker = () => {
     const code = route.params?.code;
 
     const [showLocationInfo, setShowLocationInfo] = React.useState(false);
-    const [showInfo, setShowInfo] = React.useState(false);
-    const [showForm, setShowForm] = React.useState(false);
+    //const [showInfo, setShowInfo] = React.useState(false);
+    const [showModalPdf, setShowModalPdf] = React.useState(false);
 
     const {gardenDetail, isLoading, harvestHistory} = useGardenStore();
 
@@ -141,7 +139,7 @@ const GardenWorker = () => {
             </View>
 
             <View style={styles.rightCardDocument}>
-                <TouchableOpacity onPress={() => setShowForm(true)}>
+                <TouchableOpacity onPress={() => setShowModalPdf(true)}>
                     <FontAwesome
                         name='eye'
                         color={'rgba(33, 150, 243, 1)'}
@@ -386,26 +384,11 @@ const GardenWorker = () => {
                 {gardenDetail.note && <Text>{gardenDetail.note}</Text>}
             </ScrollView>
 
-            <Modal visible={showForm} animationType='fade'>
-                <View style={styles.modalContent}>
-                    <TouchableOpacity
-                        style={styles.button2}
-                        onPress={() => setShowForm(false)}>
-                        <Text style={styles.buttonText2}>Đóng</Text>
-                    </TouchableOpacity>
-
-                    <WebView
-                        style={{flex: 1}}
-                        source={{
-                            uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
-                                pdfFilePath,
-                            )}`,
-                        }}
-                        contentMode='mobile'
-                        startInLoadingState
-                    />
-                </View>
-            </Modal>
+            <ModalPdfView
+                visible={showModalPdf}
+                pdfFilePath={pdfFilePath}
+                onClose={() => setShowModalPdf(false)}
+            />
         </>
     );
 };

@@ -8,23 +8,20 @@ import {
     ScrollView,
     TouchableOpacity,
     FlatList,
-    Modal,
     Dimensions,
-    ActivityIndicator,
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import QRCode from 'react-native-qrcode-svg';
 import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useAuthStore} from '../../../stores/authStore';
 import ENV from '@/config/ENV';
 import RNFS from 'react-native-fs';
 import Snackbar from 'react-native-snackbar';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {WebView} from 'react-native-webview';
+import ModalPdfView from '../../../utils/Modals/ModalPdfView';
 
 const CollapsibleRow = ({
     label,
@@ -59,12 +56,11 @@ const CollapsibleRow = ({
 
 const GardenDetailScreen = () => {
     const [isHarvesting, setIsHarvesting] = useState(false);
-    const {userInfo} = useAuthStore();
     const route = useRoute<any>();
     const id = route.params?.id;
     const [showLocationInfo, setShowLocationInfo] = React.useState(false);
     const [showInfo, setShowInfo] = React.useState(false);
-    const [showForm, setShowForm] = React.useState(false);
+    const [showModalPdf, setShowModalPdf] = React.useState(false);
 
     const {selectedGarden, fetchGardenDetail, isLoading} = useGardenStore();
 
@@ -143,7 +139,7 @@ const GardenDetailScreen = () => {
             </View>
 
             <View style={styles.rightCardDocument}>
-                <TouchableOpacity onPress={() => setShowForm(true)}>
+                <TouchableOpacity onPress={() => setShowModalPdf(true)}>
                     <FontAwesome
                         name='eye'
                         color={'rgba(33, 150, 243, 1)'}
@@ -367,26 +363,11 @@ const GardenDetailScreen = () => {
                 {selectedGarden.note && <Text>{selectedGarden.note}</Text>}
             </ScrollView>
 
-            <Modal visible={showForm} animationType='fade'>
-                <View style={styles.modalContent}>
-                    <TouchableOpacity
-                        style={styles.button2}
-                        onPress={() => setShowForm(false)}>
-                        <Text style={styles.buttonText2}>Đóng</Text>
-                    </TouchableOpacity>
-
-                    <WebView
-                        style={{flex: 1}}
-                        source={{
-                            uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
-                                pdfFilePath,
-                            )}`,
-                        }}
-                        contentMode='mobile'
-                        startInLoadingState
-                    />
-                </View>
-            </Modal>
+            <ModalPdfView
+                visible={showModalPdf}
+                pdfFilePath={pdfFilePath}
+                onClose={() => setShowModalPdf(false)}
+            />
         </>
     );
 };
