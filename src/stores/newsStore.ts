@@ -37,8 +37,13 @@ const useNewsStore = create<NewsState>((set) => ({
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/news/collection`,
             );
-            const newsData = res.data?.data || [];
+            let newsData: NewsItem[] = res.data?.data || [];
+
+            newsData = [...newsData].reverse();
+
             set({ news: newsData });
+            console.log(res)
+            console.log(newsData)
         } catch (error: any) {
             console.log(
                 "FETCH_NEWS_ERROR:",
