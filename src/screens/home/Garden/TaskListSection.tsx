@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import React, {useState} from 'react';
+import {Text, TextInput, View} from 'react-native';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 import Snackbar from 'react-native-snackbar';
 
@@ -54,8 +54,8 @@ const TaskListSection = ({
         if (text.includes('-') || text.includes(' ')) {
             return;
         }
-        //tối đa 2 số sau dấu chấm
-        const regex = /^\d*(\.\d{0,2})?$/;
+        //tối đa 3 số sau dấu chấm
+        const regex = /^\d*(\.\d{0,3})?$/;
         if (!regex.test(text.replace(',', '.'))) {
             return;
         }
@@ -72,10 +72,11 @@ const TaskListSection = ({
         const numericValue = parseFloat(normalizedText);
 
         const totalCurrentArea = numericValue + currentArea;
-
-        if (isNaN(numericValue) || totalCurrentArea <= gardenArea) {
+        const roundedTotal = parseFloat(totalCurrentArea.toFixed(3));
+        const roundedGarden = parseFloat(gardenArea.toFixed(3));
+        if (isNaN(numericValue) || roundedTotal <= roundedGarden) {
             handleInputChange(index, 'area', normalizedText);
-            setTempInputValues(prev => ({ ...prev, [index]: '' }));
+            setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
             setTempInputValues(prev => ({
                 ...prev,
@@ -92,18 +93,27 @@ const TaskListSection = ({
             <Text style={styles.sectionTitle}>
                 Báo cáo quy trình ({taskInputs.length})
             </Text>
-            <View style={{ gap: 12 }}>
+            <View style={{gap: 12}}>
                 {taskInputs.map((task, index) => {
                     const isCompleted = task.taskStatus === 'COMPELETED';
                     const isDisabled = isCompleted;
                     const currentInputValue =
                         tempInputValues[index] || task.area;
                     const areaValue = parseFloat(currentInputValue);
-                    const remainingArea = gardenArea - task.currentArea;
+                    const remainingArea =
+                        Math.round((gardenArea - task.currentArea) * 1000) /
+                        1000;
+                    const roundedGardenArea =
+                        Math.round(gardenArea * 1000) / 1000;
+                    const roundedTotal =
+                        Math.round((areaValue + processingRate) * 1000) / 1000;
+                    console.log('Rounded Total:', roundedTotal);
+                    console.log('Rounded Garden Area:', roundedGardenArea);
+                    console.log(roundedTotal >= roundedGardenArea);
                     const showWarning =
                         !isDisabled &&
                         !isNaN(areaValue) &&
-                        areaValue + processingRate > gardenArea;
+                        roundedTotal > roundedGardenArea;
 
                     return (
                         <CollapsibleTaskBlock
@@ -125,8 +135,8 @@ const TaskListSection = ({
                             )}
 
                             {!isCompleted &&
-                                gardenArea === task.currentArea &&
-                                gardenId !== '' ? (
+                            gardenArea === task.currentArea &&
+                            gardenId !== '' ? (
                                 <Text
                                     style={{
                                         color: 'red',
@@ -149,13 +159,13 @@ const TaskListSection = ({
                                 <>
                                     <Text style={styles.label}>
                                         Diện tích đã làm ({gardenAreaType}) {''}
-                                        <Text style={{ color: 'red' }}>*</Text>
+                                        <Text style={{color: 'red'}}>*</Text>
                                     </Text>
 
                                     <TextInput
                                         style={[
                                             styles.input,
-                                            showWarning && { borderColor: 'red' },
+                                            showWarning && {borderColor: 'red'},
                                         ]}
                                         keyboardType='numeric'
                                         placeholder='Nhập diện tích'
@@ -175,14 +185,15 @@ const TaskListSection = ({
                             )}
 
                             {showWarning && (
-                                <View style={{ gap: 0, marginBottom: 10 }}>
+                                <View style={{gap: 0, marginBottom: 10}}>
                                     <Text style={styles.warningText}>
                                         Diện tích không được vượt quá{' '}
                                         {gardenArea} {gardenAreaType}
                                     </Text>
 
                                     <Text style={styles.warningText}>
-                                        Diện tích còn lại cần hoàn thành: {remainingArea} {gardenAreaType}
+                                        Diện tích còn lại cần hoàn thành:{' '}
+                                        {remainingArea} {gardenAreaType}
                                     </Text>
 
                                     <Text style={styles.warningText}>
