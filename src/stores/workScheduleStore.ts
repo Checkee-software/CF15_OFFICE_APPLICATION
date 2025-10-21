@@ -108,7 +108,6 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
-            console.error('❌ Error sending request:', error);
             console.log(error.response);
             Snackbar.show({
                 text: error.response.data

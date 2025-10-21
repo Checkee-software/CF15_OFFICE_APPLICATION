@@ -94,7 +94,7 @@ const GardenDeclare = () => {
     useEffect(() => {
         console.log(detailWorkSchedule);
         if (detailWorkSchedule && !hasLogged.current) {
-            //console.log('📦 Chi tiết công việc:', detailWorkSchedule);
+            console.log('📦 Chi tiết công việc:', detailWorkSchedule);
             hasLogged.current = true;
         }
 
@@ -120,12 +120,11 @@ const GardenDeclare = () => {
                 const userInTask = task.staff?.find(
                     (s: any) => s.userId === userInfo?._id,
                 );
-
                 return {
                     taskId: task._id,
                     taskName: task.name,
                     area: '',
-                    currentArea: task.staff[0].processingRate,
+                    currentArea: selectedGarden.area,
                     taskStatus: userInTask?.status || task.status,
                 };
             });
@@ -144,11 +143,11 @@ const GardenDeclare = () => {
                     })),
                 );
 
-            //console.log(allMachinesWithTaskInfo);
+            console.log('1111', allMachinesWithTaskInfo);
 
             setAvailableMachines(allMachinesWithTaskInfo);
         }
-    }, [detailWorkSchedule, userInfo]);
+    }, [detailWorkSchedule, userInfo, selectedGarden]);
 
     const handleInputChange = (index: number, field: 'area', value: string) => {
         setTaskInputs(prev => {
@@ -226,11 +225,11 @@ const GardenDeclare = () => {
                     machineId: shift.processId,
                     type: EProcessesType.CA_MAY,
                 };
-                // console.log('📤 Gửi ca máy:', {
-                //     scheduleId: detailWorkSchedule._id,
-                //     taskId: matchingTask._id,
-                //     payload,
-                // });
+                console.log('📤 Gửi ca máy:', {
+                    scheduleId: detailWorkSchedule._id,
+                    taskId: matchingTask._id,
+                    payload,
+                });
 
                 if (matchingTask._id) {
                     await requestPersonalTask(
@@ -263,7 +262,7 @@ const GardenDeclare = () => {
         } finally {
             setTimeout(() => {
                 setLoading(false);
-            }, 700);
+            }, 2000);
         }
     };
 
@@ -316,7 +315,7 @@ const GardenDeclare = () => {
         } finally {
             setTimeout(() => {
                 setLoading(false);
-            }, 700);
+            }, 3000);
         }
     };
 

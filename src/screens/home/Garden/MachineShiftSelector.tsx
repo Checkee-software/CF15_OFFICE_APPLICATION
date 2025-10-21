@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, {useState, useMemo} from 'react';
+import {View, Text, StyleSheet, TextInput} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import CollapsibleTaskBlock from './CollapsibleTaskBlock';
 import Snackbar from 'react-native-snackbar';
 
@@ -63,7 +63,7 @@ interface MachineShiftInput {
     taskName: string;
     gardenAreaType: string;
     processId: string;
-    history?: { area: number }[];
+    history?: {area: number}[];
 }
 
 interface Props {
@@ -106,9 +106,9 @@ const MachineShiftSelector: React.FC<Props> = ({
         return machines.map(m => {
             const total = m.history
                 ? m.history.reduce(
-                    (sum: number, h: any) => sum + (h.area || 0),
-                    0,
-                )
+                      (sum: number, h: any) => sum + (h.area || 0),
+                      0,
+                  )
                 : 0;
             return total;
         });
@@ -128,7 +128,7 @@ const MachineShiftSelector: React.FC<Props> = ({
         if (text.startsWith('.') || text.startsWith(',')) return;
         if (text.includes('-') || text.includes(' ')) return;
 
-        const regex = /^\d*(\.\d{0,2})?$/;
+        const regex = /^\d*(\.\d{0,3})?$/;
         if (!regex.test(text.replace(',', '.'))) return;
 
         const currentText =
@@ -149,9 +149,9 @@ const MachineShiftSelector: React.FC<Props> = ({
 
         if (isNaN(numericValue) || totalArea <= gardenArea) {
             onChange(index, 'area', normalizedText);
-            setTempInputValues(prev => ({ ...prev, [index]: '' }));
+            setTempInputValues(prev => ({...prev, [index]: ''}));
         } else {
-            setTempInputValues(prev => ({ ...prev, [index]: normalizedText }));
+            setTempInputValues(prev => ({...prev, [index]: normalizedText}));
         }
     };
 
@@ -159,7 +159,7 @@ const MachineShiftSelector: React.FC<Props> = ({
         <View>
             <Text style={styles.sectionTitle}>Ca máy</Text>
 
-            <View style={{ gap: 12 }}>
+            <View style={{gap: 12}}>
                 {/* {debugMachines.map((shift, index) => { */}
                 {machines.map((shift, index) => {
                     console.log(shift);
@@ -169,7 +169,7 @@ const MachineShiftSelector: React.FC<Props> = ({
                         '';
                     const areaValue = parseFloat(currentInputValue);
                     const warnArea = Number(
-                        (gardenArea - historyAreas[index]).toFixed(2),
+                        (gardenArea - historyAreas[index]).toFixed(3),
                     );
                     const showWarning =
                         !isNaN(areaValue) &&
@@ -181,10 +181,10 @@ const MachineShiftSelector: React.FC<Props> = ({
                             title={shift.childTaskName}
                             backgroundColor='#FF98004D'>
                             {gardenId !== '' ? (
-                                <View style={{ gap: 8 }}>
+                                <View style={{gap: 8}}>
                                     <Text style={styles.label}>
                                         Loại ca máy{' '}
-                                        <Text style={{ color: 'red' }}>*</Text>
+                                        <Text style={{color: 'red'}}>*</Text>
                                     </Text>
                                     <View style={styles.pickerWrapper}>
                                         <Picker
@@ -217,7 +217,7 @@ const MachineShiftSelector: React.FC<Props> = ({
                                             <Text style={styles.label}>
                                                 Diện tích đã làm (
                                                 {gardenAreaType}){' '}
-                                                <Text style={{ color: 'red' }}>
+                                                <Text style={{color: 'red'}}>
                                                     *
                                                 </Text>
                                             </Text>
@@ -257,8 +257,12 @@ const MachineShiftSelector: React.FC<Props> = ({
                                                         vượt quá {gardenArea}{' '}
                                                         {gardenAreaType}
                                                     </Text>
-                                                    <Text style={styles.warningText}>
-                                                        Diện tích còn lại cần hoàn thành {warnArea}{' '}
+                                                    <Text
+                                                        style={
+                                                            styles.warningText
+                                                        }>
+                                                        Diện tích còn lại cần
+                                                        hoàn thành {warnArea}{' '}
                                                         {gardenAreaType}
                                                     </Text>
                                                     <Text

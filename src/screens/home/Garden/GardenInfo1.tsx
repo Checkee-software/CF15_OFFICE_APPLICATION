@@ -13,6 +13,7 @@ import {
 import {useRoute} from '@react-navigation/native';
 import QRCode from 'react-native-qrcode-svg';
 import useGardenStore from '../../../stores/gardenStore';
+import {useDocumentStore} from '@/stores/documentStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ENV from '@/config/ENV';
@@ -63,6 +64,7 @@ const GardenDetailScreen = () => {
     const [showModalPdf, setShowModalPdf] = React.useState(false);
 
     const {selectedGarden, fetchGardenDetail, isLoading} = useGardenStore();
+    const {downloadFile} = useDocumentStore();
 
     const fixEncoding = (input: string): string => {
         try {
@@ -92,32 +94,8 @@ const GardenDetailScreen = () => {
         }
     };
 
-    const downloadFile = async (fileUrl: string, fileName: string) => {
-        const updatedFileUrl = fixFilePath(fileUrl);
-        try {
-            const downloadDest = `${RNFS.DownloadDirectoryPath}/${fileName}`;
-            const options = {
-                fromUrl: updatedFileUrl,
-                toFile: downloadDest,
-            };
-            const result = await RNFS.downloadFile(options).promise;
-            if (result.statusCode === 200) {
-                Snackbar.show({
-                    text: 'Đã tải tập tin về điện thoại của bạn!',
-                    duration: Snackbar.LENGTH_LONG,
-                });
-            } else {
-                Snackbar.show({
-                    text: 'Tải file không thành công!',
-                    duration: Snackbar.LENGTH_LONG,
-                });
-            }
-        } catch (error) {
-            Snackbar.show({
-                text: 'Có lỗi xảy ra khi tải file.',
-                duration: Snackbar.LENGTH_LONG,
-            });
-        }
+    const handleDownloadFile = async (fileName: string) => {
+        await downloadFile(fileName);
     };
 
     const renderItemAttachedFiles = (itemAttachedFiles: any) => (
@@ -149,10 +127,7 @@ const GardenDetailScreen = () => {
 
                 <TouchableOpacity
                     onPress={() =>
-                        downloadFile(
-                            itemAttachedFiles.path,
-                            itemAttachedFiles.filename,
-                        )
+                        handleDownloadFile(itemAttachedFiles.filename)
                     }>
                     <Feather
                         name='download'

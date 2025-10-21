@@ -151,7 +151,8 @@ const WorkScreen = () => {
                                           0,
                                       ),
                                   )} ha)`
-                                : itemGardenWork.processingRate !== 0
+                                : //lan n gửi
+                                itemGardenWork.processingRate !== 0
                                 ? `(còn: ${formatNumber(
                                       Math.max(
                                           itemGardenWork.gardenSquare -
@@ -160,7 +161,8 @@ const WorkScreen = () => {
                                           0,
                                       ),
                                   )} ha)`
-                                : `(còn: ${formatNumber(
+                                : //lần đầu tiên gửi
+                                  `(còn: ${formatNumber(
                                       Math.max(
                                           itemGardenWork.gardenSquare -
                                               itemGardenWork.area,
@@ -467,6 +469,8 @@ const WorkScreen = () => {
     if (isLoading) {
         return <Loading />;
     }
+
+    console.log(listGardenWorkBrowseFilter);
 
     return (
         <View style={styles.container}>
