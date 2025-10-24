@@ -217,6 +217,13 @@ const BrowseHarvest = () => {
                         (KG)
                     </Text>
                 </View>
+
+                <View style={styles.warpLabelAndValue}>
+                    <Text style={styles.label}>Người duyệt</Text>
+                    <Text style={styles.value}>
+                        {itemGardenWork.verifierName || ''}
+                    </Text>
+                </View>
             </View>
 
             {itemGardenWork.status === EStatusData.NONE ? (
