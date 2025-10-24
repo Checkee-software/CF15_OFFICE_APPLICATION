@@ -1,5 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
 import {
     View,
@@ -8,6 +6,8 @@ import {
     TouchableOpacity,
     Image,
     TextInput,
+    Modal,
+    Pressable,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
@@ -15,18 +15,36 @@ import useGardenStore from '../../../stores/gardenStore';
 import Loading from '../../subscreen/Loading';
 import {IGarden} from '../../../stores/gardenStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icons from 'react-native-vector-icons/Ionicons';
 import {useAuthStore} from '../../../stores/authStore';
 import Snackbar from 'react-native-snackbar';
 import asyncStorageHelper from '../../../utils/localStorageHelper/index';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {Dropdown} from 'react-native-element-dropdown';
+import {useStatisticStore} from '@/stores/statisticStore';
+import {useWorkScheduleStore} from '@/stores/workScheduleStore';
 
 const GardenInfo = () => {
+    const [filterVisible, setFilterVisible] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState(null);
+    const [selectedPlant, setSelectedPlant] = useState(null);
+    const [selectedGarden, setSelectedGarden] = useState(null);
+    const {getListSelection, listSelection} = useStatisticStore();
+    const {getProductType, listProductType} = useWorkScheduleStore();
     const navigation = useNavigation() as any;
 
-    const {gardens, fetchGardens, isLoading, setGardenData, isLoading2} =
-        useGardenStore();
+    const {
+        gardens,
+        fetchGardens,
+        isLoading,
+        setGardenData,
+        isLoading2,
+        filterGarden,
+        plantsGarden,
+        getPlantGarden,
+    } = useGardenStore();
     const {userInfo} = useAuthStore();
 
     const [gardenNameInput, setGardenNameInput] = useState({_id: '', name: ''});
@@ -37,6 +55,38 @@ const GardenInfo = () => {
 
     const [searchText, setSearchText] = useState('');
     const [filteredGardens, setFilteredGardens] = useState<IGarden[]>([]);
+
+    const [filters, setFilters] = useState({
+        teamId: undefined,
+        productTypeId: undefined,
+        productId: undefined,
+    });
+
+    const teams = [
+        {label: 'Tất cả Đội sản xuất', value: 'all'},
+        ...(listSelection
+            ?.filter((item: any) => item._id !== '')
+            .map((item: any) => ({
+                label: item?.name ?? 'Không tên',
+                value: item?._id,
+            })) || []),
+    ];
+
+    const plants = [
+        {label: 'Tất cả Cây trồng', value: 'all'},
+        ...(listProductType?.map((item: any) => ({
+            label: item?.name ?? 'Không tên',
+            value: item?._id,
+        })) || []),
+    ];
+
+    const gardensFilter = [
+        {label: 'Tất cả Khu vườn', value: 'all'},
+        ...(plantsGarden?.map((item: any) => ({
+            label: item?.name ?? 'Không tên',
+            value: item?._id,
+        })) || []),
+    ];
 
     const handleNavigate = (item: any) => {
         if (
@@ -119,26 +169,22 @@ const GardenInfo = () => {
     }, []);
 
     useEffect(() => {
-        const gardenList = gardens ?? [];
+        getListSelection('UNIT');
+        getProductType();
+    }, []);
 
-        if (searchText === '') {
-            setFilteredGardens(gardenList as IGarden[]);
-        } else {
-            const filtered = (gardenList as IGarden[]).filter(
-                (garden: IGarden) =>
-                    garden.name
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase()) ||
-                    garden.code
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase()) ||
-                    (garden.gardenNickname ?? '')
-                        .toLowerCase()
-                        .includes(searchText.toLowerCase()),
-            );
-            setFilteredGardens(filtered);
-        }
-    }, [searchText, gardens]);
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            filterGarden({
+                groupId: filters.teamId,
+                productTypeId: filters.productTypeId,
+                productId: filters.productId,
+                searchValue: searchText.trim(),
+            });
+        }, 400);
+
+        return () => clearTimeout(timeout);
+    }, [searchText, filters]);
 
     const renderItem = ({item}: {item: IGarden}) => (
         <TouchableOpacity
@@ -211,6 +257,8 @@ const GardenInfo = () => {
 
     if (isLoading) return <Loading />;
 
+    console.log(gardens);
+
     return (
         <View style={styles.container}>
             <View style={styles.searchContainer}>
@@ -221,15 +269,24 @@ const GardenInfo = () => {
                         color='#888'
                         style={styles.searchIcon}
                     />
+
                     <TextInput
                         style={styles.searchInput}
-                        placeholder='Tìm kiếm khu vườn'
+                        placeholder='Tìm kiếm khu vườn '
                         value={searchText}
                         onChangeText={setSearchText}
                         placeholderTextColor='#888'
                     />
                     {searchText.length > 0 && (
-                        <TouchableOpacity onPress={() => setSearchText('')}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                setSearchText('');
+                                filterGarden({
+                                    groupId: filters.teamId,
+                                    productTypeId: filters.productTypeId,
+                                    productId: filters.productId,
+                                });
+                            }}>
                             <Icon
                                 name='close'
                                 size={20}
@@ -239,10 +296,18 @@ const GardenInfo = () => {
                         </TouchableOpacity>
                     )}
                 </View>
+                <TouchableOpacity onPress={() => setFilterVisible(true)}>
+                    <Icons
+                        name='filter-outline'
+                        size={35}
+                        color='#888'
+                        style={styles.filterIcon}
+                    />
+                </TouchableOpacity>
             </View>
 
             <KeyboardAwareFlatList
-                data={filteredGardens}
+                data={gardens}
                 extraHeight={100}
                 renderItem={renderItem}
                 keyboardShouldPersistTaps='handled'
@@ -268,6 +333,134 @@ const GardenInfo = () => {
                     </View>
                 }
             />
+
+            <Modal
+                visible={filterVisible}
+                animationType='fade'
+                transparent
+                onRequestClose={() => setFilterVisible(false)}>
+                <Pressable
+                    style={styles.modalOverlay}
+                    onPress={() => setFilterVisible(false)}>
+                    <Pressable
+                        style={styles.modalContainer}
+                        onPress={e => e.stopPropagation()}>
+                        <Text style={styles.modalTitle}>Bộ lọc nâng cao</Text>
+
+                        {/* Đội sản xuất */}
+                        <View style={styles.dropdownBlock}>
+                            <Text style={styles.dropdownLabel}>
+                                Đội sản xuất
+                            </Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                data={teams}
+                                labelField='label'
+                                valueField='value'
+                                placeholder='Tất cả Đội sản xuất'
+                                value={selectedTeam}
+                                onChange={item => {
+                                    const newFilters = {
+                                        ...filters,
+                                        teamId:
+                                            item.value !== 'all'
+                                                ? item.value
+                                                : undefined,
+                                    };
+                                    setSelectedTeam(item.value);
+                                    setFilters(newFilters);
+                                    filterGarden({
+                                        groupId: newFilters.teamId,
+                                        productTypeId: newFilters.productTypeId,
+                                        productId: newFilters.productId,
+                                    });
+                                }}
+                            />
+                        </View>
+
+                        {/* Cây trồng */}
+                        <View style={styles.dropdownBlock}>
+                            <Text style={styles.dropdownLabel}>Cây trồng</Text>
+
+                            <Dropdown
+                                style={styles.dropdown}
+                                data={plants}
+                                labelField='label'
+                                valueField='value'
+                                placeholder='Tất cả Cây trồng'
+                                value={selectedPlant}
+                                onChange={item => {
+                                    const newFilters = {
+                                        ...filters,
+                                        productTypeId:
+                                            item.value !== 'all'
+                                                ? item.value
+                                                : undefined,
+                                    };
+                                    setSelectedPlant(item.value);
+                                    setFilters(newFilters);
+
+                                    if (item.value !== 'all') {
+                                        getPlantGarden(item.value);
+                                    }
+
+                                    filterGarden({
+                                        groupId: newFilters.teamId,
+                                        productTypeId: newFilters.productTypeId,
+                                        productId: newFilters.productId,
+                                    });
+                                }}
+                            />
+                        </View>
+
+                        {/* Khu vườn */}
+                        <View style={styles.dropdownBlock}>
+                            <Text style={styles.dropdownLabel}>Khu vườn</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                data={gardensFilter}
+                                labelField='label'
+                                valueField='value'
+                                placeholder='Tất cả Khu vườn'
+                                value={selectedGarden}
+                                onChange={item => {
+                                    const newFilters = {
+                                        ...filters,
+                                        productId:
+                                            item.value !== 'all'
+                                                ? item.value
+                                                : undefined,
+                                    };
+                                    setSelectedGarden(item.value);
+                                    setFilters(newFilters);
+
+                                    filterGarden({
+                                        groupId: newFilters.teamId,
+                                        productTypeId: newFilters.productTypeId,
+                                        productId: newFilters.productId,
+                                    });
+                                }}
+                            />
+                        </View>
+
+                        {/* Nút đặt lại */}
+                        <TouchableOpacity
+                            style={styles.resetButton}
+                            onPress={() => {
+                                setSelectedTeam(null);
+                                setSelectedPlant(null);
+                                setSelectedGarden(null);
+                                setFilters({
+                                    teamId: undefined,
+                                    productTypeId: undefined,
+                                    productId: undefined,
+                                });
+                            }}>
+                            <Text style={styles.resetText}>✕ ĐẶT LẠI</Text>
+                        </TouchableOpacity>
+                    </Pressable>
+                </Pressable>
+            </Modal>
 
             <Backdrop open={isLoading2} />
         </View>
@@ -307,13 +500,19 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 8,
         height: 40,
+        flex: 8.5,
     },
     searchIcon: {
         marginRight: 8,
     },
+    filterIcon: {
+        flex: 1.5,
+    },
     searchContainer: {
         paddingHorizontal: 16,
         marginBottom: 12,
+        flexDirection: 'row',
+        gap: 10,
     },
     searchInput: {
         flex: 1,
@@ -371,5 +570,61 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#888',
         marginTop: 4,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: '85%',
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 16,
+    },
+    modalTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        marginBottom: 16,
+        color: '#000',
+    },
+    dropdownBlock: {
+        marginBottom: 12,
+    },
+    dropdownLabel: {
+        fontSize: 16,
+        color: '#333',
+        marginBottom: 4,
+    },
+    dropdown: {
+        height: 42,
+        borderColor: '#ddd',
+        borderWidth: 1,
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        backgroundColor: '#fff',
+    },
+    resetButton: {
+        marginTop: 12,
+        borderWidth: 1,
+        borderColor: '#ff4e45',
+        backgroundColor: '#fff1f1',
+        borderRadius: 8,
+        paddingVertical: 10,
+        alignItems: 'center',
+    },
+    resetText: {
+        color: '#ff4e45',
+        fontWeight: '600',
+    },
+    closeArea: {
+        marginTop: 12,
+        alignItems: 'center',
+    },
+    closeText: {
+        color: '#2196F3',
+        fontWeight: '600',
+        fontSize: 14,
     },
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -6,15 +6,21 @@ import {
     Image,
     TouchableOpacity,
     ScrollView,
+    Animated,
+    Dimensions,
 } from 'react-native';
 import images from '../../../assets/images';
 import 'moment/locale/vi';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useAuthStore} from '../../../stores/authStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import useNotificationStore from '@/stores/notificationStore';
 
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
+    const [announcement, setAnnouncement] = useState('');
+    const [scrollX] = useState(new Animated.Value(0));
+    const screenWidth = Dimensions.get('window').width;
 
     //console.log(userInfo);
 
@@ -113,6 +119,33 @@ export default function Main({navigation}: any) {
             navigateTo: SCREEN_INFO.NEWS.key,
         },
     ];
+
+    const {notification, fetchActiveNotification} = useNotificationStore();
+
+    useEffect(() => {
+        // Gọi API lấy thông báo active
+        fetchActiveNotification();
+    }, []);
+
+    useEffect(() => {
+        if (notification?.message) {
+            setAnnouncement(notification.message);
+
+            scrollX.setValue(screenWidth);
+            const animation = Animated.loop(
+                Animated.timing(scrollX, {
+                    toValue: -screenWidth * 1.5,
+                    duration: 10000,
+                    useNativeDriver: true,
+                }),
+            );
+            animation.start();
+
+            return () => animation.stop();
+        } else {
+            setAnnouncement('');
+        }
+    }, [notification]);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
@@ -276,7 +309,19 @@ export default function Main({navigation}: any) {
                         />
                     </TouchableOpacity>
                 </View>
-
+                {announcement ? (
+                    <View style={MainStyles.announcementContainer}>
+                        <Animated.Text
+                            style={[
+                                MainStyles.announcementText,
+                                {
+                                    transform: [{translateX: scrollX}],
+                                },
+                            ]}>
+                            {announcement}
+                        </Animated.Text>
+                    </View>
+                ) : null}
                 <View style={MainStyles.mainMenu}>
                     <View style={MainStyles.warpMenuButton}>
                         {menuList.map(item => (
@@ -374,5 +419,19 @@ const MainStyles = StyleSheet.create({
         fontSize: 12,
         flexShrink: 1,
         textAlign: 'center',
+    },
+    announcementContainer: {
+        backgroundColor: 'red',
+        borderRadius: 8,
+        paddingVertical: 10,
+        overflow: 'hidden',
+        marginVertical: 6,
+    },
+    announcementText: {
+        color: 'yellow',
+        fontWeight: '600',
+        fontSize: 18,
+        paddingHorizontal: 10,
+        width: '200%',
     },
 });
