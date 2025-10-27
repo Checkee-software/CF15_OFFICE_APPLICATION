@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     ScrollView,
     Modal,
+    ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
@@ -16,30 +17,54 @@ import moment from 'moment';
 import images from '../../../assets/images';
 import {OneSignal} from 'react-native-onesignal';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 export default function Profile({navigation}: any) {
-    const {userInfo, logout} = useAuthStore();
+    const {userInfo, logout, updateAvatar} = useAuthStore();
     const {resetStateWhenLogout} = useWorkerStore();
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const [showAccountInfo, setShowAccountInfo] = useState(false);
 
+    const [isUploading, setIsUploading] = useState(false);
+
+    const handleSelectAvatar = async () => {
+        const result = await launchImageLibrary({
+            mediaType: 'photo',
+            quality: 0.8,
+        });
+
+        if (result.didCancel) return;
+
+        const uri = result.assets?.[0]?.uri;
+        if (uri && userInfo._id) {
+            setIsUploading(true);
+            await updateAvatar(userInfo._id, uri);
+            setIsUploading(false);
+        }
+    };
+
     return (
         <View style={styles.wrapper}>
-            <ScrollView contentContainerStyle={styles.scrollViewStyle} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={styles.scrollViewStyle}
+                showsVerticalScrollIndicator={false}>
                 <View style={styles.container}>
                     <View style={styles.avatarWrapper}>
-                        <Image
-                            source={
-                                userInfo.avatar
-                                    ? {
-                                          uri: userInfo.avatar,
-                                      }
-                                    : images.avatar
-                            }
-                            style={styles.avatar}
-                        />
+                        <TouchableOpacity onPress={handleSelectAvatar}>
+                            <Image
+                                source={
+                                    userInfo.avatar
+                                        ? {uri: userInfo.avatar}
+                                        : images.avatar
+                                }
+                                style={styles.avatar}
+                            />
+                            <View style={styles.cameraIcon}>
+                                <Icon name='camera' size={18} color='#4CAF50' />
+                            </View>
+                        </TouchableOpacity>
                     </View>
 
                     <Text style={styles.name}>{userInfo.fullName}</Text>
@@ -227,6 +252,14 @@ export default function Profile({navigation}: any) {
                     </View>
                 </View>
             </Modal>
+            {isUploading && (
+                <View style={styles.loadingOverlay}>
+                    <ActivityIndicator size='large' color='#fff' />
+                    <Text style={styles.loadingText}>
+                        Đang cập nhật ảnh đại diện...
+                    </Text>
+                </View>
+            )}
         </View>
     );
 }
@@ -474,5 +507,29 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#E53935',
         fontWeight: 'bold',
+    },
+    cameraIcon: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 6,
+    },
+    loadingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 99,
+    },
+    loadingText: {
+        color: '#fff',
+        marginTop: 10,
+        fontSize: 16,
     },
 });
