@@ -42,9 +42,9 @@ export default function Login({navigation}: any) {
     const [isLicenseLoading, setIsLicenseLoading] = useState<boolean>(false);
     const [license, setLicense] = useState<string>('');
     const [userAccount, setUserAccount] = useState({
-        username: 'd2lehoaison', //cf15office lamphucf15
+        username: 'd9phamtiendung', //cf15office lamphucf15
         phoneNumber: '',
-        password: 'Aa@123456', //CF15@FFICE2025 123456789A@
+        password: '00000000', //CF15@FFICE2025 123456789A@
     });
 
     // useEffect(() => {

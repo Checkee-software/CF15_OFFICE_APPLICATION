@@ -63,6 +63,7 @@ type GardenState = {
         productId?: string;
         searchValue?: string;
         productTypeId?: string;
+        userId?: string;
     }) => Promise<void>;
     plantsGarden: {_id: string; name: string}[];
     getPlantGarden: (typeId: string) => Promise<void>;
@@ -271,11 +272,13 @@ const useGardenStore = create<GardenState>(set => ({
         productId,
         searchValue = '',
         productTypeId,
+        userId,
     }: {
         productId?: string;
         groupId?: string;
         searchValue?: string;
         productTypeId?: string;
+        userId?: string;
     }) => {
         try {
             const queryParams = new URLSearchParams();
@@ -293,13 +296,37 @@ const useGardenStore = create<GardenState>(set => ({
             console.log(res);
 
             if (res.data?.data?.length > 0) {
-                set({gardens: res.data.data});
+                const userGardenNickname =
+                    asyncStorageHelper.userGardenNickname;
+
+                const user = userGardenNickname.find(u => u.userId === userId);
+
+                const newGardenNickname = res.data.data?.map((item: any) => {
+                    let gardenNickname = '';
+
+                    if (user) {
+                        const matchedGarden = user.garden.find(
+                            g => g.gardenId === item._id,
+                        );
+                        if (matchedGarden) {
+                            gardenNickname = matchedGarden.gardenNickname;
+                        }
+                    }
+
+                    // Trả về object gốc + thêm gardenNickname
+                    return {
+                        ...item,
+                        gardenNickname,
+                    };
+                });
+
+                set({gardens: newGardenNickname});
             } else {
                 set({gardens: []});
-                Snackbar.show({
-                    text: 'Không tìm thấy khu vườn phù hợp',
-                    duration: Snackbar.LENGTH_SHORT,
-                });
+                // Snackbar.show({
+                //     text: 'Không tìm thấy khu vườn phù hợp',
+                //     duration: Snackbar.LENGTH_SHORT,
+                // });
             }
         } catch (error: any) {
             Snackbar.show({

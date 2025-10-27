@@ -180,6 +180,7 @@ const GardenInfo = () => {
                 productTypeId: filters.productTypeId,
                 productId: filters.productId,
                 searchValue: searchText.trim(),
+                userId: userInfo._id,
             });
         }, 400);
 
