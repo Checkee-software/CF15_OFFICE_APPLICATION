@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -9,17 +9,19 @@ import {
     TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import useGardenStore from '../../../../stores/gardenStore';
-import { useAuthStore } from '../../../../stores/authStore';
+import {useAuthStore} from '../../../../stores/authStore';
 import SCREEN_INFO from '../../../../config/SCREEN_CONFIG/screenInfo';
+import Loading from '@/screens/subscreen/Loading';
 
 const HarvestDetail = () => {
     const navigation = useNavigation() as any;
     const route = useRoute<any>();
-    const { code } = route.params;
-    const { userInfo } = useAuthStore();
-    const { gardenDetail, searchGardens, postHarvestReport } = useGardenStore();
+    const {code} = route.params;
+    const {userInfo} = useAuthStore();
+    const {gardenDetail, searchGardens, postHarvestReport, isLoading} =
+        useGardenStore();
 
     const [weight, setWeight] = useState('');
     const [confirmMode, setConfirmMode] = useState(false);
@@ -58,6 +60,8 @@ const HarvestDetail = () => {
 
     const showReport = weight.trim() !== '';
 
+    if (isLoading) return <Loading />;
+
     return (
         <SafeAreaView style={styles.safeContainer}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -66,9 +70,11 @@ const HarvestDetail = () => {
                     <Text style={styles.gardenCode}>{gardenDetail?.code}</Text>
 
                     <View style={styles.productBox}>
-                        <Text style={styles.productLabel}>Cây trồng/Khu vườn</Text>
+                        <Text style={styles.productLabel}>
+                            Cây trồng/Khu vườn
+                        </Text>
                         <View style={styles.productRow}>
-                            <Icon name="group-work" color="green" size={20} />
+                            <Icon name='group-work' color='green' size={20} />
                             <Text style={styles.productText}>
                                 {gardenDetail?.productName}
                             </Text>
@@ -84,34 +90,49 @@ const HarvestDetail = () => {
                 </View>
 
                 <View style={styles.inputBox}>
-                    <Text style={styles.inputLabel}>Khối lượng thu hoạch (Kg)</Text>
+                    <Text style={styles.inputLabel}>
+                        Khối lượng thu hoạch (Kg)
+                    </Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Nhập khối lượng"
-                        keyboardType="numeric"
+                        placeholder='Nhập khối lượng'
+                        keyboardType='numeric'
                         value={weight}
-                        onChangeText={(text) => {
-                            let formatted = text.replace(/,/g, '.');
-                            formatted = formatted.replace(/[^0-9.]/g, '');
-
-                            const parts = formatted.split('.');
-
-                            if (parts.length > 2) {
-                                formatted = parts[0] + '.' + parts.slice(1).join('');
-                            }
-
-                            if (formatted.startsWith('.')) {
-                                formatted = '0' + formatted;
-                            }
-
-                            const [intPart, decimalPart] = formatted.split('.');
-                            if (decimalPart !== undefined) {
-                                formatted = intPart + '.' + decimalPart.slice(0, 2);
+                        onChangeText={text => {
+                            let formatted = text.replace(/[^0-9]/g, '');
+                            if (
+                                formatted.length > 1 &&
+                                formatted.startsWith('0')
+                            ) {
+                                formatted = formatted.replace(/^0+/, '');
                             }
 
                             setWeight(formatted);
                         }}
-                        placeholderTextColor="#000"
+                        // onChangeText={text => {
+                        //     let formatted = text.replace(/,/g, '.');
+                        //     formatted = formatted.replace(/[^0-9.]/g, '');
+
+                        //     const parts = formatted.split('.');
+
+                        //     if (parts.length > 2) {
+                        //         formatted =
+                        //             parts[0] + '.' + parts.slice(1).join('');
+                        //     }
+
+                        //     if (formatted.startsWith('.')) {
+                        //         formatted = '0' + formatted;
+                        //     }
+
+                        //     const [intPart, decimalPart] = formatted.split('.');
+                        //     if (decimalPart !== undefined) {
+                        //         formatted =
+                        //             intPart + '.' + decimalPart.slice(0, 2);
+                        //     }
+
+                        //     setWeight(formatted);
+                        // }}
+                        placeholderTextColor='#000'
                     />
                 </View>
             </ScrollView>
@@ -121,7 +142,8 @@ const HarvestDetail = () => {
                 {confirmMode ? (
                     <>
                         <Text style={styles.confirmText}>
-                            Bạn có chắc chắn muốn báo cáo công việc đã thực hiện không?
+                            Bạn có chắc chắn muốn báo cáo công việc đã thực hiện
+                            không?
                         </Text>
                         <View style={styles.footerRow}>
                             <TouchableOpacity
@@ -132,30 +154,37 @@ const HarvestDetail = () => {
                             <TouchableOpacity
                                 style={[styles.confirmButton]}
                                 onPress={handleConfirm}>
-                                <Text style={styles.confirmButtonText}>Xác nhận</Text>
+                                <Text style={styles.confirmButtonText}>
+                                    Xác nhận
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </>
                 ) : (
-                    <View style={[styles.footerRow, !showReport && { justifyContent: 'center' }]}>
+                    <View
+                        style={[
+                            styles.footerRow,
+                            !showReport && {justifyContent: 'center'},
+                        ]}>
                         <TouchableOpacity
                             style={[
                                 styles.exitButton1,
-                                showReport ? styles.exitButtonSmall : { flex: 1 }
+                                showReport ? styles.exitButtonSmall : {flex: 1},
                             ]}
                             onPress={handleExit}>
                             <Icon
-                                name="arrow-circle-left"
+                                name='arrow-circle-left'
                                 size={22}
-                                color="white"
-                                style={{ marginRight: 10 }}
+                                color='white'
+                                style={{marginRight: 10}}
                             />
                             <Text style={styles.exitText1}>Thoát ra</Text>
                         </TouchableOpacity>
 
-
                         {showReport && (
-                            <TouchableOpacity style={styles.reportButton} onPress={handleReport}>
+                            <TouchableOpacity
+                                style={styles.reportButton}
+                                onPress={handleReport}>
                                 <Text style={styles.reportText}>Báo cáo</Text>
                             </TouchableOpacity>
                         )}
@@ -169,49 +198,95 @@ const HarvestDetail = () => {
 export default HarvestDetail;
 
 const styles = StyleSheet.create({
-    safeContainer: { flex: 1, backgroundColor: '#fff' },
-    scrollContent: { padding: 16, paddingBottom: 100 },
-    infoContainer: { backgroundColor: '#fff', borderRadius: 8, marginBottom: 16 },
-    gardenName: { fontSize: 16, fontWeight: '600' },
-    gardenCode: { color: 'green', fontWeight: '500', marginTop: 2 },
-    productBox: { marginTop: 12, backgroundColor: '#4CAF5026', padding: 10, borderRadius: 6 },
-    productLabel: { fontSize: 14, fontWeight: '500', marginBottom: 4 },
-    productRow: { flexDirection: 'row', alignItems: 'center' },
-    productText: { fontSize: 14, color: '#333', marginLeft: 4 },
-    headerRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-    taskHeader: { fontSize: 14, fontWeight: '500' },
-    linkText: { color: '#2196F3', textDecorationLine: 'underline' },
-    inputBox: { backgroundColor: '#E3F2FD', padding: 16, borderRadius: 8, marginTop: 8 },
-    inputLabel: { fontSize: 14, fontWeight: '500', marginBottom: 6 },
+    safeContainer: {flex: 1, backgroundColor: '#fff'},
+    scrollContent: {padding: 16, paddingBottom: 100},
+    infoContainer: {backgroundColor: '#fff', borderRadius: 8, marginBottom: 16},
+    gardenName: {fontSize: 16, fontWeight: '600'},
+    gardenCode: {color: 'green', fontWeight: '500', marginTop: 2},
+    productBox: {
+        marginTop: 12,
+        backgroundColor: '#4CAF5026',
+        padding: 10,
+        borderRadius: 6,
+    },
+    productLabel: {fontSize: 14, fontWeight: '500', marginBottom: 4},
+    productRow: {flexDirection: 'row', alignItems: 'center'},
+    productText: {fontSize: 14, color: '#333', marginLeft: 4},
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    taskHeader: {fontSize: 14, fontWeight: '500'},
+    linkText: {color: '#2196F3', textDecorationLine: 'underline'},
+    inputBox: {
+        backgroundColor: '#E3F2FD',
+        padding: 16,
+        borderRadius: 8,
+        marginTop: 8,
+    },
+    inputLabel: {fontSize: 14, fontWeight: '500', marginBottom: 6},
     input: {
-        borderWidth: 1, borderColor: '#bbb', borderRadius: 6, padding: 8, fontSize: 14,
-        backgroundColor: '#E3F2FD', textAlign: 'center', color: '#000',
+        borderWidth: 1,
+        borderColor: '#bbb',
+        borderRadius: 6,
+        padding: 8,
+        fontSize: 14,
+        backgroundColor: '#E3F2FD',
+        textAlign: 'center',
+        color: '#000',
     },
     footer: {
-        position: 'absolute', bottom: 0, left: 0, right: 0,
-        backgroundColor: '#fff', padding: 16, borderTopWidth: 1, borderColor: '#eee',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: '#fff',
+        padding: 16,
+        borderTopWidth: 1,
+        borderColor: '#eee',
     },
-    footerRow: { flexDirection: 'row', justifyContent: 'space-between' },
+    footerRow: {flexDirection: 'row', justifyContent: 'space-between'},
     exitButton1: {
-        flexDirection: 'row', justifyContent: 'center', alignItems: 'center',
-        padding: 12, backgroundColor: 'red', borderRadius: 26
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 12,
+        backgroundColor: 'red',
+        borderRadius: 26,
     },
-    exitButtonSmall: { flex: 0.9, marginRight: 10 },
-    exitText1: { color: 'white', fontWeight: '600', fontSize: 16 },
+    exitButtonSmall: {flex: 0.9, marginRight: 10},
+    exitText1: {color: 'white', fontWeight: '600', fontSize: 16},
     reportButton: {
-        flex: 1, paddingVertical: 12, alignItems: 'center',
-        borderWidth: 1, borderColor: 'green', borderRadius: 26,
+        flex: 1,
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'green',
+        borderRadius: 26,
     },
-    reportText: { color: 'green', fontWeight: '600', fontSize: 16 },
-    confirmText: { textAlign: 'center', marginBottom: 12, fontSize: 14, fontWeight: '400' },
+    reportText: {color: 'green', fontWeight: '600', fontSize: 16},
+    confirmText: {
+        textAlign: 'center',
+        marginBottom: 12,
+        fontSize: 14,
+        fontWeight: '400',
+    },
     cancelButton: {
-        flex: 1, paddingVertical: 12, alignItems: 'center',
-        borderRadius: 26, backgroundColor: '#eee', marginRight: 10,
+        flex: 1,
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderRadius: 26,
+        backgroundColor: '#eee',
+        marginRight: 10,
     },
-    cancelText: { color: '#333', fontWeight: '600', fontSize: 16 },
+    cancelText: {color: '#333', fontWeight: '600', fontSize: 16},
     confirmButton: {
-        flex: 1, paddingVertical: 12, alignItems: 'center',
-        borderRadius: 26, backgroundColor: '#4CAF50',
+        flex: 1,
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderRadius: 26,
+        backgroundColor: '#4CAF50',
     },
-    confirmButtonText: { color: 'white', fontWeight: '600', fontSize: 16 },
+    confirmButtonText: {color: 'white', fontWeight: '600', fontSize: 16},
 });

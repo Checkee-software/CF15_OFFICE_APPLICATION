@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -7,27 +7,26 @@ import {
     Image,
     TextInput,
 } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import SCREEN_INFO from '../../../../config/SCREEN_CONFIG/screenInfo';
 import useGardenStore from '../../../../stores/gardenStore';
 import Loading from '../../../subscreen/Loading';
-import { IGarden } from '../../../../stores/gardenStore';
+import {IGarden} from '../../../../stores/gardenStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useAuthStore } from '../../../../stores/authStore';
+import {useAuthStore} from '../../../../stores/authStore';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useRoute } from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import Backdrop from '@/screens/subscreen/Loading/index2';
-import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
 
 const HarvestList = () => {
     const navigation = useNavigation() as any;
 
-    const { gardens, fetchGardens, isLoading, setGardenData, isLoading2 } =
-        useGardenStore();
+    const {gardens, fetchGardens, isLoading, setGardenData} = useGardenStore();
     const [searchText, setSearchText] = useState('');
     const [filteredGardens, setFilteredGardens] = useState<IGarden[]>([]);
 
-    const { userInfo } = useAuthStore();
+    const {userInfo} = useAuthStore();
     const route = useRoute<any>();
     const navigateNext =
         route.params?.navigateNext ?? SCREEN_INFO.HARVEST_DETAIL.key;
@@ -56,8 +55,12 @@ const HarvestList = () => {
         if (searchText !== '') {
             filtered = filtered.filter(
                 (garden: IGarden) =>
-                    garden.name.toLowerCase().includes(searchText.toLowerCase()) ||
-                    garden.code.toLowerCase().includes(searchText.toLowerCase()) ||
+                    garden.name
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase()) ||
+                    garden.code
+                        .toLowerCase()
+                        .includes(searchText.toLowerCase()) ||
                     (garden.gardenNickname ?? '')
                         .toLowerCase()
                         .includes(searchText.toLowerCase()),
@@ -67,27 +70,24 @@ const HarvestList = () => {
         setFilteredGardens(filtered);
     }, [searchText, gardens]);
 
-
-    const renderItem = ({ item }: { item: IGarden }) => (
+    const renderItem = ({item}: {item: IGarden}) => (
         <TouchableOpacity
             style={styles.card}
             onPress={() => handleNavigate(item.code)}
-            activeOpacity={0.7}
-        >
+            activeOpacity={0.7}>
             <Image
                 source={require('../../../../assets/images/garden.png')}
                 style={styles.image}
-                resizeMode="contain"
+                resizeMode='contain'
             />
             <View style={styles.cardContent}>
                 <View style={styles.cardTextContainer}>
                     <Text style={styles.cardTitle}>{item.name}</Text>
                     <Text style={styles.cardSubtitle}>{item.code}</Text>
                 </View>
-                <TouchableOpacity
-                    onPress={() => handleNavigate(item.code)}>
+                <TouchableOpacity onPress={() => handleNavigate(item.code)}>
                     <MaterialCommunityIcons
-                        name="cart-outline"
+                        name='cart-outline'
                         size={24}
                         style={styles.harvestIcon}
                     />
@@ -95,7 +95,6 @@ const HarvestList = () => {
             </View>
         </TouchableOpacity>
     );
-
 
     if (isLoading) return <Loading />;
 
@@ -166,7 +165,7 @@ const HarvestList = () => {
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         {searchText.trim() ? (
-                            <View style={{ alignItems: 'center' }}>
+                            <View style={{alignItems: 'center'}}>
                                 <Text style={styles.emptyText}>
                                     Không tìm thấy khu vườn liên quan tới
                                 </Text>
@@ -183,7 +182,7 @@ const HarvestList = () => {
                 }
             />
 
-            <Backdrop open={isLoading2} />
+            {/* <Backdrop open={isLoading2} /> */}
         </View>
     );
 };

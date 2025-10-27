@@ -1,14 +1,17 @@
+/* eslint-disable curly */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 
 /* configurations */
-import asyncStorageHelper from './src/utils/localStorageHelper/index';
+import UpdateRequiredModal from '@/utils/useForceUpdate';
 import {useAuthStore} from './src/stores/authStore';
+import asyncStorageHelper from './src/utils/localStorageHelper/index';
 
 /* packages */
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {OneSignal, LogLevel} from 'react-native-onesignal';
+import VersionCheck from 'react-native-version-check';
 
 /* screens */
 import Router from './src/router';
@@ -79,11 +82,51 @@ const InitApp = () => {
 
 export default function App() {
     const {isLogin} = useAuthStore();
+    const [isUpdateRequired, setIsUpdateRequired] = useState<boolean>(false);
+
+    console.log('get-update-version: ', isUpdateRequired);
+
+    useEffect(() => {
+        const checkVersion = async () => {
+            try {
+                const currentVersion = VersionCheck.getCurrentVersion();
+                // const currentVersion = '0.0.1';
+                const latestVersion = await VersionCheck.getLatestVersion();
+
+                // Hàm so sánh phiên bản, ví dụ: "1.2.10" với "1.2.9"
+                function compareVersions(v1: string, v2: string): number {
+                    const arr1 = v1.split('.').map(Number);
+                    const arr2 = v2.split('.').map(Number);
+                    const maxLen = Math.max(arr1.length, arr2.length);
+
+                    for (let i = 0; i < maxLen; i++) {
+                        const num1 = arr1[i] || 0;
+                        const num2 = arr2[i] || 0;
+
+                        if (num1 > num2) return 1;
+                        if (num1 < num2) return -1;
+                    }
+                    return 0;
+                }
+                if (compareVersions(currentVersion, latestVersion) < 0) {
+                    setIsUpdateRequired(true);
+                }
+            } catch (error) {
+                console.log('Lỗi kiểm tra phiên bản:', error);
+            }
+        };
+        checkVersion();
+    }, []);
 
     return (
         <SafeAreaView style={{flex: 1}} edges={['bottom']}>
             <StatusBar barStyle={isLogin ? 'dark-content' : 'light-content'} />
             <InitApp />
+            {/* Modal yêu cầu cập nhật */}
+            <UpdateRequiredModal
+                visible={isUpdateRequired}
+                onClose={() => setIsUpdateRequired(false)}
+            />
         </SafeAreaView>
     );
 }

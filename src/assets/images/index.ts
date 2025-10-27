@@ -47,6 +47,8 @@ const images = {
     plant2: require('./plant2.jpg'),
     emptyNews: require('./empty-schedule-list.png'),
     emptyGarden: require('./not-found-any-garden.png'),
+    app_store: require('./app_store_logo.png'),
+    play_store: require('./google_play_logo.png'),
 };
 
 export default images;

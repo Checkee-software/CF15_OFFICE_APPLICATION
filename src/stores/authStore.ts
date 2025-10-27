@@ -69,6 +69,7 @@ type AuthStore = {
     updatePassword: (userPasswordUpdate: IUpdatePassword) => Promise<any>;
     setRedirectData: (type: string, data: string) => void;
     clearRedirectData: () => void;
+    updateAvatar: (userId: string, uri: string) => Promise<void>;
 };
 
 const fixAvatarPath = (path: string) => {
@@ -328,5 +329,50 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             OneSignal.logout();
         }
         set({userInfo: undefined, isLogin: false});
+    },
+
+    updateAvatar: async (userId: string, uri: string) => {
+        try {
+            const formData = new FormData();
+            formData.append('avatar', {
+                uri,
+                name: 'avatar.jpg',
+                type: 'image/jpeg',
+            } as any);
+
+            const res = await axiosClient.post(
+                `${ENV.BACKEND_URL}/resources/users/update-avatar/${userId}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                },
+            );
+            console.log(res);
+
+            if (res.data?.data?.path) {
+                const updatedPath = `${ENV.BACKEND_URL}${fixAvatarPath(
+                    res.data.data.path,
+                )}`;
+                set(state => ({
+                    userInfo: {
+                        ...state.userInfo,
+                        avatar: updatedPath,
+                    },
+                }));
+
+                Snackbar.show({
+                    text: 'Cập nhật ảnh đại diện thành công!',
+                    duration: Snackbar.LENGTH_SHORT,
+                });
+            }
+        } catch (error: any) {
+            console.log(error);
+            Snackbar.show({
+                text: 'Không thể cập nhật ảnh đại diện!',
+                duration: Snackbar.LENGTH_LONG,
+            });
+        }
     },
 }));
