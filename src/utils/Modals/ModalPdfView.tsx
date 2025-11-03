@@ -1,6 +1,14 @@
-import {View, Text, Modal, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+    View,
+    Text,
+    Modal,
+    TouchableOpacity,
+    StyleSheet,
+    Platform,
+} from 'react-native';
 import React from 'react';
 import Pdf from 'react-native-pdf';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const ModalPdfView = (props: {
     visible: boolean;
@@ -8,14 +16,18 @@ const ModalPdfView = (props: {
     onClose: () => void;
 }) => {
     const {visible, pdfFilePath, onClose} = props;
-
+    const insets = useSafeAreaInsets();
     return (
-        <Modal visible={visible} animationType='fade'>
-            <View style={styles.modalContent}>
+        <Modal visible={visible} animationType={'fade'}>
+            <View
+                style={[
+                    styles.modalContent,
+                    Platform.OS === 'ios' && {marginTop: insets.top},
+                ]}>
                 <TouchableOpacity
                     style={styles.button2}
                     onPress={() => onClose()}>
-                    <Text style={styles.buttonText2}>Đóng</Text>
+                    <Text style={styles.buttonText2}>Đóng lại</Text>
                 </TouchableOpacity>
                 <Pdf
                     trustAllCerts={false}

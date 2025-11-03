@@ -1,7 +1,6 @@
 /* eslint-disable curly */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import 'react-native-gesture-handler';
 import React, {useState, useEffect} from 'react';
 
 /* configurations */

@@ -291,7 +291,7 @@ const useGardenStore = create<GardenState>(set => ({
             const res = await axiosClient.get(
                 `${
                     ENV.BACKEND_URL
-                }/resources/gardens/list?${queryParams.toString()}`,
+                }/resources/gardens/collection?${queryParams.toString()}`,
             );
             console.log(res);
 
