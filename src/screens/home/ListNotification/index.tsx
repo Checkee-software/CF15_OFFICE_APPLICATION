@@ -1,268 +1,115 @@
-import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    FlatList,
+    Image,
+} from 'react-native';
 import React from 'react';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {useRoute} from '@react-navigation/native';
+import images from '@/assets/images';
+import moment from 'moment';
+import useNotificationStore from '@/stores/notificationStore';
+import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
 
-const ListNotification = () => {
-    const data: any = [];
+const ListNotification = ({navigation}: any) => {
+    const route = useRoute();
+    const {notifications = [], unreadCount = 0}: any = route.params || {};
+    const {markAsRead, markAllAsRead, bellNotifications} =
+        useNotificationStore();
+
+    const handlePressItem = async (item: any) => {
+        if (!item.isRead) {
+            await markAsRead(item._id);
+        }
+        switch (item.type) {
+            case 'DOCUMENT':
+                navigation.navigate(SCREEN_INFO.DOCUMENT.key, {
+                    _id: item.referenceId,
+                });
+                break;
+            case 'FEEDBACK':
+                navigation.navigate(SCREEN_INFO.FEEDBACK.key, {
+                    _id: item.referenceId,
+                });
+                break;
+            case 'SCHEDULE':
+                navigation.navigate(SCREEN_INFO.WORKSCHEDULE.key, {
+                    _id: item.referenceId,
+                });
+                break;
+            default:
+                break;
+        }
+    };
+
+    const handleMarkAllAsRead = async () => {
+        await markAllAsRead();
+    };
+
+    const renderItem = ({item}: any) => {
+        const formattedTime = moment(item.createdAt).fromNow();
+
+        return (
+            <TouchableOpacity
+                onPress={() => handlePressItem(item)}
+                style={[
+                    NotificationStyle.cardNotifi,
+                    item.isRead && NotificationStyle.readCard,
+                ]}>
+                <View style={NotificationStyle.headerNotifi}>
+                    <View style={NotificationStyle.warpLeftHeader}>
+                        <Text style={NotificationStyle.headerLabel}>
+                            {item.title || 'Thông báo'}
+                        </Text>
+                    </View>
+                    <Text style={NotificationStyle.notifiTime}>
+                        {formattedTime}
+                    </Text>
+                </View>
+
+                <View style={NotificationStyle.notifiContent}>
+                    <Text style={NotificationStyle.notifiContentText}>
+                        {item.body}
+                    </Text>
+                    <Text
+                        style={[
+                            NotificationStyle.notifiContentText,
+                            {textAlign: 'right'},
+                        ]}>
+                        {item.actor?.fullName}
+                    </Text>
+                </View>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <View style={NotificationStyle.container}>
+            <TouchableOpacity onPress={handleMarkAllAsRead}>
+                <Text style={NotificationStyle.linkText}>Đánh dấu đã đọc</Text>
+            </TouchableOpacity>
+
             <View style={NotificationStyle.warpNotifi}>
                 <FlatList
-                    data={data}
+                    data={
+                        bellNotifications.length > 0
+                            ? bellNotifications
+                            : notifications
+                    }
+                    keyExtractor={(item: any) => item._id}
                     contentContainerStyle={
                         NotificationStyle.flatListNotification
                     }
                     showsVerticalScrollIndicator={false}
-                    renderItem={({}) => (
-                        <>
-                            <TouchableOpacity
-                                style={NotificationStyle.cardNotifi}>
-                                <View style={NotificationStyle.headerNotifi}>
-                                    <View
-                                        style={
-                                            NotificationStyle.warpLeftHeader
-                                        }>
-                                        <MaterialIcons
-                                            name='check-circle-outline'
-                                            size={26}
-                                            color='green'
-                                        />
-                                        <Text
-                                            style={
-                                                NotificationStyle.headerLabel
-                                            }>
-                                            Công việc con
-                                        </Text>
-                                    </View>
-                                    <Text style={NotificationStyle.notifiTime}>
-                                        3 phút trước
-                                    </Text>
-                                </View>
-                                <View style={NotificationStyle.notifiContent}>
-                                    <Text
-                                        style={
-                                            NotificationStyle.notifiContentText
-                                        }>
-                                        Các thành viên đã hoàn thành công việc
-                                        của họ. Nhấn để xem.
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={NotificationStyle.cardNotifi}>
-                                <View style={NotificationStyle.headerNotifi}>
-                                    <View
-                                        style={
-                                            NotificationStyle.warpLeftHeader
-                                        }>
-                                        <MaterialIcons
-                                            name='check-circle-outline'
-                                            size={26}
-                                            color='green'
-                                        />
-                                        <Text
-                                            style={
-                                                NotificationStyle.headerLabel
-                                            }>
-                                            Công việc con
-                                        </Text>
-                                    </View>
-                                    <Text style={NotificationStyle.notifiTime}>
-                                        3 phút trước
-                                    </Text>
-                                </View>
-                                <View style={NotificationStyle.notifiContent}>
-                                    <Text
-                                        style={
-                                            NotificationStyle.notifiContentText
-                                        }>
-                                        Các thành viên đã hoàn thành công việc
-                                        của họ. Nhấn để xem.
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={NotificationStyle.cardNotifi}>
-                                <View style={NotificationStyle.headerNotifi}>
-                                    <View
-                                        style={
-                                            NotificationStyle.warpLeftHeader
-                                        }>
-                                        <MaterialCommunityIcons
-                                            name='dots-horizontal-circle'
-                                            size={26}
-                                            color='rgba(255, 152, 0, 1)'
-                                        />
-                                        <Text
-                                            style={
-                                                NotificationStyle.headerLabel
-                                            }>
-                                            Công việc con
-                                        </Text>
-                                    </View>
-                                    <Text style={NotificationStyle.notifiTime}>
-                                        3 phút trước
-                                    </Text>
-                                </View>
-                                <View style={NotificationStyle.notifiContent}>
-                                    <Text
-                                        style={
-                                            NotificationStyle.notifiContentText
-                                        }>
-                                        Bạn đã thực hiện xong công việc. Vui
-                                        lòng chờ duyệt.
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={NotificationStyle.cardNotifi}>
-                                <View style={NotificationStyle.headerNotifi}>
-                                    <View
-                                        style={
-                                            NotificationStyle.warpLeftHeader
-                                        }>
-                                        <AntDesign
-                                            name='closecircle'
-                                            size={22}
-                                            color='rgba(255, 78, 69, 1)'
-                                        />
-                                        <Text
-                                            style={
-                                                NotificationStyle.headerLabel
-                                            }>
-                                            Công việc con
-                                        </Text>
-                                    </View>
-                                    <Text style={NotificationStyle.notifiTime}>
-                                        3 phút trước
-                                    </Text>
-                                </View>
-                                <View style={NotificationStyle.notifiContent}>
-                                    <Text
-                                        style={
-                                            NotificationStyle.notifiContentText
-                                        }>
-                                        Ban lãnh đạo đã huỷ bỏ tiến trình công
-                                        việc của bạn. Nhấn để xem lý do.
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={NotificationStyle.cardNotifi}>
-                                <View style={NotificationStyle.headerNotifi}>
-                                    <View
-                                        style={
-                                            NotificationStyle.warpLeftHeader
-                                        }>
-                                        <MaterialIcons
-                                            name='warning'
-                                            size={26}
-                                            color='rgba(255, 152, 0, 1)'
-                                        />
-                                        <Text
-                                            style={
-                                                NotificationStyle.headerLabel
-                                            }>
-                                            Công việc
-                                        </Text>
-                                    </View>
-                                    <Text style={NotificationStyle.notifiTime}>
-                                        3 phút trước
-                                    </Text>
-                                </View>
-                                <View style={NotificationStyle.notifiContent}>
-                                    <Text
-                                        style={
-                                            NotificationStyle.notifiContentText
-                                        }>
-                                        Ban lãnh đạo không chấp nhận tiến trình
-                                        công việc của bạn. Nhấn để xem.
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={NotificationStyle.cardNotifi}>
-                                <View style={NotificationStyle.headerNotifi}>
-                                    <View
-                                        style={
-                                            NotificationStyle.warpLeftHeader
-                                        }>
-                                        <MaterialCommunityIcons
-                                            name='alert-decagram'
-                                            size={26}
-                                            color='rgba(33, 150, 243, 1)'
-                                        />
-                                        <Text
-                                            style={
-                                                NotificationStyle.headerLabel
-                                            }>
-                                            Công việc
-                                        </Text>
-                                    </View>
-                                    <Text style={NotificationStyle.notifiTime}>
-                                        3 phút trước
-                                    </Text>
-                                </View>
-                                <View style={NotificationStyle.notifiContent}>
-                                    <Text
-                                        style={
-                                            NotificationStyle.notifiContentText
-                                        }>
-                                        Bạn có công việc mới được giao. Nhấn để
-                                        xem.
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={NotificationStyle.cardNotifi}>
-                                <View style={NotificationStyle.headerNotifi}>
-                                    <View
-                                        style={
-                                            NotificationStyle.warpLeftHeader
-                                        }>
-                                        <MaterialCommunityIcons
-                                            name='check-decagram'
-                                            size={26}
-                                            color='green'
-                                        />
-                                        <Text
-                                            style={
-                                                NotificationStyle.headerLabel
-                                            }>
-                                            Công việc
-                                        </Text>
-                                    </View>
-                                    <Text style={NotificationStyle.notifiTime}>
-                                        3 phút trước
-                                    </Text>
-                                </View>
-                                <View style={NotificationStyle.notifiContent}>
-                                    <Text
-                                        style={
-                                            NotificationStyle.notifiContentText
-                                        }>
-                                        Công việc đã hoàn thành. Nhấn để xem.
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                        </>
-                    )}
+                    renderItem={renderItem}
                     ListEmptyComponent={
                         <View style={NotificationStyle.emptyListNotifyView}>
-                            <FontAwesome
-                                name='bell'
-                                size={120}
-                                color={'rgba(76, 175, 80, 1)'}
+                            <Image
+                                source={images.emptyNotificationList}
+                                style={NotificationStyle.emptyImage}
+                                resizeMode='contain'
                             />
                             <Text style={NotificationStyle.emptyListNotifyText}>
                                 Hiện tại bạn không có thông báo!
@@ -275,62 +122,75 @@ const ListNotification = () => {
     );
 };
 
-export default ListNotification;
-
 const NotificationStyle = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: 12,
         backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
+        paddingHorizontal: 10,
     },
     warpNotifi: {
-        marginTop: 12,
-        gap: 12,
+        flex: 1,
+        marginTop: 10,
     },
     flatListNotification: {
-        flexGrow: 1,
+        paddingBottom: 20,
     },
     cardNotifi: {
-        padding: 10,
-        boxShadow: '0 1 2 0 rgba(0, 0, 0, 0.25)',
+        backgroundColor: '#F9F9F9',
+        padding: 12,
+        marginBottom: 10,
+        gap: 10,
     },
+    readCard: {
+        opacity: 0.4,
+    },
+
     headerNotifi: {
         flexDirection: 'row',
-        alignItems: 'center',
         justifyContent: 'space-between',
+        alignItems: 'center',
     },
     warpLeftHeader: {
-        gap: 8,
         flexDirection: 'row',
         alignItems: 'center',
     },
     headerLabel: {
-        fontSize: 15,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#333',
     },
     notifiTime: {
-        fontSize: 13,
-        fontWeight: '200',
-        color: 'rgba(128, 128, 128, 1)',
+        fontSize: 12,
+        color: 'gray',
     },
     notifiContent: {
-        marginTop: 2,
-        marginLeft: 34,
+        marginTop: 6,
     },
     notifiContentText: {
         fontSize: 14,
+        color: '#555',
+        fontWeight: '600',
     },
     emptyListNotifyView: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 15,
+        marginTop: 80,
+    },
+    emptyImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 10,
     },
     emptyListNotifyText: {
-        color: 'rgba(0, 0, 0, 1)',
-        fontWeight: 400,
-        fontSize: 13,
+        color: 'gray',
+        fontSize: 14,
+    },
+    linkText: {
+        color: '#2196F3',
+        textDecorationLine: 'underline',
+        textAlign: 'right',
+        marginTop: 8,
     },
 });
+
+export default ListNotification;

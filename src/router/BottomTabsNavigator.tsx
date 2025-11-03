@@ -22,6 +22,7 @@ import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import {useAuthStore} from '@/stores/authStore';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import useNotificationStore from '@/stores/notificationStore';
 
 const BottomTabsNavigator = ({navigation}: any) => {
     const {
@@ -33,6 +34,12 @@ const BottomTabsNavigator = ({navigation}: any) => {
 
     const insets = useSafeAreaInsets();
     const Tab = createBottomTabNavigator();
+    const {fetchBellNotifications, bellNotifications, unreadCount} =
+        useNotificationStore();
+
+    useEffect(() => {
+        fetchBellNotifications();
+    }, []);
 
     useEffect(() => {
         if (redirectData) {
@@ -51,6 +58,22 @@ const BottomTabsNavigator = ({navigation}: any) => {
             clearRedirectData();
         }, 1000);
     }, [redirectData, otherRedirect]);
+
+    const hasUnread = unreadCount > 0 || bellNotifications.some(n => !n.isRead);
+
+    const BellButton = () => (
+        <TouchableOpacity
+            style={style.alertView}
+            onPress={() =>
+                navigation.navigate(SCREEN_INFO.LISTNOTIFICATION.key, {
+                    notifications: bellNotifications,
+                    unreadCount: unreadCount,
+                })
+            }>
+            {hasUnread && <View style={style.alertDot} />}
+            <FontAwesome name='bell' size={26} color={'rgba(76, 175, 80, 1)'} />
+        </TouchableOpacity>
+    );
 
     return redirectData ? (
         <Backdrop open />
@@ -96,22 +119,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
                             color={color}
                         />
                     ),
-                    headerRight: () => (
-                        <TouchableOpacity
-                            style={style.alertView}
-                            onPress={() =>
-                                navigation.navigate(
-                                    SCREEN_INFO.LISTNOTIFICATION.key,
-                                )
-                            }>
-                            <View style={style.alertDot} />
-                            <FontAwesome
-                                name='bell'
-                                size={26}
-                                color={'rgba(76, 175, 80, 1)'}
-                            />
-                        </TouchableOpacity>
-                    ),
+                    headerRight: () => <BellButton />,
                 }}
             />
 
@@ -181,22 +189,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
                     tabBarIcon: ({color}) => (
                         <FontAwesome name='user' size={26} color={color} />
                     ),
-                    headerRight: () => (
-                        <TouchableOpacity
-                            style={style.alertView}
-                            onPress={() =>
-                                navigation.navigate(
-                                    SCREEN_INFO.LISTNOTIFICATION.key,
-                                )
-                            }>
-                            <View style={style.alertDot} />
-                            <FontAwesome
-                                name='bell'
-                                size={26}
-                                color={'rgba(76, 175, 80, 1)'}
-                            />
-                        </TouchableOpacity>
-                    ),
+                    headerRight: () => <BellButton />,
                 }}
             />
         </Tab.Navigator>
