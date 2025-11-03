@@ -16,6 +16,11 @@ const HOME_SCREENS = {
         headerTitle: 'DUYỆT THU HOẠCH',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    HARVEST_SCHEDULE: {
+        key: 'HARVEST_SCHEDULE',
+        headerTitle: 'QUY TRÌNH THU HOẠCH',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     HARVEST: {
         key: 'HARVEST',
         headerTitle: 'DANH SÁCH KHU VƯỜN THU HOẠCH',

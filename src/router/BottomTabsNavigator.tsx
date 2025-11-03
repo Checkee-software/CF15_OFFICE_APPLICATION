@@ -22,9 +22,11 @@ import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import {useAuthStore} from '@/stores/authStore';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 const BottomTabsNavigator = ({navigation}: any) => {
     const {
+        userInfo,
         otherRedirect,
         redirectData,
         redirectDataRequestSchedule,
@@ -115,18 +117,24 @@ const BottomTabsNavigator = ({navigation}: any) => {
                 }}
             />
 
-            <Tab.Screen
-                component={Work}
-                name='Công việc'
-                options={{
-                    headerShown: true,
-                    headerTitle: 'CÔNG VIỆC KHU VƯỜN',
-                    headerTitleStyle: style.headerTitle,
-                    tabBarIcon: ({color}) => (
-                        <MaterialIcons name='work' size={26} color={color} />
-                    ),
-                }}
-            />
+            {userInfo.userType.level === EOrganization.LEADER && (
+                <Tab.Screen
+                    component={Work}
+                    name='Công việc'
+                    options={{
+                        headerShown: true,
+                        headerTitle: 'CÔNG VIỆC KHU VƯỜN',
+                        headerTitleStyle: style.headerTitle,
+                        tabBarIcon: ({color}) => (
+                            <MaterialIcons
+                                name='work'
+                                size={26}
+                                color={color}
+                            />
+                        ),
+                    }}
+                />
+            )}
 
             {/* <Tab.Screen
                 component={AutomaticTracing}
@@ -158,18 +166,24 @@ const BottomTabsNavigator = ({navigation}: any) => {
                 }}
             /> */}
 
-            <Tab.Screen
-                component={History}
-                name='Lịch sử'
-                options={{
-                    headerShown: true,
-                    headerTitle: 'LỊCH SỬ HOẠT ĐỘNG',
-                    headerTitleStyle: style.headerTitle,
-                    tabBarIcon: ({color}) => (
-                        <MaterialIcons name='history' size={26} color={color} />
-                    ),
-                }}
-            />
+            {userInfo.userType.level !== EOrganization.WORKER && (
+                <Tab.Screen
+                    component={History}
+                    name='Lịch sử'
+                    options={{
+                        headerShown: true,
+                        headerTitle: 'LỊCH SỬ HOẠT ĐỘNG',
+                        headerTitleStyle: style.headerTitle,
+                        tabBarIcon: ({color}) => (
+                            <MaterialIcons
+                                name='history'
+                                size={26}
+                                color={color}
+                            />
+                        ),
+                    }}
+                />
+            )}
 
             <Tab.Screen
                 component={Profile}

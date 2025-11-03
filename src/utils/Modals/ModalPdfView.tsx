@@ -19,8 +19,11 @@ const ModalPdfView = (props: {
                 </TouchableOpacity>
                 <Pdf
                     trustAllCerts={false}
-                    source={{uri: pdfFilePath, cache: true}}
+                    source={{uri: pdfFilePath, cache: false}}
                     style={styles.modalContent}
+                    onError={error => {
+                        console.log('PDF error:', error);
+                    }}
                 />
             </View>
         </Modal>

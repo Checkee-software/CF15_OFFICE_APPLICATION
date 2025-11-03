@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
     View,
     Text,
@@ -90,7 +91,6 @@ const Unit = ({navigation}: any) => {
 
     useEffect(() => {
         getListWorkerByLeader();
-        // eslint-disable-next-line
     }, []);
 
     if (isLoading) return <Loading />;
@@ -116,7 +116,7 @@ const Unit = ({navigation}: any) => {
                     contentContainerStyle={UnitStyles.flatListUnit}
                     data={filterWorkerBySearch}
                     renderItem={({item}) => renderWorker(item)}
-                    keyExtractor={item => item._id}
+                    keyExtractor={(item, index) => index.toString()}
                     onRefresh={handleReFetch}
                     refreshing={isLoading}
                     keyboardShouldPersistTaps='handled'

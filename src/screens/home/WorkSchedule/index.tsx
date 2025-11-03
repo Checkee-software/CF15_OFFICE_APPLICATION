@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
 import {
     View,
@@ -522,7 +523,6 @@ const WorkSchedule = ({navigation}: any) => {
 
     useEffect(() => {
         handleGetListWorkSchedule();
-        // eslint-disable-next-line
     }, []);
 
     if (isLoading) return <Loading />;
@@ -796,6 +796,7 @@ const styles = StyleSheet.create({
     flatListSchedule: {
         flexGrow: 1,
         gap: 15,
+        paddingBottom: 25,
     },
     workCard: {
         gap: 12,

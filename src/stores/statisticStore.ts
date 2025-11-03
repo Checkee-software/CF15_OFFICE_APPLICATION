@@ -175,7 +175,10 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                             {
                                 value: notComplete,
                                 color: '#FF4E45',
-                                text: notComplete > 0 ? `${notComplete}%` : '',
+                                text:
+                                    notComplete > 0
+                                        ? `${notComplete.toFixed(1)}%`
+                                        : '',
                             },
                         ],
                     };

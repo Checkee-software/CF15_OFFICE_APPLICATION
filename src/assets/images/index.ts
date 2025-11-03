@@ -18,6 +18,7 @@ import emptyHistoryList from './empty-history-list.png';
 import emptyWorkList from './empty-work-list.png';
 import approve from './approve.png';
 import approveHarvest from './approve-harvest.png';
+import harvestSchedule from './harvest-schedule.png';
 
 const images = {
     feedBack: feedBack,
@@ -40,6 +41,7 @@ const images = {
     emptyWorkList: emptyWorkList,
     approve: approve,
     approveHarvest: approveHarvest,
+    harvestSchedule: harvestSchedule,
 
     backgroundLogin: require('./picloginbg.png'),
     avatar: require('./picavt.png'),

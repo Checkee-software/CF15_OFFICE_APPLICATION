@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
 import {
     View,
@@ -15,12 +16,16 @@ import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
 import {useAuthStore} from '../../../stores/authStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import useNotificationStore from '@/stores/notificationStore';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {Marquee} from '@animatereactnative/marquee';
+import {useIsFocused} from '@react-navigation/native';
 
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
     const [announcement, setAnnouncement] = useState('');
     const [scrollX] = useState(new Animated.Value(0));
     const screenWidth = Dimensions.get('window').width;
+    const isFocused = useIsFocused();
 
     //console.log(userInfo);
 
@@ -96,6 +101,13 @@ export default function Main({navigation}: any) {
             label: 'Thu hoạch',
             buttonImage: images.approveHarvest,
             navigateTo: SCREEN_INFO.HARVEST.key,
+        },
+        {
+            function: '',
+            key: 'harvestschedule',
+            label: 'Quy trình thu hoạch',
+            buttonImage: images.harvestSchedule,
+            navigateTo: SCREEN_INFO.HARVEST_SCHEDULE.key,
         },
         {
             function: 'FEEDBACK',
@@ -194,18 +206,12 @@ export default function Main({navigation}: any) {
                 item =>
                     item.key !== 'gardenForWorker' &&
                     item.key !== 'gardenDeclareForWorker' &&
-                    item.key !== 'gardenInfo' &&
                     item.key !== 'unit' &&
-                    item.key !== 'workschedule' &&
                     item.key !== 'browseaddmaterial' &&
                     item.key !== 'browseharvest' &&
                     item.key !== 'harvest',
             );
-            const reorderedMenu = [
-                ...filteredMenu.filter(item => item.key === 'statistic'),
-                ...filteredMenu.filter(item => item.key !== 'statistic'),
-            ];
-            return reorderedMenu.filter(
+            return filteredMenu.filter(
                 item => !item.function || hasAccessToFunction(item.function),
             );
         }
@@ -251,7 +257,8 @@ export default function Main({navigation}: any) {
                     item.key !== 'employee' &&
                     item.key !== 'gardenInfo' &&
                     item.key !== 'browseaddmaterial' &&
-                    item.key !== 'browseharvest',
+                    item.key !== 'browseharvest' &&
+                    item.key !== 'harvestschedule',
             );
 
             return filteredMenu.filter(item => {
@@ -309,19 +316,21 @@ export default function Main({navigation}: any) {
                         />
                     </TouchableOpacity>
                 </View>
-                {announcement ? (
+                {announcement && isFocused && (
                     <View style={MainStyles.announcementContainer}>
-                        <Animated.Text
-                            style={[
-                                MainStyles.announcementText,
-                                {
-                                    transform: [{translateX: scrollX}],
-                                },
-                            ]}>
-                            {announcement}
-                        </Animated.Text>
+                        <GestureHandlerRootView>
+                            <Marquee
+                                frameRate={30}
+                                spacing={120}
+                                speed={1.5}
+                                withGesture={false}>
+                                <Text style={MainStyles.announcementText}>
+                                    {announcement}
+                                </Text>
+                            </Marquee>
+                        </GestureHandlerRootView>
                     </View>
-                ) : null}
+                )}
                 <View style={MainStyles.mainMenu}>
                     <View style={MainStyles.warpMenuButton}>
                         {menuList.map(item => (
@@ -432,6 +441,5 @@ const MainStyles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 22,
         paddingHorizontal: 10,
-        width: '200%',
     },
 });

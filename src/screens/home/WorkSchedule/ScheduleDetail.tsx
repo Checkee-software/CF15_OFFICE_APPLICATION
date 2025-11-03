@@ -107,20 +107,18 @@ const ScheduleDetail = ({route}: any) => {
         );
 
         /* Number.EPSILON là một hằng số được dùng để tránh lỗi làm tròn số thực (số chứa số thập phân) trong máy tính */
-        const roundedProcessing = Math.round((totalSquareProcessing + Number.EPSILON) * 1000) / 1000;
+        const roundedProcessing =
+            Math.round((totalSquareProcessing + Number.EPSILON) * 1000) / 1000;
 
         const formattedProcessing =
             roundedProcessing % 1 === 0
                 ? formatNumber(roundedProcessing) // số nguyên
-                : formatNumber(
-                      Number(roundedProcessing.toFixed(3)),
-                  ); // số thực
+                : formatNumber(Number(roundedProcessing.toFixed(3))); // số thực
 
         const formattedTotalSquare =
             Number(totalSquare) % 1 === 0
                 ? formatNumber(totalSquare ?? 0) // số nguyên
                 : formatNumber(Number(Number(totalSquare ?? 0).toFixed(3))); // số thực
-
 
         return `${formattedProcessing} / ${formattedTotalSquare} ha`;
         // return `${roundedProcessing} / ${totalSquare} ha`;
@@ -655,7 +653,8 @@ const ScheduleDetail = ({route}: any) => {
                 </Text>
 
                 {(userInfo.userType.level === EOrganization.LEADER ||
-                    userInfo.userType.level === EOrganization.DEPARTMENT) && (
+                    userInfo.userType.level === EOrganization.DEPARTMENT ||
+                    userInfo.userType.level === EOrganization.MANAGEMENT) && (
                     <>
                         {userInfo.userType.level === EOrganization.LEADER && (
                             <View
@@ -1131,7 +1130,9 @@ const ScheduleDetail = ({route}: any) => {
                         </>
                     )}
 
-                    {userInfo.userType.level === EOrganization.DEPARTMENT && (
+                    {(userInfo.userType.level === EOrganization.DEPARTMENT ||
+                        userInfo.userType.level ===
+                            EOrganization.MANAGEMENT) && (
                         <List.Accordion
                             titleStyle={ScheduleDetailStyles.titleAccordion2}
                             title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}

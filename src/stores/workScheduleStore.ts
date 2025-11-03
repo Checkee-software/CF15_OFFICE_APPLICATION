@@ -1,7 +1,10 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
-import {ISchedule} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
+import {
+    EScheduleStatus,
+    ISchedule,
+} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
 import {
     IRequest,
     IRequestMaterial,
@@ -368,11 +371,54 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     },
 
     filterByStatus: status =>
-        set(state => ({
-            listWorkScheduleFilter: state.listWorkSchedule.filter(
-                task => task.status === status,
-            ),
-        })),
+        set(state => {
+            let filterData = [];
+
+            if (
+                status === EScheduleStatus.ALMOST_EXPIRE ||
+                status === EScheduleStatus.EXPIRED
+            ) {
+                const today = moment();
+
+                filterData = state.listWorkSchedule.filter(task => {
+                    const start = moment(task.startedDate); // ISO
+                    const end = moment(task.finishedDate); // ISO
+
+                    if (!start.isValid() || !end.isValid()) return false;
+
+                    // Tổng thời gian của tiến trình
+                    const totalDuration = end.diff(start);
+
+                    // Thời gian còn lại
+                    const remaining = end.diff(today);
+
+                    // Thời gian còn lại còn <= 30% tổng thời gian
+                    const threshold = totalDuration * 0.3;
+
+                    if (status === EScheduleStatus.EXPIRED) {
+                        return end.isBefore(today, 'day'); // finishedDate < hôm nay
+                    }
+
+                    if (status === EScheduleStatus.ALMOST_EXPIRE) {
+                        // còn hạn nhưng <= 30% thời gian
+                        return (
+                            end.isAfter(today, 'day') && remaining <= threshold
+                        );
+                    }
+
+                    return true;
+                });
+            } else {
+                filterData = state.listWorkSchedule.filter(
+                    task => task.status === status,
+                );
+            }
+
+            return {
+                listWorkScheduleFilter: filterData,
+            };
+        }),
+
     filterWorkSchedule: (fromDate, toDate, productTypeId, productId) =>
         set(state => {
             const parseDate = (dateStr: string) => {

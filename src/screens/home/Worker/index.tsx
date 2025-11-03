@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
     View,
     Text,
@@ -124,8 +125,8 @@ const Woker = ({navigation}: any) => {
                         </Text>
                         <Text style={WokerStyles.workerUnit}>
                             {itemListWorker.userType.level ===
-                            EOrganization.LEADER
-                                ? ''
+                            EOrganization.WORKER
+                                ? 'Người lao động'
                                 : itemListWorker.roleName}
                         </Text>
                     </View>
@@ -142,7 +143,6 @@ const Woker = ({navigation}: any) => {
 
     useEffect(() => {
         getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
-        // eslint-disable-next-line
     }, []);
 
     if (isLoading) return <Loading />;
@@ -171,7 +171,7 @@ const Woker = ({navigation}: any) => {
                         contentContainerStyle={WokerStyles.sectionListWorker}
                         data={filterWorkerBySearch}
                         renderItem={({item}) => renderWorkerBySearch(item)}
-                        keyExtractor={item => item._id}
+                        keyExtractor={(item, index) => index.toString()}
                         onRefresh={handleReFetch}
                         refreshing={isLoading}
                         ListEmptyComponent={
@@ -194,7 +194,7 @@ const Woker = ({navigation}: any) => {
                         keyboardShouldPersistTaps='handled'
                         contentContainerStyle={WokerStyles.sectionListWorker}
                         sections={listWorkerFilterByRole}
-                        keyExtractor={item => item._id}
+                        keyExtractor={(item, index) => index.toString()}
                         onRefresh={handleReFetch}
                         refreshing={isLoading}
                         renderItem={({item}) => renderListWorker(item)}

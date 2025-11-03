@@ -1,6 +1,7 @@
 /* eslint-disable curly */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
+import 'react-native-gesture-handler';
 import React, {useState, useEffect} from 'react';
 
 /* configurations */
@@ -12,6 +13,7 @@ import asyncStorageHelper from './src/utils/localStorageHelper/index';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {OneSignal, LogLevel} from 'react-native-onesignal';
 import VersionCheck from 'react-native-version-check';
+import 'react-native-reanimated';
 
 /* screens */
 import Router from './src/router';
