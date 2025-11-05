@@ -9,6 +9,7 @@ export type ScreenName =
     | 'BROWSEADDMATERIALS'
     | 'BROWSE_HARVEST'
     | 'HARVEST_SCHEDULE'
+    | 'HARVEST_SCHEDULE_DETAIL'
     | 'HARVEST'
     | 'HARVEST_DETAIL'
     | 'HARVEST_HISTORY'

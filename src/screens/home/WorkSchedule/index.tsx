@@ -601,8 +601,8 @@ const WorkSchedule = ({navigation}: any) => {
                             />
                             <Text style={styles.emptyScheduleListText}>
                                 {searchSchedule.length !== 0
-                                    ? `Không tìm thấy lịch công việc phù hợp với \n“${searchSchedule}"`
-                                    : 'Không tìm thấy danh sách lịch công việc!'}
+                                    ? `Không tìm thấy quy trình phù hợp với \n“${searchSchedule}"`
+                                    : 'Không tìm thấy danh sách quy trình!'}
                             </Text>
                         </View>
                     }

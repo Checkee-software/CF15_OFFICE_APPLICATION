@@ -7,8 +7,6 @@ import {
     Image,
     TouchableOpacity,
     ScrollView,
-    Animated,
-    Dimensions,
 } from 'react-native';
 import images from '../../../assets/images';
 import 'moment/locale/vi';
@@ -23,8 +21,6 @@ import {useIsFocused} from '@react-navigation/native';
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
     const [announcement, setAnnouncement] = useState('');
-    const [scrollX] = useState(new Animated.Value(0));
-    const screenWidth = Dimensions.get('window').width;
     const isFocused = useIsFocused();
 
     //console.log(userInfo);
@@ -142,18 +138,6 @@ export default function Main({navigation}: any) {
     useEffect(() => {
         if (notification?.message) {
             setAnnouncement(notification.message);
-
-            scrollX.setValue(screenWidth);
-            const animation = Animated.loop(
-                Animated.timing(scrollX, {
-                    toValue: -screenWidth * 1.5,
-                    duration: 10000,
-                    useNativeDriver: true,
-                }),
-            );
-            animation.start();
-
-            return () => animation.stop();
         } else {
             setAnnouncement('');
         }
@@ -440,6 +424,6 @@ const MainStyles = StyleSheet.create({
         color: 'white',
         fontWeight: '700',
         fontSize: 22,
-        paddingHorizontal: 10,
+        marginLeft: 10,
     },
 });

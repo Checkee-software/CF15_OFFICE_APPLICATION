@@ -174,24 +174,18 @@ const BottomTabsNavigator = ({navigation}: any) => {
                 }}
             /> */}
 
-            {userInfo.userType.level !== EOrganization.WORKER && (
-                <Tab.Screen
-                    component={History}
-                    name='Lịch sử'
-                    options={{
-                        headerShown: true,
-                        headerTitle: 'LỊCH SỬ HOẠT ĐỘNG',
-                        headerTitleStyle: style.headerTitle,
-                        tabBarIcon: ({color}) => (
-                            <MaterialIcons
-                                name='history'
-                                size={26}
-                                color={color}
-                            />
-                        ),
-                    }}
-                />
-            )}
+            <Tab.Screen
+                component={History}
+                name='Lịch sử'
+                options={{
+                    headerShown: true,
+                    headerTitle: 'LỊCH SỬ HOẠT ĐỘNG',
+                    headerTitleStyle: style.headerTitle,
+                    tabBarIcon: ({color}) => (
+                        <MaterialIcons name='history' size={26} color={color} />
+                    ),
+                }}
+            />
 
             <Tab.Screen
                 component={Profile}

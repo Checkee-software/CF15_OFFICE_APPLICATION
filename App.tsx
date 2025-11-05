@@ -48,15 +48,15 @@ const InitApp = () => {
         const handleNotificationClick = (event: any) => {
             const data = event.notification.additionalData;
 
-            if (data?._id && data._id !== '') {
+            if (data?.action === 'SCHEDULE') {
                 //điều hướng xem chi tiết quy trình
                 setRedirectData('schdule', data?._id);
-            } else if (data?.requestId && data.requestId !== '') {
+            } else if (data?.action === 'REQUEST') {
                 //điều hướng duyệt quy trình khi người ld gửi lên
-                setRedirectData('request', data?.requestId);
-            } else if (data.gardenId && data.gardenId !== '') {
+                setRedirectData('request', data?._id);
+            } else if (data?.action === 'HARVEST') {
                 //điều hướng duyệt thu hoạch khi người ld gửi lên
-                setRedirectData('harvest', data?.gardenId);
+                setRedirectData('harvest', data?._id);
             }
         };
 

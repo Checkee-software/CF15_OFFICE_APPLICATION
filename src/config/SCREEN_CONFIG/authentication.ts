@@ -30,6 +30,7 @@ import GardenInfoWorker1 from '@/screens/home/Garden/GardenInfoWorker1';
 import BrowseAddMaterials from '@/screens/home/BrowseAddMaterials';
 import BrowseHarvest from '@/screens/home/BrowseHarvest';
 import SchedulesHarvest from '@/screens/home/ScheduleHarvest/SchedulesHarvest';
+import SchedulesHarvestDetail from '@/screens/home/ScheduleHarvest/SchedulesHarvestDetail';
 import HarvestList from '@/screens/home/Garden/Harvest/HarvestList';
 import HarvestDetail from '@/screens/home/Garden/Harvest/HarvestDetail';
 import HarvestHistory from '@/screens/home/Garden/Harvest/HarvestHistory';
@@ -107,6 +108,13 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: SchedulesHarvest,
         options: {
             title: SCREEN_INFO.HARVEST_SCHEDULE.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.HARVEST_SCHEDULE_DETAIL.key,
+        component: SchedulesHarvestDetail,
+        options: {
+            title: SCREEN_INFO.HARVEST_SCHEDULE_DETAIL.headerTitle,
         },
     },
     //khu vườn cho worker

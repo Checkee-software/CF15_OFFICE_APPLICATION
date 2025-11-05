@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
@@ -52,9 +53,7 @@ const History = () => {
     );
 
     useEffect(() => {
-        if (userInfo.userType.level !== EOrganization.WORKER) {
-            handleGetHistoryRecord();
-        }
+        handleGetHistoryRecord();
     }, [isFocused]);
 
     if (isLoading) return <Loading />;
