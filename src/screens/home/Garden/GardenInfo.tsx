@@ -31,6 +31,9 @@ const GardenInfo = () => {
     const [selectedTeam, setSelectedTeam] = useState(null);
     const [selectedPlant, setSelectedPlant] = useState(null);
     const [selectedGarden, setSelectedGarden] = useState(null);
+    const [groupedGardens, setGroupedGardens] = useState<
+        Record<string, IGarden[]>
+    >({});
 
     const [expandedParentId, setExpandedParentId] = useState<string | null>(
         null,
@@ -51,6 +54,7 @@ const GardenInfo = () => {
         getPlantGarden,
     } = useGardenStore();
     const {userInfo} = useAuthStore();
+    const isDepartment = userInfo?.userType?.level === 'DEPARTMENT';
 
     const [gardenNameInput, setGardenNameInput] = useState({_id: '', name: ''});
     const [showInputGardenName, setShowInputGardenName] = useState({
@@ -140,7 +144,9 @@ const GardenInfo = () => {
     };
 
     // useEffect(() => {
-    //     fetchGardens(userInfo._id);
+    //     filterGarden({
+    //         userId: userInfo._id,
+    //     });
     // }, []);
 
     useEffect(() => {
@@ -160,6 +166,21 @@ const GardenInfo = () => {
         }, 400);
         return () => clearTimeout(timeout);
     }, [searchText, filters]);
+
+    useEffect(() => {
+        if (gardens && gardens.length > 0) {
+            const grouped: Record<string, IGarden[]> = {};
+            gardens.forEach(garden => {
+                const key = isDepartment
+                    ? garden.groupId
+                    : garden.productTypeId;
+                if (!key) return;
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(garden);
+            });
+            setGroupedGardens(grouped);
+        }
+    }, [gardens, isDepartment]);
 
     const renderGardenItem = (item: IGarden) => (
         <TouchableOpacity
@@ -219,39 +240,16 @@ const GardenInfo = () => {
         </TouchableOpacity>
     );
 
-    const isDepartment = userInfo?.userType?.level === 'DEPARTMENT';
-
     const renderParentItem = ({item}: {item: any}) => {
         const isExpanded = expandedParentId === item.value;
-        const gardensOfParent = isExpanded
-            ? gardens.filter(g =>
-                  isDepartment
-                      ? g.groupId === item.value
-                      : g.productTypeId === item.value,
-              )
-            : [];
+        const gardensOfParent = groupedGardens[item.value] || [];
 
         return (
             <View>
                 <TouchableOpacity
                     style={styles.teamCard}
                     onPress={() => {
-                        if (isExpanded) {
-                            setExpandedParentId(null);
-                        } else {
-                            setExpandedParentId(item.value);
-                            if (isDepartment) {
-                                filterGarden({
-                                    groupId: item.value,
-                                    userId: userInfo._id,
-                                });
-                            } else {
-                                filterGarden({
-                                    productTypeId: item.value,
-                                    userId: userInfo._id,
-                                });
-                            }
-                        }
+                        setExpandedParentId(isExpanded ? null : item.value);
                     }}>
                     <View style={{flexDirection: 'row', alignItems: 'center'}}>
                         <Icon
