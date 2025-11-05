@@ -356,7 +356,7 @@ const MainStyles = StyleSheet.create({
         marginBottom: 10,
     },
     helloTime: {
-        flexDirection: 'column',
+        width: '75%',
     },
     helloTimeText: {
         fontSize: 13,
