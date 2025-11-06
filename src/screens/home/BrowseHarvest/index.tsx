@@ -218,12 +218,19 @@ const BrowseHarvest = () => {
                     </Text>
                 </View>
 
-                <View style={styles.warpLabelAndValue}>
-                    <Text style={styles.label}>Người duyệt</Text>
-                    <Text style={styles.value}>
-                        {itemGardenWork.verifierName || ''}
-                    </Text>
-                </View>
+                {(itemGardenWork.status === EStatusData.VERIFIED ||
+                    itemGardenWork.status === EStatusData.DENIED) && (
+                    <View style={styles.warpLabelAndValue}>
+                        <Text style={styles.label}>
+                            {itemGardenWork.status === EStatusData.VERIFIED
+                                ? 'Người duyệt'
+                                : 'Người từ chối'}
+                        </Text>
+                        <Text style={styles.value}>
+                            {itemGardenWork.verifierName || ''}
+                        </Text>
+                    </View>
+                )}
             </View>
 
             {itemGardenWork.status === EStatusData.NONE ? (

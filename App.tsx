@@ -48,6 +48,8 @@ const InitApp = () => {
         const handleNotificationClick = (event: any) => {
             const data = event.notification.additionalData;
 
+            console.log('notification-click: ', data);
+
             if (data?.action === 'SCHEDULE') {
                 //điều hướng xem chi tiết quy trình
                 setRedirectData('schdule', data?._id);

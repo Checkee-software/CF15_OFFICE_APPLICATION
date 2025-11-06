@@ -85,7 +85,7 @@ const TaskListSection = ({
         }
     };
 
-    console.log(taskInputs);
+    console.log('zxcvzxcv', taskInputs);
     console.log(gardenAreaType);
 
     return (
@@ -184,22 +184,24 @@ const TaskListSection = ({
                                 </>
                             )}
 
-                            <View style={{gap: 0, marginBottom: 10}}>
-                                <Text style={styles.warningText}>
-                                    Diện tích không được vượt quá {gardenArea}{' '}
-                                    {gardenAreaType}
-                                </Text>
+                            {gardenId !== '' && (
+                                <View style={{gap: 0, marginBottom: 10}}>
+                                    <Text style={styles.warningText}>
+                                        Diện tích không được vượt quá{' '}
+                                        {gardenArea} {gardenAreaType}
+                                    </Text>
 
-                                <Text style={styles.warningText}>
-                                    Diện tích còn lại cần hoàn thành:{' '}
-                                    {remainingArea} {gardenAreaType}
-                                </Text>
+                                    <Text style={styles.warningText}>
+                                        Diện tích còn lại cần hoàn thành:{' '}
+                                        {remainingArea} {gardenAreaType}
+                                    </Text>
 
-                                <Text style={styles.warningText}>
-                                    Diện tích đã làm: {task.currentArea}{' '}
-                                    {gardenAreaType}
-                                </Text>
-                            </View>
+                                    <Text style={styles.warningText}>
+                                        Diện tích đã làm: {task.currentArea}{' '}
+                                        {gardenAreaType}
+                                    </Text>
+                                </View>
+                            )}
                         </CollapsibleTaskBlock>
                     );
                 })}

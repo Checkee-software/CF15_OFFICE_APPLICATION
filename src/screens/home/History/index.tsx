@@ -3,9 +3,7 @@
 import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
 import images from '../../../assets/images';
-import {useAuthStore} from '@/stores/authStore';
 import {useHistoryRecordsStore} from '@/stores/historyRecordsStore';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import Loading from '@/screens/subscreen/Loading';
 import moment from 'moment';
 import {useIsFocused} from '@react-navigation/native';
@@ -13,7 +11,6 @@ import {useIsFocused} from '@react-navigation/native';
 const History = () => {
     const isFocused = useIsFocused();
 
-    const {userInfo} = useAuthStore();
     const {isLoading, listHistoryRecords, getListHistoryRecord} =
         useHistoryRecordsStore();
 
@@ -60,33 +57,27 @@ const History = () => {
 
     return (
         <View style={styles.container}>
-            {userInfo.userType.level !== EOrganization.WORKER ? (
-                <FlatList
-                    contentContainerStyle={styles.flatListHistory}
-                    data={listHistoryRecords}
-                    renderItem={({item}: any) => renderItemHistory(item)}
-                    keyExtractor={item => item._id}
-                    onRefresh={handleGetHistoryRecord}
-                    refreshing={isLoading}
-                    showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <Image
-                                source={images.emptyHistoryList}
-                                style={styles.emptyImage}
-                                resizeMode='contain'
-                            />
-                            <Text style={styles.emptyText}>
-                                Lịch sử hoạt động trống!
-                            </Text>
-                        </View>
-                    }
-                />
-            ) : (
-                <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyText}>Danh sách trống!</Text>
-                </View>
-            )}
+            <FlatList
+                contentContainerStyle={styles.flatListHistory}
+                data={listHistoryRecords}
+                renderItem={({item}: any) => renderItemHistory(item)}
+                keyExtractor={item => item._id}
+                onRefresh={handleGetHistoryRecord}
+                refreshing={isLoading}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                    <View style={styles.emptyContainer}>
+                        <Image
+                            source={images.emptyHistoryList}
+                            style={styles.emptyImage}
+                            resizeMode='contain'
+                        />
+                        <Text style={styles.emptyText}>
+                            Lịch sử hoạt động trống!
+                        </Text>
+                    </View>
+                }
+            />
         </View>
     );
 };

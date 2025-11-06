@@ -35,6 +35,7 @@ const WorkScreen = () => {
         listGardenWorkBrowseFilter,
         badgeGardenWorkUnBrowse,
         isLoading,
+        isLoadingCreate,
         getRequestDataGarden,
         filterByStatus,
         createRateReportHarvest,
@@ -137,9 +138,10 @@ const WorkScreen = () => {
                     <Text style={styles.label}>Diện tích đã làm</Text>
                     <Text style={styles.value}>
                         {`${
-                            selectedStatus !== 1
-                                ? itemGardenWork.processingRate
-                                : itemGardenWork.area
+                            itemGardenWork.type === 'CA_MAY' ||
+                            selectedStatus === 1
+                                ? itemGardenWork.area
+                                : itemGardenWork.processingRate
                         } ha \n`}
 
                         <Text style={styles.valueRemaining}>
@@ -466,11 +468,9 @@ const WorkScreen = () => {
         }
     }, []);
 
-    if (isLoading) {
+    if (isLoading || isLoadingCreate) {
         return <Loading />;
     }
-
-    console.log(listGardenWorkBrowseFilter);
 
     return (
         <View style={styles.container}>

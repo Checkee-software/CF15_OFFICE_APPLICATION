@@ -45,6 +45,7 @@ export type IGardenHarvest = {
     ownerName: string;
     productName: string;
     productTypeName: string;
+    verifierName: string;
 };
 
 interface gardenWorkStore {

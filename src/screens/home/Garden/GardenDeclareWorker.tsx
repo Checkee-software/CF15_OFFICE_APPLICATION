@@ -92,7 +92,6 @@ const GardenDeclare = () => {
     }, []);
 
     useEffect(() => {
-        console.log(detailWorkSchedule);
         if (detailWorkSchedule && !hasLogged.current) {
             console.log('📦 Chi tiết công việc:', detailWorkSchedule);
             hasLogged.current = true;
@@ -143,7 +142,7 @@ const GardenDeclare = () => {
                     })),
                 );
 
-            console.log('1111', allMachinesWithTaskInfo);
+            //console.log('tất cả ca máy đang có: ', allMachinesWithTaskInfo);
 
             setAvailableMachines(allMachinesWithTaskInfo);
         }

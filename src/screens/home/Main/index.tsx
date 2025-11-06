@@ -305,7 +305,7 @@ export default function Main({navigation}: any) {
                         <GestureHandlerRootView>
                             <Marquee
                                 frameRate={30}
-                                spacing={120}
+                                spacing={150}
                                 speed={1.5}
                                 withGesture={false}>
                                 <Text style={MainStyles.announcementText}>

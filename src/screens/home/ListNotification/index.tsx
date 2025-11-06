@@ -39,6 +39,11 @@ const ListNotification = ({navigation}: any) => {
                     _id: item.referenceId,
                 });
                 break;
+            case 'HARVEST':
+                navigation.navigate(SCREEN_INFO.HARVEST_SCHEDULE.key, {
+                    _id: item.referenceId,
+                });
+                break;
             default:
                 break;
         }
