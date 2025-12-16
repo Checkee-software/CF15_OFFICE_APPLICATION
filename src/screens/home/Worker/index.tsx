@@ -16,8 +16,16 @@ import images from '../../../assets/images';
 import {useWorkerStore} from '../../../stores/workerStore';
 import Loading from '@/screens/subscreen/Loading';
 import {useAuthStore} from '../../../stores/authStore';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import {
+    EOrganization,
+    organizations,
+} from '@/shared-types/common/Permissions/Permissions';
 import Snackbar from 'react-native-snackbar';
+
+interface ListUnitCard {
+    groupId: string;
+    isExpand: boolean;
+}
 
 const Woker = ({navigation}: any) => {
     const {
@@ -30,6 +38,7 @@ const Woker = ({navigation}: any) => {
     const {userInfo} = useAuthStore();
 
     const [searchWorker, setSearchWorker] = useState('');
+    const [listUnitCard, setListUnitCard] = useState<ListUnitCard[]>([]);
 
     const filterWorkerBySearch = listWorker.filter(user =>
         user?.fullName.toLowerCase().includes(searchWorker.toLowerCase()),
@@ -83,35 +92,31 @@ const Woker = ({navigation}: any) => {
                             {itemWorkerBySearch.fullName}
                         </Text>
                         <Text style={WokerStyles.workerUnit}>
+                            {itemWorkerBySearch.roleName}
                             {itemWorkerBySearch.userType.level ===
-                            EOrganization.LEADER
-                                ? ''
-                                : itemWorkerBySearch.roleName}
+                            EOrganization.DEPARTMENT
+                                ? ` - ${itemWorkerBySearch.departmentName}`
+                                : itemWorkerBySearch?.groupName &&
+                                  ` - ${itemWorkerBySearch.groupName}`}
                         </Text>
                     </View>
-                </View>
-
-                <View>
-                    <Text style={WokerStyles.workerOrder}>
-                        {itemWorkerBySearch.order}
-                    </Text>
                 </View>
             </TouchableOpacity>
         </View>
     );
 
-    const renderListWorker = (itemListWorker: any) => (
+    const renderWorkersUnit = (itemListWorkerUnit: any) => (
         <View style={WokerStyles.listWorkerMargin}>
             <TouchableOpacity
                 style={WokerStyles.workerCard}
-                onPress={() => handleNavigate(itemListWorker)}>
+                onPress={() => handleNavigate(itemListWorkerUnit)}>
                 <View style={WokerStyles.leftWorkerCard}>
                     <View style={WokerStyles.workerAvatar}>
                         <Image
                             source={
-                                itemListWorker.avatar
+                                itemListWorkerUnit.avatar
                                     ? {
-                                          uri: itemListWorker.avatar,
+                                          uri: itemListWorkerUnit.avatar,
                                       }
                                     : images.avatar
                             }
@@ -121,29 +126,133 @@ const Woker = ({navigation}: any) => {
 
                     <View style={WokerStyles.workerNameAndUnit}>
                         <Text style={WokerStyles.workerName}>
-                            {itemListWorker.fullName}
+                            {itemListWorkerUnit.fullName}
                         </Text>
                         <Text style={WokerStyles.workerUnit}>
-                            {itemListWorker.userType.level ===
-                            EOrganization.WORKER
-                                ? 'Người lao động'
-                                : itemListWorker.roleName}
+                            {itemListWorkerUnit.roleName
+                                ? itemListWorkerUnit.roleName
+                                : organizations.find(
+                                      org =>
+                                          org.code ===
+                                          itemListWorkerUnit.userType.level,
+                                  )?.label}
+                            {itemListWorkerUnit?.groupName &&
+                                ` - ${itemListWorkerUnit.groupName}`}
                         </Text>
                     </View>
                 </View>
-
-                {/* <View>
-                    <Text style={WokerStyles.workerOrder}>
-                        {itemListWorker.order}
-                    </Text>
-                </View> */}
             </TouchableOpacity>
         </View>
     );
 
+    const renderListWorker = (itemListWorker: any) => {
+        if (itemListWorker?.workers && itemListWorker.workers?.length > 0) {
+            return (
+                <View>
+                    <TouchableOpacity
+                        style={WokerStyles.workerUnitCard}
+                        onPress={() =>
+                            setListUnitCard(prev =>
+                                prev.map(item =>
+                                    item.groupId === itemListWorker.groupId
+                                        ? {...item, isExpand: !item.isExpand}
+                                        : item,
+                                ),
+                            )
+                        }>
+                        <Text>
+                            {itemListWorker?.groupName || 'Đội này chưa có tên'}
+                            {` (${itemListWorker?.workers?.length || 0})`}
+                        </Text>
+                        <MaterialIcons
+                            name={
+                                listUnitCard.find(
+                                    item =>
+                                        item.groupId === itemListWorker.groupId,
+                                )?.isExpand
+                                    ? 'arrow-drop-up'
+                                    : 'arrow-drop-down'
+                            }
+                            color={'rgba(128, 128, 128, 1)'}
+                            size={25}
+                        />
+                    </TouchableOpacity>
+                    {listUnitCard.find(
+                        item => item.groupId === itemListWorker.groupId,
+                    )?.isExpand && (
+                        <FlatList
+                            data={itemListWorker.workers}
+                            renderItem={({item}) => renderWorkersUnit(item)}
+                            keyExtractor={(item, index) => item._id + index}
+                            //initialNumToRender={12} // render ít ban đầu
+                            //maxToRenderPerBatch={10}
+                            windowSize={5} // viewport buffer nhỏ để đỡ lag
+                            removeClippedSubviews={true}
+                        />
+                    )}
+                </View>
+            );
+        }
+
+        return (
+            <View style={WokerStyles.listWorkerMargin}>
+                <TouchableOpacity
+                    style={WokerStyles.workerCard}
+                    onPress={() => handleNavigate(itemListWorker)}>
+                    <View style={WokerStyles.leftWorkerCard}>
+                        <View style={WokerStyles.workerAvatar}>
+                            <Image
+                                source={
+                                    itemListWorker.avatar
+                                        ? {
+                                              uri: itemListWorker.avatar,
+                                          }
+                                        : images.avatar
+                                }
+                                style={WokerStyles.avatar}
+                            />
+                        </View>
+
+                        <View style={WokerStyles.workerNameAndUnit}>
+                            <Text style={WokerStyles.workerName}>
+                                {itemListWorker.fullName}
+                            </Text>
+                            <Text style={WokerStyles.workerUnit}>
+                                {itemListWorker.roleName}
+                                {itemListWorker.userType.level ===
+                                EOrganization.DEPARTMENT
+                                    ? ` - ${itemListWorker.departmentName}`
+                                    : itemListWorker?.groupName &&
+                                      ` - ${itemListWorker.groupName}`}
+                            </Text>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </View>
+        );
+    };
+
     useEffect(() => {
         getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
     }, []);
+
+    useEffect(() => {
+        if (!listWorkerFilterByRole || listWorkerFilterByRole.length === 0) {
+            return;
+        }
+
+        setListUnitCard(
+            listWorkerFilterByRole
+                .find(item => item.title === 'Người lao động')
+                ?.data.map(item => ({
+                    groupId: item.groupId,
+                    isExpand: false,
+                }))
+                .filter(
+                    (item): item is ListUnitCard => item.groupId !== undefined,
+                ) || [],
+        );
+    }, [listWorkerFilterByRole]);
 
     if (isLoading) return <Loading />;
 
@@ -200,7 +309,14 @@ const Woker = ({navigation}: any) => {
                         renderItem={({item}) => renderListWorker(item)}
                         renderSectionHeader={({section}) => (
                             <Text style={WokerStyles.workerRole}>
-                                {`${section.title} (${section.data.length})`}
+                                {section.title === 'Người lao động'
+                                    ? `${section.title} (${section.data.reduce(
+                                          (total, item) =>
+                                              total +
+                                              (item.workers?.length || 0),
+                                          0,
+                                      )})`
+                                    : `${section.title} (${section.data.length})`}
                             </Text>
                         )}
                         ListEmptyComponent={
@@ -258,6 +374,16 @@ const WokerStyles = StyleSheet.create({
     },
     listWorkerMargin: {
         marginVertical: 12,
+    },
+    workerUnitCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderRadius: 8,
+        //boxShadow: '0px 0px 2px 0px rgba(0, 0, 0, 0.25)',
+        boxShadow: '0 1 3 0 rgba(0, 0, 0, 0.25)',
+        padding: 12,
+        marginVertical: 6,
     },
     workerCard: {
         paddingHorizontal: 14,

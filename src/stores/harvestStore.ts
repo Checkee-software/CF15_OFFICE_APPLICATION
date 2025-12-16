@@ -211,6 +211,8 @@ export const useHarvestStore = create<HarvestStore>(set => ({
                 `${ENV.BACKEND_URL}/resources/harvest/detail/${_id}`,
             );
 
+            console.log(response.data?.data || {});
+
             const newschedulesHarvestDetail = {
                 ...(response.data?.data || {}),
             };

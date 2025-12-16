@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
@@ -20,6 +21,9 @@ interface listWorkerFilterByRole {
             contract: string;
             phoneNumber: string;
             ID: string;
+            groupId?: string;
+            groupName?: string;
+            workers?: IUser[];
         },
     ];
 }
@@ -66,129 +70,80 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     },
                 );
 
-                if (userLevel === EOrganization.DEPARTMENT) {
-                    const filterManagements = updateImgPathListWorker.filter(
-                        (item: {userType: {level: string}}) =>
-                            item.userType.level !== EOrganization.MANAGEMENT,
-                    );
+                const filterManagements = updateImgPathListWorker.filter(
+                    (user: {_id: string; userType: {level: string}}) =>
+                        user.userType.level === EOrganization.MANAGEMENT,
+                );
 
-                    const filterLeaders = filterManagements.filter(
-                        (user: {userType: {level: string}}) =>
-                            user.userType.level === EOrganization.LEADER,
-                    );
+                const filterDepartment = updateImgPathListWorker.filter(
+                    (user: {
+                        _id: string;
+                        userType: {_id: string; level: string};
+                    }) => user.userType.level === EOrganization.DEPARTMENT,
+                );
 
-                    const filterWorkers = filterManagements.filter(
-                        (user: {
-                            _id: string;
-                            userType: {_id: string; level: string};
-                        }) =>
-                            user.userType.level === EOrganization.DEPARTMENT &&
-                            user._id !== userId,
-                    );
+                const filterLeaders = updateImgPathListWorker.filter(
+                    (user: {_id: string; userType: {level: string}}) =>
+                        user.userType.level === EOrganization.LEADER,
+                );
 
-                    //thêm order cho 2 mảng
-                    let order = 0;
-                    filterLeaders.forEach((item: {order: number}) => {
-                        item.order = order += 1;
-                    });
+                const filterWorker = Object.values(
+                    updateImgPathListWorker
+                        .filter(
+                            (user: {_id: string; userType: {level: string}}) =>
+                                user.userType.level === EOrganization.WORKER,
+                        )
+                        .reduce((acc: any, item: any) => {
+                            const key = `${item.groupId}_${item.groupName}`;
 
-                    order = 0;
+                            if (!acc[key]) {
+                                acc[key] = {
+                                    groupId: item.groupId,
+                                    groupName: item.groupName,
+                                    workers: [],
+                                };
+                            }
 
-                    filterWorkers.forEach((item: {order: number}) => {
-                        item.order = order += 1;
-                    });
+                            acc[key].workers.push(item);
+                            return acc;
+                        }, {}),
+                );
 
-                    const newListWorker = [
-                        {
-                            title: 'Cán bộ quản lý',
-                            data: filterLeaders,
-                        },
-                        {
-                            title: 'Phòng ban',
-                            data: filterWorkers,
-                        },
-                    ];
+                const newListWorker = [
+                    {
+                        title: 'Phòng ban',
+                        data: filterDepartment,
+                    },
+                    {
+                        title: 'Cán bộ quản lý',
+                        data: filterLeaders,
+                    },
+                    {
+                        title: 'Người lao động',
+                        data: filterWorker,
+                    },
+                ];
 
-                    set({
-                        listWorker: filterManagements,
-                        listWorkerFilterByRole: newListWorker,
-                    });
-                } else {
-                    const filterManagements = updateImgPathListWorker.filter(
-                        (user: {_id: string; userType: {level: string}}) =>
-                            user.userType.level === EOrganization.MANAGEMENT &&
-                            user._id !== userId,
-                    );
-
-                    const filterDepartment = updateImgPathListWorker.filter(
-                        (user: {
-                            _id: string;
-                            userType: {_id: string; level: string};
-                        }) =>
-                            user.userType.level === EOrganization.DEPARTMENT &&
-                            user._id !== userId,
-                    );
-
-                    const filterLeaders = updateImgPathListWorker.filter(
-                        (user: {_id: string; userType: {level: string}}) =>
-                            user.userType.level === EOrganization.LEADER &&
-                            user._id !== userId,
-                    );
-
-                    const filterWorker = updateImgPathListWorker.filter(
-                        (user: {_id: string; userType: {level: string}}) =>
-                            user.userType.level === EOrganization.WORKER &&
-                            user._id !== userId,
-                    );
-
-                    //thêm order cho 4 mảng
-                    let order = 0;
-                    filterManagements.forEach((item: {order: number}) => {
-                        item.order = order += 1;
-                    });
-
-                    order = 0;
-
-                    filterDepartment.forEach((item: {order: number}) => {
-                        item.order = order += 1;
-                    });
-
-                    order = 0;
-
-                    filterLeaders.forEach((item: {order: number}) => {
-                        item.order = order += 1;
-                    });
-
-                    order = 0;
-
-                    filterWorker.forEach((item: {order: number}) => {
-                        item.order = order += 1;
-                    });
-
-                    const newListWorker = [
-                        {
-                            title: 'Ban lãnh đạo',
-                            data: filterManagements,
-                        },
-                        {
-                            title: 'Phòng ban',
-                            data: filterDepartment,
-                        },
-                        {
-                            title: 'Cán bộ quản lý',
-                            data: filterLeaders,
-                        },
-                        {
-                            title: 'Người lao động',
-                            data: filterWorker,
-                        },
-                    ];
-
-                    set({
-                        listWorker: updateImgPathListWorker,
-                        listWorkerFilterByRole: newListWorker,
-                    });
-                }
+                set({
+                    listWorker:
+                        userLevel === EOrganization.MANAGEMENT
+                            ? updateImgPathListWorker
+                            : updateImgPathListWorker.filter(
+                                  (item: any) =>
+                                      item.userType.level !==
+                                      EOrganization.MANAGEMENT,
+                              ),
+                    listWorkerFilterByRole:
+                        userLevel === EOrganization.DEPARTMENT
+                            ? newListWorker
+                            : [
+                                  ...newListWorker,
+                                  {
+                                      title: 'Ban lãnh đạo',
+                                      data: filterManagements,
+                                  },
+                              ],
+                });
             } else {
                 set({listWorker: [], listWorkerFilterByRole: []});
             }

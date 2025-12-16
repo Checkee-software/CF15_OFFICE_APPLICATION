@@ -67,14 +67,20 @@ const WorkerInfo = ({route}: any) => {
                             Số điện thoại
                         </Text>
                         <Text style={WorkerInfoStyles.valueText}>
-                            {item.phoneNumber}
+                            {userInfo?.canViewSensitiveInfo ||
+                            userInfo?.userType?.level === EOrganization.ADMIN
+                                ? item?.phoneNumber
+                                : '*'.repeat(item?.phoneNumber?.length ?? 0)}
                         </Text>
                     </View>
 
                     <View style={WorkerInfoStyles.warpLabelAndValue}>
                         <Text style={WorkerInfoStyles.labelText}>CCCD</Text>
                         <Text style={WorkerInfoStyles.valueText}>
-                            {item.ID}
+                            {userInfo?.canViewSensitiveInfo ||
+                            userInfo?.userType?.level === EOrganization.ADMIN
+                                ? item?.ID
+                                : '*'.repeat(item?.ID?.length ?? 0)}
                         </Text>
                     </View>
 
@@ -83,7 +89,13 @@ const WorkerInfo = ({route}: any) => {
                             Ngày sinh
                         </Text>
                         <Text style={WorkerInfoStyles.valueText}>
-                            {moment(item.dateOfBirth).format('l')}
+                            {userInfo?.canViewSensitiveInfo ||
+                            userInfo?.userType?.level === EOrganization.ADMIN
+                                ? moment(item.dateOfBirth).format('l')
+                                : '*'.repeat(
+                                      moment(item?.dateOfBirth).format('l')
+                                          ?.length ?? 0,
+                                  )}
                         </Text>
                     </View>
                 </View>
@@ -249,6 +261,7 @@ const WorkerInfoStyles = StyleSheet.create({
     },
     warpLabelAndValue: {
         flexDirection: 'row',
+        alignItems: 'center',
     },
 });
 

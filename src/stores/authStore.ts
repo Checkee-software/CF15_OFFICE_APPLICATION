@@ -43,6 +43,7 @@ type IUser = {
     tasks: tasks;
     groupId: string;
     groupName: string;
+    canViewSensitiveInfo: boolean;
 };
 
 type AuthStore = {
@@ -147,6 +148,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             set({isLoading: false});
         } catch (error: any) {
             set({isLoading: false});
+
+            console.log(error.response);
 
             const _error = error;
 

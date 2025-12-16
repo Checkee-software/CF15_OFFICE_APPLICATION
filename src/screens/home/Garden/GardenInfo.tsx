@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {
     View,
@@ -8,6 +9,7 @@ import {
     TextInput,
     Modal,
     Pressable,
+    FlatList,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
@@ -25,6 +27,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useStatisticStore} from '@/stores/statisticStore';
 import {useWorkScheduleStore} from '@/stores/workScheduleStore';
+import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 
 const GardenInfo = () => {
     const [filterVisible, setFilterVisible] = useState(false);
@@ -43,6 +46,8 @@ const GardenInfo = () => {
     const {getProductType, listProductType} = useWorkScheduleStore();
     const navigation = useNavigation() as any;
 
+    console.log(listProductType);
+
     const {
         gardens,
         // fetchGardens,
@@ -54,7 +59,10 @@ const GardenInfo = () => {
         getPlantGarden,
     } = useGardenStore();
     const {userInfo} = useAuthStore();
-    const isDepartment = userInfo?.userType?.level === 'DEPARTMENT';
+
+    const isDepartment =
+        userInfo?.userType?.level === EOrganization.DEPARTMENT ||
+        userInfo?.userType?.level === EOrganization.MANAGEMENT;
 
     const [gardenNameInput, setGardenNameInput] = useState({_id: '', name: ''});
     const [showInputGardenName, setShowInputGardenName] = useState({
@@ -270,9 +278,18 @@ const GardenInfo = () => {
                 {isExpanded && (
                     <View style={{paddingLeft: 30, paddingTop: 4}}>
                         {gardensOfParent.length > 0 ? (
-                            gardensOfParent.map(g => (
-                                <View key={g._id}>{renderGardenItem(g)}</View>
-                            ))
+                            // gardensOfParent.map(g => (
+                            //     <View key={g._id}>{renderGardenItem(g)}</View>
+                            // ))
+                            <FlatList
+                                data={gardensOfParent}
+                                keyExtractor={g => g._id}
+                                renderItem={({item}) => renderGardenItem(item)}
+                                initialNumToRender={12} // render ít ban đầu
+                                maxToRenderPerBatch={10}
+                                windowSize={5} // viewport buffer nhỏ để đỡ lag
+                                removeClippedSubviews={true}
+                            />
                         ) : (
                             <Text
                                 style={{

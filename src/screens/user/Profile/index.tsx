@@ -45,6 +45,14 @@ export default function Profile({navigation}: any) {
         }
     };
 
+    const renderProtectedInfo = (info: string) => {
+        const stars = '*'.repeat(info.length);
+        return userInfo?.canViewSensitiveInfo ||
+            userInfo?.userType?.level === EOrganization.ADMIN
+            ? info
+            : stars;
+    };
+
     return (
         <View style={styles.wrapper}>
             <ScrollView
@@ -179,15 +187,22 @@ export default function Profile({navigation}: any) {
 
                                     {renderInfoRow(
                                         'Ngày sinh',
-                                        `${moment(userInfo.dateOfBirth).format(
-                                            'L',
+                                        `${renderProtectedInfo(
+                                            moment(userInfo.dateOfBirth).format(
+                                                'L',
+                                            ),
                                         )}`,
                                     )}
                                     {renderInfoRow(
                                         'Số điện thoại',
-                                        `${userInfo.phoneNumber}`,
+                                        `${renderProtectedInfo(
+                                            userInfo.phoneNumber,
+                                        )}`,
                                     )}
-                                    {renderInfoRow('CCCD', `${userInfo.ID}`)}
+                                    {renderInfoRow(
+                                        'CCCD',
+                                        `${renderProtectedInfo(userInfo.ID)}`,
+                                    )}
                                     {renderInfoRow(
                                         'Ngày tuyển dụng',
                                         `${moment(

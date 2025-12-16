@@ -97,7 +97,7 @@ const HarvestDetail = () => {
                         style={styles.input}
                         placeholder='Nhập khối lượng'
                         keyboardType='numeric'
-                        value={weight}
+                        value={Number(weight).toLocaleString()}
                         onChangeText={text => {
                             let formatted = text.replace(/[^0-9]/g, '');
                             if (
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         borderColor: '#bbb',
         borderRadius: 6,
         padding: 8,
-        fontSize: 14,
+        fontSize: 20,
         backgroundColor: '#E3F2FD',
         textAlign: 'center',
         color: '#000',

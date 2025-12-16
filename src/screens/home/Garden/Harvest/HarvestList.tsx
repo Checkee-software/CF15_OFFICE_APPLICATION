@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useCallback, useEffect, useState} from 'react';
 import {
     View,
@@ -14,10 +15,10 @@ import Loading from '../../../subscreen/Loading';
 import {IGarden} from '../../../../stores/gardenStore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useAuthStore} from '../../../../stores/authStore';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useRoute} from '@react-navigation/native';
-import Backdrop from '@/screens/subscreen/Loading/index2';
 import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import asyncStorageHelper from '@/utils/localStorageHelper';
 
 const HarvestList = () => {
     const navigation = useNavigation() as any;
@@ -25,6 +26,11 @@ const HarvestList = () => {
     const {gardens, fetchGardens, isLoading, setGardenData} = useGardenStore();
     const [searchText, setSearchText] = useState('');
     const [filteredGardens, setFilteredGardens] = useState<IGarden[]>([]);
+    const [gardenNameInput, setGardenNameInput] = useState({_id: '', name: ''});
+    const [showInputGardenName, setShowInputGardenName] = useState({
+        _id: '',
+        check: false,
+    });
 
     const {userInfo} = useAuthStore();
     const route = useRoute<any>();
@@ -35,6 +41,38 @@ const HarvestList = () => {
         navigation.navigate(navigateNext, {
             code: code,
         });
+    };
+
+    const getStorageUserGardens = () => {
+        const newGardens = gardens;
+        const userGardenNickname = asyncStorageHelper.userGardenNickname;
+        const user = userGardenNickname.find(u => u.userId === userInfo._id);
+        return newGardens?.map((item: any) => {
+            let gardenNickname = '';
+            if (user) {
+                const matchedGarden = user.garden.find(
+                    g => g.gardenId === item._id,
+                );
+                if (matchedGarden) {
+                    gardenNickname = matchedGarden.gardenNickname;
+                }
+            }
+            return {...item, gardenNickname};
+        });
+    };
+
+    const saveGardenName = () => {
+        if (gardenNameInput.name !== '') {
+            asyncStorageHelper.setStorageUserGardens(
+                userInfo._id,
+                gardenNameInput._id,
+                gardenNameInput.name,
+            );
+            const newGardenNickname = getStorageUserGardens();
+            setGardenData(newGardenNickname);
+        }
+        setGardenNameInput({_id: '', name: ''});
+        setShowInputGardenName({_id: '', check: false});
     };
 
     useEffect(() => {
@@ -81,18 +119,51 @@ const HarvestList = () => {
                 resizeMode='contain'
             />
             <View style={styles.cardContent}>
-                <View style={styles.cardTextContainer}>
+                <View>
                     <Text style={styles.cardTitle}>{item.name}</Text>
+                    {showInputGardenName._id === item._id ? (
+                        <TextInput
+                            style={{width: '90%', padding: 0, margin: 0}}
+                            placeholder='Hãy đặt tên khu vườn'
+                            placeholderTextColor={'black'}
+                            autoFocus={gardenNameInput._id === item._id}
+                            onChangeText={value =>
+                                setGardenNameInput({
+                                    ...gardenNameInput,
+                                    name: value,
+                                })
+                            }
+                            value={gardenNameInput.name}
+                        />
+                    ) : (
+                        item.gardenNickname !== '' && (
+                            <Text style={styles.cardTitle}>
+                                {item.gardenNickname}
+                            </Text>
+                        )
+                    )}
                     <Text style={styles.cardSubtitle}>{item.code}</Text>
                 </View>
-                <TouchableOpacity onPress={() => handleNavigate(item.code)}>
-                    <MaterialCommunityIcons
-                        name='cart-outline'
-                        size={24}
-                        style={styles.harvestIcon}
-                    />
-                </TouchableOpacity>
             </View>
+
+            {showInputGardenName._id === item._id ? (
+                <TouchableOpacity onPress={saveGardenName}>
+                    <FontAwesome name='check' size={24} color={'#2196F3'} />
+                </TouchableOpacity>
+            ) : (
+                <TouchableOpacity
+                    onPress={() => {
+                        setShowInputGardenName({_id: item._id, check: true});
+                        setGardenNameInput({
+                            _id: item._id,
+                            name: item.gardenNickname
+                                ? item.gardenNickname
+                                : '',
+                        });
+                    }}>
+                    <FontAwesome name='pencil' size={24} color={'#FF4E45'} />
+                </TouchableOpacity>
+            )}
         </TouchableOpacity>
     );
 
@@ -191,10 +262,10 @@ export default HarvestList;
 
 const styles = StyleSheet.create({
     cardContent: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        width: '70%',
     },
 
     harvestIcon: {
@@ -254,6 +325,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
+        gap: 6,
     },
 
     image: {
@@ -271,7 +343,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
         color: '#000',
-        width: '85%',
     },
 
     cardSubtitle: {

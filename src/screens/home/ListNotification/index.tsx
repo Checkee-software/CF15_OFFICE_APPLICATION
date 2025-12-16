@@ -23,6 +23,7 @@ const ListNotification = ({navigation}: any) => {
         if (!item.isRead) {
             await markAsRead(item._id);
         }
+        console.log(item.type);
         switch (item.type) {
             case 'DOCUMENT':
                 navigation.navigate(SCREEN_INFO.DOCUMENT.key, {
@@ -41,6 +42,11 @@ const ListNotification = ({navigation}: any) => {
                 break;
             case 'HARVEST':
                 navigation.navigate(SCREEN_INFO.HARVEST_SCHEDULE.key, {
+                    _id: item.referenceId,
+                });
+                break;
+            case 'NEWS':
+                navigation.navigate(SCREEN_INFO.NEWS.key, {
                     _id: item.referenceId,
                 });
                 break;

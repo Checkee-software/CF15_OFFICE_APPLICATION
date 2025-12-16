@@ -9,7 +9,6 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {useAuthStore} from '@/stores/authStore';
 import {useHarvestStore} from '@/stores/harvestStore';
 import {EHarvestStatus} from '@/shared-types/Response/HarvestResponse/HarvestResponse';
 import colors from '@/assets/colors';
@@ -22,7 +21,6 @@ import moment from 'moment';
 import Loading from '@/screens/subscreen/Loading';
 
 const SchedulesHarvest = ({navigation}: any) => {
-    const {userInfo} = useAuthStore();
     const {schedulesHarvest, getListScheduleHarvest} = useHarvestStore();
     const [searchSchedule, setSearchSchedule] = useState<String>('');
     const [isLoading, setIsLoading] = useState<Boolean>(false);

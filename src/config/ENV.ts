@@ -1,8 +1,8 @@
 namespace ENV {
     export const BACKEND_URL: string = 'http://cf15officeservice.checkee.vn';
-        // 'http://cf15dev.checkee.vn'
-       // 'https://zlhct5tw-3015.asse.devtunnels.ms'; //url pc Phuc
-    // 'https://9g7ltw0j-3015.asse.devtunnels.ms'; //url laptop Phuc
+    // 'http://cf15dev.checkee.vn'
+    //'https://zlhct5tw-3015.asse.devtunnels.ms'; //url pc Phuc
+    //'https://9g7ltw0j-3015.asse.devtunnels.ms'; //url laptop Phuc
 }
 
 export default ENV;

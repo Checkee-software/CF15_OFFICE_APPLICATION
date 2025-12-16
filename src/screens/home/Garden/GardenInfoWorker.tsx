@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {
     View,
@@ -208,13 +209,6 @@ const GardenInfoWorker = () => {
                     )}
                     <Text style={styles.cardSubtitle}>{item.code}</Text>
                 </View>
-                {item.isHarvest && (
-                    <MaterialCommunityIcons
-                        name='cart-outline'
-                        size={24}
-                        style={styles.harvestIcon}
-                    />
-                )}
             </View>
 
             {showInputGardenName._id === item._id ? (
@@ -223,6 +217,7 @@ const GardenInfoWorker = () => {
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity
+                    style={styles.warpIcon}
                     onPress={() => {
                         setShowInputGardenName({_id: item._id, check: true});
                         setGardenNameInput({
@@ -232,6 +227,13 @@ const GardenInfoWorker = () => {
                                 : '',
                         });
                     }}>
+                    {item.isHarvest && (
+                        <MaterialCommunityIcons
+                            name='cart-outline'
+                            size={24}
+                            style={styles.harvestIcon}
+                        />
+                    )}
                     <FontAwesome name='pencil' size={24} color={'#FF4E45'} />
                 </TouchableOpacity>
             )}
@@ -442,6 +444,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        marginRight: 10,
     },
     cardTitle: {fontSize: 14, fontWeight: '600', color: '#000'},
     cardSubtitle: {fontSize: 12, color: '#888'},
@@ -449,6 +452,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingTop: 100,
+    },
+    warpIcon: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
     },
     emptyText: {fontSize: 16, color: 'gray', fontStyle: 'italic'},
     modalOverlay: {

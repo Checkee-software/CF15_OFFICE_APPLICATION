@@ -16,6 +16,7 @@ import {useWorkerStore} from '../../../stores/workerStore';
 import Loading from '@/screens/subscreen/Loading';
 import {useAuthStore} from '../../../stores/authStore';
 import Snackbar from 'react-native-snackbar';
+import {organizations} from '@/shared-types/common/Permissions/Permissions';
 
 const Unit = ({navigation}: any) => {
     const {listWorker, getListWorkerByLeader, isLoading} = useWorkerStore();
@@ -75,7 +76,15 @@ const Unit = ({navigation}: any) => {
                             {itemListWorker.fullName}
                         </Text>
                         <Text style={UnitStyles.workerUnit}>
-                            {itemListWorker.userType.unit}
+                            {
+                                organizations.find(
+                                    org =>
+                                        org.code ===
+                                        itemListWorker.userType.level,
+                                )?.label
+                            }{' '}
+                            {itemListWorker.userType.unit &&
+                                `- ${itemListWorker.userType.unit}`}
                         </Text>
                     </View>
                 </View>
@@ -94,6 +103,8 @@ const Unit = ({navigation}: any) => {
     }, []);
 
     if (isLoading) return <Loading />;
+
+    console.log(filterWorkerBySearch);
 
     return (
         <View style={UnitStyles.container}>
