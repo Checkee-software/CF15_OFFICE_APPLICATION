@@ -33,6 +33,7 @@ export type ScreenName =
     | 'SCHEDULEDETAIL'
     | 'UNIT'
     | 'STATISTIC'
+    | 'STATISTIC_HARVEST'
     /* USER */
     | 'PROFILE'
     | 'UPDATE_PASSWORD'

@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 import {
     Modal,
@@ -9,8 +9,6 @@ import {
     TouchableOpacity,
     ScrollView,
 } from 'react-native';
-import StatisticResult from './StatisticResult';
-import StatisticResultWorker from './StatisticResultWorker';
 import {useStatisticStore} from '../../../stores/statisticStore';
 import Backdrop from '@/screens/subscreen/Loading/index2';
 import moment from 'moment';
@@ -21,24 +19,24 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {useAuthStore} from '@/stores/authStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import Loading from '@/screens/subscreen/Loading';
+import ProgressBlock from './Components/ProgressBlock';
 
-const Statistic = () => {
+const StatisticHarvest = () => {
     const listStatisticTypeDefault = [
         {_id: 'WORK', name: 'Quy trình'},
         {_id: 'PRODUCT', name: 'Cây trồng'},
         {_id: 'GROUP', name: 'Đội sản xuất'},
-        {_id: 'DISPLAY', name: 'Tiến độ'},
     ];
 
     const {
-        getStatistic,
-        getStatisticProgress,
+        getStatisticHarvest,
         getListSelection,
         getGroupName,
         clearStatisticData,
         clearListSelection,
         isLoading,
         listSelection,
+        statisticData,
     } = useStatisticStore();
 
     const {userInfo} = useAuthStore();
@@ -51,71 +49,40 @@ const Statistic = () => {
 
     const [showForm, setShowForm] = useState(false);
     const [selectedType, setSelectedType] = useState<EType | ''>('');
-    const [currentSelectedType, setCurrentSelectedType] = useState<EType | ''>(
-        '',
-    );
-    const [selectedTarget, setSelectedTarget] = useState('');
-    const [currentSelectedTarget, setCurrentSelectedTarget] = useState('');
-    const [selectedTargetName, setSelectedTargetName] = useState('');
-    const [currentSelectedTargetName, setCurrentSelectedTargetName] =
-        useState('');
+
+    const [selectedTarget, setSelectedTarget] = useState({
+        id: '',
+        name: '',
+    });
+
     const [selectedTimeOption, setSelectedTimeOption] = useState<string | null>(
         null,
     );
-    const [currentSelectedTimeOption, setCurrentSelectedTimeOption] = useState<
-        string | null
-    >(null);
     const [startDate, setStartDate] = useState<string | null>(null);
-    const [currentStartDate, setCurrentStartDate] = useState<string | null>(
-        moment()
-            .startOf('month')
-            .set({
-                hour: 0,
-                minute: 0,
-                second: 0,
-                millisecond: 0,
-            })
-            .add(7, 'hours')
-            .toISOString(),
-    );
     const [endDate, setEndDate] = useState<string | null>(null);
-    const [currentEndDate, setCurrentEndDate] = useState<string | null>(
-        moment()
-            .endOf('month')
-            .set({
-                hour: 23,
-                minute: 59,
-                second: 59,
-                millisecond: 999,
-            })
-            .add(7, 'hours')
-            .toISOString(),
-    );
     const [showStartDatePicker, setShowStartDatePicker] = useState(false);
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
-    // const closeModalFilter = () => {
-    //     setShowForm(!showForm);
-    //     setSelectedType(currentSelectedType);
-    //     setSelectedTarget(currentSelectedTarget);
-    //     setSelectedTargetName(currentSelectedTargetName);
-    //     setSelectedTimeOption(currentSelectedTimeOption);
-    //     setStartDate(currentStartDate);
-    //     setCurrentEndDate(currentEndDate);
-    // };
-
     const renderTimeStatistic = () => {
-        if (currentSelectedTimeOption === 'month') {
+        if (selectedTimeOption === 'month') {
             return 'Tháng này';
-        } else if (currentSelectedTimeOption === 'quarter') {
+        } else if (selectedTimeOption === 'quarter') {
             return 'Theo quý';
-        } else if (currentSelectedTimeOption === 'year') {
+        } else if (selectedTimeOption === 'year') {
             return 'Theo năm';
         } else {
-            return `${moment(currentStartDate).format('DD/MM/YYYY')} - ${moment
-                .utc(currentEndDate)
+            return `${moment(startDate).format('DD/MM/YYYY')} - ${moment
+                .utc(endDate)
                 .format('DD/MM/YYYY')}`;
         }
+    };
+
+    const formatVND = (value: number) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            maximumFractionDigits: 0, // không hiển thị số lẻ
+        }).format(value);
     };
 
     const onChangeSelectedType = async (value: EType) => {
@@ -125,23 +92,18 @@ const Statistic = () => {
         ) {
             setSelectedType('GROUP' as EType);
             await getGroupName(userInfo.groupId);
-            setSelectedTarget(userInfo.groupId);
-        } else if (value !== 'DISPLAY') {
+            setSelectedTarget({
+                id: userInfo.groupId,
+                name: userInfo.groupName,
+            });
+        } else {
             setSelectedType(value);
             await getListSelection(value);
-            setSelectedTarget('');
-            setSelectedTargetName('');
-        } else {
-            await getListSelection('WORK');
-            setSelectedType(value);
-            setSelectedTarget('');
-            setSelectedTargetName('');
+            setSelectedTarget({
+                id: '',
+                name: '',
+            });
         }
-    };
-
-    const onChangeSelectedTarget = (value: any) => {
-        setSelectedTarget(value._id);
-        setSelectedTargetName(value.name);
     };
 
     const onChangeSelectedTime = (value: moment.unitOfTime.StartOf) => {
@@ -225,28 +187,18 @@ const Statistic = () => {
     };
 
     const handleGetStatistic = async () => {
-        setCurrentSelectedType(selectedType);
-        setCurrentSelectedTarget(selectedTarget);
-        setCurrentSelectedTargetName(selectedTargetName);
-        setCurrentSelectedTimeOption(selectedTimeOption);
-        setCurrentStartDate(startDate);
-        setCurrentEndDate(endDate);
-
-        if (selectedType === 'DISPLAY') {
-            await getStatisticProgress({
-                type: selectedType as EType,
-                startDate: new Date(startDate as string),
-                endDate: new Date(endDate as string),
-                targetId: selectedTarget,
-            });
-        } else {
-            await getStatistic({
-                type: selectedType as EType,
-                startDate: new Date(startDate as string),
-                endDate: new Date(endDate as string),
-                targetId: selectedTarget,
-            });
-        }
+        await getStatisticHarvest({
+            type: selectedType as EType,
+            startDate: new Date(startDate as string),
+            endDate: new Date(endDate as string),
+            targetType:
+                selectedType === 'WORK'
+                    ? 'harvestId'
+                    : selectedType === 'PRODUCT'
+                    ? 'productId'
+                    : 'groupId',
+            targetTypeValue: selectedTarget.id,
+        });
         setShowForm(!showForm);
     };
 
@@ -262,8 +214,12 @@ const Statistic = () => {
                     ),
                 );
 
-                setSelectedType('DISPLAY' as EType);
-                setCurrentSelectedType('DISPLAY' as EType);
+                setSelectedType('GROUP' as EType);
+                setSelectedTarget({
+                    id: 'all',
+                    name: 'Tất cả',
+                });
+
                 await getListSelection('WORK');
 
                 const selectedStartDate = moment()
@@ -288,17 +244,17 @@ const Statistic = () => {
                     .toISOString();
 
                 setSelectedTimeOption('month');
-                setCurrentSelectedTimeOption('month');
-                setStartDate(selectedStartDate);
-                setCurrentStartDate(selectedStartDate);
-                setEndDate(selectedEndDate);
-                setCurrentEndDate(selectedEndDate);
 
-                await getStatisticProgress({
-                    type: 'DISPLAY' as EType,
+                setStartDate(selectedStartDate);
+
+                setEndDate(selectedEndDate);
+
+                await getStatisticHarvest({
+                    type: 'GROUP' as EType,
                     startDate: new Date(selectedStartDate),
                     endDate: new Date(selectedEndDate),
-                    targetId: currentSelectedTarget,
+                    targetType: 'groupId',
+                    targetTypeValue: 'all',
                 });
             } else if (userInfo.userType.level === EOrganization.WORKER) {
                 setListStatisticType(
@@ -308,7 +264,6 @@ const Statistic = () => {
                     ),
                 );
                 setSelectedType('DISPLAY' as EType);
-                setCurrentSelectedType('DISPLAY' as EType);
 
                 await getListSelection('WORK');
 
@@ -334,27 +289,25 @@ const Statistic = () => {
                     .toISOString();
 
                 setSelectedTimeOption('month');
-                setCurrentSelectedTimeOption('month');
-                setStartDate(selectedStartDate);
-                setCurrentStartDate(selectedStartDate);
-                setEndDate(selectedEndDate);
-                setCurrentEndDate(selectedEndDate);
 
-                await getStatisticProgress({
-                    type: 'DISPLAY' as EType,
-                    startDate: new Date(selectedStartDate),
-                    endDate: new Date(selectedEndDate),
-                    targetId: currentSelectedTarget,
-                });
+                setStartDate(selectedStartDate);
+
+                setEndDate(selectedEndDate);
+
+                // await getStatisticProgress({
+                //     type: 'DISPLAY' as EType,
+                //     startDate: new Date(selectedStartDate),
+                //     endDate: new Date(selectedEndDate),
+                //     targetId: currentSelectedTarget,
+                // });
             } else {
-                setListStatisticType(
-                    listStatisticTypeDefault.filter(
-                        (item: any) => item._id !== 'DISPLAY',
-                    ),
-                );
+                setListStatisticType(listStatisticTypeDefault);
 
                 setSelectedType('WORK' as EType);
-                setCurrentSelectedType('DISPLAY' as EType);
+                setSelectedTarget({
+                    id: 'all',
+                    name: 'Tất cả',
+                });
 
                 await getListSelection('WORK');
 
@@ -380,17 +333,17 @@ const Statistic = () => {
                     .toISOString();
 
                 setSelectedTimeOption('month');
-                setCurrentSelectedTimeOption('month');
-                setStartDate(selectedStartDate);
-                setCurrentStartDate(selectedStartDate);
-                setEndDate(selectedEndDate);
-                setCurrentEndDate(selectedEndDate);
 
-                await getStatistic({
+                setStartDate(selectedStartDate);
+
+                setEndDate(selectedEndDate);
+
+                await getStatisticHarvest({
                     type: 'WORK' as EType,
                     startDate: new Date(selectedStartDate),
                     endDate: new Date(selectedEndDate),
-                    targetId: currentSelectedTarget,
+                    targetType: 'harvestId',
+                    targetTypeValue: 'all',
                 });
             }
 
@@ -400,9 +353,9 @@ const Statistic = () => {
         fetchData();
     }, []);
 
-    if (firstAccess) {
-        return <Loading />;
-    }
+    // if (firstAccess) {
+    //     return <Loading />;
+    // }
 
     return (
         <View style={styles.container}>
@@ -412,13 +365,11 @@ const Statistic = () => {
                         style={styles.btnCurrentStatistic}
                         onPress={() => setShowForm(!showForm)}>
                         <Text style={styles.statisticTypeText}>
-                            {currentSelectedType === 'WORK'
+                            {selectedType === 'WORK'
                                 ? 'Quy trình'
                                 : selectedType === 'PRODUCT'
                                 ? 'Cây trồng'
-                                : selectedType === 'GROUP'
-                                ? 'Đội sản xuất'
-                                : 'Tiến độ'}
+                                : 'Đội sản xuất'}
                         </Text>
                         <View style={styles.warpIconTextStatistic}>
                             <View style={{flexDirection: 'row', gap: 10}}>
@@ -428,9 +379,9 @@ const Statistic = () => {
                                     color={'#808080'}
                                 />
                                 <Text style={styles.statisticTargetText}>
-                                    {currentSelectedTargetName === ''
+                                    {selectedTarget.name === ''
                                         ? 'Tất cả'
-                                        : currentSelectedTargetName}
+                                        : selectedTarget.name}
                                 </Text>
                             </View>
 
@@ -452,15 +403,13 @@ const Statistic = () => {
                             }>{`Thời gian: ${renderTimeStatistic()}`}</Text>
                     </TouchableOpacity>
 
-                    <View style={styles.statisticContent}>
-                        {userInfo.userType.level !== EOrganization.WORKER ? (
-                            <StatisticResult selectedType={selectedType} />
-                        ) : (
-                            <StatisticResultWorker
-                                selectedType={selectedType}
-                            />
-                        )}
-                    </View>
+                    {statisticData && statisticData.length > 0 && (
+                        <View style={styles.statisticContent}>
+                            {statisticData.map((item: any, index: number) => (
+                                <ProgressBlock {...item} key={index} />
+                            ))}
+                        </View>
+                    )}
                 </View>
             </ScrollView>
 
@@ -510,10 +459,17 @@ const Statistic = () => {
                             labelField='name'
                             valueField='_id'
                             placeholder='Chọn'
-                            value={selectedTarget}
-                            onChange={itemValue =>
-                                onChangeSelectedTarget(itemValue)
+                            value={
+                                selectedTarget.id !== 'all'
+                                    ? selectedTarget.id
+                                    : ''
                             }
+                            onChange={itemValue => {
+                                setSelectedTarget({
+                                    id: itemValue._id,
+                                    name: itemValue.name,
+                                });
+                            }}
                         />
 
                         <Text style={styles.text1}>Thời gian</Text>
@@ -725,6 +681,8 @@ const Statistic = () => {
     );
 };
 
+export default StatisticHarvest;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -887,10 +845,19 @@ const styles = StyleSheet.create({
         fontSize: 13,
     },
     statisticContent: {
-        alignItems: 'center',
+        marginTop: 75,
         justifyContent: 'center',
         flex: 1,
+        gap: 120,
+    },
+    chartTooltip: {
+        padding: 6,
+        backgroundColor: '#5A5A5B',
+        borderRadius: 8,
+    },
+    tooltipText: {
+        color: '#fff',
+        fontWeight: 500,
+        fontSize: 13,
     },
 });
-
-export default Statistic;

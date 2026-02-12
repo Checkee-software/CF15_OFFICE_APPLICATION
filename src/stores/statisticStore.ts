@@ -1,5 +1,8 @@
 import ENV from '@/config/ENV';
-import {IStatisticFormData} from '@/shared-types/form-data/StatisticFormData/StatisticFormData';
+import {
+    EType,
+    IStatisticFormData,
+} from '@/shared-types/form-data/StatisticFormData/StatisticFormData';
 import {IWorkList} from '@/shared-types/Response/StatisticResponse/StatisticResponse';
 import axiosClient from '@/utils/axiosClient';
 import moment from 'moment';
@@ -18,17 +21,27 @@ interface IStatisticResponse {
     pieChart: any[];
 }
 
+interface IStatisticHarvestFormData {
+    targetType: string; // WORK, PRODUCT, GROUP
+    targetTypeValue: string;
+    productTypeId?: string;
+    type?: EType;
+    startDate: Date;
+    endDate: Date;
+}
+
 interface IListSelection {
     _id: string;
     name: string;
 }
 
 type StatisticStore = {
-    statisticData: IStatisticResponse | null;
+    statisticData: IStatisticResponse | null | any;
     listSelection: IListSelection[];
     isLoading: boolean;
     getStatistic: (data: IStatisticFormData) => Promise<void>;
     getStatisticProgress: (data: IStatisticFormData) => Promise<void>;
+    getStatisticHarvest: (data: IStatisticHarvestFormData) => Promise<void>;
     getListSelection: (selection: string) => Promise<void>;
     getGroupName: (groupId: string) => Promise<void>;
     clearStatisticData: () => void;
@@ -43,6 +56,19 @@ type IChartData = {
     spacing?: number;
     _realValue: number;
 };
+
+const COLOR_PALETTE = [
+    '#0EA5E9', // sky
+    '#22C55E', // green
+    '#F97316', // orange
+    '#A855F7', // purple
+    '#14B8A6', // teal
+    '#EAB308', // yellow
+    '#EF4444', // red
+    '#6366F1', // indigo
+    '#EC4899', // pink
+    '#84CC16', // lime
+];
 
 const convertToChartData = (data: any[]): IChartData[] => {
     const result: IChartData[] = [];
@@ -90,6 +116,18 @@ const convertToChartData = (data: any[]): IChartData[] => {
     return result;
 };
 
+let lastIndex = -1;
+
+const getRandomColor = () => {
+    let index;
+    do {
+        index = Math.floor(Math.random() * COLOR_PALETTE.length);
+    } while (index === lastIndex);
+
+    lastIndex = index;
+    return COLOR_PALETTE[index];
+};
+
 export const useStatisticStore = create<StatisticStore>(set => ({
     statisticData: null,
     listSelection: [],
@@ -119,6 +157,9 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     chart: convertToChartData(response.data.data.chart || []),
                     pieChart: [],
                 };
+
+                console.log(mainStatisticData);
+
                 set({statisticData: mainStatisticData});
                 set({isLoading: false});
             } else {
@@ -201,6 +242,70 @@ export const useStatisticStore = create<StatisticStore>(set => ({
             }
 
             set({isLoading: false});
+        } catch (error: any) {
+            console.log(error);
+            set({isLoading: false});
+
+            const _error = error;
+
+            setTimeout(() => {
+                if (_error?.response?.data) {
+                    Snackbar.show({
+                        text: _error.response.data,
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                } else {
+                    Snackbar.show({
+                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        duration: Snackbar.LENGTH_LONG,
+                    });
+                }
+            }, 100);
+        }
+    },
+
+    getStatisticHarvest: async ({
+        targetType,
+        targetTypeValue,
+        type,
+        startDate,
+        endDate,
+    }: IStatisticHarvestFormData) => {
+        const formattedStartDate = moment(startDate).toISOString();
+        const formattedEndDate = moment(endDate).toISOString();
+        console.log(formattedStartDate);
+        console.log(formattedEndDate);
+        set({isLoading: true});
+
+        try {
+            const response = await axiosClient.get(
+                `${
+                    ENV.BACKEND_URL
+                }/resources/statistics/statistic-harvest/?${targetType}=${targetTypeValue}&type=${type}&startDate=${'2025-01-01T00:00:00.000Z'}&endDate=${'2025-12-31T23:59:59.999Z'}`,
+            );
+
+            if (response.data.data) {
+                const maxQuantity = Math.max(
+                    ...response.data.data.map(
+                        (item: any) => item.totalQuantity,
+                    ),
+                );
+
+                let mainStatisticData = response.data.data.map((item: any) => ({
+                    ...item,
+                    value: Number(
+                        ((item.totalQuantity / maxQuantity) * 100).toFixed(2),
+                    ),
+                    color: getRandomColor(),
+                }));
+
+                mainStatisticData.sort((a: any, b: any) => b.value - a.value);
+
+                set({statisticData: mainStatisticData});
+                set({isLoading: false});
+            } else {
+                set({isLoading: false});
+            }
         } catch (error: any) {
             console.log(error);
             set({isLoading: false});

@@ -76,7 +76,6 @@ const useNotificationStore = create<NotificationStore>(set => ({
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/notifications/bells`,
             );
-            console.log(res);
 
             const data = res?.data?.data?.data || [];
             const unread = res?.data?.data?.unreadCount || 0;

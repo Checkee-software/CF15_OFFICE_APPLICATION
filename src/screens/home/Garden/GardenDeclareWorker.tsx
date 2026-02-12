@@ -87,67 +87,6 @@ const GardenDeclare = () => {
     const [onlyShowReportButton, setOnlyShowReportButton] = useState(false);
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
 
-    useEffect(() => {
-        if (id) getDetailWorkSchedule(id, userInfo._id);
-    }, []);
-
-    useEffect(() => {
-        if (detailWorkSchedule && !hasLogged.current) {
-            console.log('📦 Chi tiết công việc:', detailWorkSchedule);
-            hasLogged.current = true;
-        }
-
-        if (
-            detailWorkSchedule?.childTasks[0]?.staff[0]?.gardens?.length === 1
-        ) {
-            setSelectedGarden({
-                gardenId:
-                    detailWorkSchedule.childTasks[0]?.staff[0]?.gardens[0]
-                        ?.gardenId,
-                totalSquare:
-                    detailWorkSchedule.childTasks[0]?.staff[0].gardens[0]
-                        ?.square,
-                area: detailWorkSchedule.childTasks[0]?.staff[0].gardens[0]
-                    ?.area,
-            });
-        }
-    }, [detailWorkSchedule]);
-
-    useEffect(() => {
-        if (detailWorkSchedule?.childTasks?.length) {
-            const inputs = detailWorkSchedule.childTasks.map((task: any) => {
-                const userInTask = task.staff?.find(
-                    (s: any) => s.userId === userInfo?._id,
-                );
-                return {
-                    taskId: task._id,
-                    taskName: task.name,
-                    area: '',
-                    currentArea: selectedGarden.area,
-                    taskStatus: userInTask?.status || task.status,
-                };
-            });
-
-            setTaskInputs(inputs);
-
-            const allMachinesWithTaskInfo =
-                detailWorkSchedule.childTasks.flatMap(task =>
-                    (task.machines || []).map(machine => ({
-                        ...machine,
-                        childTaskCurrentArea: task.staff[0].processingRate,
-                        childTaskId: task._id,
-                        childTaskStatus: task.status,
-                        childTaskName: task.name,
-                        childTaskStaff: task.staff,
-                    })),
-                );
-
-            //console.log('tất cả ca máy đang có: ', allMachinesWithTaskInfo);
-
-            setAvailableMachines(allMachinesWithTaskInfo);
-        }
-    }, [detailWorkSchedule, userInfo, selectedGarden]);
-
     const handleInputChange = (index: number, field: 'area', value: string) => {
         setTaskInputs(prev => {
             const updated = [...prev];
@@ -318,6 +257,102 @@ const GardenDeclare = () => {
         }
     };
 
+    useEffect(() => {
+        if (id) getDetailWorkSchedule(id, userInfo._id);
+    }, []);
+
+    useEffect(() => {
+        setSelectedGarden({
+            gardenId: '',
+            totalSquare: 0,
+            area: 0,
+        });
+
+        if (detailWorkSchedule && !hasLogged.current) {
+            hasLogged.current = true;
+        }
+
+        if (
+            detailWorkSchedule?.childTasks?.some(task =>
+                task?.staff.some(staff => staff?.gardens.length === 1),
+            )
+        ) {
+            setSelectedGarden({
+                gardenId:
+                    detailWorkSchedule.childTasks[0]?.staff[0]?.gardens[0]
+                        ?.gardenId,
+                totalSquare:
+                    detailWorkSchedule.childTasks[0]?.staff[0].gardens[0]
+                        ?.square,
+                area: detailWorkSchedule.childTasks[0]?.staff[0].gardens[0]
+                    ?.area,
+            });
+        }
+    }, [detailWorkSchedule]);
+
+    useEffect(() => {
+        console.log('📦 Chi tiết công việc:', detailWorkSchedule);
+        if (detailWorkSchedule?.childTasks?.length) {
+            let inputs;
+            if (selectedGarden.gardenId === '') {
+                inputs = detailWorkSchedule.childTasks.map((task: any) => {
+                    const userInTask = task.staff?.find(
+                        (s: any) => s.userId === userInfo?._id,
+                    );
+                    return {
+                        taskId: task._id,
+                        taskName: task.name,
+                        area: '',
+                        totalSquare: selectedGarden.totalSquare,
+                        currentArea: selectedGarden.area,
+                        taskStatus: userInTask?.status || task.status,
+                    };
+                });
+            } else {
+                inputs = detailWorkSchedule.childTasks.map((task: any) => {
+                    const userInTask = task.staff?.find(
+                        (s: any) => s.userId === userInfo?._id,
+                    );
+
+                    return {
+                        taskId: task._id,
+                        taskName: task.name,
+                        area: '',
+                        totalSquare:
+                            userInTask.gardens.find(
+                                (g: any) =>
+                                    g.gardenId === selectedGarden.gardenId,
+                            )?.square || 0,
+                        currentArea:
+                            userInTask.gardens.find(
+                                (g: any) =>
+                                    g.gardenId === selectedGarden.gardenId,
+                            )?.area || 0,
+                        taskStatus: userInTask?.status || task.status,
+                    };
+                });
+            }
+
+            setTaskInputs(inputs);
+
+            const allMachinesWithTaskInfo =
+                detailWorkSchedule.childTasks.flatMap(task =>
+                    (task.machines || []).map(machine => ({
+                        ...machine,
+                        childTaskCurrentArea: task.staff[0].processingRate,
+                        childTaskId: task._id,
+                        childTaskStatus: task.status,
+                        childTaskName: task.name,
+                        childTaskStaff: task.staff,
+                    })),
+                );
+
+            //console.log('tất cả ca máy đang có: ', allMachinesWithTaskInfo);
+
+            setAvailableMachines(allMachinesWithTaskInfo);
+        }
+    }, [detailWorkSchedule, userInfo, selectedGarden, selectedGarden.gardenId]);
+
     if (!detailWorkSchedule) {
         return (
             <View style={styles.centered}>
@@ -325,8 +360,6 @@ const GardenDeclare = () => {
             </View>
         );
     }
-
-    //console.log(detailWorkSchedule);
 
     return (
         <View style={{flex: 1}}>
@@ -365,8 +398,9 @@ const GardenDeclare = () => {
                         </View>
                     </View>
 
-                    {detailWorkSchedule?.childTasks[0]?.staff[0]?.gardens
-                        ?.length > 1 && (
+                    {detailWorkSchedule?.childTasks?.some(task =>
+                        task?.staff.some(staff => staff?.gardens.length > 1),
+                    ) && (
                         <Dropdown
                             mode='modal'
                             style={styles.dropdown}

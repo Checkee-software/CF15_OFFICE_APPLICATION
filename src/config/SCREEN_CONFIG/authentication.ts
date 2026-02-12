@@ -9,6 +9,7 @@ import Document from '../../screens/home/Document';
 import WorkSchedule from '../../screens/home/WorkSchedule';
 import DetailDocuments from '../../screens/home/Document/DetailDocuments';
 import Statistic from '../../screens/home/Statistic';
+import StatisticHarvest from '@/screens/home/Statistic/StatisticHarvest';
 import UpdatePassword from '../../screens/user/UpdatePassword';
 import Notification from '../../screens/user/Notification';
 import ListNotification from '../../screens/home/ListNotification';
@@ -222,6 +223,13 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: Statistic,
         options: {
             title: SCREEN_INFO.STATISTIC.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.STATISTIC_HARVEST.key,
+        component: StatisticHarvest,
+        options: {
+            title: SCREEN_INFO.STATISTIC_HARVEST.headerTitle,
         },
     },
     /* USER */

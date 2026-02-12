@@ -131,6 +131,11 @@ const HOME_SCREENS = {
         headerTitle: 'BÁO CÁO THỐNG KÊ',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    STATISTIC_HARVEST: {
+        key: 'STATISTIC_HARVEST',
+        headerTitle: 'BÁO CÁO THỐNG KÊ THU HOẠCH',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
 };
 
 export default HOME_SCREENS;

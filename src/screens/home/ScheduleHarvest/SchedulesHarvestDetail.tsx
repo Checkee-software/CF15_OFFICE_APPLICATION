@@ -287,65 +287,68 @@ const SchedulesHarvestDetail = ({route}: any) => {
                                 </List.Accordion>
                             )}
 
-                            {userInfo.userType.level ===
-                                EOrganization.LEADER && (
-                                <>
-                                    {schedulesHarvestDetail.groupProgress.map(
-                                        item => (
-                                            <List.Accordion
-                                                key={item.groupId}
-                                                titleStyle={
-                                                    styles.titleAccordion1
-                                                }
-                                                title={`${
-                                                    item.name
-                                                }: ${item.users.reduce(
-                                                    (sumUser, user) =>
-                                                        sumUser +
-                                                        user.gardens.reduce(
-                                                            (sumGarden, g) =>
-                                                                sumGarden +
-                                                                g.quantity,
-                                                            0,
-                                                        ),
-                                                    0,
-                                                )} (KG)`}
-                                                style={styles.boxAccordion}
-                                                id='3'>
-                                                <FlatList
-                                                    scrollEnabled={false}
-                                                    data={item.users}
-                                                    renderItem={({item}) =>
-                                                        renderHarvestProgressForLeader(
-                                                            item,
-                                                        )
+                            {userInfo.userType.level === EOrganization.LEADER &&
+                                schedulesHarvestDetail?.groupProgress && (
+                                    <>
+                                        {schedulesHarvestDetail.groupProgress.map(
+                                            item => (
+                                                <List.Accordion
+                                                    key={item.groupId}
+                                                    titleStyle={
+                                                        styles.titleAccordion1
                                                     }
-                                                    keyExtractor={item =>
-                                                        item.userId._id
-                                                    }
-                                                />
-                                            </List.Accordion>
-                                        ),
-                                    )}
+                                                    title={`${
+                                                        item.name
+                                                    }: ${item.users.reduce(
+                                                        (sumUser, user) =>
+                                                            sumUser +
+                                                            user.gardens.reduce(
+                                                                (
+                                                                    sumGarden,
+                                                                    g,
+                                                                ) =>
+                                                                    sumGarden +
+                                                                    g.quantity,
+                                                                0,
+                                                            ),
+                                                        0,
+                                                    )} (KG)`}
+                                                    style={styles.boxAccordion}
+                                                    id='3'>
+                                                    <FlatList
+                                                        scrollEnabled={false}
+                                                        data={item.users}
+                                                        renderItem={({item}) =>
+                                                            renderHarvestProgressForLeader(
+                                                                item,
+                                                            )
+                                                        }
+                                                        keyExtractor={item =>
+                                                            item.userId._id
+                                                        }
+                                                    />
+                                                </List.Accordion>
+                                            ),
+                                        )}
 
-                                    <List.Accordion
-                                        titleStyle={styles.titleAccordion1}
-                                        title={`Người lao động (${schedulesHarvestDetail?.employeeIds?.length})`}
-                                        style={styles.boxAccordion}
-                                        id='4'>
-                                        <FlatList
-                                            scrollEnabled={false}
-                                            data={
-                                                schedulesHarvestDetail?.employeeIds
-                                            }
-                                            renderItem={({item, index}) =>
-                                                renderStaff(item, index)
-                                            }
-                                            keyExtractor={item => item._id}
-                                        />
-                                    </List.Accordion>
-                                </>
-                            )}
+                                        <List.Accordion
+                                            titleStyle={styles.titleAccordion1}
+                                            title={`Người lao động (${schedulesHarvestDetail?.employeeIds?.length})`}
+                                            style={styles.boxAccordion}
+                                            id='4'>
+                                            <FlatList
+                                                scrollEnabled={false}
+                                                data={
+                                                    schedulesHarvestDetail?.employeeIds
+                                                }
+                                                renderItem={({item, index}) =>
+                                                    renderStaff(item, index)
+                                                }
+                                                keyExtractor={item => item._id}
+                                            />
+                                        </List.Accordion>
+                                    </>
+                                )}
                         </View>
                     </View>
                 </View>

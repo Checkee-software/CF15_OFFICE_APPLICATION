@@ -85,128 +85,135 @@ const TaskListSection = ({
         }
     };
 
-    console.log('zxcvzxcv', taskInputs);
-    console.log(gardenAreaType);
+    console.log(taskInputs);
+    console.log(gardenArea);
 
     return (
-        <View>
-            <Text style={styles.sectionTitle}>
-                Báo cáo quy trình ({taskInputs.length})
-            </Text>
-            <View style={{gap: 12}}>
-                {taskInputs.map((task, index) => {
-                    const isCompleted = task.taskStatus === 'COMPELETED';
-                    const isDisabled = isCompleted;
-                    const currentInputValue =
-                        tempInputValues[index] || task.area;
-                    const areaValue = parseFloat(currentInputValue);
-                    const remainingArea =
-                        Math.round((gardenArea - task.currentArea) * 1000) /
-                        1000;
-                    const roundedGardenArea =
-                        Math.round(gardenArea * 1000) / 1000;
-                    const roundedTotal =
-                        Math.round((areaValue + processingRate) * 1000) / 1000;
-                    console.log('Rounded Total:', roundedTotal);
-                    console.log('Rounded Garden Area:', roundedGardenArea);
-                    console.log(roundedTotal >= roundedGardenArea);
-                    const showWarning =
-                        !isDisabled &&
-                        !isNaN(areaValue) &&
-                        roundedTotal > roundedGardenArea;
+        gardenId !== '' && (
+            <View>
+                <Text style={styles.sectionTitle}>
+                    Báo cáo quy trình ({taskInputs.length})
+                </Text>
+                <View style={{gap: 12}}>
+                    {taskInputs.map((task, index) => {
+                        const isCompleted = task.taskStatus === 'COMPELETED';
+                        const isDisabled = isCompleted;
+                        const currentInputValue =
+                            tempInputValues[index] || task.area;
+                        const areaValue = parseFloat(currentInputValue);
+                        const remainingArea =
+                            Math.round((gardenArea - task.currentArea) * 1000) /
+                            1000;
+                        const roundedGardenArea =
+                            Math.round(gardenArea * 1000) / 1000;
+                        const roundedTotal =
+                            Math.round((areaValue + processingRate) * 1000) /
+                            1000;
+                        const showWarning =
+                            !isDisabled &&
+                            !isNaN(areaValue) &&
+                            roundedTotal > roundedGardenArea;
 
-                    return (
-                        <CollapsibleTaskBlock
-                            key={task.taskId}
-                            title={task.taskName}
-                            backgroundColor={
-                                isCompleted ? '#d4edda' : '#e6f3ff'
-                            }>
-                            {isCompleted && (
-                                <Text
-                                    style={{
-                                        color: 'red',
-                                        fontStyle: 'italic',
-                                        marginBottom: 8,
-                                    }}>
-                                    Quy trình này đã hoàn thành, bạn không thể
-                                    chỉnh sửa.
-                                </Text>
-                            )}
-
-                            {!isCompleted &&
-                            gardenArea === task.currentArea &&
-                            gardenId !== '' ? (
-                                <Text
-                                    style={{
-                                        color: 'red',
-                                        fontStyle: 'italic',
-                                        marginBottom: 8,
-                                    }}>
-                                    Bạn đã làm đủ diện tích của quy trình này.
-                                    Chờ cán bộ duyệt để hoàn thành.
-                                </Text>
-                            ) : gardenId === '' ? (
-                                <Text
-                                    style={{
-                                        color: 'red',
-                                        fontStyle: 'italic',
-                                        marginBottom: 8,
-                                    }}>
-                                    Hãy chọn khu vườn cần làm
-                                </Text>
-                            ) : (
-                                <>
-                                    <Text style={styles.label}>
-                                        Diện tích đã làm ({gardenAreaType}) {''}
-                                        <Text style={{color: 'red'}}>*</Text>
+                        return (
+                            <CollapsibleTaskBlock
+                                key={task.taskId}
+                                title={task.taskName}
+                                backgroundColor={
+                                    isCompleted ? '#d4edda' : '#e6f3ff'
+                                }>
+                                {isCompleted && (
+                                    <Text
+                                        style={{
+                                            color: 'red',
+                                            fontStyle: 'italic',
+                                            marginBottom: 8,
+                                        }}>
+                                        Quy trình này đã hoàn thành, bạn không
+                                        thể chỉnh sửa.
                                     </Text>
+                                )}
 
-                                    <TextInput
-                                        style={[
-                                            styles.input,
-                                            showWarning && {borderColor: 'red'},
-                                        ]}
-                                        keyboardType='numeric'
-                                        placeholder='Nhập diện tích'
-                                        placeholderTextColor='black'
-                                        maxLength={6}
-                                        value={task.area}
-                                        onChangeText={text =>
-                                            handleAreaChange(
-                                                index,
-                                                text,
-                                                task.currentArea,
-                                            )
-                                        }
-                                        editable={!isDisabled}
-                                    />
-                                </>
-                            )}
-
-                            {gardenId !== '' && (
-                                <View style={{gap: 0, marginBottom: 10}}>
-                                    <Text style={styles.warningText}>
-                                        Diện tích không được vượt quá{' '}
-                                        {gardenArea} {gardenAreaType}
+                                {!isCompleted &&
+                                gardenArea === task.currentArea &&
+                                gardenId !== '' ? (
+                                    <Text
+                                        style={{
+                                            color: 'red',
+                                            fontStyle: 'italic',
+                                            marginBottom: 8,
+                                        }}>
+                                        Bạn đã làm đủ diện tích của quy trình
+                                        này. Chờ cán bộ duyệt để hoàn thành.
                                     </Text>
-
-                                    <Text style={styles.warningText}>
-                                        Diện tích còn lại cần hoàn thành:{' '}
-                                        {remainingArea} {gardenAreaType}
+                                ) : gardenId === '' ? (
+                                    <Text
+                                        style={{
+                                            color: 'red',
+                                            fontStyle: 'italic',
+                                            marginBottom: 8,
+                                        }}>
+                                        Hãy chọn khu vườn cần làm
                                     </Text>
+                                ) : (
+                                    <>
+                                        <Text style={styles.label}>
+                                            Diện tích đã làm ({gardenAreaType}){' '}
+                                            {''}
+                                            <Text style={{color: 'red'}}>
+                                                *
+                                            </Text>
+                                        </Text>
 
-                                    <Text style={styles.warningText}>
-                                        Diện tích đã làm: {task.currentArea}{' '}
-                                        {gardenAreaType}
-                                    </Text>
-                                </View>
-                            )}
-                        </CollapsibleTaskBlock>
-                    );
-                })}
+                                        <TextInput
+                                            style={[
+                                                styles.input,
+                                                showWarning && {
+                                                    borderColor: 'red',
+                                                },
+                                            ]}
+                                            keyboardType='numeric'
+                                            placeholder='Nhập diện tích'
+                                            placeholderTextColor='black'
+                                            maxLength={6}
+                                            value={task.area}
+                                            onChangeText={text =>
+                                                handleAreaChange(
+                                                    index,
+                                                    text,
+                                                    task.currentArea,
+                                                )
+                                            }
+                                            editable={!isDisabled}
+                                        />
+                                    </>
+                                )}
+
+                                {gardenId !== '' && (
+                                    <View style={{gap: 0, marginBottom: 10}}>
+                                        <Text style={styles.warningText}>
+                                            Diện tích không được vượt quá{' '}
+                                            {Math.round(gardenArea * 1000) /
+                                                1000}{' '}
+                                            {gardenAreaType}
+                                        </Text>
+
+                                        <Text style={styles.warningText}>
+                                            Diện tích còn lại cần hoàn thành:{' '}
+                                            {remainingArea} {gardenAreaType}
+                                        </Text>
+
+                                        <Text style={styles.warningText}>
+                                            Diện tích đã làm: {task.currentArea}{' '}
+                                            {gardenAreaType}
+                                        </Text>
+                                    </View>
+                                )}
+                            </CollapsibleTaskBlock>
+                        );
+                    })}
+                </View>
             </View>
-        </View>
+        )
     );
 };
 

@@ -16,7 +16,10 @@ import {useWorkerStore} from '@/stores/workerStore';
 import moment from 'moment';
 import images from '../../../assets/images';
 import {OneSignal} from 'react-native-onesignal';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import {
+    EOrganization,
+    organizations,
+} from '@/shared-types/common/Permissions/Permissions';
 import {launchImageLibrary} from 'react-native-image-picker';
 
 export default function Profile({navigation}: any) {
@@ -151,7 +154,14 @@ export default function Profile({navigation}: any) {
                                     EOrganization.WORKER
                                         ? renderInfoRow(
                                               'Cấp đơn vị',
-                                              `${userInfo.departmentName}`,
+                                              `${
+                                                  organizations.find(
+                                                      (item: any) =>
+                                                          item.code ===
+                                                          userInfo.userType
+                                                              .level,
+                                                  )?.label || 'Chưa cập nhật'
+                                              }`,
                                           )
                                         : null}
 

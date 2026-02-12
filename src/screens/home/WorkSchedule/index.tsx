@@ -25,6 +25,7 @@ import {Dropdown} from 'react-native-element-dropdown';
 import Snackbar from 'react-native-snackbar';
 import {useAuthStore} from '../../../stores/authStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import Feather from 'react-native-vector-icons/Feather';
 
 const WorkSchedule = ({navigation}: any) => {
     const {
@@ -43,12 +44,12 @@ const WorkSchedule = ({navigation}: any) => {
     const {userInfo} = useAuthStore();
 
     const statusList = [
-        {label: 'Tất cả', value: 1},
         {label: 'Đang làm', value: 2},
-        {label: 'Hoàn thành', value: 3},
         {label: 'Sắp hết hạn', value: 4},
         {label: 'Trễ hạn', value: 5},
+        {label: 'Hoàn thành', value: 3},
         {label: 'Đang chờ', value: 6},
+        {label: 'Tất cả', value: 1},
         {label: 'Đã huỷ', value: 7},
     ];
 
@@ -83,7 +84,7 @@ const WorkSchedule = ({navigation}: any) => {
 
     const listYear = generateYears();
 
-    const [selectedStatus, setSelectedStatus] = useState(1);
+    const [selectedStatus, setSelectedStatus] = useState(2);
     const [searchSchedule, setSearchSchedule] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [selectedMonth, setSelectedMonth] = useState('');
@@ -518,7 +519,7 @@ const WorkSchedule = ({navigation}: any) => {
         if (searchSchedule !== '') {
             setSearchSchedule('');
         }
-        setSelectedStatus(1);
+        setSelectedStatus(2);
     };
 
     useEffect(() => {
@@ -544,14 +545,22 @@ const WorkSchedule = ({navigation}: any) => {
                                 selectedStatus === item.value &&
                                     styles.selectedStatusBtn,
                             ]}>
-                            <Text
-                                style={[
-                                    styles.statusBtnText,
-                                    selectedStatus === item.value &&
-                                        styles.selectedStatusBtnText,
-                                ]}>
-                                {item.label}
-                            </Text>
+                            {item.value === 7 ? (
+                                <Feather
+                                    name='trash-2'
+                                    color={'#FF4E45'}
+                                    size={25}
+                                />
+                            ) : (
+                                <Text
+                                    style={[
+                                        styles.statusBtnText,
+                                        selectedStatus === item.value &&
+                                            styles.selectedStatusBtnText,
+                                    ]}>
+                                    {item.label}
+                                </Text>
+                            )}
                         </TouchableOpacity>
                     )}
                 />

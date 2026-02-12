@@ -21,17 +21,25 @@ interface listWorkerFilterByRole {
             contract: string;
             phoneNumber: string;
             ID: string;
+            workers?: IUser[];
             groupId?: string;
             groupName?: string;
-            workers?: IUser[];
+            isUnit: boolean;
+            quantity: number;
         },
     ];
+}
+
+interface IGroupedGarden {
+    groupId: string;
+    workers: IUser[];
 }
 
 interface DocumentStore {
     isLoading: boolean;
     listWorker: IUser[];
     listWorkerFilterByRole: listWorkerFilterByRole[];
+    groupedGarden: IGroupedGarden[];
     getListWorkerByDepartment: (
         userId: string,
         userLevel: string,
@@ -49,6 +57,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
     isLoading: false,
     listWorker: [],
     listWorkerFilterByRole: [],
+    groupedGarden: [],
 
     getListWorkerByDepartment: async (userId: string, userLevel: string) => {
         set({isLoading: true});
@@ -87,7 +96,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                         user.userType.level === EOrganization.LEADER,
                 );
 
-                const filterWorker = Object.values(
+                const filterUnit = Object.values(
                     updateImgPathListWorker
                         .filter(
                             (user: {_id: string; userType: {level: string}}) =>
@@ -100,6 +109,29 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                                 acc[key] = {
                                     groupId: item.groupId,
                                     groupName: item.groupName,
+                                    quantity: 0,
+                                    isUnit: true,
+                                };
+                            }
+
+                            acc[key].quantity += 1;
+
+                            return acc;
+                        }, {}),
+                );
+
+                const groupGarden = Object.values(
+                    updateImgPathListWorker
+                        .filter(
+                            (user: {_id: string; userType: {level: string}}) =>
+                                user.userType.level === EOrganization.WORKER,
+                        )
+                        .reduce((acc: any, item: any) => {
+                            const key = `${item.groupId}_${item.groupName}`;
+
+                            if (!acc[key]) {
+                                acc[key] = {
+                                    groupId: item.groupId,
                                     workers: [],
                                 };
                             }
@@ -120,7 +152,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                     },
                     {
                         title: 'Người lao động',
-                        data: filterWorker,
+                        data: filterUnit,
                     },
                 ];
 
@@ -143,6 +175,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                                       data: filterManagements,
                                   },
                               ],
+                    groupedGarden: groupGarden as IGroupedGarden[],
                 });
             } else {
                 set({listWorker: [], listWorkerFilterByRole: []});
@@ -255,6 +288,6 @@ export const useWorkerStore = create<DocumentStore>(set => ({
     },
 
     resetStateWhenLogout: () => {
-        set({listWorker: [], listWorkerFilterByRole: []});
+        set({listWorker: [], listWorkerFilterByRole: [], groupedGarden: []});
     },
 }));

@@ -22,23 +22,19 @@ import {
 } from '@/shared-types/common/Permissions/Permissions';
 import Snackbar from 'react-native-snackbar';
 
-interface ListUnitCard {
-    groupId: string;
-    isExpand: boolean;
-}
-
 const Woker = ({navigation}: any) => {
     const {
         listWorker,
         listWorkerFilterByRole,
         getListWorkerByDepartment,
         isLoading,
+        groupedGarden,
     } = useWorkerStore();
 
     const {userInfo} = useAuthStore();
 
     const [searchWorker, setSearchWorker] = useState('');
-    const [listUnitCard, setListUnitCard] = useState<ListUnitCard[]>([]);
+    const [selectedUnitCard, setSelectedUnitCard] = useState<string>('');
 
     const filterWorkerBySearch = listWorker.filter(user =>
         user?.fullName.toLowerCase().includes(searchWorker.toLowerCase()),
@@ -62,9 +58,8 @@ const Woker = ({navigation}: any) => {
     };
 
     const handleReFetch = () => {
-        if (searchWorker.length !== 0) {
-            setSearchWorker('');
-        }
+        setSelectedUnitCard('');
+        setSearchWorker('');
         getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
     };
 
@@ -146,30 +141,24 @@ const Woker = ({navigation}: any) => {
     );
 
     const renderListWorker = (itemListWorker: any) => {
-        if (itemListWorker?.workers && itemListWorker.workers?.length > 0) {
+        if (itemListWorker?.isUnit) {
+            const unitWorker = groupedGarden.find(
+                item => item.groupId === itemListWorker.groupId,
+            );
             return (
                 <View>
                     <TouchableOpacity
                         style={WokerStyles.workerUnitCard}
                         onPress={() =>
-                            setListUnitCard(prev =>
-                                prev.map(item =>
-                                    item.groupId === itemListWorker.groupId
-                                        ? {...item, isExpand: !item.isExpand}
-                                        : item,
-                                ),
-                            )
+                            setSelectedUnitCard(itemListWorker.groupId)
                         }>
                         <Text>
                             {itemListWorker?.groupName || 'Đội này chưa có tên'}
-                            {` (${itemListWorker?.workers?.length || 0})`}
+                            {` (${itemListWorker?.quantity})`}
                         </Text>
                         <MaterialIcons
                             name={
-                                listUnitCard.find(
-                                    item =>
-                                        item.groupId === itemListWorker.groupId,
-                                )?.isExpand
+                                itemListWorker.groupId === selectedUnitCard
                                     ? 'arrow-drop-up'
                                     : 'arrow-drop-down'
                             }
@@ -177,17 +166,22 @@ const Woker = ({navigation}: any) => {
                             size={25}
                         />
                     </TouchableOpacity>
-                    {listUnitCard.find(
-                        item => item.groupId === itemListWorker.groupId,
-                    )?.isExpand && (
+
+                    {selectedUnitCard === itemListWorker.groupId && (
                         <FlatList
-                            data={itemListWorker.workers}
+                            data={unitWorker?.workers || []}
                             renderItem={({item}) => renderWorkersUnit(item)}
                             keyExtractor={(item, index) => item._id + index}
                             //initialNumToRender={12} // render ít ban đầu
                             //maxToRenderPerBatch={10}
-                            windowSize={5} // viewport buffer nhỏ để đỡ lag
-                            removeClippedSubviews={true}
+                            //windowSize={5} // viewport buffer nhỏ để đỡ lag
+                            //removeClippedSubviews={true}
+                            //updateCellsBatchingPeriod={50}
+                            ListEmptyComponent={
+                                <Text style={WokerStyles.workerUnit}>
+                                    Đội này chưa có nguời lao động
+                                </Text>
+                            }
                         />
                     )}
                 </View>
@@ -235,24 +229,6 @@ const Woker = ({navigation}: any) => {
     useEffect(() => {
         getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
     }, []);
-
-    useEffect(() => {
-        if (!listWorkerFilterByRole || listWorkerFilterByRole.length === 0) {
-            return;
-        }
-
-        setListUnitCard(
-            listWorkerFilterByRole
-                .find(item => item.title === 'Người lao động')
-                ?.data.map(item => ({
-                    groupId: item.groupId,
-                    isExpand: false,
-                }))
-                .filter(
-                    (item): item is ListUnitCard => item.groupId !== undefined,
-                ) || [],
-        );
-    }, [listWorkerFilterByRole]);
 
     if (isLoading) return <Loading />;
 
@@ -312,8 +288,7 @@ const Woker = ({navigation}: any) => {
                                 {section.title === 'Người lao động'
                                     ? `${section.title} (${section.data.reduce(
                                           (total, item) =>
-                                              total +
-                                              (item.workers?.length || 0),
+                                              total + item.quantity,
                                           0,
                                       )})`
                                     : `${section.title} (${section.data.length})`}

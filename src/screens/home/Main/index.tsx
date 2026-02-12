@@ -77,6 +77,13 @@ export default function Main({navigation}: any) {
             buttonImage: images.pieChart,
             navigateTo: SCREEN_INFO.STATISTIC.key,
         },
+        // {
+        //     function: 'STATISTIC_HARVEST',
+        //     key: 'statisticharvest',
+        //     label: 'Báo cáo thống kê thu hoạch',
+        //     buttonImage: images.harvestChart,
+        //     navigateTo: SCREEN_INFO.STATISTIC_HARVEST.key,
+        // },
         {
             function: '',
             key: 'browseaddmaterial',
@@ -179,7 +186,9 @@ export default function Main({navigation}: any) {
     const filterMenuByRole = (role: string) => {
         const hasAccessToFunction = (functionKey: string) => {
             return userInfo.functions.some(
-                func => func._id === functionKey && func.access,
+                func =>
+                    (func._id === functionKey && func.access) ||
+                    (func._id === functionKey.split('_')[0] && func.access),
             );
         };
 
