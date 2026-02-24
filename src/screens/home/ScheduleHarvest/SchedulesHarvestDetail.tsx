@@ -106,7 +106,12 @@ const SchedulesHarvestDetail = ({route}: any) => {
                             : styles.participantStatus1,
                     ]}>
                     {itemProgress.gardens
-                        .map(g => `${g.gardenId.code}: ${g.quantity} (KG)`)
+                        .map(
+                            g =>
+                                `${
+                                    g.gardenId.code
+                                }: ${g.quantity.toLocaleString('vi-VN')} (KG)`,
+                        )
                         .join(', ')}
                 </Text>
             </View>
@@ -299,20 +304,24 @@ const SchedulesHarvestDetail = ({route}: any) => {
                                                     }
                                                     title={`${
                                                         item.name
-                                                    }: ${item.users.reduce(
-                                                        (sumUser, user) =>
-                                                            sumUser +
-                                                            user.gardens.reduce(
-                                                                (
-                                                                    sumGarden,
-                                                                    g,
-                                                                ) =>
-                                                                    sumGarden +
-                                                                    g.quantity,
-                                                                0,
-                                                            ),
-                                                        0,
-                                                    )} (KG)`}
+                                                    }: ${item.users
+                                                        .reduce(
+                                                            (sumUser, user) =>
+                                                                sumUser +
+                                                                user.gardens.reduce(
+                                                                    (
+                                                                        sumGarden,
+                                                                        g,
+                                                                    ) =>
+                                                                        sumGarden +
+                                                                        g.quantity,
+                                                                    0,
+                                                                ),
+                                                            0,
+                                                        )
+                                                        .toLocaleString(
+                                                            'vi-VN',
+                                                        )} (KG)`}
                                                     style={styles.boxAccordion}
                                                     id='3'>
                                                     <FlatList

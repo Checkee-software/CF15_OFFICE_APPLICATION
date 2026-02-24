@@ -295,7 +295,10 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
 
                 set({
                     listWorkSchedule: convertedTime,
-                    listWorkScheduleFilter: convertedTime,
+                    listWorkScheduleFilter: convertedTime.filter(
+                        (item: any) =>
+                            item.status === EScheduleStatus.PROCESSING,
+                    ),
                 });
             } else {
                 set({
@@ -380,34 +383,37 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             ) {
                 const today = moment();
 
-                filterData = state.listWorkSchedule.filter(task => {
-                    const start = moment(task.startedDate); // ISO
-                    const end = moment(task.finishedDate); // ISO
+                filterData = state.listWorkSchedule
+                    .filter(task => task.status !== EScheduleStatus.CANCELED)
+                    .filter(task => {
+                        const start = moment(task.startedDate); // ISO
+                        const end = moment(task.finishedDate); // ISO
 
-                    if (!start.isValid() || !end.isValid()) return false;
+                        if (!start.isValid() || !end.isValid()) return false;
 
-                    // Tổng thời gian của tiến trình
-                    const totalDuration = end.diff(start);
+                        // Tổng thời gian của tiến trình
+                        const totalDuration = end.diff(start);
 
-                    // Thời gian còn lại
-                    const remaining = end.diff(today);
+                        // Thời gian còn lại
+                        const remaining = end.diff(today);
 
-                    // Thời gian còn lại còn <= 30% tổng thời gian
-                    const threshold = totalDuration * 0.3;
+                        // Thời gian còn lại còn <= 30% tổng thời gian
+                        const threshold = totalDuration * 0.3;
 
-                    if (status === EScheduleStatus.EXPIRED) {
-                        return end.isBefore(today, 'day'); // finishedDate < hôm nay
-                    }
+                        if (status === EScheduleStatus.EXPIRED) {
+                            return end.isBefore(today, 'day'); // finishedDate < hôm nay
+                        }
 
-                    if (status === EScheduleStatus.ALMOST_EXPIRE) {
-                        // còn hạn nhưng <= 30% thời gian
-                        return (
-                            end.isAfter(today, 'day') && remaining <= threshold
-                        );
-                    }
+                        if (status === EScheduleStatus.ALMOST_EXPIRE) {
+                            // còn hạn nhưng <= 30% thời gian
+                            return (
+                                end.isAfter(today, 'day') &&
+                                remaining <= threshold
+                            );
+                        }
 
-                    return true;
-                });
+                        return true;
+                    });
             } else {
                 filterData = state.listWorkSchedule.filter(
                     task => task.status === status,

@@ -117,6 +117,9 @@ const SchedulesHarvest = ({navigation}: any) => {
                                                 : item.status ===
                                                   EHarvestStatus.PROCESSING
                                                 ? styles.textColor2
+                                                : item.status ===
+                                                  EHarvestStatus.CANCELED
+                                                ? styles.textColor4
                                                 : styles.textColor3,
                                         ]}>
                                         {duration.asMilliseconds() < 0 &&
@@ -127,6 +130,8 @@ const SchedulesHarvest = ({navigation}: any) => {
                                               item.status ===
                                                   EHarvestStatus.COMPLETED
                                             ? 'Hoàn thành'
+                                            : EHarvestStatus.CANCELED
+                                            ? 'Đã hủy'
                                             : `Còn ${days} ngày, ${hours} giờ ${minutes} phút`}
                                     </Text>
                                 </View>
@@ -350,6 +355,9 @@ const styles = StyleSheet.create({
     },
     textColor3: {
         color: '#808080',
+    },
+    textColor4: {
+        color: '#FF4E45',
     },
     completedTextTime: {
         // marginLeft: 5,
