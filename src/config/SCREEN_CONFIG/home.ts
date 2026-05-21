@@ -6,6 +6,16 @@ const HOME_SCREENS = {
         headerTitle: 'CF15 OFFICE',
         isOpenQRCamera: false,
     } as ScreenInformation,
+    PRODUCTION_PORTAL: {
+        key: 'PRODUCTION_PORTAL',
+        headerTitle: 'QUẢN TRỊ SẢN XUẤT',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    OFFICE_PORTAL: {
+        key: 'OFFICE_PORTAL',
+        headerTitle: 'VĂN PHÒNG ĐIỆN TỬ',
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     BROWSEADDMATERIALS: {
         key: 'BROWSEADDMATERIALS',
         headerTitle: 'ĐẦU TƯ TĂNG THÊM',

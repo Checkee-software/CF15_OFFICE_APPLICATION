@@ -6,6 +6,8 @@ export type ScreenName =
     | 'DETAIL_TRACKING'
     /* HOME */
     | 'MAIN'
+    | 'PRODUCTION_PORTAL'
+    | 'OFFICE_PORTAL'
     | 'BROWSEADDMATERIALS'
     | 'BROWSE_HARVEST'
     | 'HARVEST_SCHEDULE'

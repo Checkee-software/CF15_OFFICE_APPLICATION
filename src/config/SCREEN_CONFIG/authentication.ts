@@ -3,7 +3,8 @@ import {ScreenRegistry} from './types';
 
 /* screens */
 import Main from '../../screens/home/Main';
-import Unit from '../../screens/home/Unit';
+import FunctionPortal from '../../screens/home/Main/FunctionPortal';
+import Unit from '../../screens/home/unit';
 import Profile from '../../screens/user/Profile';
 import Document from '../../screens/home/Document';
 import WorkSchedule from '../../screens/home/WorkSchedule';
@@ -60,6 +61,20 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         component: Main,
         options: {
             title: SCREEN_INFO.MAIN.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.PRODUCTION_PORTAL.key,
+        component: FunctionPortal,
+        options: {
+            title: SCREEN_INFO.PRODUCTION_PORTAL.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.OFFICE_PORTAL.key,
+        component: FunctionPortal,
+        options: {
+            title: SCREEN_INFO.OFFICE_PORTAL.headerTitle,
         },
     },
     {

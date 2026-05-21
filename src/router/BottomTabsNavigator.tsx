@@ -15,8 +15,10 @@ import Work from '../screens/home/Work';
 import History from '../screens/home/History';
 import Profile from '../screens/user/Profile';
 import Main from '../screens/home/Main';
+import Document from '../screens/home/Document';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 // import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
 import Backdrop from '@/screens/subscreen/Loading/index2';
@@ -143,6 +145,23 @@ const BottomTabsNavigator = ({navigation}: any) => {
                     }}
                 />
             )}
+
+            <Tab.Screen
+                component={Document}
+                name='Văn bản'
+                options={{
+                    headerShown: true,
+                    headerTitle: 'TÀI LIỆU',
+                    headerTitleStyle: style.headerTitle,
+                    tabBarIcon: ({color}) => (
+                        <MaterialCommunityIcons
+                            name='file-document-outline'
+                            size={24}
+                            color={color}
+                        />
+                    ),
+                }}
+            />
 
             {/* <Tab.Screen
                 component={AutomaticTracing}

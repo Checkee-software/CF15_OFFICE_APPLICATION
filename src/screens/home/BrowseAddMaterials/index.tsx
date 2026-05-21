@@ -195,8 +195,8 @@ const BrowseAddMaterials = () => {
                                                 style={
                                                     styles.cancelProgressInput
                                                 }
-                                                placeholder='Nhập lý do từ chối...'
-                                                placeholderTextColor={'#808080'}
+                                                placeholder="Nhập lý do từ chối..."
+                                                placeholderTextColor="#808080"
                                                 multiline
                                                 numberOfLines={5}
                                                 value={itemComfirm.message}
@@ -407,7 +407,6 @@ const BrowseAddMaterials = () => {
         if (userInfo.userType.level === EOrganization.LEADER) {
             handleGetRequestGardenData();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (isLoading) {
@@ -477,7 +476,7 @@ const BrowseAddMaterials = () => {
                             removeClippedSubviews={false}
                             enableOnAndroid={true}
                             extraHeight={250}
-                            keyboardShouldPersistTaps='handled'
+                            keyboardShouldPersistTaps="handled"
                             ListEmptyComponent={
                                 <View style={styles.emptyContainer}>
                                     {selectedStatus === 1 ? (
@@ -485,7 +484,7 @@ const BrowseAddMaterials = () => {
                                             <Image
                                                 source={images.emptyWorkList}
                                                 style={styles.emptyImage}
-                                                resizeMode='contain'
+                                                resizeMode="contain"
                                             />
                                             <Text style={styles.emptyText}>
                                                 Hiện tại không có vật tư để
