@@ -1,4 +1,4 @@
-export type ScreenName =
+﻿export type ScreenName =
     /* ONBOARDING */
     | 'INDEX'
     | 'LOGIN'
@@ -17,7 +17,13 @@ export type ScreenName =
     | 'HARVEST_HISTORY'
     | 'LISTNOTIFICATION'
     | 'DOCUMENT'
+    | 'INCOMING'
+    | 'OUTGOING'
+    | 'DOCUMENTCATEGORYMANAGER'
     | 'DETAILDOCUMENTS'
+    | 'DOCUMENT_APPROVAL_HISTORY'
+    | 'DOCUMENT_EXECUTION_STEPS'
+    | 'DOCUMENT_COMMUNICATION'
     | 'GARDENINFO'
     | 'GARDENWORKER'
     | 'GARDENINFOWORKER'
@@ -52,3 +58,5 @@ export type ScreenName =
     /* SUB-SCREENS */
     | 'LOADING'
     | 'ERROR';
+
+

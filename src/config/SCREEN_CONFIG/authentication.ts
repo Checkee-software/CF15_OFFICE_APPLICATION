@@ -1,4 +1,4 @@
-import SCREEN_INFO from './screenInfo';
+﻿import SCREEN_INFO from './screenInfo';
 import {ScreenRegistry} from './types';
 
 /* screens */
@@ -7,8 +7,14 @@ import FunctionPortal from '../../screens/home/Main/FunctionPortal';
 import Unit from '../../screens/home/unit';
 import Profile from '../../screens/user/Profile';
 import Document from '../../screens/home/Document';
+import DocumentCategoryManager from '../../screens/home/DocumentCategory/DocumentCategoryManager';
 import WorkSchedule from '../../screens/home/WorkSchedule';
 import DetailDocuments from '../../screens/home/Document/DetailDocuments';
+import DocumentApprovalHistory from '../../screens/home/Document/DocumentApprovalHistory';
+import DocumentExecutionSteps from '../../screens/home/Document/DocumentExecutionSteps';
+import DocumentCommunication from '../../screens/home/Document/DocumentCommunication';
+import Incoming from '../../screens/home/Incoming';
+import Outgoing from '../../screens/home/Outgoing';
 import Statistic from '../../screens/home/Statistic';
 import StatisticHarvest from '@/screens/home/Statistic/StatisticHarvest';
 import UpdatePassword from '../../screens/user/UpdatePassword';
@@ -285,12 +291,56 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
         },
     },
     {
+        name: SCREEN_INFO.INCOMING.key,
+        component: Incoming,
+        options: {
+            title: SCREEN_INFO.INCOMING.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.OUTGOING.key,
+        component: Outgoing,
+        options: {
+            title: SCREEN_INFO.OUTGOING.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.DOCUMENTCATEGORYMANAGER.key,
+        component: DocumentCategoryManager,
+        options: {
+            title: SCREEN_INFO.DOCUMENTCATEGORYMANAGER.headerTitle,
+        },
+    },
+    {
         name: SCREEN_INFO.DETAILDOCUMENTS.key,
         component: DetailDocuments,
         options: {
             title: SCREEN_INFO.DETAILDOCUMENTS.headerTitle,
         },
     },
+    {
+        name: SCREEN_INFO.DOCUMENT_APPROVAL_HISTORY.key,
+        component: DocumentApprovalHistory,
+        options: {
+            title: SCREEN_INFO.DOCUMENT_APPROVAL_HISTORY.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.DOCUMENT_EXECUTION_STEPS.key,
+        component: DocumentExecutionSteps,
+        options: {
+            title: SCREEN_INFO.DOCUMENT_EXECUTION_STEPS.headerTitle,
+        },
+    },
+    {
+        name: SCREEN_INFO.DOCUMENT_COMMUNICATION.key,
+        component: DocumentCommunication,
+        options: {
+            title: SCREEN_INFO.DOCUMENT_COMMUNICATION.headerTitle,
+        },
+    },
 ];
 
 Object.freeze(AUTHENTICATION_SCREENS);
+
+

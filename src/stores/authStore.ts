@@ -58,15 +58,8 @@ type AuthStore = {
     otherRedirect: string | null;
     login: (userAccount: ILogin) => Promise<void>;
     autoLogin: () => Promise<void>;
-    getScheduleCollection: () => Promise<
-        | {
-              total: Number;
-              compeleted: Number;
-              processing: Number;
-              expired: Number;
-          }
-        | undefined
-    >;
+    getScheduleCollection: () => Promise<tasks | undefined>;
+    loadSupplementalUserInfo: (userData: IUser) => Promise<void>;
     logout: () => Promise<void>;
     updatePassword: (userPasswordUpdate: IUpdatePassword) => Promise<any>;
     setRedirectData: (type: string, data: string) => void;
@@ -74,13 +67,110 @@ type AuthStore = {
     updateAvatar: (userId: string, uri: string) => Promise<void>;
 };
 
-const fixAvatarPath = (path: string) => {
-    const updatedPath = path.replace(/\\/g, '/');
-    return updatedPath;
+const initialUserInfo: IUser = {
+    _id: '',
+    status: false,
+    avatar: '',
+    username: '',
+    fullName: '',
+    nation: '',
+    dateOfBirth: undefined,
+    recruimentDate: undefined,
+    contract: '',
+    phoneNumber: '',
+    ID: '',
+    departmentName: '',
+    userType: {
+        level: '',
+        role: '',
+        department: '',
+        unit: '',
+    } as UserType.IUserType,
+    address: {} as Address.IAddresses,
+    managedGardens: [],
+    functions: [],
+    tasks: {
+        compeleted: '0',
+        expired: '0',
+        processing: '0',
+        total: '0',
+    },
+    groupId: '',
+    groupName: '',
+    canViewSensitiveInfo: false,
+    roleName: '',
 };
 
+const fixAvatarPath = (path: string) => {
+    if (!path || typeof path !== 'string') {
+        return '';
+    }
+
+    const updatedPath = path.replace(/\\/g, '/').trim();
+
+    if (/^https?:\/\//i.test(updatedPath)) {
+        return updatedPath;
+    }
+
+    const baseUrl = ENV.BACKEND_URL.replace(/\/+$/, '');
+    const normalizedPath = updatedPath.startsWith('/')
+        ? updatedPath
+        : `/${updatedPath}`;
+
+    return `${baseUrl}${normalizedPath}`;
+};
+
+const resolveAvatarUrl = (avatar: any): string => {
+    if (!avatar) {
+        return '';
+    }
+
+    if (typeof avatar === 'string') {
+        return fixAvatarPath(avatar);
+    }
+
+    if (typeof avatar === 'object') {
+        if (typeof avatar.path === 'string' && avatar.path) {
+            return fixAvatarPath(avatar.path);
+        }
+
+        if (typeof avatar.url === 'string' && avatar.url) {
+            return fixAvatarPath(avatar.url);
+        }
+
+        if (
+            typeof avatar.destination === 'string' &&
+            typeof avatar.filename === 'string' &&
+            avatar.filename
+        ) {
+            const destination = avatar.destination.replace(/\/+$/, '');
+            return fixAvatarPath(`${destination}/${avatar.filename}`);
+        }
+    }
+
+    return '';
+};
+
+const AUTH_REQUEST_TIMEOUT_MS = 15000;
+const SUPPLEMENTAL_REQUEST_TIMEOUT_MS = 8000;
+
+const getDefaultTasks = (): tasks => ({
+    compeleted: '0',
+    expired: '0',
+    processing: '0',
+    total: '0',
+});
+
+const shouldLoadTasks = (level?: string) =>
+    level === EOrganization.DEPARTMENT ||
+    level === EOrganization.LEADER ||
+    level === EOrganization.WORKER;
+
+const shouldLoadGroupName = (level?: string) =>
+    level === EOrganization.LEADER || level === EOrganization.WORKER;
+
 export const useAuthStore = create<AuthStore>((set, get) => ({
-    userInfo: {} as IUser,
+    userInfo: initialUserInfo,
     userLogin: {} as ILogin,
     userPasswordUpdate: {} as IUpdatePassword,
     redirectData: null,
@@ -95,6 +185,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             const response = await axiosClient.post(
                 `${ENV.BACKEND_URL}/login/sign-in`,
                 userAccount,
+                {timeout: AUTH_REQUEST_TIMEOUT_MS},
             );
 
             if (response.data.data) {
@@ -104,26 +195,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                 OneSignal.User.addAlias('userId', userData._id);
 
-                if (response.data.data.avatar) {
-                    userData.avatar = `${ENV.BACKEND_URL}${fixAvatarPath(
-                        response.data.data.avatar.path
-                            ? response.data.data.avatar.path
-                            : response.data.data.avatar,
-                    )}`;
-                } else {
-                    userData.avatar = '';
-                }
-
-                if (
-                    response.data.data.userType.level ===
-                        EOrganization.DEPARTMENT ||
-                    response.data.data.userType.level ===
-                        EOrganization.LEADER ||
-                    response.data.data.userType.level === EOrganization.WORKER
-                ) {
-                    const getTasks = await get().getScheduleCollection();
-                    userData.tasks = getTasks;
-                }
+                userData.avatar = resolveAvatarUrl(response.data.data.avatar);
+                userData.tasks = userData.tasks || getDefaultTasks();
+                userData.groupName = userData.groupName || '';
 
                 if (
                     response.data.data.userType.level ===
@@ -132,19 +206,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 ) {
                     OneSignal.login(response.data.data._id);
                     OneSignal.User.pushSubscription.optIn();
-
-                    const responseGroup = await axiosClient.get(
-                        `${ENV.BACKEND_URL}/resources/units/selection`,
-                    );
-
-                    const findGroupName = responseGroup.data.data.find(
-                        (item: any) => item._id === response.data.data.groupId,
-                    );
-
-                    userData.groupName = findGroupName.name;
                 }
-                set({isLoading: false});
-                set({userInfo: userData, isLogin: true});
+
+                set({userInfo: userData, isLogin: true, isLoading: false});
+                get()
+                    .loadSupplementalUserInfo(userData)
+                    .catch(error =>
+                        console.log(
+                            '[authStore] Background supplemental load failed',
+                            error,
+                        ),
+                    );
+                return;
             }
             set({isLoading: false});
         } catch (error: any) {
@@ -209,6 +282,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/check-access`,
+                {timeout: AUTH_REQUEST_TIMEOUT_MS},
             );
 
             if (response.data.data) {
@@ -216,44 +290,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     ...response.data.data,
                 };
 
-                if (response.data.data.avatar) {
-                    userData.avatar = `${ENV.BACKEND_URL}${fixAvatarPath(
-                        response.data.data.avatar.path
-                            ? response.data.data.avatar.path
-                            : response.data.data.avatar,
-                    )}`;
-                } else {
-                    userData.avatar = '';
-                }
-
-                if (
-                    response.data.data.userType.level ===
-                        EOrganization.DEPARTMENT ||
-                    response.data.data.userType.level ===
-                        EOrganization.LEADER ||
-                    response.data.data.userType.level === EOrganization.WORKER
-                ) {
-                    const getTasks = await get().getScheduleCollection();
-                    userData.tasks = getTasks;
-                }
-
-                if (
-                    response.data.data.userType.level ===
-                        EOrganization.LEADER ||
-                    response.data.data.userType.level === EOrganization.WORKER
-                ) {
-                    const responseGroup = await axiosClient.get(
-                        `${ENV.BACKEND_URL}/resources/units/selection`,
-                    );
-
-                    const findGroupName = responseGroup.data.data.find(
-                        (item: any) => item._id === response.data.data.groupId,
-                    );
-
-                    userData.groupName = findGroupName.name;
-                }
+                userData.avatar = resolveAvatarUrl(response.data.data.avatar);
+                userData.tasks = userData.tasks || getDefaultTasks();
+                userData.groupName = userData.groupName || '';
 
                 set({userInfo: userData, isLogin: true});
+                get()
+                    .loadSupplementalUserInfo(userData)
+                    .catch(error =>
+                        console.log(
+                            '[authStore] Background supplemental load failed',
+                            error,
+                        ),
+                    );
             }
         } catch (error: any) {
             const _error = error;
@@ -274,10 +323,79 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         }
     },
 
+    loadSupplementalUserInfo: async (userData: IUser) => {
+        const userId = userData._id;
+        const userLevel = userData.userType?.level;
+
+        const tasksPromise = shouldLoadTasks(userLevel)
+            ? get().getScheduleCollection()
+            : Promise.resolve(undefined);
+
+        const groupNamePromise = shouldLoadGroupName(userLevel)
+            ? axiosClient
+                  .get(`${ENV.BACKEND_URL}/resources/units/selection`, {
+                      timeout: SUPPLEMENTAL_REQUEST_TIMEOUT_MS,
+                  })
+                  .then(responseGroup => {
+                      const findGroupName = responseGroup.data.data.find(
+                          (item: any) => item._id === userData.groupId,
+                      );
+
+                      return findGroupName?.name;
+                  })
+            : Promise.resolve(undefined);
+
+        const [tasksResult, groupNameResult] = await Promise.allSettled([
+            tasksPromise,
+            groupNamePromise,
+        ]);
+
+        const updates: Partial<IUser> = {};
+
+        if (tasksResult.status === 'fulfilled' && tasksResult.value) {
+            updates.tasks = tasksResult.value;
+        } else if (tasksResult.status === 'rejected') {
+            console.log(
+                '[authStore] Background load tasks failed',
+                tasksResult.reason,
+            );
+        }
+
+        if (
+            groupNameResult.status === 'fulfilled' &&
+            typeof groupNameResult.value === 'string'
+        ) {
+            updates.groupName = groupNameResult.value;
+        } else if (groupNameResult.status === 'rejected') {
+            console.log(
+                '[authStore] Background load group name failed',
+                groupNameResult.reason,
+            );
+        }
+
+        if (Object.keys(updates).length === 0) {
+            return;
+        }
+
+        set(state => {
+            if (!state.isLogin || state.userInfo._id !== userId) {
+                return {};
+            }
+
+            return {
+                userInfo: {
+                    ...state.userInfo,
+                    ...updates,
+                },
+            };
+        });
+    },
+
     getScheduleCollection: async () => {
         try {
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/schedules/collection`,
+                {timeout: SUPPLEMENTAL_REQUEST_TIMEOUT_MS},
             );
 
             if (response.data.data) {
@@ -322,15 +440,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     logout: async () => {
         await asyncStorageHelper.clearToken();
-        const checkLevel = get().userInfo.userType.level;
-        if (
-            checkLevel === EOrganization.LEADER ||
-            checkLevel === EOrganization.WORKER
-        ) {
-            OneSignal.User.pushSubscription.optOut();
-            OneSignal.logout();
+        const checkLevel = get().userInfo?.userType?.level;
+
+        try {
+            if (
+                checkLevel === EOrganization.LEADER ||
+                checkLevel === EOrganization.WORKER
+            ) {
+                OneSignal.User.pushSubscription.optOut();
+                OneSignal.logout();
+            }
+        } catch (error) {
+            console.log('[authStore] OneSignal logout failed', error);
+        } finally {
+            set({userInfo: initialUserInfo, isLogin: false});
         }
-        set({userInfo: undefined, isLogin: false});
     },
 
     updateAvatar: async (userId: string, uri: string) => {
@@ -353,10 +477,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             );
             console.log(res);
 
-            if (res.data?.data?.path) {
-                const updatedPath = `${ENV.BACKEND_URL}${fixAvatarPath(
-                    res.data.data.path,
-                )}`;
+            const updatedPath = resolveAvatarUrl(res.data?.data);
+            if (updatedPath) {
                 set(state => ({
                     userInfo: {
                         ...state.userInfo,

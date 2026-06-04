@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
     Image,
     ScrollView,
@@ -10,6 +10,7 @@ import {
 import {useAuthStore} from '@/stores/authStore';
 import images from '@/assets/images';
 import {HomeMenuItem, filterMenuByRole} from './menuConfig';
+import {useDocumentStore} from '@/stores/documentStore';
 
 type Props = {
     navigation: any;
@@ -22,7 +23,23 @@ type Props = {
 
 export default function FunctionPortal({navigation, route}: Props) {
     const {userInfo} = useAuthStore();
+    const {fetchDocumentListWithTotal} = useDocumentStore();
     const category = route.params?.category || 'production';
+    const [outgoingBadge, setOutgoingBadge] = useState(0);
+    const [incomingBadge, setIncomingBadge] = useState(0);
+
+    useEffect(() => {
+        const loadDocumentBadge = async () => {
+            const [outgoingResult, incomingResult] = await Promise.all([
+                fetchDocumentListWithTotal({type: 'OUTGOING'}),
+                fetchDocumentListWithTotal({type: 'INCOMING'}),
+            ]);
+            setOutgoingBadge(outgoingResult.total || 0);
+            setIncomingBadge(incomingResult.total || 0);
+        };
+
+        loadDocumentBadge();
+    }, [fetchDocumentListWithTotal]);
 
     const items = useMemo(
         () =>
@@ -30,6 +47,19 @@ export default function FunctionPortal({navigation, route}: Props) {
                 item => item.category === category,
             ),
         [category, userInfo],
+    );
+    const itemsWithBadge = useMemo(
+        () =>
+            items.map(item => {
+                if (item.key === 'outgoingDocument') {
+                    return {...item, badgeCount: outgoingBadge};
+                }
+                if (item.key === 'incomingDocument') {
+                    return {...item, badgeCount: incomingBadge};
+                }
+                return item;
+            }),
+        [incomingBadge, items, outgoingBadge],
     );
 
     return (
@@ -53,7 +83,7 @@ export default function FunctionPortal({navigation, route}: Props) {
             </View>
 
             <View style={styles.grid}>
-                {items.map((item: HomeMenuItem) => (
+                {itemsWithBadge.map((item: HomeMenuItem) => (
                     <TouchableOpacity
                         key={item.key}
                         style={styles.card}
@@ -61,6 +91,7 @@ export default function FunctionPortal({navigation, route}: Props) {
                         onPress={() =>
                             navigation.navigate(item.navigateTo, {
                                 navigateNext: item.navigateNext || null,
+                                menuKey: item.key,
                             })
                         }>
                         {item.badgeCount ? (

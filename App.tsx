@@ -1,7 +1,7 @@
 /* eslint-disable curly */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 /* configurations */
 import UpdateRequiredModal from '@/utils/useForceUpdate';
@@ -10,14 +10,17 @@ import asyncStorageHelper from './src/utils/localStorageHelper/index';
 
 /* packages */
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {StatusBar} from 'react-native';
 import {OneSignal, LogLevel} from 'react-native-onesignal';
 import VersionCheck from 'react-native-version-check';
 import 'react-native-reanimated';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
 
 /* screens */
 import Router from './src/router';
 import Loading from './src/screens/subscreen/Loading';
-import {StatusBar} from 'react-native';
+import {persistor, store} from '@/redux/store';
 
 const InitApp = () => {
     const {autoLogin, setRedirectData} = useAuthStore();
@@ -44,20 +47,16 @@ const InitApp = () => {
     }, []);
 
     useEffect(() => {
-        // gắn sự kiện khi người dùng nhấn vào thông báo
         const handleNotificationClick = (event: any) => {
             const data = event.notification.additionalData;
 
             console.log('notification-click: ', data);
 
             if (data?.action === 'SCHEDULE') {
-                //điều hướng xem chi tiết quy trình
                 setRedirectData('schdule', data?._id);
             } else if (data?.action === 'REQUEST') {
-                //điều hướng duyệt quy trình khi người ld gửi lên
                 setRedirectData('request', data?._id);
             } else if (data?.action === 'HARVEST') {
-                //điều hướng duyệt thu hoạch khi người ld gửi lên
                 setRedirectData('harvest', data?._id);
             }
         };
@@ -67,7 +66,6 @@ const InitApp = () => {
             handleNotificationClick,
         );
 
-        // clean khi component unmount
         return () => {
             OneSignal.Notifications.removeEventListener(
                 'click',
@@ -93,10 +91,8 @@ export default function App() {
         const checkVersion = async () => {
             try {
                 const currentVersion = VersionCheck.getCurrentVersion();
-                // const currentVersion = '0.0.1';
                 const latestVersion = await VersionCheck.getLatestVersion();
 
-                // Hàm so sánh phiên bản, ví dụ: "1.2.10" với "1.2.9"
                 function compareVersions(v1: string, v2: string): number {
                     const arr1 = v1.split('.').map(Number);
                     const arr2 = v2.split('.').map(Number);
@@ -115,21 +111,26 @@ export default function App() {
                     setIsUpdateRequired(true);
                 }
             } catch (error) {
-                console.log('Lỗi kiểm tra phiên bản:', error);
+                console.log('Loi kiem tra phien ban:', error);
             }
         };
         checkVersion();
     }, []);
 
     return (
-        <SafeAreaView style={{flex: 1}} edges={['bottom']}>
-            <StatusBar barStyle={isLogin ? 'dark-content' : 'light-content'} />
-            <InitApp />
-            {/* Modal yêu cầu cập nhật */}
-            <UpdateRequiredModal
-                visible={isUpdateRequired}
-                onClose={() => setIsUpdateRequired(false)}
-            />
-        </SafeAreaView>
+        <Provider store={store}>
+            <PersistGate loading={<Loading />} persistor={persistor}>
+                <SafeAreaView style={{flex: 1}} edges={['bottom','top']}>
+                    <StatusBar
+                        barStyle={'light-content'}
+                    />
+                    <InitApp />
+                    <UpdateRequiredModal
+                        visible={isUpdateRequired}
+                        onClose={() => setIsUpdateRequired(false)}
+                    />
+                </SafeAreaView>
+            </PersistGate>
+        </Provider>
     );
 }

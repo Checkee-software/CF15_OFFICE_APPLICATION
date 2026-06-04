@@ -26,8 +26,12 @@ import outgoingDocuments from './outgoing_documents.png';
 import incomingDocuments from './incoming_documents.png';
 import folderManagement from './folder_management.png';
 import documentStatistic from './document_statistic.png';
+import folder from './folder.png';
+import folder_2 from './folder_2.png';
 
 const images = {
+    folder: folder,
+    folder_2: folder_2,
     feedBack: feedBack,
     garden: garden,
     toDoList: toDoList,

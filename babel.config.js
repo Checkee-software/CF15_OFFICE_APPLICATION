@@ -7,7 +7,7 @@ module.exports = {
         root: ['./src'],
         alias: {
           '@': './src',
-          '@shared-types': './shared-types',
+          '@shared-types': './src/shared-types',
         },
       },
     ],

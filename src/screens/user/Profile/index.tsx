@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     View,
     Text,
@@ -15,7 +15,6 @@ import {useAuthStore} from '../../../stores/authStore';
 import {useWorkerStore} from '@/stores/workerStore';
 import moment from 'moment';
 import images from '../../../assets/images';
-import {OneSignal} from 'react-native-onesignal';
 import {
     EOrganization,
     organizations,
@@ -24,6 +23,13 @@ import {launchImageLibrary} from 'react-native-image-picker';
 
 export default function Profile({navigation}: any) {
     const {userInfo, logout, updateAvatar} = useAuthStore();
+    const userLevel = userInfo?.userType?.level;
+    const userTasks = userInfo?.tasks || {
+        total: '0',
+        compeleted: '0',
+        processing: '0',
+        expired: '0',
+    };
     const {resetStateWhenLogout} = useWorkerStore();
 
     const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -31,6 +37,16 @@ export default function Profile({navigation}: any) {
     const [showAccountInfo, setShowAccountInfo] = useState(false);
 
     const [isUploading, setIsUploading] = useState(false);
+    const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
+
+    const avatarSource =
+        userInfo.avatar && !avatarLoadFailed
+            ? {uri: userInfo.avatar}
+            : images.avatar;
+
+    useEffect(() => {
+        setAvatarLoadFailed(false);
+    }, [userInfo.avatar]);
 
     const handleSelectAvatar = async () => {
         const result = await launchImageLibrary({
@@ -65,12 +81,9 @@ export default function Profile({navigation}: any) {
                     <View style={styles.avatarWrapper}>
                         <TouchableOpacity onPress={handleSelectAvatar}>
                             <Image
-                                source={
-                                    userInfo.avatar
-                                        ? {uri: userInfo.avatar}
-                                        : images.avatar
-                                }
+                                source={avatarSource}
                                 style={styles.avatar}
+                                onError={() => setAvatarLoadFailed(true)}
                             />
                             <View style={styles.cameraIcon}>
                                 <Icon name='camera' size={18} color='#4CAF50' />
@@ -88,8 +101,8 @@ export default function Profile({navigation}: any) {
                             )}
                         </Text>
 
-                        {userInfo.userType.level !== EOrganization.ADMIN &&
-                            userInfo.userType.level !==
+                        {userLevel !== EOrganization.ADMIN &&
+                            userLevel !==
                                 EOrganization.MANAGEMENT && (
                                 <>
                                     <View style={styles.divider} />
@@ -101,19 +114,19 @@ export default function Profile({navigation}: any) {
                                     <View style={styles.jobStats}>
                                         {renderStat(
                                             'Tổng',
-                                            userInfo.tasks.total,
+                                            userTasks.total,
                                         )}
                                         {renderStat(
                                             'Hoàn thành',
-                                            userInfo.tasks.compeleted,
+                                            userTasks.compeleted,
                                         )}
                                         {renderStat(
                                             'Đang làm',
-                                            userInfo.tasks.processing,
+                                            userTasks.processing,
                                         )}
                                         {renderStat(
                                             'Thất bại',
-                                            userInfo.tasks.expired,
+                                            userTasks.expired,
                                         )}
                                     </View>
                                 </>
@@ -150,7 +163,7 @@ export default function Profile({navigation}: any) {
                                         'Dân tộc',
                                         `${userInfo.nation}`,
                                     )}
-                                    {userInfo.userType.level !==
+                                    {userLevel !==
                                     EOrganization.WORKER
                                         ? renderInfoRow(
                                               'Cấp đơn vị',
@@ -158,20 +171,19 @@ export default function Profile({navigation}: any) {
                                                   organizations.find(
                                                       (item: any) =>
                                                           item.code ===
-                                                          userInfo.userType
-                                                              .level,
+                                                          userLevel,
                                                   )?.label || 'Chưa cập nhật'
                                               }`,
                                           )
                                         : null}
 
-                                    {userInfo.userType.level ===
+                                    {userLevel ===
                                         EOrganization.LEADER ||
-                                    userInfo.userType.level ===
+                                    userLevel ===
                                         EOrganization.WORKER
                                         ? renderInfoRow(
                                               'Đội sản xuất',
-                                              //{userInfo.userType.unit}
+                                              //{userInfo?.userType?.unit}
                                               `${
                                                   userInfo.groupName === ''
                                                       ? 'Chưa cập nhật'
@@ -180,17 +192,17 @@ export default function Profile({navigation}: any) {
                                           )
                                         : null}
 
-                                    {userInfo.userType.level ===
+                                    {userLevel ===
                                         EOrganization.LEADER ||
-                                    userInfo.userType.level ===
+                                    userLevel ===
                                         EOrganization.WORKER
                                         ? renderInfoRow(
                                               'Tổ',
-                                              //{userInfo.userType.unit}
+                                              //{userInfo?.userType?.unit}
                                               `${
-                                                  userInfo.userType.unit === ''
+                                                  userInfo?.userType?.unit === ''
                                                       ? 'Chưa cập nhật'
-                                                      : userInfo.userType.unit
+                                                      : userInfo?.userType?.unit
                                               }`,
                                           )
                                         : null}
@@ -248,11 +260,14 @@ export default function Profile({navigation}: any) {
                 onRequestClose={() => setShowLogoutModal(false)}>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContainer}>
-                        <Text style={styles.modalTitle}>Đăng xuất</Text>
-                        <Text style={styles.modalMessage}>
-                            Xác nhận đăng xuất khỏi ứng dụng?
-                        </Text>
-                        <View style={styles.divider} />
+                        <View style={styles.modalBody}>
+                            <Text style={styles.modalTitle}>Đăng xuất</Text>
+                            <Text style={styles.modalMessage}>
+                                Xác nhận đăng xuất khỏi ứng dụng?
+                            </Text>
+                        </View>
+
+                        <View style={styles.modalDivider} />
 
                         <View style={styles.modalButtons}>
                             <TouchableOpacity
@@ -264,10 +279,8 @@ export default function Profile({navigation}: any) {
                                 style={styles.modalButton}
                                 onPress={async () => {
                                     resetStateWhenLogout();
-                                    OneSignal.logout();
                                     await logout();
                                     setShowLogoutModal(false);
-                                    // TODO: Handle logout logic here
                                 }}>
                                 <Text style={styles.confirmButton}>
                                     Xác nhận
@@ -490,48 +503,61 @@ const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: 'rgba(0, 0, 0, 0.34)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     modalContainer: {
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        width: 312,
-        height: 220,
-        padding: 16,
-        alignItems: 'flex-start',
+        backgroundColor: '#F4F0F8',
+        borderRadius: 14,
+        width: '82%',
+        maxWidth: 310,
+        overflow: 'hidden',
+    },
+    modalBody: {
+        paddingHorizontal: 20,
+        paddingTop: 18,
+        paddingBottom: 16,
+    },
+    modalDivider: {
+        width: '100%',
+        height: 1,
+        backgroundColor: '#D7D0DE',
     },
     modalTitle: {
         fontSize: 22,
-        marginBottom: 16,
+        lineHeight: 28,
+        marginBottom: 10,
+        fontWeight: '600',
         textAlign: 'left',
+        color: '#2D2A31',
     },
     modalMessage: {
-        fontSize: 16,
-        color: '#555',
-        marginBottom: 10,
+        fontSize: 15,
+        lineHeight: 21,
+        color: '#67606F',
         textAlign: 'left',
     },
     modalButtons: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
-        marginTop: 15,
     },
     modalButton: {
         flex: 1,
-        alignItems: 'flex-end',
-        paddingVertical: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 18,
     },
     cancelButton: {
-        fontSize: 16,
-        color: '#888',
+        fontSize: 18,
+        color: '#8E8A94',
+        fontWeight: '500',
     },
     confirmButton: {
-        fontSize: 16,
-        color: '#E53935',
-        fontWeight: 'bold',
+        fontSize: 18,
+        color: '#FF3B30',
+        fontWeight: '600',
     },
     cameraIcon: {
         position: 'absolute',
