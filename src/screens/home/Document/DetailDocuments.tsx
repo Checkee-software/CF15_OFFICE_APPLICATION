@@ -1344,6 +1344,11 @@ const DetailDocuments = ({route, navigation}: any) => {
         !isStationaryLevel || stationaryPrimaryMode !== null;
     const shouldShowStationaryReject =
         isStationaryLevel && stationaryPrimaryMode === 'SUBMIT_BGD';
+    const shouldShowDepartmentActions =
+        isDepartmentLevel && departmentCanHandleCurrentStep;
+    const shouldShowOutgoingNonManagementActions =
+        shouldShowDepartmentActions ||
+        (isStationaryLevel && shouldShowStationaryActions);
 
     useEffect(() => {
         if (mainFiles.length === 0) {
@@ -1822,7 +1827,7 @@ const DetailDocuments = ({route, navigation}: any) => {
                                 style={styles.actionIconGreen}
                                 onPress={() =>
                                     navigation.navigate(
-                                            SCREEN_INFO.DOCUMENTCATEGORYMANAGER.key,
+                                        SCREEN_INFO.DOCUMENT_COMMUNICATION.key,
                                         {
                                             documentId: documentDetail._id,
                                             communicationHistories:
@@ -2348,7 +2353,7 @@ const DetailDocuments = ({route, navigation}: any) => {
                                 <Text
                                     style={[
                                         styles.approveButtonText,
-                                        {color: '#4CAF50'},
+                                        styles.approveGreenButtonText,
                                     ]}>
                                     Phê duyệt
                                 </Text>
@@ -2395,7 +2400,7 @@ const DetailDocuments = ({route, navigation}: any) => {
             {!isDocumentManagementView &&
                 canShowProcessActions &&
                 level !== EOrganization.MANAGEMENT &&
-                shouldShowStationaryActions && (
+                shouldShowOutgoingNonManagementActions && (
                     <View style={styles.bottomActions}>
                         {(!isStationaryLevel || shouldShowStationaryReject) && (
                             <TouchableOpacity
@@ -2468,14 +2473,19 @@ const DetailDocuments = ({route, navigation}: any) => {
                             <Text
                                 style={[
                                     styles.approveButtonText,
-                                    departmentApproveMode && {color: '#4CAF50'},
-                                    hasRedCheck && {color: '#4CAF50'},
+                                    departmentApproveMode &&
+                                        styles.approveGreenButtonText,
+                                    hasRedCheck &&
+                                        !departmentApproveMode && {
+                                            color: '#4CAF50',
+                                        },
                                     isStationaryLevel &&
                                         stationaryPrimaryMode !==
                                             'SUBMIT_BGD' && {color: '#fff'},
                                     isStationaryLevel &&
                                         stationaryPrimaryMode ===
-                                            'SUBMIT_BGD' && {color: '#4CAF50'},
+                                            'SUBMIT_BGD' &&
+                                        styles.approveGreenButtonText,
                                 ]}>
                                 {isStationaryLevel
                                     ? stationaryPrimaryMode === 'PUBLISH'
@@ -2900,33 +2910,34 @@ const styles = StyleSheet.create({
     },
     rejectButton: {
         flex: 1,
-        backgroundColor: '#F8DCDC',
+        backgroundColor: '#E53935',
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         height: 44,
     },
-    rejectButtonText: {color: '#F44336', fontWeight: '600'},
+    rejectButtonText: {color: '#FFFFFF', fontWeight: '700'},
     approveButton: {
         flex: 1,
-        backgroundColor: '#ECE2C8',
+        backgroundColor: '#F59E0B',
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         height: 44,
     },
-    approveButtonText: {color: '#D28A00', fontWeight: '600'},
+    approveButtonText: {color: '#FFFFFF', fontWeight: '700'},
     disabledButton: {opacity: 0.5},
     managementSignButton: {
         flex: 1,
-        backgroundColor: '#DDEEDD',
+        backgroundColor: '#0F766E',
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         height: 44,
     },
-    managementSignButtonText: {color: '#4CAF50', fontWeight: '600'},
-    approveGreenButton: {backgroundColor: '#E4F2E4'},
+    managementSignButtonText: {color: '#FFFFFF', fontWeight: '700'},
+    approveGreenButton: {backgroundColor: '#43A047'},
+    approveGreenButtonText: {color: '#FFFFFF'},
     publishButton: {backgroundColor: '#FF9800'},
     archiveButton: {backgroundColor: '#4CAF50'},
     modalDivider: {
