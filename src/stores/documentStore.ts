@@ -1,14 +1,69 @@
 import {create} from 'zustand';
 import axiosClient from '../utils/axiosClient';
 import Snackbar from 'react-native-snackbar';
+import {Platform} from 'react-native';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import {IDocument} from '../shared-types/Response/DocumentResponse/DocumentResponse';
 import ENV from '@/config/ENV';
 import RNFS from 'react-native-fs';
 import {encode} from 'base64-arraybuffer';
+import asyncStorageHelper from '@/utils/localStorageHelper';
 
 type DocumentListParams = {type?: string; page?: number; rows?: number};
 type DocumentListWithTotal = {data: IDocument[]; total: number};
 type DocumentDetailPayload = IDocument | {document?: IDocument | null; stepsInfo?: any[]};
+const DOWNLOAD_ENDPOINT_FOLDERS = ['files', 'signedFiles', 'attachedFiles'];
+
+const normalizeFilePath = (value: string) => String(value || '').replace(/\\/g, '/').trim();
+
+const getLastPathSegment = (value: string) => {
+    const clean = normalizeFilePath(value).split('?')[0].split('#')[0];
+    const segment = clean.split('/').filter(Boolean).pop() || '';
+
+    try {
+        return decodeURIComponent(segment);
+    } catch {
+        return segment;
+    }
+};
+
+const sanitizeFileName = (value: string) =>
+    String(value || '')
+        .replace(/[\\/:*?"<>|]/g, '_')
+        .trim();
+
+const buildDownloadUrl = (fileSource: string) => {
+    const normalizedSource = normalizeFilePath(fileSource);
+    const fileName = getLastPathSegment(normalizedSource);
+
+    if (/^https?:\/\//i.test(normalizedSource)) {
+        return encodeURI(normalizedSource);
+    }
+
+    if (normalizedSource.includes('/')) {
+        const sourceParts = normalizedSource
+            .split('?')[0]
+            .split('#')[0]
+            .split('/')
+            .filter(Boolean);
+        const sourceFolder = sourceParts[sourceParts.length - 2] || '';
+
+        if (DOWNLOAD_ENDPOINT_FOLDERS.includes(sourceFolder)) {
+            return `${ENV.BACKEND_URL}/resources/downloads/${encodeURIComponent(
+                fileName,
+            )}`;
+        }
+
+        const normalizedUrlPath = normalizedSource.startsWith('/')
+            ? normalizedSource
+            : `/${normalizedSource}`;
+        return `${ENV.BACKEND_URL}${encodeURI(normalizedUrlPath)}`;
+    }
+
+    return `${ENV.BACKEND_URL}/resources/downloads/${encodeURIComponent(
+        fileName,
+    )}`;
+};
 
 const requestDocumentList = async (
     params?: DocumentListParams,
@@ -52,7 +107,10 @@ interface DocumentStore {
     fetchDocumentListWithTotal: (params?: DocumentListParams) => Promise<DocumentListWithTotal>;
     fetchDocuments: (params?: DocumentListParams) => Promise<IDocument[]>;
     getListDocument: (params?: DocumentListParams) => Promise<void>;
-    downloadFile: (fileName: string) => Promise<string | undefined>;
+    downloadFile: (
+        fileSource: string,
+        displayFileName?: string,
+    ) => Promise<string | undefined>;
     createOutgoingDocument: (formData: FormData) => Promise<boolean>;
     createIncomingDocument: (formData: FormData) => Promise<boolean>;
     getDocumentDetail: (documentId: string) => Promise<DocumentDetailPayload | null>;
@@ -77,17 +135,64 @@ export const useDocumentStore = create<DocumentStore>(set => ({
         return data;
     },
 
-    downloadFile: async (fileName: string) => {
+    downloadFile: async (fileSource: string, displayFileName?: string) => {
+        const sourceFileName = getLastPathSegment(fileSource);
+        const normalizedFileName = sanitizeFileName(
+            displayFileName || sourceFileName,
+        );
+
+        if (!normalizedFileName) {
+            Snackbar.show({
+                text: 'File chưa có thông tin tải xuống',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+            return;
+        }
+
+        const downloadUrl = buildDownloadUrl(fileSource);
+
         try {
+            if (Platform.OS === 'android') {
+                const filePath = `${ReactNativeBlobUtil.fs.dirs.DownloadDir}/${normalizedFileName}`;
+                const headers: {[key: string]: string} | undefined =
+                    asyncStorageHelper.token
+                        ? {Authorization: asyncStorageHelper.token}
+                        : undefined;
+                const result = await ReactNativeBlobUtil.config({
+                    addAndroidDownloads: {
+                        useDownloadManager: true,
+                        notification: true,
+                        mediaScannable: true,
+                        title: normalizedFileName,
+                        path: filePath,
+                        description: 'Đang tải file',
+                    },
+                }).fetch('GET', downloadUrl, headers);
+                const statusCode = result.info().status;
+
+                if (statusCode < 200 || statusCode >= 300) {
+                    throw new Error(`Download failed with status ${statusCode}`);
+                }
+
+                Snackbar.show({
+                    text: 'Đã tải file thành công',
+                    duration: Snackbar.LENGTH_LONG,
+                });
+
+                return filePath;
+            }
+
             const response = await axiosClient.get(
-                `${ENV.BACKEND_URL}/resources/downloads/${fileName}`,
+                downloadUrl,
                 {
                     responseType: 'arraybuffer',
                 },
             );
             const base64Data = encode(response.data);
 
-            const filePath = `${RNFS.DownloadDirectoryPath}/${fileName}`;
+            const downloadDirectory =
+                RNFS.DownloadDirectoryPath || RNFS.DocumentDirectoryPath;
+            const filePath = `${downloadDirectory}/${normalizedFileName}`;
             await RNFS.writeFile(filePath, base64Data, 'base64');
 
             Snackbar.show({
@@ -98,6 +203,10 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             return filePath;
         } catch (error) {
             console.error('Download failed:', error);
+            Snackbar.show({
+                text: 'Tải file không thành công, vui lòng thử lại!',
+                duration: Snackbar.LENGTH_LONG,
+            });
         }
     },
 

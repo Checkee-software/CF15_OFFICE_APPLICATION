@@ -1,24 +1,12 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {
     ActivityIndicator,
-    AppState,
-    AppStateStatus,
-    Dimensions,
-    FlatList,
     Linking,
-    Modal,
     SafeAreaView,
     ScrollView,
-    StyleSheet,
     Text,
-    TextInput,
-    TouchableOpacity,
     View,
 } from 'react-native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useFocusEffect} from '@react-navigation/native';
-import moment from 'moment';
-import AutoHeightWebView from 'react-native-autoheight-webview';
 import ENV from '@/config/ENV';
 import ModalPdfView from '../../../utils/Modals/ModalPdfView';
 import axiosClient from '@/utils/axiosClient';
@@ -30,116 +18,41 @@ import {
 } from '@/shared-types/common/Document/document';
 import {IDocument} from '@/shared-types/Response/DocumentResponse/DocumentResponse';
 import {useAuthStore} from '@/stores/authStore';
+import {useDocumentStore} from '@/stores/documentStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import {useDispatch, useSelector} from 'react-redux';
-import type {AppDispatch, RootState} from '@/redux/store';
+import {useDispatch} from 'react-redux';
+import type {AppDispatch} from '@/redux/store';
 import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
 import {
-    clearSigningSession,
     completeSigningFailed,
-    completeSigningSuccess,
-    incrementSigningPollCount,
-    markSigningAsPolling,
     startSigningSession,
 } from '@/redux/signingFlowSlice';
-
-type AttachedFiles = {
-    originalname: string;
-    path: string;
-    size: number;
-    filename?: string;
-    source?: string;
-    group?: 'main' | 'attached';
-    signStatus?: string;
-    managerInitialedAt?: string | null;
-    managerSignedAt?: string | null;
-    directorInitialedAt?: string | null;
-    directorApprovedAt?: string | null;
-};
-
-type TApproveActionMode =
-    | 'AUTO'
-    | 'DEPARTMENT_INITIAL'
-    | 'DEPARTMENT_APPROVE'
-    | 'MANAGEMENT_INITIAL'
-    | 'MANAGEMENT_SIGN'
-    | 'MANAGEMENT_FINAL'
-    | 'STATIONARY_SUBMIT'
-    | 'STATIONARY_PUBLISH'
-    | 'STATIONARY_ARCHIVE';
-
-const MYSIGN_POLL_INTERVAL_MS = 2500;
-const MYSIGN_POLL_MAX_ATTEMPTS = 24;
-
-const OUTGOING_DETAIL_STATUS_DISPLAY: Record<string, string> = {
-    DRAFT: 'Bản nháp',
-    SENDING: 'Gửi duyệt',
-    MANAGER_INITIAL_SIGNING: 'TP duyệt',
-    MANAGER_SIGNING: 'TP duyệt',
-    MANAGER_APPROVING: 'TP duyệt',
-    CLERK_CHECKING: 'VT kiểm tra',
-    DIRECTOR_INITIAL_SIGNING: 'Phê duyệt',
-    DIRECTOR_SIGNING: 'Phê duyệt',
-    DIRECTOR_APPROVING: 'Phê duyệt',
-    READY_TO_PUBLISH: 'Phát hành',
-    OFFICIAL_PUBLISHED: 'Phát hành',
-    ARCHIVED: 'Lưu trữ',
-    REJECTED: 'Từ chối',
-};
-
-const getOutgoingDetailStatusLabel = (
-    status: EDocumentStatus,
-    level?: EOrganization,
-) => {
-    const normalizedStatus = String(status || '').toUpperCase();
-
-    if (level === EOrganization.STATIONARY) {
-        if (
-            [
-                EDocumentStatus.MANAGER_INITIAL_SIGNING,
-                EDocumentStatus.MANAGER_SIGNING,
-                EDocumentStatus.MANAGER_APPROVING,
-                EDocumentStatus.DIRECTOR_INITIAL_SIGNING,
-                EDocumentStatus.DIRECTOR_SIGNING,
-                EDocumentStatus.DIRECTOR_APPROVING,
-            ].includes(normalizedStatus as EDocumentStatus)
-        ) {
-            return 'Phê duyệt';
-        }
-    }
-
-    if (
-        level === EOrganization.MANAGEMENT &&
-        [
-            EDocumentStatus.MANAGER_INITIAL_SIGNING,
-            EDocumentStatus.MANAGER_SIGNING,
-            EDocumentStatus.MANAGER_APPROVING,
-        ].includes(normalizedStatus as EDocumentStatus)
-    ) {
-        return 'Gửi duyệt';
-    }
-
-    return (
-        OUTGOING_DETAIL_STATUS_DISPLAY[normalizedStatus] ||
-        getStatusLabel(status)
-    );
-};
+import DocumentActions from './components/DocumentActions';
+import DocumentContent from './components/DocumentContent';
+import DocumentFiles from './components/DocumentFiles';
+import DocumentHeader from './components/DocumentHeader';
+import DecisionModal from './components/DecisionModal';
+import MySignOverlay from './components/MySignOverlay';
+import {useDocumentDetail} from './hooks/useDocumentDetail';
+import {useDocumentFiles} from './hooks/useDocumentFiles';
+import {useMySignPolling} from './hooks/useMySignPolling';
+import {
+    getFileUrl,
+    getIncomingLeadAgencyLabel,
+    getOutgoingDetailStatusLabel,
+} from './utils/documentHelpers';
+import {AttachedFiles, TApproveActionMode} from './utils/types';
+import styles from './styles/styles';
 
 const DetailDocuments = ({route, navigation}: any) => {
     const {userInfo} = useAuthStore();
+    const {downloadFile} = useDocumentStore();
     const dispatch = useDispatch<AppDispatch>();
-    const signingSession = useSelector(
-        (state: RootState) => state.signingFlow.currentSession,
-    );
-    const appStateRef = useRef<AppStateStatus>(AppState.currentState);
-    const isPollingRef = useRef(false);
+    const [incomingDepartmentOptions, setIncomingDepartmentOptions] = useState<
+        {id: string; name: string; code: string}[]
+    >([]);
     const [showModalPdf, setShowModalPdf] = useState(false);
     const [selectedPdf, setSelectedPdf] = useState<string | null>(null);
-    const [documentDetail, setDocumentDetail] = useState<IDocument | null>(
-        null,
-    );
-    const [stepsInfo, setStepsInfo] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [checkedMainFileIndex, setCheckedMainFileIndex] = useState<
         number | null
     >(null);
@@ -164,12 +77,19 @@ const DetailDocuments = ({route, navigation}: any) => {
     const routeItemDocument = route?.params?.itemDocument as
         | IDocument
         | undefined;
+    const {documentDetail, stepsInfo, isLoading, fetchDetail} =
+        useDocumentDetail({route, initialDocument: routeItemDocument});
     const currentDocumentId = String(
         documentDetail?._id ||
             route?.params?.documentId ||
             routeItemDocument?._id ||
             '',
     );
+    const {
+        resumeMySignPolling,
+        isCurrentDocumentSigningPending,
+        mySignPendingMessage,
+    } = useMySignPolling(currentDocumentId, fetchDetail);
     const signedDepartmentLabelMap = useMemo<Record<string, string>>(
         () => ({
             MANAGEMENT: 'Ban giám đốc',
@@ -199,75 +119,6 @@ const DetailDocuments = ({route, navigation}: any) => {
         navigation?.setOptions?.({title: 'NỘI DUNG VĂN BẢN ĐI'});
     }, [navigation, sourceModule]);
 
-    const fetchDetail = useCallback(async () => {
-        const initialDoc = route.params?.itemDocument;
-        const docId = route.params?.documentId || initialDoc?._id;
-        if (!docId && initialDoc) {
-            setDocumentDetail(initialDoc);
-            setIsLoading(false);
-            return;
-        }
-        try {
-            const response = await axiosClient.get(
-                `${ENV.BACKEND_URL}/resources/documents/detail/${docId}`,
-            );
-            const payload = response.data?.data ?? response.data;
-            const docCandidate =
-                payload?.data?.data ||
-                payload?.data?.document ||
-                payload?.data ||
-                payload?.document ||
-                payload;
-            const normalizedDocument =
-                docCandidate?.document &&
-                typeof docCandidate.document === 'object'
-                    ? docCandidate.document
-                    : docCandidate;
-            const stepsCandidate =
-                payload?.stepsInfo ||
-                payload?.data?.stepsInfo ||
-                payload?.document?.stepsInfo ||
-                docCandidate?.stepsInfo ||
-                [];
-
-            setDocumentDetail(
-                (normalizedDocument as IDocument) || initialDoc || null,
-            );
-            if (Array.isArray(stepsCandidate)) setStepsInfo(stepsCandidate);
-        } catch {
-            if (initialDoc) setDocumentDetail(initialDoc);
-            else
-                Snackbar.show({
-                    text: 'Lỗi khi tải chi tiết văn bản từ máy chủ',
-                    duration: Snackbar.LENGTH_SHORT,
-                });
-        } finally {
-            setIsLoading(false);
-        }
-    }, [route.params?.documentId, route.params?.itemDocument]);
-
-    useFocusEffect(
-        useCallback(() => {
-            fetchDetail();
-        }, [fetchDetail]),
-    );
-
-    const getFileUrl = useCallback((filePath: string) => {
-        const normalizedPath = String(filePath || '')
-            .replace(/\\/g, '/')
-            .trim();
-        if (!normalizedPath) {
-            return '';
-        }
-        if (/^https?:\/\//i.test(normalizedPath)) {
-            return normalizedPath;
-        }
-        if (normalizedPath.startsWith('/')) {
-            return `${ENV.BACKEND_URL}${normalizedPath}`;
-        }
-        return `${ENV.BACKEND_URL}/${normalizedPath}`;
-    }, []);
-
     const launchMySignApp = useCallback(
         async (documentId: string, fileName: string, filePath: string) => {
             const encodedDocumentId = encodeURIComponent(documentId);
@@ -292,228 +143,8 @@ const DetailDocuments = ({route, navigation}: any) => {
 
             return false;
         },
-        [getFileUrl],
-    );
-
-    const isSigningCompletedForSelectedFile = useCallback(
-        (documentCandidate: any, selectedFileName: string) => {
-            if (!documentCandidate || !selectedFileName) {
-                return false;
-            }
-
-            const matchedFiles = [
-                ...((Array.isArray(documentCandidate?.signedFiles)
-                    ? documentCandidate.signedFiles
-                    : []) as any[]),
-                ...((Array.isArray(documentCandidate?.mainFiles)
-                    ? documentCandidate.mainFiles
-                    : []) as any[]),
-                ...((Array.isArray(documentCandidate?.files)
-                    ? documentCandidate.files
-                    : []) as any[]),
-            ].filter((file: any) => {
-                const fileKeys = [
-                    file?.filename,
-                    file?.originalname,
-                    file?.fileName,
-                    file?.name,
-                    file?.display_file_name,
-                    file?.file?.filename,
-                    file?.file?.originalname,
-                ]
-                    .map((value: any) => String(value || '').trim())
-                    .filter(Boolean);
-
-                return fileKeys.includes(selectedFileName);
-            });
-
-            return matchedFiles.some((file: any) => {
-                const signStatus = String(file?.signStatus || '').toUpperCase();
-                return (
-                    !!file?.managerSignedAt ||
-                    !!file?.directorApprovedAt ||
-                    signStatus.includes('MANAGER_SIGN') ||
-                    signStatus.includes('DIRECTOR_SIGN') ||
-                    signStatus.includes('DIRECTOR_APPROV')
-                );
-            });
-        },
         [],
     );
-
-    const resumeMySignPolling = useCallback(async () => {
-        if (!signingSession) {
-            return;
-        }
-
-        if (
-            !currentDocumentId ||
-            signingSession.documentId !== currentDocumentId
-        ) {
-            return;
-        }
-
-        if (isPollingRef.current) {
-            return;
-        }
-
-        isPollingRef.current = true;
-        dispatch(markSigningAsPolling());
-
-        let latestErrorMessage = '';
-
-        try {
-            for (
-                let attempt = 0;
-                attempt < MYSIGN_POLL_MAX_ATTEMPTS;
-                attempt += 1
-            ) {
-                dispatch(incrementSigningPollCount());
-
-                try {
-                    await axiosClient.patch(
-                        `${ENV.BACKEND_URL}/resources/documents/action/${signingSession.documentId}?action=APPROVE`,
-                        {
-                            comment: signingSession.comment || '',
-                            signedFiles: JSON.stringify([
-                                signingSession.selectedFileName,
-                            ]),
-                        },
-                    );
-                } catch (actionError: any) {
-                    latestErrorMessage =
-                        actionError?.response?.data?.message ||
-                        actionError?.message ||
-                        '';
-                }
-
-                try {
-                    const response = await axiosClient.get(
-                        `${ENV.BACKEND_URL}/resources/documents/detail/${signingSession.documentId}`,
-                    );
-                    const payload = response.data?.data ?? response.data;
-                    const docCandidate =
-                        payload?.data?.data ||
-                        payload?.data?.document ||
-                        payload?.data ||
-                        payload?.document ||
-                        payload;
-                    const normalizedDocument =
-                        docCandidate?.document &&
-                        typeof docCandidate.document === 'object'
-                            ? docCandidate.document
-                            : docCandidate;
-
-                    if (
-                        isSigningCompletedForSelectedFile(
-                            normalizedDocument,
-                            signingSession.selectedFileName,
-                        )
-                    ) {
-                        dispatch(completeSigningSuccess());
-                        await fetchDetail();
-                        Snackbar.show({
-                            text: 'Ký thật thành công',
-                            duration: Snackbar.LENGTH_SHORT,
-                        });
-                        dispatch(clearSigningSession());
-                        return;
-                    }
-                } catch (detailError: any) {
-                    latestErrorMessage =
-                        detailError?.response?.data?.message ||
-                        detailError?.message ||
-                        latestErrorMessage;
-                }
-
-                if (attempt < MYSIGN_POLL_MAX_ATTEMPTS - 1) {
-                    await new Promise(resolve =>
-                        setTimeout(resolve, MYSIGN_POLL_INTERVAL_MS),
-                    );
-                }
-            }
-
-            const failMessage =
-                latestErrorMessage ||
-                (ENV.MYSIGN_ENABLED
-                    ? 'Không tìm thấy chữ ký sau khi quay lại từ MySign'
-                    : 'Không tìm thấy kết quả ký duyệt từ API');
-            dispatch(completeSigningFailed(failMessage));
-            Snackbar.show({text: failMessage, duration: Snackbar.LENGTH_LONG});
-        } finally {
-            isPollingRef.current = false;
-        }
-    }, [
-        currentDocumentId,
-        dispatch,
-        fetchDetail,
-        isSigningCompletedForSelectedFile,
-        signingSession,
-    ]);
-
-    const isCurrentDocumentSigningPending = Boolean(
-        signingSession &&
-            signingSession.documentId === currentDocumentId &&
-            (signingSession.status === 'WAITING_EXTERNAL' ||
-                signingSession.status === 'POLLING'),
-    );
-    const mySignPendingMessage =
-        signingSession?.status === 'POLLING'
-            ? `Đang đồng bộ kết quả ký... (${signingSession.pollCount}/${MYSIGN_POLL_MAX_ATTEMPTS})`
-            : ENV.MYSIGN_ENABLED
-            ? 'Đang chờ bạn hoàn tất ký trên MySign...'
-            : 'Đang chuẩn bị đồng bộ kết quả ký...';
-
-    useEffect(() => {
-        const appStateSubscription = AppState.addEventListener(
-            'change',
-            nextState => {
-                const previousState = appStateRef.current;
-                appStateRef.current = nextState;
-
-                if (
-                    (previousState === 'background' ||
-                        previousState === 'inactive') &&
-                    nextState === 'active' &&
-                    isCurrentDocumentSigningPending
-                ) {
-                    resumeMySignPolling();
-                }
-            },
-        );
-
-        return () => {
-            appStateSubscription.remove();
-        };
-    }, [isCurrentDocumentSigningPending, resumeMySignPolling]);
-
-    useEffect(() => {
-        if (
-            signingSession &&
-            signingSession.documentId === currentDocumentId &&
-            signingSession.status === 'POLLING'
-        ) {
-            resumeMySignPolling();
-        }
-    }, [currentDocumentId, resumeMySignPolling, signingSession]);
-
-    useEffect(() => {
-        if (
-            !signingSession ||
-            signingSession.documentId !== currentDocumentId ||
-            signingSession.status !== 'WAITING_EXTERNAL'
-        ) {
-            return;
-        }
-
-        const lastUpdateTime = new Date(
-            signingSession.updatedAt || signingSession.createdAt,
-        ).getTime();
-        const elapsedTime = Date.now() - lastUpdateTime;
-        if (Number.isFinite(elapsedTime) && elapsedTime > 10000) {
-            resumeMySignPolling();
-        }
-    }, [currentDocumentId, resumeMySignPolling, signingSession]);
 
     const handleConfirmDecision = async () => {
         if (!documentDetail?._id) {
@@ -776,8 +407,7 @@ const DetailDocuments = ({route, navigation}: any) => {
             });
         } catch (error: any) {
             Snackbar.show({
-                text:
-                    error?.response?.data?.message || 'Ký nháy thất bại',
+                text: error?.response?.data?.message || 'Ký nháy thất bại',
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
@@ -794,7 +424,9 @@ const DetailDocuments = ({route, navigation}: any) => {
             return;
         }
 
-        const selectedFileName = String(selectedMainFile?.filename || '').trim();
+        const selectedFileName = String(
+            selectedMainFile?.filename || '',
+        ).trim();
         if (!selectedFileName) {
             Snackbar.show({
                 text: 'Vui lòng chọn file trình ký hợp lệ',
@@ -842,9 +474,7 @@ const DetailDocuments = ({route, navigation}: any) => {
             );
             if (!openedMySign) {
                 dispatch(
-                    completeSigningFailed(
-                        'Không mở được ứng dụng MySign',
-                    ),
+                    completeSigningFailed('Không mở được ứng dụng MySign'),
                 );
                 Snackbar.show({
                     text: 'Không mở được MySign. Vui lòng kiểm tra app MySign đã cài đặt.',
@@ -858,8 +488,7 @@ const DetailDocuments = ({route, navigation}: any) => {
             }
         } catch (error: any) {
             Snackbar.show({
-                text:
-                    error?.response?.data?.message || 'Ký thật thất bại',
+                text: error?.response?.data?.message || 'Ký thật thất bại',
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
@@ -867,283 +496,42 @@ const DetailDocuments = ({route, navigation}: any) => {
         }
     };
 
-    const filesList: AttachedFiles[] = useMemo(() => {
-        const asArray = (value: any): any[] => {
-            if (Array.isArray(value)) {
-                return value;
-            }
-            if (value === null || value === undefined) {
-                return [];
-            }
-            if (typeof value === 'string') {
-                return [{path: value}];
-            }
-            if (typeof value === 'object') {
-                return [value];
-            }
-            return [];
-        };
-        const pickByType = (files: any[], types: string[]) =>
-            files.filter((f: any) =>
-                types.includes(
-                    String(f?.type || f?.fileType || '').toUpperCase(),
-                ),
-            );
-
-        const getFileNameFromPath = (path: string) => {
-            const clean = String(path || '').replace(/\\/g, '/');
-            const parts = clean.split('/').filter(Boolean);
-            return parts.length ? parts[parts.length - 1] : '';
-        };
-
-        const normalizeFiles = (
-            files: any[] = [],
-            source = '',
-            defaultGroup: 'main' | 'attached' = 'main',
-        ): AttachedFiles[] =>
-            files
-                .map((file: any, index: number) => ({
-                    originalname:
-                        file?.originalname ||
-                        file?.originalName ||
-                        file?.fileNameDisplay ||
-                        file?.display_file_name ||
-                        file?.nameFile ||
-                        file?.name_file ||
-                        file?.filename ||
-                        file?.fileName ||
-                        file?.name ||
-                        file?.documentName ||
-                        file?.displayName ||
-                        file?.document_file_name ||
-                        file?.file?.fileNameDisplay ||
-                        file?.file?.display_file_name ||
-                        file?.file?.nameFile ||
-                        file?.file?.name_file ||
-                        file?.file?.originalname ||
-                        file?.file?.originalName ||
-                        file?.file?.filename ||
-                        file?.file?.fileName ||
-                        getFileNameFromPath(
-                            file?.path ||
-                                file?.url ||
-                                file?.uri ||
-                                file?.filePath ||
-                                file?.file?.path ||
-                                file?.file?.url ||
-                                file?.file?.uri ||
-                                file?.file?.filePath,
-                        ) ||
-                        `${source || 'file'}-${index + 1}.pdf`,
-                    path:
-                        file?.path ||
-                        file?.url ||
-                        file?.uri ||
-                        file?.filePath ||
-                        file?.documentFile ||
-                        file?.document_file ||
-                        file?.fileUrl ||
-                        file?.fileURL ||
-                        file?.file?.path ||
-                        file?.file?.url ||
-                        file?.file?.uri ||
-                        file?.file?.filePath ||
-                        file?.file?.documentFile ||
-                        file?.file?.document_file ||
-                        file?.file?.fileUrl ||
-                        file?.file?.fileURL ||
-                        '',
-                    size: Number(file?.size || file?.file?.size || 0),
-                    filename:
-                        file?.filename ||
-                        file?.fileName ||
-                        file?.file?.filename ||
-                        file?.file?.fileName ||
-                        '',
-                    source,
-                    group: defaultGroup,
-                    signStatus: file?.signStatus || '',
-                    managerInitialedAt: file?.managerInitialedAt || null,
-                    managerSignedAt: file?.managerSignedAt || null,
-                    directorInitialedAt: file?.directorInitialedAt || null,
-                    directorApprovedAt: file?.directorApprovedAt || null,
-                }))
-                .filter(file => !!String(file?.originalname || '').trim());
-
-        const collectNestedFiles = (root: any): any[] => {
-            if (!root || typeof root !== 'object') {
-                return [];
-            }
-            const buckets: any[] = [];
-            const queue: any[] = [root];
-            const seen = new Set<any>();
-            while (queue.length > 0) {
-                const node = queue.shift();
-                if (!node || typeof node !== 'object' || seen.has(node)) {
-                    continue;
-                }
-                seen.add(node);
-                const entries = Object.entries(node);
-                entries.forEach(([key, value]) => {
-                    const lowerKey = key.toLowerCase();
-                    if (lowerKey.includes('file') && Array.isArray(value)) {
-                        buckets.push(...value);
-                    }
-                    if (
-                        value &&
-                        typeof value === 'object' &&
-                        !Array.isArray(value)
-                    ) {
-                        queue.push(value);
-                    }
-                });
-            }
-            return buckets;
-        };
-
-        const detailRawFiles = asArray((documentDetail as any)?.files);
-        const routeRawFiles = asArray((routeItemDocument as any)?.files);
-        const detailFallbackMain = asArray((documentDetail as any)?.file);
-        const routeFallbackMain = asArray((routeItemDocument as any)?.file);
-        const detailDocumentFiles = asArray(
-            (documentDetail as any)?.documentFile,
-        );
-        const routeDocumentFiles = asArray(
-            (routeItemDocument as any)?.documentFile,
-        );
-        const detailDocumentFilesAlt = asArray(
-            (documentDetail as any)?.documentFiles,
-        );
-        const routeDocumentFilesAlt = asArray(
-            (routeItemDocument as any)?.documentFiles,
-        );
-
-        const merged = [
-            ...normalizeFiles(
-                (documentDetail?.signedFiles as any[]) || [],
-                'signedFiles',
-                'main',
-            ),
-            ...normalizeFiles(
-                (documentDetail?.mainFiles as any[]) || [],
-                'mainFiles',
-                'main',
-            ),
-            ...normalizeFiles(
-                (documentDetail?.attachedFiles as any[]) || [],
-                'attachedFiles',
-                'attached',
-            ),
-            ...normalizeFiles(
-                (documentDetail?.approvedFiles as any[]) || [],
-                'approvedFiles',
-                'main',
-            ),
-            ...normalizeFiles(detailFallbackMain, 'file', 'main'),
-            ...normalizeFiles(detailDocumentFiles, 'documentFile', 'main'),
-            ...normalizeFiles(detailDocumentFilesAlt, 'documentFiles', 'main'),
-            ...normalizeFiles(
-                pickByType(detailRawFiles, ['SIGNED', 'SIGN', 'MAIN']),
-                'files.signed-main',
-                'main',
-            ),
-            ...normalizeFiles(
-                pickByType(detailRawFiles, ['ATTACHED', 'ATTACHMENT']),
-                'files.attached',
-                'attached',
-            ),
-            ...normalizeFiles(detailRawFiles, 'files', 'main'),
-            ...normalizeFiles(
-                (routeItemDocument?.signedFiles as any[]) || [],
-                'route.signedFiles',
-                'main',
-            ),
-            ...normalizeFiles(
-                (routeItemDocument?.mainFiles as any[]) || [],
-                'route.mainFiles',
-                'main',
-            ),
-            ...normalizeFiles(
-                (routeItemDocument?.attachedFiles as any[]) || [],
-                'route.attachedFiles',
-                'attached',
-            ),
-            ...normalizeFiles(
-                (routeItemDocument?.approvedFiles as any[]) || [],
-                'route.approvedFiles',
-                'main',
-            ),
-            ...normalizeFiles(routeFallbackMain, 'route.file', 'main'),
-            ...normalizeFiles(routeDocumentFiles, 'route.documentFile', 'main'),
-            ...normalizeFiles(
-                routeDocumentFilesAlt,
-                'route.documentFiles',
-                'main',
-            ),
-            ...normalizeFiles(
-                pickByType(routeRawFiles, ['SIGNED', 'SIGN', 'MAIN']),
-                'route.files.signed-main',
-                'main',
-            ),
-            ...normalizeFiles(
-                pickByType(routeRawFiles, ['ATTACHED', 'ATTACHMENT']),
-                'route.files.attached',
-                'attached',
-            ),
-            ...normalizeFiles(routeRawFiles, 'route.files', 'main'),
-            ...normalizeFiles(
-                collectNestedFiles(documentDetail),
-                'detail.nested',
-                'main',
-            ),
-            ...normalizeFiles(
-                collectNestedFiles(routeItemDocument),
-                'route.nested',
-                'main',
-            ),
+    const isIncomingFileGroupingView = useMemo(() => {
+        const status = documentDetail?.status as EDocumentStatus | undefined;
+        const incomingStatuses = [
+            EDocumentStatus.STATIONARY_RECEIVED,
+            EDocumentStatus.MANAGEMENT_REVIEWING,
+            EDocumentStatus.REGISTERED,
+            EDocumentStatus.ASSIGNED,
+            EDocumentStatus.PROCESSING,
+            EDocumentStatus.COMPLETED,
         ];
+        const incomingMetadata = [
+            (documentDetail as any)?.destinationCategoryId,
+            (routeItemDocument as any)?.destinationCategoryId,
+            (documentDetail as any)?.leadAgency,
+            (routeItemDocument as any)?.leadAgency,
+            (documentDetail as any)?.receiveDepartmentId,
+            (routeItemDocument as any)?.receiveDepartmentId,
+            (documentDetail as any)?.receiveToKnowDepartments,
+            (routeItemDocument as any)?.receiveToKnowDepartments,
+            (documentDetail as any)?.supportDepartments,
+            (routeItemDocument as any)?.supportDepartments,
+        ].some(Boolean);
 
-        const uniqueMap = new Map<string, AttachedFiles>();
-        merged.forEach(file => {
-            const key =
-                file.filename ||
-                file.path ||
-                `${file.source}-${file.originalname}`;
-            if (!uniqueMap.has(key)) {
-                uniqueMap.set(key, file);
-            } else {
-                const existing = uniqueMap.get(key)!;
-                if (
-                    existing.group !== 'attached' &&
-                    file.group === 'attached'
-                ) {
-                    uniqueMap.set(key, {...existing, group: 'attached'});
-                }
-            }
-        });
-        return Array.from(uniqueMap.values());
-    }, [documentDetail, routeItemDocument]);
+        return (
+            isIncomingDocumentView ||
+            incomingStatuses.includes(status as EDocumentStatus) ||
+            incomingMetadata
+        );
+    }, [documentDetail, isIncomingDocumentView, routeItemDocument]);
 
-    const mainFiles = useMemo(
-        () => {
-            const list = filesList.filter(file => file.group !== 'attached');
-            if (!isIncomingDocumentView) {
-                return list.filter(
-                    file =>
-                        file.source === 'signedFiles' ||
-                        file.source === 'approvedFiles' ||
-                        file.source === 'route.signedFiles' ||
-                        file.source === 'route.approvedFiles',
-                );
-            }
-            return list;
-        },
-        [filesList, isIncomingDocumentView],
+    const {filesList, mainFiles, attachedOnlyFiles} = useDocumentFiles(
+        documentDetail,
+        routeItemDocument,
+        isIncomingFileGroupingView,
     );
-    const attachedOnlyFiles = useMemo(
-        () => filesList.filter(file => file.group === 'attached'),
-        [filesList],
-    );
+
     const selectedMainFile = useMemo(
         () =>
             checkedMainFileIndex !== null
@@ -1276,9 +664,6 @@ const DetailDocuments = ({route, navigation}: any) => {
     const shouldShowManagementActions =
         isManagementLevel && managementCanHandleCurrentStep;
 
-    const hasRedCheck =
-        route.params?.hasRedCheck === true ||
-        documentDetail?.status === 'PROCESSING';
     const currentOwner = stepsInfo.length
         ? [...stepsInfo].sort(
               (a, b) => (b.stepOrder || 0) - (a.stepOrder || 0),
@@ -1310,6 +695,24 @@ const DetailDocuments = ({route, navigation}: any) => {
         if (isLeaderView) {
             return 'CBNV theo dõi văn bản';
         }
+
+        const signedDepartment = String(
+            documentDetail?.signedDepartment || '',
+        ).toUpperCase();
+        const status = documentDetail?.status as EDocumentStatus | undefined;
+        const isDepartmentApproved =
+            signedDepartment === 'DEPARTMENT' &&
+            [
+                EDocumentStatus.MANAGER_APPROVING,
+                EDocumentStatus.ARCHIVED,
+                EDocumentStatus.READY_TO_PUBLISH,
+                EDocumentStatus.OFFICIAL_PUBLISHED,
+            ].includes(status as EDocumentStatus);
+
+        if (isDepartmentApproved) {
+            return 'Trưởng phòng đã phê duyệt';
+        }
+
         return (
             signedDepartmentActionMap[
                 String(documentDetail?.signedDepartment || '')
@@ -1317,6 +720,7 @@ const DetailDocuments = ({route, navigation}: any) => {
         );
     }, [
         documentDetail?.signedDepartment,
+        documentDetail?.status,
         isLeaderView,
         signedDepartmentActionMap,
     ]);
@@ -1503,6 +907,32 @@ const DetailDocuments = ({route, navigation}: any) => {
               .filter(Boolean)
               .join(', ')
         : '';
+    const incomingLeadAgencyLookupValue = useMemo(() => {
+        const raw =
+            (documentDetail as any)?.leadAgency ||
+            (routeItemDocument as any)?.leadAgency ||
+            (documentDetail as any)?.receiveDepartmentId ||
+            (routeItemDocument as any)?.receiveDepartmentId;
+
+        if (raw && typeof raw === 'object') {
+            return String(
+                raw._id || raw.id || raw.value || raw.code || '',
+            ).trim();
+        }
+
+        return String(raw || '').trim();
+    }, [documentDetail, routeItemDocument]);
+    const incomingLeadAgencyNameFromPayload =
+        getIncomingLeadAgencyLabel(documentDetail) ||
+        getIncomingLeadAgencyLabel(routeItemDocument);
+    const incomingLeadAgencyNameFromOptions =
+        incomingDepartmentOptions.find(
+            item =>
+                item.id === incomingLeadAgencyLookupValue ||
+                item.code === incomingLeadAgencyLookupValue,
+        )?.name || '';
+    const incomingLeadAgencyName =
+        incomingLeadAgencyNameFromPayload || incomingLeadAgencyNameFromOptions;
     const shouldShowIncomingAddress =
         incomingStatus === EDocumentStatus.REGISTERED ||
         incomingStatus === EDocumentStatus.ASSIGNED ||
@@ -1512,6 +942,64 @@ const DetailDocuments = ({route, navigation}: any) => {
         incomingStatus === EDocumentStatus.ASSIGNED ||
         incomingStatus === EDocumentStatus.PROCESSING ||
         incomingStatus === EDocumentStatus.COMPLETED;
+    useEffect(() => {
+        if (
+            !isIncomingDocumentView ||
+            !shouldShowIncomingAssignmentInfo ||
+            incomingLeadAgencyNameFromPayload ||
+            !incomingLeadAgencyLookupValue ||
+            incomingDepartmentOptions.length > 0
+        ) {
+            return;
+        }
+
+        let isCancelled = false;
+        const normalizeList = (payload: any) => {
+            if (Array.isArray(payload?.data?.data)) return payload.data.data;
+            if (Array.isArray(payload?.data)) return payload.data;
+            if (Array.isArray(payload)) return payload;
+            return [];
+        };
+
+        const loadDepartmentOptions = async () => {
+            try {
+                const response = await axiosClient.get(
+                    `${ENV.BACKEND_URL}/resources/departments/selection`,
+                );
+                const departments = normalizeList(response?.data);
+                const options = departments
+                    .map((dep: any) => ({
+                        id: String(dep?._id || dep?.id || dep?.value || ''),
+                        name: String(
+                            dep?.name ||
+                                dep?.departmentName ||
+                                dep?.label ||
+                                '',
+                        ),
+                        code: String(dep?.code || dep?.departmentCode || ''),
+                    }))
+                    .filter(
+                        (dep: {id: string; name: string}) => dep.id && dep.name,
+                    );
+
+                if (!isCancelled) {
+                    setIncomingDepartmentOptions(options);
+                }
+            } catch {}
+        };
+
+        loadDepartmentOptions();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [
+        incomingDepartmentOptions.length,
+        incomingLeadAgencyLookupValue,
+        incomingLeadAgencyNameFromPayload,
+        isIncomingDocumentView,
+        shouldShowIncomingAssignmentInfo,
+    ]);
     const incomingLevelBannerText = useMemo(() => {
         if (level === EOrganization.MANAGEMENT) {
             return '→ Ban giám đốc phê duyệt văn bản đến';
@@ -1580,178 +1068,57 @@ const DetailDocuments = ({route, navigation}: any) => {
     const htmlContent = `<html><head><meta name="viewport" content="width=device-width, initial-scale=1" /></head><body style="font-size:14px;line-height:1.6;color:#37474F;margin:0;padding:0;">${
         documentDetail?.content || 'Không có nội dung văn bản.'
     }</body></html>`;
-    const formatFileSize = (size: number) =>
-        size >= 1024 * 1024
-            ? `${(size / (1024 * 1024)).toFixed(1)} mb`
-            : `${(size / 1024).toFixed(1)} kb`;
-    const getSignatureDotsForFile = (file: AttachedFiles): string[] => {
-        const dots: string[] = [];
-        const signStatus = String(file.signStatus || '').toUpperCase();
-
-        const hasRed =
-            !!file.managerInitialedAt ||
-            !!file.managerSignedAt ||
-            signStatus.includes('MANAGER_INITIAL') ||
-            signStatus.includes('MANAGER_SIGN');
-        const hasYellow =
-            !!file.directorInitialedAt ||
-            signStatus.includes('DIRECTOR_INITIAL');
-        const hasGreen =
-            !!file.directorApprovedAt ||
-            signStatus.includes('DIRECTOR_SIGN') ||
-            signStatus.includes('DIRECTOR_APPROV');
-
-        if (hasRed) {
-            dots.push('#F44336');
-        }
-        if (hasYellow) {
-            dots.push('#F39C12');
-        }
-        if (hasGreen) {
-            dots.push('#4CAF50');
+    const openPdfPreview = (file: AttachedFiles) => {
+        if (!file.path) {
+            Snackbar.show({
+                text: 'File chưa có đường dẫn tải xuống',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+            return;
         }
 
-        return dots;
+        const fixed = file.path.replace(/\\/g, '/');
+        setSelectedPdf(`${ENV.BACKEND_URL}${fixed}`);
+        setShowModalPdf(true);
     };
 
-    const renderSignatureDot = (color: string, key: string) => (
-        <View
-            key={key}
-            style={[styles.signatureDot, {backgroundColor: color}]}>
-            <MaterialCommunityIcons name='check' size={11} color='#FFFFFF' />
-        </View>
-    );
+    const getDownloadFilePathName = (file: AttachedFiles) => {
+        const pathFileName = String(file.path || '')
+            .replace(/\\/g, '/')
+            .split('/')
+            .filter(Boolean)
+            .pop();
 
-    const renderItemAttachedFiles = (
-        file: AttachedFiles,
-        isMain = false,
-        index?: number,
-    ) => {
-        const dots: string[] = getSignatureDotsForFile(file);
-        const isCheckboxDisabled =
-            (isDepartmentLevel &&
-                (!departmentCanHandleCurrentStep || departmentApproveMode)) ||
-            isStationaryLevel ||
-            (isManagementLevel &&
-                (managementFinalApproveMode || hasDirectorApproved(file)));
-        const isChecked = checkedMainFileIndex === index;
-        const showSignatureDots = dots.length > 0;
-        const showSigningStateColumn = isMain && (canProcess || showSignatureDots);
+        return String(
+            pathFileName || file.filename || file.originalname || '',
+        ).trim();
+    };
 
-        const openPdfPreview = () => {
-            if (!file.path) {
-                Snackbar.show({
-                    text: 'File chưa có đường dẫn tải xuống',
-                    duration: Snackbar.LENGTH_SHORT,
-                });
-                return;
-            }
+    const handleDownloadFile = async (file: AttachedFiles) => {
+        const fileSource = String(
+            file.path || file.filename || getDownloadFilePathName(file),
+        ).trim();
+        const displayFileName = String(
+            file.originalname || file.filename || getDownloadFilePathName(file),
+        ).trim();
 
-            const fixed = file.path.replace(/\\/g, '/');
-            setSelectedPdf(`${ENV.BACKEND_URL}${fixed}`);
-            setShowModalPdf(true);
-        };
-
-        const fileRow = (
-            <View style={isMain ? styles.signingFileInner : styles.fileCard}>
-                <View style={styles.fileLeft}>
-                    {showSigningStateColumn ? (
-                        <View style={styles.signingCheckboxColumn}>
-                            {canProcess ? (
-                                <TouchableOpacity
-                                    disabled={isCheckboxDisabled}
-                                    onPress={() =>
-                                        setCheckedMainFileIndex(prev =>
-                                            prev === index ? null : index ?? null,
-                                        )
-                                    }
-                                    style={styles.checkboxWrap}>
-                                    <MaterialCommunityIcons
-                                        name={
-                                            isChecked
-                                                ? 'checkbox-marked'
-                                                : 'checkbox-blank-outline'
-                                        }
-                                        size={21}
-                                        color={
-                                            isChecked
-                                                ? isCheckboxDisabled
-                                                    ? '#9E9E9E'
-                                                    : '#1E88E5'
-                                                : '#707070'
-                                        }
-                                    />
-                                </TouchableOpacity>
-                            ) : (
-                                <View style={styles.signingCheckboxPlaceholder} />
-                            )}
-                            {showSignatureDots ? (
-                                <View style={styles.signatureRowUnderCheckbox}>
-                                    {dots.map((color, idx) =>
-                                        renderSignatureDot(
-                                            color,
-                                            `${color}-${idx}`,
-                                        ),
-                                    )}
-                                </View>
-                            ) : null}
-                        </View>
-                    ) : null}
-
-                    <MaterialCommunityIcons
-                        name='file-pdf-box'
-                        color='#FF5B57'
-                        size={24}
-                    />
-
-                    <View style={styles.fileNameWrap}>
-                        <Text style={styles.fileName} numberOfLines={1}>
-                            {file.originalname}
-                        </Text>
-                        {!isMain && showSignatureDots ? (
-                            <View style={styles.signatureRow}>
-                                {dots.map((color, idx) =>
-                                    renderSignatureDot(
-                                        color,
-                                        `${color}-${idx}`,
-                                    ),
-                                )}
-                            </View>
-                        ) : null}
-                    </View>
-                </View>
-
-                <View
-                    style={
-                        isMain ? styles.signingFileMetaColumn : styles.fileRight
-                    }>
-                    <Text
-                        style={[
-                            styles.fileSize,
-                            !isMain && styles.fileRightFileSize,
-                        ]}>
-                        {formatFileSize(file.size)}
-                    </Text>
-                    {isMain ? <View style={styles.signingMetaSpacer} /> : null}
-                    <TouchableOpacity
-                        onPress={openPdfPreview}
-                        style={isMain ? styles.signingDownloadBtn : undefined}>
-                        <MaterialCommunityIcons
-                            name='download'
-                            color='#1E88E5'
-                            size={20}
-                        />
-                    </TouchableOpacity>
-                </View>
-            </View>
-        );
-
-        if (!isMain) {
-            return fileRow;
+        if (!fileSource) {
+            Snackbar.show({
+                text: 'File chưa có thông tin tải xuống',
+                duration: Snackbar.LENGTH_SHORT,
+            });
+            return;
         }
 
-        return <View style={styles.signingFileCardOuter}>{fileRow}</View>;
+        await downloadFile(fileSource, displayFileName);
     };
+
+    const getIsCheckboxDisabled = (file: AttachedFiles) =>
+        (isDepartmentLevel &&
+            (!departmentCanHandleCurrentStep || departmentApproveMode)) ||
+        isStationaryLevel ||
+        (isManagementLevel &&
+            (managementFinalApproveMode || hasDirectorApproved(file)));
 
     if (isLoading)
         return (
@@ -1771,6 +1138,71 @@ const DetailDocuments = ({route, navigation}: any) => {
     const outgoingStatusLabel = isDocumentManagementView
         ? getStatusLabel(documentDetail.status)
         : getOutgoingDetailStatusLabel(documentDetail.status, level);
+    const outgoingSignedDepartmentLabel =
+        signedDepartmentLabelMap[
+            String(documentDetail.signedDepartment || '')
+        ] || String(documentDetail.signedDepartment || '');
+    const outgoingConfirmButtonStyle = [
+        decisionType === 'approve' &&
+            isStationaryLevel &&
+            approveActionMode === 'STATIONARY_PUBLISH' && {
+                backgroundColor: '#FF9800',
+            },
+        decisionType === 'approve' &&
+            isStationaryLevel &&
+            approveActionMode === 'STATIONARY_ARCHIVE' && {
+                backgroundColor: '#43A047',
+            },
+        decisionType === 'approve' &&
+            (approveActionMode === 'MANAGEMENT_SIGN' ||
+                approveActionMode === 'MANAGEMENT_FINAL') && {
+                backgroundColor: '#43A047',
+            },
+        decisionType === 'approve' &&
+            (departmentApproveMode ||
+                (isStationaryLevel &&
+                    approveActionMode === 'STATIONARY_SUBMIT')) && {
+                backgroundColor: '#4CAF50',
+            },
+    ];
+
+    const openRejectDecision = () => {
+        setDecisionType('reject');
+        setApproveActionMode('AUTO');
+        setDecisionNote('');
+        setShowDecisionModal(true);
+    };
+    const openIncomingApproveDecision = () => {
+        setDecisionType('approve');
+        setDecisionNote('');
+        setShowDecisionModal(true);
+    };
+    const openManagementFinalDecision = () => {
+        setDecisionType('approve');
+        setApproveActionMode('MANAGEMENT_FINAL');
+        setDecisionNote('');
+        setShowDecisionModal(true);
+    };
+    const openOutgoingPrimaryDecision = () => {
+        if (!isStationaryLevel && !departmentApproveMode) {
+            handleDirectInitialSign();
+            return;
+        }
+        setDecisionType('approve');
+        setApproveActionMode(
+            isStationaryLevel
+                ? stationaryPrimaryMode === 'PUBLISH'
+                    ? 'STATIONARY_PUBLISH'
+                    : stationaryPrimaryMode === 'ARCHIVE'
+                    ? 'STATIONARY_ARCHIVE'
+                    : 'STATIONARY_SUBMIT'
+                : departmentApproveMode
+                ? 'DEPARTMENT_APPROVE'
+                : 'DEPARTMENT_INITIAL',
+        );
+        setDecisionNote('');
+        setShowDecisionModal(true);
+    };
 
     if (isIncomingDocumentView) {
         return (
@@ -1778,355 +1210,83 @@ const DetailDocuments = ({route, navigation}: any) => {
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.scrollContent}>
-                    <Text style={styles.documentTitle}>
-                        {documentDetail.title}
-                    </Text>
-                    <View style={styles.subHeaderRow}>
-                        <Text
-                            style={[
-                                styles.registeredNumber,
-                                {color: '#2E9E4D'},
-                            ]}>
-                            {documentDetail.registeredNumber}
-                        </Text>
-                        <Text style={styles.createdDate}>
-                            {moment(documentDetail.createdAt).format(
-                                'HH:mm DD/MM/YYYY',
-                            )}
-                        </Text>
-                    </View>
-                    <View style={styles.lineDivider} />
-
-                    <View style={styles.statusRow}>
-                        <Text style={styles.statusLabel}>
-                            Trạng thái:{' '}
-                            <Text
-                                style={[
-                                    styles.statusValue,
-                                    {color: incomingStatusColor},
-                                ]}>
-                                {incomingStatusLabel}
-                            </Text>
-                        </Text>
-                        <View style={styles.iconActionContainer}>
-                            <TouchableOpacity
-                                style={styles.actionIconOrange}
-                                onPress={() =>
-                                    navigation.navigate(
-                                        'DOCUMENT_EXECUTION_STEPS',
-                                        {stepsInfo},
-                                    )
-                                }>
-                                <MaterialCommunityIcons
-                                    name='format-list-numbered'
-                                    size={16}
-                                    color='#E65100'
-                                />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.actionIconGreen}
-                                onPress={() =>
-                                    navigation.navigate(
-                                        SCREEN_INFO.DOCUMENT_COMMUNICATION.key,
-                                        {
-                                            documentId: documentDetail._id,
-                                            communicationHistories:
-                                                (documentDetail as any)
-                                                    ?.communicationHistories ||
-                                                [],
-                                        },
-                                    )
-                                }>
-                                <MaterialCommunityIcons
-                                    name='message-text-outline'
-                                    size={16}
-                                    color='#1B5E20'
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    <View style={styles.metaRow}>
-                        <Text
-                            style={[styles.metaLabel, {flex: 1}]}
-                            numberOfLines={1}>
-                            Loại tài liệu:{' '}
-                            <Text style={styles.metaValue}>
-                                {documentDetail.categoryDocumentName || ''}
-                            </Text>
-                        </Text>
-                        <Text
-                            style={[
-                                styles.metaLabel,
-                                {flex: 1, textAlign: 'right'},
-                            ]}
-                            numberOfLines={1}>
-                            Mức độ ưu tiên:{' '}
-                            <Text style={styles.metaValue}>
-                                {getPriorityLabel(documentDetail.priority)}
-                            </Text>
-                        </Text>
-                    </View>
-                    <Text style={styles.metaLabel}>
-                        Cập nhật lúc:{' '}
-                        <Text style={styles.metaValue}>
-                            {moment(documentDetail.updatedAt).format(
-                                'HH:mm DD/MM/YYYY',
-                            )}
-                        </Text>
-                    </Text>
-                    <Text style={[styles.metaLabel, {marginTop: 8}]}>
-                        Tổ chức gửi đến:{' '}
-                        <Text style={styles.metaValue}>
-                            {documentDetail.organization || ''}
-                        </Text>
-                    </Text>
-                    <Text style={[styles.metaLabel, {marginTop: 8}]}>
-                        Người gửi đến:{' '}
-                        <Text style={styles.metaValue}>
-                            {documentDetail.sender || ''}
-                        </Text>
-                    </Text>
-                    {shouldShowIncomingAddress && !!incomingAddress && (
-                        <Text style={[styles.metaLabel, {marginTop: 8}]}>
-                            Địa chỉ số:{' '}
-                            <Text style={styles.metaValue}>
-                                {incomingAddress}
-                            </Text>
-                        </Text>
-                    )}
-                    {shouldShowIncomingAssignmentInfo &&
-                        !!documentDetail?.leadAgency && (
-                            <Text style={[styles.metaLabel, {marginTop: 8}]}>
-                                Cơ quan chủ trì:{' '}
-                                <Text style={styles.metaValue}>
-                                    {String(documentDetail?.leadAgency || '')}
-                                </Text>
-                            </Text>
-                        )}
-                    {shouldShowIncomingAssignmentInfo &&
-                        !!incomingReceiveToKnow && (
-                            <Text style={[styles.metaLabel, {marginTop: 8}]}>
-                                Người nhận để biết:{' '}
-                                <Text style={styles.metaValue}>
-                                    {incomingReceiveToKnow}
-                                </Text>
-                            </Text>
-                        )}
-                    {shouldShowIncomingAssignmentInfo &&
-                        !!incomingSupportDepartments && (
-                            <Text style={[styles.metaLabel, {marginTop: 8}]}>
-                                Cơ quan phối hợp:{' '}
-                                <Text style={styles.metaValue}>
-                                    {incomingSupportDepartments}
-                                </Text>
-                            </Text>
-                        )}
-
-                    <View style={styles.blueInfoBox}>
-                        <View style={styles.blueInfoRow}>
-                            <View style={styles.blueInfoCol}>
-                                <Text style={styles.infoLabel}>Người tạo</Text>
-                                <Text style={styles.infoValueBlue}>
-                                    {documentDetail.creatorFullName ||
-                                        documentDetail.creatorName ||
-                                        ''}
-                                </Text>
-                                <Text
-                                    style={[styles.infoLabel, {marginTop: 8}]}>
-                                    Người chịu trách nhiệm
-                                </Text>
-                                <Text style={styles.infoValueBlue}>
-                                    {currentOwner ||
-                                        documentDetail.creatorFullName ||
-                                        documentDetail.creatorName ||
-                                        ''}
-                                </Text>
-                            </View>
-                            <View style={styles.blueInfoColRight}>
-                                <Text style={styles.infoLabel}>Bộ phận</Text>
-                                <Text style={styles.infoValueBlue}>
-                                    {documentDetail.departmentName || ''}
-                                </Text>
-                            </View>
-                        </View>
-                    </View>
-
-                    <View style={styles.orangeBanner}>
-                        <Text style={styles.orangeBannerText}>
-                            {incomingLevelBannerText}
-                        </Text>
-                    </View>
-
-                    <View style={styles.webviewContainer}>
-                        <AutoHeightWebView
-                            originWhitelist={['*']}
-                            source={{html: htmlContent}}
-                            style={styles.documentContent}
-                            scrollEnabled={false}
-                        />
-                    </View>
-
-                    <View style={styles.attachedDocuments}>
-                        <Text style={styles.attachedDocumentsText}>
-                            Văn bản trình ký{' '}
-                            <Text style={styles.requiredStar}>*</Text>
-                        </Text>
-                        {mainFiles.length > 0 ? (
-                            <FlatList
-                                scrollEnabled={false}
-                                data={mainFiles}
-                                keyExtractor={(item, i) =>
-                                    `${
-                                        item.filename ||
-                                        item.path ||
-                                        item.originalname
-                                    }-${i}`
-                                }
-                                renderItem={({item}) =>
-                                    renderItemAttachedFiles(item)
-                                }
-                            />
-                        ) : (
-                            <Text style={styles.emptyText}>
-                                Chưa có văn bản trình ký
-                            </Text>
-                        )}
-                    </View>
-
-                    {attachedOnlyFiles.length > 0 && (
-                        <View style={styles.attachedDocuments}>
-                            <Text style={styles.attachedDocumentsText}>
-                                Tài liệu đính kèm
-                            </Text>
-                            <FlatList
-                                scrollEnabled={false}
-                                data={attachedOnlyFiles}
-                                keyExtractor={(item, i) =>
-                                    `${
-                                        item.filename ||
-                                        item.path ||
-                                        item.originalname
-                                    }-${i}`
-                                }
-                                renderItem={({item}) =>
-                                    renderItemAttachedFiles(item)
-                                }
-                            />
-                        </View>
-                    )}
+                    <DocumentHeader
+                        documentDetail={documentDetail}
+                        variant='incoming'
+                        statusLabel={incomingStatusLabel}
+                        statusColor={incomingStatusColor}
+                        currentOwner={currentOwner}
+                        bannerText={incomingLevelBannerText}
+                        onExecutionStepsPress={() =>
+                            navigation.navigate('DOCUMENT_EXECUTION_STEPS', {
+                                stepsInfo,
+                            })
+                        }
+                        onSecondaryActionPress={() =>
+                            navigation.navigate(
+                                SCREEN_INFO.DOCUMENT_COMMUNICATION.key,
+                                {
+                                    documentId: documentDetail._id,
+                                    communicationHistories:
+                                        (documentDetail as any)
+                                            ?.communicationHistories || [],
+                                },
+                            )
+                        }
+                        secondaryIconName='message-text-outline'
+                        incomingExtra={{
+                            shouldShowAddress: shouldShowIncomingAddress,
+                            address: incomingAddress,
+                            shouldShowAssignmentInfo:
+                                shouldShowIncomingAssignmentInfo,
+                            leadAgencyName: incomingLeadAgencyName,
+                            receiveToKnow: incomingReceiveToKnow,
+                            supportDepartments: incomingSupportDepartments,
+                        }}
+                    />
+                    <DocumentContent htmlContent={htmlContent} />
+                    <DocumentFiles
+                        variant='incoming'
+                        filesList={filesList}
+                        mainFiles={mainFiles}
+                        attachedOnlyFiles={attachedOnlyFiles}
+                        checkedIndex={checkedMainFileIndex}
+                        setCheckedIndex={setCheckedMainFileIndex}
+                        openPdfPreview={openPdfPreview}
+                        downloadFile={handleDownloadFile}
+                        canProcess={canProcess}
+                    />
                 </ScrollView>
 
-                {(shouldShowIncomingApprove || shouldShowIncomingReject) && (
-                    <View style={styles.bottomActionsIncoming}>
-                        {shouldShowIncomingReject && (
-                            <TouchableOpacity
-                                style={styles.incomingRejectButton}
-                                onPress={() => {
-                                    setDecisionType('reject');
-                                    setDecisionNote('');
-                                    setShowDecisionModal(true);
-                                }}>
-                                <Text style={styles.incomingRejectButtonText}>
-                                    Từ chối
-                                </Text>
-                            </TouchableOpacity>
-                        )}
-                        {shouldShowIncomingApprove && (
-                            <TouchableOpacity
-                                style={styles.incomingActionButton}
-                                onPress={() => {
-                                    setDecisionType('approve');
-                                    setDecisionNote('');
-                                    setShowDecisionModal(true);
-                                }}>
-                                <Text style={styles.incomingActionButtonText}>
-                                    {incomingActionLabel}
-                                </Text>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                )}
-
-                <Modal
-                    transparent
+                <DocumentActions
+                    variant='incoming'
+                    shouldShowIncomingApprove={shouldShowIncomingApprove}
+                    shouldShowIncomingReject={shouldShowIncomingReject}
+                    incomingActionLabel={incomingActionLabel}
+                    onIncomingApprove={openIncomingApproveDecision}
+                    onReject={openRejectDecision}
+                />
+                <DecisionModal
                     visible={showDecisionModal}
-                    animationType='fade'
-                    onRequestClose={() => setShowDecisionModal(false)}>
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalCardIncoming}>
-                            <Text style={styles.modalTitleIncoming}>
-                                {incomingModalTitle}
-                            </Text>
-                            <View style={styles.modalDivider} />
-                            <Text
-                                style={[
-                                    styles.modalLabel,
-                                    decisionType === 'reject' && {
-                                        color: '#FF4B4B',
-                                    },
-                                ]}>
-                                {decisionType === 'reject'
-                                    ? 'Nội dung từ chối'
-                                    : 'Nội dung đính kèm'}
-                            </Text>
-                            <TextInput
-                                style={[
-                                    styles.modalInput,
-                                    decisionType === 'reject'
-                                        ? {backgroundColor: '#F4DEDE'}
-                                        : {backgroundColor: '#E8F3E8'},
-                                ]}
-                                placeholder='Nhập nội dung...'
-                                value={decisionNote}
-                                onChangeText={setDecisionNote}
-                                multiline
-                            />
-                            <View style={styles.modalActions}>
-                                <TouchableOpacity
-                                    style={styles.backBtn}
-                                    onPress={() => setShowDecisionModal(false)}
-                                    disabled={isSubmittingDecision}>
-                                    <Text style={styles.backBtnText}>
-                                        Quay lại
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[
-                                        styles.confirmBtn,
-                                        decisionType === 'reject'
-                                            ? {backgroundColor: '#FF4B4B'}
-                                            : {backgroundColor: '#47B24A'},
-                                        isSubmittingDecision && {opacity: 0.7},
-                                    ]}
-                                    onPress={handleConfirmDecision}
-                                    disabled={isSubmittingDecision}>
-                                    <Text style={styles.confirmBtnText}>
-                                        {isSubmittingDecision
-                                            ? 'Đang xử lý...'
-                                            : incomingModalConfirmLabel}
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
-
+                    onClose={() => setShowDecisionModal(false)}
+                    onConfirm={handleConfirmDecision}
+                    decisionType={decisionType}
+                    decisionNote={decisionNote}
+                    setDecisionNote={setDecisionNote}
+                    isSubmitting={isSubmittingDecision}
+                    title={incomingModalTitle}
+                    confirmLabel={incomingModalConfirmLabel}
+                    variant='incoming'
+                />
                 <ModalPdfView
                     visible={showModalPdf}
                     pdfFilePath={selectedPdf || ''}
                     onClose={() => setShowModalPdf(false)}
                 />
-                {isCurrentDocumentSigningPending && (
-                    <View style={styles.mySignPendingOverlay}>
-                        <View style={styles.mySignPendingCard}>
-                            <ActivityIndicator size='large' color='#4CAF50' />
-                            <Text style={styles.mySignPendingText}>
-                                {mySignPendingMessage}
-                            </Text>
-                        </View>
-                    </View>
-                )}
+                <MySignOverlay
+                    visible={isCurrentDocumentSigningPending}
+                    message={mySignPendingMessage}
+                />
             </SafeAreaView>
         );
     }
@@ -2136,899 +1296,92 @@ const DetailDocuments = ({route, navigation}: any) => {
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}>
-                <Text style={styles.documentTitle}>{documentDetail.title}</Text>
-                <View style={styles.subHeaderRow}>
-                    <Text style={styles.registeredNumber}>
-                        Số hiệu văn bản: {documentDetail.registeredNumber}
-                    </Text>
-                    <Text style={styles.createdDate}>
-                        {moment(documentDetail.createdAt).format(
-                            'HH:mm DD/MM/YYYY',
-                        )}
-                    </Text>
-                </View>
-                <View style={styles.lineDivider} />
-                <View style={styles.statusRow}>
-                    <Text style={styles.statusLabel}>
-                        Trạng thái:{' '}
-                        <Text style={styles.statusValue}>
-                            {outgoingStatusLabel}
-                        </Text>
-                    </Text>
-                    <View style={styles.iconActionContainer}>
-                        <TouchableOpacity
-                            style={styles.actionIconOrange}
-                            onPress={() =>
-                                navigation.navigate(
-                                    'DOCUMENT_EXECUTION_STEPS',
-                                    {stepsInfo},
-                                )
-                            }>
-                            <MaterialCommunityIcons
-                                name='format-list-numbered'
-                                size={16}
-                                color='#E65100'
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.actionIconGreen}
-                            onPress={() =>
-                                navigation.navigate(
-                                    'DOCUMENT_APPROVAL_HISTORY',
-                                    {stepsInfo, documentDetail},
-                                )
-                            }>
-                            <MaterialCommunityIcons
-                                name='history'
-                                size={16}
-                                color='#1B5E20'
-                            />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                <View style={styles.metaRow}>
-                    <Text
-                        style={[styles.metaLabel, {flex: 1}]}
-                        numberOfLines={1}>
-                        Loại tài liệu:{' '}
-                        <Text style={styles.metaValue}>
-                            {documentDetail.categoryDocumentName || ''}
-                        </Text>
-                    </Text>
-
-                    <Text
-                        style={[
-                            styles.metaLabel,
-                            {flex: 1, textAlign: 'right'},
-                        ]}
-                        numberOfLines={1}>
-                        Mức độ ưu tiên:{' '}
-                        <Text style={styles.metaValue}>
-                            {getPriorityLabel(documentDetail.priority)}
-                        </Text>
-                    </Text>
-                </View>
-                {!isDocumentManagementView && (
-                    <Text style={styles.metaLabel}>
-                        Cấp ký duyệt:{' '}
-                        <Text style={styles.metaValue}>
-                            {signedDepartmentLabelMap[
-                                String(documentDetail.signedDepartment || '')
-                            ] || String(documentDetail.signedDepartment || '')}
-                        </Text>
-                    </Text>
-                )}
-                <Text style={styles.metaLabel}>
-                    Cập nhật lúc:{' '}
-                    <Text style={styles.metaValue}>
-                        {moment(documentDetail.updatedAt).format(
-                            'HH:mm DD/MM/YYYY',
-                        )}
-                    </Text>
-                </Text>
-
-                <View style={styles.blueInfoBox}>
-                    <View style={styles.blueInfoRow}>
-                        <View style={styles.blueInfoCol}>
-                            <Text style={styles.infoLabel}>Người tạo</Text>
-                            <Text style={styles.infoValueBlue}>
-                                {documentDetail.creatorFullName ||
-                                    documentDetail.creatorName ||
-                                    ''}
-                            </Text>
-                            <Text style={[styles.infoLabel, {marginTop: 8}]}>
-                                Người chịu trách nhiệm
-                            </Text>
-                            <Text style={styles.infoValueBlue}>
-                                {currentOwner || ''}
-                            </Text>
-                        </View>
-                        <View style={styles.blueInfoColRight}>
-                            <Text style={styles.infoLabel}>Bộ phận</Text>
-                            <Text style={styles.infoValueBlue}>
-                                {documentDetail.departmentName || ''}
-                            </Text>
-                        </View>
-                    </View>
-                </View>
-                <View style={styles.orangeBanner}>
-                    <Text style={styles.orangeBannerText}>
-                        → {workflowBannerText}
-                    </Text>
-                </View>
-
-                <View style={styles.webviewContainer}>
-                    <AutoHeightWebView
-                        originWhitelist={['*']}
-                        source={{html: htmlContent}}
-                        style={styles.documentContent}
-                        scrollEnabled={false}
-                    />
-                </View>
-                <View style={styles.attachedDocuments}>
-                    <Text style={styles.signingSectionTitle}>
-                        Văn bản trình ký{' '}
-                        <Text style={styles.requiredStar}>*</Text>
-                    </Text>
-                    {mainFiles.length > 0 ? (
-                        <FlatList
-                            scrollEnabled={false}
-                            data={mainFiles}
-                            keyExtractor={(item, i) =>
-                                `${
-                                    item.filename ||
-                                    item.path ||
-                                    item.originalname
-                                }-${i}`
-                            }
-                            renderItem={({item, index}) =>
-                                renderItemAttachedFiles(item, true, index)
-                            }
-                        />
-                    ) : (
-                        <Text style={styles.emptyText}></Text>
-                    )}
-                </View>
-                <View style={styles.attachedDocuments}>
-                    <Text style={styles.attachedDocumentsText}>
-                        Tài liệu đính kèm{' '}
-                        <Text style={styles.requiredStar}>*</Text>
-                    </Text>
-                    {attachedOnlyFiles.length > 0 ? (
-                        <FlatList
-                            scrollEnabled={false}
-                            data={attachedOnlyFiles}
-                            keyExtractor={(item, i) =>
-                                `${
-                                    item.filename ||
-                                    item.path ||
-                                    item.originalname
-                                }-${i}`
-                            }
-                            renderItem={({item}) =>
-                                renderItemAttachedFiles(item)
-                            }
-                        />
-                    ) : (
-                        <Text style={styles.emptyText}>
-                            Chưa có tài liệu đính kèm
-                        </Text>
-                    )}
-                </View>
-                {filesList.length === 0 && (
-                    <View style={styles.attachedDocuments}>
-                        <Text style={styles.emptyText}>
-                            Chưa có file đính kèm trong bản ghi này.
-                        </Text>
-                    </View>
-                )}
+                <DocumentHeader
+                    documentDetail={documentDetail}
+                    variant='outgoing'
+                    statusLabel={outgoingStatusLabel}
+                    currentOwner={currentOwner}
+                    bannerText={`→ ${workflowBannerText}`}
+                    onExecutionStepsPress={() =>
+                        navigation.navigate('DOCUMENT_EXECUTION_STEPS', {
+                            stepsInfo,
+                        })
+                    }
+                    onSecondaryActionPress={() =>
+                        navigation.navigate('DOCUMENT_APPROVAL_HISTORY', {
+                            stepsInfo,
+                            documentDetail,
+                        })
+                    }
+                    secondaryIconName='history'
+                    showSignedDepartment={!isDocumentManagementView}
+                    signedDepartmentLabel={outgoingSignedDepartmentLabel}
+                />
+                <DocumentContent htmlContent={htmlContent} />
+                <DocumentFiles
+                    variant='outgoing'
+                    filesList={filesList}
+                    mainFiles={mainFiles}
+                    attachedOnlyFiles={attachedOnlyFiles}
+                    checkedIndex={checkedMainFileIndex}
+                    setCheckedIndex={setCheckedMainFileIndex}
+                    openPdfPreview={openPdfPreview}
+                    downloadFile={handleDownloadFile}
+                    canProcess={canProcess}
+                    getIsCheckboxDisabled={getIsCheckboxDisabled}
+                />
             </ScrollView>
 
-            {!isDocumentManagementView &&
-                canShowProcessActions &&
-                shouldShowManagementActions && (
-                    <View style={styles.bottomActions}>
-                        <TouchableOpacity
-                            style={styles.rejectButton}
-                            onPress={() => {
-                                setDecisionType('reject');
-                                setApproveActionMode('AUTO');
-                                setDecisionNote('');
-                                setShowDecisionModal(true);
-                            }}>
-                            <Text style={styles.rejectButtonText}>Từ chối</Text>
-                        </TouchableOpacity>
-                        {managementFinalApproveMode ? (
-                            <TouchableOpacity
-                                style={[
-                                    styles.approveButton,
-                                    styles.approveGreenButton,
-                                ]}
-                                onPress={() => {
-                                    setDecisionType('approve');
-                                    setApproveActionMode('MANAGEMENT_FINAL');
-                                    setDecisionNote('');
-                                    setShowDecisionModal(true);
-                                }}>
-                                <Text
-                                    style={[
-                                        styles.approveButtonText,
-                                        styles.approveGreenButtonText,
-                                    ]}>
-                                    Phê duyệt
-                                </Text>
-                            </TouchableOpacity>
-                        ) : (
-                            <>
-                                <TouchableOpacity
-                                    style={[
-                                        styles.approveButton,
-                                        (!managementCanInitialSign ||
-                                            isSubmittingDecision) &&
-                                            styles.disabledButton,
-                                    ]}
-                                    disabled={
-                                        !managementCanInitialSign ||
-                                        isSubmittingDecision
-                                    }
-                                    onPress={handleDirectInitialSign}>
-                                    <Text style={styles.approveButtonText}>
-                                        Ký nháy
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[
-                                        styles.managementSignButton,
-                                        (!managementCanSign ||
-                                            isSubmittingDecision) &&
-                                            styles.disabledButton,
-                                    ]}
-                                    disabled={
-                                        !managementCanSign ||
-                                        isSubmittingDecision
-                                    }
-                                    onPress={handleDirectManagementSign}>
-                                    <Text
-                                        style={styles.managementSignButtonText}>
-                                        Ký thật
-                                    </Text>
-                                </TouchableOpacity>
-                            </>
-                        )}
-                    </View>
-                )}
-            {!isDocumentManagementView &&
-                canShowProcessActions &&
-                level !== EOrganization.MANAGEMENT &&
-                shouldShowOutgoingNonManagementActions && (
-                    <View style={styles.bottomActions}>
-                        {(!isStationaryLevel || shouldShowStationaryReject) && (
-                            <TouchableOpacity
-                                style={styles.rejectButton}
-                                onPress={() => {
-                                    setDecisionType('reject');
-                                    setApproveActionMode('AUTO');
-                                    setDecisionNote('');
-                                    setShowDecisionModal(true);
-                                }}>
-                                <Text style={styles.rejectButtonText}>
-                                    Từ chối
-                                </Text>
-                            </TouchableOpacity>
-                        )}
-                        <TouchableOpacity
-                            style={[
-                                styles.approveButton,
-                                (isOutgoingApproveDisabled ||
-                                    isSubmittingDecision) &&
-                                    styles.disabledButton,
-                                departmentApproveMode &&
-                                    styles.approveGreenButton,
-                                isStationaryLevel &&
-                                    stationaryPrimaryMode === 'PUBLISH' &&
-                                    styles.publishButton,
-                                isStationaryLevel &&
-                                    stationaryPrimaryMode === 'ARCHIVE' &&
-                                    styles.archiveButton,
-                                isStationaryLevel &&
-                                    stationaryPrimaryMode === 'SUBMIT_BGD' &&
-                                    styles.approveGreenButton,
-                                isStationaryLevel &&
-                                    stationaryPrimaryMode !== 'SUBMIT_BGD' && {
-                                        flex: 1,
-                                        backgroundColor:
-                                            stationaryPrimaryMode === 'PUBLISH'
-                                                ? '#FF9800'
-                                                : '#43A047',
-                                    },
-                            ]}
-                            disabled={
-                                isOutgoingApproveDisabled ||
-                                isSubmittingDecision
-                            }
-                            onPress={() => {
-                                if (
-                                    !isStationaryLevel &&
-                                    !departmentApproveMode
-                                ) {
-                                    handleDirectInitialSign();
-                                    return;
-                                }
-                                setDecisionType('approve');
-                                setApproveActionMode(
-                                    isStationaryLevel
-                                        ? stationaryPrimaryMode === 'PUBLISH'
-                                            ? 'STATIONARY_PUBLISH'
-                                            : stationaryPrimaryMode ===
-                                              'ARCHIVE'
-                                            ? 'STATIONARY_ARCHIVE'
-                                            : 'STATIONARY_SUBMIT'
-                                        : departmentApproveMode
-                                        ? 'DEPARTMENT_APPROVE'
-                                        : 'DEPARTMENT_INITIAL',
-                                );
-                                setDecisionNote('');
-                                setShowDecisionModal(true);
-                            }}>
-                            <Text
-                                style={[
-                                    styles.approveButtonText,
-                                    departmentApproveMode &&
-                                        styles.approveGreenButtonText,
-                                    hasRedCheck &&
-                                        !departmentApproveMode && {
-                                            color: '#4CAF50',
-                                        },
-                                    isStationaryLevel &&
-                                        stationaryPrimaryMode !==
-                                            'SUBMIT_BGD' && {color: '#fff'},
-                                    isStationaryLevel &&
-                                        stationaryPrimaryMode ===
-                                            'SUBMIT_BGD' &&
-                                        styles.approveGreenButtonText,
-                                ]}>
-                                {isStationaryLevel
-                                    ? stationaryPrimaryMode === 'PUBLISH'
-                                        ? 'Ban hành văn bản'
-                                        : stationaryPrimaryMode === 'ARCHIVE'
-                                        ? 'Lưu sổ văn bản'
-                                        : 'Trình BGD'
-                                    : departmentApproveMode
-                                    ? 'Phê duyệt'
-                                    : 'Ký nháy'}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                )}
+            <DocumentActions
+                variant='outgoing'
+                onReject={openRejectDecision}
+                isDocumentManagementView={isDocumentManagementView}
+                canShowProcessActions={canShowProcessActions}
+                isManagementLevel={isManagementLevel}
+                shouldShowManagementActions={shouldShowManagementActions}
+                managementFinalApproveMode={managementFinalApproveMode}
+                managementCanInitialSign={managementCanInitialSign}
+                managementCanSign={managementCanSign}
+                isSubmittingDecision={isSubmittingDecision}
+                onManagementFinalApprove={openManagementFinalDecision}
+                onDirectInitialSign={handleDirectInitialSign}
+                onDirectManagementSign={handleDirectManagementSign}
+                shouldShowOutgoingNonManagementActions={
+                    shouldShowOutgoingNonManagementActions
+                }
+                isStationaryLevel={isStationaryLevel}
+                shouldShowStationaryReject={shouldShowStationaryReject}
+                isOutgoingApproveDisabled={isOutgoingApproveDisabled}
+                departmentApproveMode={departmentApproveMode}
+                stationaryPrimaryMode={stationaryPrimaryMode}
+                onOutgoingPrimaryApprove={openOutgoingPrimaryDecision}
+            />
 
             {!isDocumentManagementView && (
-                <Modal
-                    transparent
+                <DecisionModal
                     visible={showDecisionModal}
-                    animationType='fade'
-                    onRequestClose={() => setShowDecisionModal(false)}>
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalCard}>
-                            <Text style={styles.modalTitle}>
-                                {outgoingModalTitle}
-                            </Text>
-                            <Text
-                                style={[
-                                    styles.modalLabel,
-                                    decisionType === 'reject' && {
-                                        color: '#F44336',
-                                    },
-                                ]}>
-                                {decisionType === 'reject'
-                                    ? 'Nội dung từ chối'
-                                    : 'Nội dung đính kèm'}
-                            </Text>
-                            <TextInput
-                                style={[
-                                    styles.modalInput,
-                                    decisionType === 'reject' && {
-                                        backgroundColor: '#FCE7E7',
-                                    },
-                                    decisionType === 'approve' && {
-                                        backgroundColor: '#E8F3E8',
-                                    },
-                                ]}
-                                placeholder='Nhập nội dung...'
-                                value={decisionNote}
-                                onChangeText={setDecisionNote}
-                                multiline
-                            />
-                            <View style={styles.modalActions}>
-                                <TouchableOpacity
-                                    style={styles.backBtn}
-                                    onPress={() => setShowDecisionModal(false)}
-                                    disabled={isSubmittingDecision}>
-                                    <Text style={styles.backBtnText}>
-                                        Quay lại
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[
-                                        styles.confirmBtn,
-                                        decisionType === 'reject' && {
-                                            backgroundColor: '#FF4B4B',
-                                        },
-                                        decisionType === 'approve' &&
-                                            isStationaryLevel &&
-                                            approveActionMode ===
-                                                'STATIONARY_PUBLISH' && {
-                                                backgroundColor: '#FF9800',
-                                            },
-                                        decisionType === 'approve' &&
-                                            isStationaryLevel &&
-                                            approveActionMode ===
-                                                'STATIONARY_ARCHIVE' && {
-                                                backgroundColor: '#43A047',
-                                            },
-                                        decisionType === 'approve' &&
-                                            (approveActionMode ===
-                                                'MANAGEMENT_SIGN' ||
-                                                approveActionMode ===
-                                                    'MANAGEMENT_FINAL') && {
-                                                backgroundColor: '#43A047',
-                                            },
-                                        decisionType === 'approve' &&
-                                            (departmentApproveMode ||
-                                                (isStationaryLevel &&
-                                                    approveActionMode ===
-                                                        'STATIONARY_SUBMIT')) && {
-                                                backgroundColor: '#4CAF50',
-                                            },
-                                        isSubmittingDecision && {opacity: 0.7},
-                                    ]}
-                                    onPress={handleConfirmDecision}
-                                    disabled={isSubmittingDecision}>
-                                    <Text style={styles.confirmBtnText}>
-                                        {isSubmittingDecision
-                                            ? 'Đang xử lý...'
-                                            : outgoingModalConfirmLabel}
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
+                    onClose={() => setShowDecisionModal(false)}
+                    onConfirm={handleConfirmDecision}
+                    decisionType={decisionType}
+                    decisionNote={decisionNote}
+                    setDecisionNote={setDecisionNote}
+                    isSubmitting={isSubmittingDecision}
+                    title={outgoingModalTitle}
+                    confirmLabel={outgoingModalConfirmLabel}
+                    confirmButtonStyle={outgoingConfirmButtonStyle}
+                />
             )}
             <ModalPdfView
                 visible={showModalPdf}
                 pdfFilePath={selectedPdf || ''}
                 onClose={() => setShowModalPdf(false)}
             />
-            {isCurrentDocumentSigningPending && (
-                <View style={styles.mySignPendingOverlay}>
-                    <View style={styles.mySignPendingCard}>
-                        <ActivityIndicator size='large' color='#4CAF50' />
-                        <Text style={styles.mySignPendingText}>
-                            {mySignPendingMessage}
-                        </Text>
-                    </View>
-                </View>
-            )}
+            <MySignOverlay
+                visible={isCurrentDocumentSigningPending}
+                message={mySignPendingMessage}
+            />
         </SafeAreaView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {flex: 1, backgroundColor: '#FFFFFF'},
-    scrollContent: {
-        paddingHorizontal: 14,
-        paddingTop: 10,
-        paddingBottom: 24,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-    },
-    emptyContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-    emptyText: {color: '#78909C'},
-    documentTitle: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: '#1A1A1A',
-        lineHeight: 22,
-    },
-    subHeaderRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    registeredNumber: {
-        fontSize: 13,
-        fontWeight: '600',
-        color: '#1A1A1A',
-        flex: 1,
-    },
-
-    createdDate: {
-        fontSize: 11,
-        color: '#777',
-        fontStyle: 'italic',
-    },
-    lineDivider: {height: 1, backgroundColor: '#D3D3D3', marginBottom: 14},
-    statusRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    statusLabel: {
-        fontSize: 15,
-        color: '#8A8A8A',
-        fontWeight: '400',
-    },
-
-    statusValue: {
-        fontSize: 15,
-        color: '#43A047',
-        fontWeight: '700',
-    },
-    iconActionContainer: {flexDirection: 'row', gap: 10},
-    actionIconOrange: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#FCE7C8',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    actionIconGreen: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#D8ECD6',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    metaRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    metaLabel: {
-        fontSize: 12,
-        color: '#9A9A9A',
-    },
-    metaValue: {
-        color: '#2B2F33',
-        fontWeight: '500',
-    },
-    blueInfoBox: {
-        backgroundColor: '#EAF2FA',
-        borderLeftWidth: 3,
-        borderLeftColor: '#1E88E5',
-        paddingVertical: 12,
-        paddingHorizontal: 12,
-        borderRadius: 8,
-        marginTop: 12,
-        marginBottom: 14,
-    },
-    blueInfoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    blueInfoCol: {flex: 1},
-    blueInfoColRight: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    infoLabel: {fontSize: 12, color: '#3F4A56', marginBottom: 2},
-    infoValueBlue: {fontSize: 13, color: '#1E88E5', fontWeight: '500'},
-    orangeBanner: {
-        backgroundColor: '#FFF4E5',
-        borderLeftWidth: 3,
-        borderLeftColor: '#FF9800',
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-        borderRadius: 6,
-        marginBottom: 14,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    orangeBannerText: {
-        fontSize: 16,
-        color: '#F39C12',
-        fontStyle: 'italic',
-        fontWeight: '500',
-    },
-    webviewContainer: {marginTop: 6, marginBottom: 12},
-    documentContent: {
-        width: Dimensions.get('window').width - 28,
-        backgroundColor: '#FFFFFF',
-    },
-    attachedDocuments: {marginTop: 8},
-    attachedDocumentsText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#222',
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#E0E0E0',
-        marginBottom: 14,
-    },
-    requiredStar: {color: '#F44336'},
-    signingSectionTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#222',
-        marginBottom: 10,
-    },
-    signingFileCardOuter: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: '#B3D4FC',
-        padding: 10,
-        marginBottom: 12,
-        minHeight: 88,
-    },
-    signingFileInner: {
-        backgroundColor: '#F5F5F5',
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        minHeight: 72,
-        flexDirection: 'row',
-        alignItems: 'stretch',
-    },
-    signingCheckboxColumn: {
-        alignItems: 'center',
-        marginRight: 8,
-        minWidth: 24,
-    },
-    signingCheckboxPlaceholder: {
-        width: 21,
-        height: 21,
-    },
-    signatureRowUnderCheckbox: {
-        flexDirection: 'row',
-        gap: 6,
-        marginTop: 8,
-    },
-    signatureDot: {
-        width: 17,
-        height: 17,
-        borderRadius: 8.5,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    signingFileMetaColumn: {
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        minHeight: 52,
-        marginLeft: 8,
-    },
-    signingMetaSpacer: {
-        flex: 1,
-        minHeight: 4,
-    },
-    signingDownloadBtn: {
-        paddingBottom: 2,
-    },
-    fileCard: {
-        backgroundColor: '#F5F5F5',
-        borderRadius: 10,
-        paddingHorizontal: 12,
-        paddingVertical: 12,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 12,
-    },
-
-    fileLeft: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        flex: 1,
-    },
-
-    fileRight: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 10,
-    },
-
-    checkboxWrap: {
-        marginRight: 10,
-        marginTop: 1,
-    },
-
-    fileNameWrap: {
-        flex: 1,
-        marginLeft: 10,
-    },
-
-    fileName: {
-        fontSize: 14,
-        color: '#3A3A3A',
-        fontWeight: '400',
-    },
-
-    fileSize: {
-        fontSize: 13,
-        color: '#5F5F5F',
-    },
-    fileRightFileSize: {
-        marginRight: 14,
-    },
-
-    signatureRow: {
-        flexDirection: 'row',
-        gap: 8,
-        marginTop: 8,
-    },
-    bottomActionsIncoming: {
-        paddingHorizontal: 14,
-        paddingTop: 8,
-        paddingBottom: 10,
-        backgroundColor: '#FFFFFF',
-        flexDirection: 'row',
-        gap: 8,
-    },
-    incomingActionButton: {
-        height: 44,
-        borderRadius: 8,
-        backgroundColor: '#47B24A',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flex: 1,
-    },
-    incomingActionButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '700',
-    },
-    incomingRejectButton: {
-        height: 44,
-        borderRadius: 8,
-        backgroundColor: '#F5DCDC',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flex: 1,
-    },
-    incomingRejectButtonText: {
-        color: '#E54E4E',
-        fontSize: 16,
-        fontWeight: '700',
-    },
-    bottomActions: {
-        flexDirection: 'row',
-        gap: 10,
-        padding: 12,
-        backgroundColor: '#F2F2F2',
-    },
-    rejectButton: {
-        flex: 1,
-        backgroundColor: '#E53935',
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 44,
-    },
-    rejectButtonText: {color: '#FFFFFF', fontWeight: '700'},
-    approveButton: {
-        flex: 1,
-        backgroundColor: '#F59E0B',
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 44,
-    },
-    approveButtonText: {color: '#FFFFFF', fontWeight: '700'},
-    disabledButton: {opacity: 0.5},
-    managementSignButton: {
-        flex: 1,
-        backgroundColor: '#0F766E',
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 44,
-    },
-    managementSignButtonText: {color: '#FFFFFF', fontWeight: '700'},
-    approveGreenButton: {backgroundColor: '#43A047'},
-    approveGreenButtonText: {color: '#FFFFFF'},
-    publishButton: {backgroundColor: '#FF9800'},
-    archiveButton: {backgroundColor: '#4CAF50'},
-    modalDivider: {
-        height: 1,
-        backgroundColor: '#E6E6E6',
-        marginHorizontal: -14,
-        marginBottom: 12,
-    },
-    modalCardIncoming: {
-        width: '100%',
-        backgroundColor: '#fff',
-        borderRadius: 14,
-        padding: 14,
-    },
-    modalTitleIncoming: {
-        textAlign: 'center',
-        fontSize: 32,
-        fontWeight: '700',
-        marginBottom: 10,
-    },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 16,
-    },
-    modalCard: {
-        width: '100%',
-        backgroundColor: '#fff',
-        borderRadius: 14,
-        padding: 14,
-    },
-    modalTitle: {
-        textAlign: 'center',
-        fontSize: 28,
-        fontWeight: '700',
-        marginBottom: 12,
-    },
-    modalLabel: {color: '#4CAF50', fontWeight: '500', marginBottom: 6},
-    modalInput: {
-        backgroundColor: '#E8F3E8',
-        borderRadius: 10,
-        minHeight: 110,
-        padding: 10,
-        textAlignVertical: 'top',
-    },
-    modalActions: {flexDirection: 'row', gap: 14, marginTop: 16},
-    backBtn: {
-        flex: 1,
-        height: 42,
-        borderRadius: 10,
-        backgroundColor: '#D3D3D3',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    backBtnText: {fontWeight: '600'},
-    confirmBtn: {
-        flex: 1,
-        height: 42,
-        borderRadius: 10,
-        backgroundColor: '#47B24A',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    confirmBtnText: {color: '#fff', fontWeight: '700'},
-    mySignPendingOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.35)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 24,
-        zIndex: 99,
-    },
-    mySignPendingCard: {
-        width: '100%',
-        backgroundColor: '#fff',
-        borderRadius: 14,
-        paddingVertical: 22,
-        paddingHorizontal: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 10,
-    },
-    mySignPendingText: {
-        fontSize: 15,
-        color: '#2B2F33',
-        textAlign: 'center',
-        fontWeight: '500',
-    },
-    publishConfirmBtn: {backgroundColor: '#47B24A'},
-});
 
 export default DetailDocuments;
