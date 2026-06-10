@@ -109,6 +109,7 @@ const styles = StyleSheet.create({
   webview: { flex: 1, backgroundColor: '#FFF' },
   bottomActions: { height: 78, borderTopWidth: 1, borderTopColor: '#DADADA', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingTop: 10, backgroundColor: '#EFEFEF' },
   formActionDisabled: { opacity: 0.7 },
+  webEditorContainer: { height: 220 },
   btnDraft: { flex: 1, height: 46, borderRadius: 24, borderWidth: 1, borderColor: '#9B9B9B', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F8F8F8' },
   btnDraftText: { fontSize: 16, color: '#8D8D8D', fontWeight: '500' },
   btnSubmit: { flex: 1.2, height: 46, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: '#4CAF50' },

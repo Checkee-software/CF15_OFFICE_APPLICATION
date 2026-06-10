@@ -8,7 +8,7 @@ import Backdrop from '@/screens/subscreen/Loading/index2';
 import DropdownModal from './components/DropdownModal';
 import DocumentCard from './components/DocumentCard';
 import FileRow from './components/FileRow';
-import WebEditor from './components/Editor/WebEditor';
+import WebEditor from '../Document/components/WebEditor';
 import { useIncomingForm } from './hooks/useIncomingForm';
 import styles from './styles';
 import { formatDate, type TDropdownListOption } from './utils';
@@ -277,6 +277,7 @@ export default function Incoming({ navigation }: any) {
           <KeyboardAwareScrollView
             ref={formScrollRef}
             enableOnAndroid
+            enableAutomaticScroll={isKeyboardVisible && !isEditorFocused}
             extraScrollHeight={96}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps='handled'

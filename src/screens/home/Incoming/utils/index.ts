@@ -42,7 +42,7 @@ export type TDropdownListOption = {
   label: string;
   subLabel?: string;
   checked?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
 };
 export type TIncomingAssignmentDraft = {
   leadDepartmentId: string;

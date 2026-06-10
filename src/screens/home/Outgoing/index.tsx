@@ -11,7 +11,7 @@ import {
   ESignDepartment,
   SIGN_DEPARTMENT_LABEL,
 } from './components/constants';
-import OutgoingEditor from './components/OutgoingEditor';
+import WebEditor from '../Document/components/WebEditor';
 import OutgoingList, { OutgoingHeaderCreateButton } from './components/OutgoingList';
 import styles from './styles';
 import { useOutgoingForm } from './hook/useOutgoingForm';
@@ -58,8 +58,11 @@ export default function Outgoing({ navigation }: any) {
     editingDocument,
     editorCommand,
     editorContent,
+    editorContentRequestRef,
     editorContentVersion,
     editorFocusedRef,
+    editorReadyRef,
+    editorRef,
     errors,
     existingAttachedFiles,
     existingSignedFiles,
@@ -109,6 +112,7 @@ export default function Outgoing({ navigation }: any) {
     signedFilesNew,
     titleValue,
     toggleFormat,
+    editorContentRef,
   } = useOutgoingForm();
 
   const renderHeaderCreateButton = useCallback(() => (
@@ -151,7 +155,7 @@ export default function Outgoing({ navigation }: any) {
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
           enableOnAndroid
-          enableAutomaticScroll
+          enableAutomaticScroll={!isEditorFocused}
           enableResetScrollToCoords={false}
           extraScrollHeight={Platform.OS === 'ios' ? 24 : 96}
         >
@@ -298,76 +302,26 @@ export default function Outgoing({ navigation }: any) {
           <Text style={styles.fieldLabel}>Nội dung văn bản <Text style={styles.required}>*</Text></Text>
 
 
-        <View style={styles.editorContainer}>
-          <View style={styles.editorToolbar}>
-            <TouchableOpacity style={styles.toolbarIconBtn} onPress={() => sendEditorCommand('undo')}>
-              <MaterialCommunityIcons name="undo-variant" size={18} color="#3D495A" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.toolbarIconBtn} onPress={() => sendEditorCommand('redo')}>
-              <MaterialCommunityIcons name="redo-variant" size={18} color="#3D495A" />
-            </TouchableOpacity>
-
-            <View style={styles.toolbarDivider} />
-
-            <TouchableOpacity style={styles.toolbarDropdown} onPress={() => {
-
-              setShowColorMenu(false);
-              setShowFormatMenu(!showFormatMenu);
-            }}>
-              <Text style={styles.toolbarDropdownText}>{activeFormat}</Text>
-              <MaterialCommunityIcons name="chevron-down" size={16} color="#7C8797" />
-            </TouchableOpacity>
-
-            <View style={styles.toolbarSpacer} />
-
-            <TouchableOpacity onPress={() => sendEditorCommand('bold')}>
-              <Text style={styles.toolbarStrong}>B</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => sendEditorCommand('italic')}>
-              <Text style={styles.toolbarItalic}>I</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.toolbarAButton} onPress={() => {
-              setShowFormatMenu(false);
-              setShowColorMenu(!showColorMenu);
-            }}>
-              <Text style={styles.toolbarUnderline}>A</Text>
-              <MaterialCommunityIcons name="chevron-down" size={14} color="#7C8797" />
-            </TouchableOpacity>
-          </View>
-
-          {showFormatMenu && (
-            <View style={styles.menuBox}>
-              <TouchableOpacity style={styles.menuItem} onPress={() => toggleFormat('Paragraph')}>
-                <Text style={styles.menuText}>Paragraph</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => toggleFormat('H1')}>
-                <Text style={styles.menuText}>Heading 1</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => toggleFormat('H2')}>
-                <Text style={styles.menuText}>Heading 2</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {showColorMenu && (
-            <View style={styles.colorMenu}>
-              {['#111827', '#374151', '#6B7280', '#1E88E5', '#1976D2', '#0EA5E9', '#43A047', '#22C55E', '#84CC16', '#F59E0B', '#F4511E', '#DC2626', '#D81B60', '#8E24AA', '#7C3AED', '#0F766E', '#0891B2', '#334155', '#000000', '#94A3B8', '#06B6D4', '#2563EB', '#65A30D', '#EAB308', '#EA580C', '#EF4444', '#EC4899', '#A855F7', '#14B8A6'].map(color => (
-                <TouchableOpacity
-                  key={color}
-                  style={[styles.colorDot, { backgroundColor: color }]}
-                  onPress={() => chooseColor(color)}
-                />
-              ))}
-            </View>
-          )}
-
-          <View style={styles.editorBody}>
-            <OutgoingEditor
+            <WebEditor
+              editorRef={editorRef}
+              editorReadyRef={editorReadyRef}
+              editorFocusedRef={editorFocusedRef}
+              editorContentRef={editorContentRef}
+              editorContentRequestRef={editorContentRequestRef}
+              isEditorFocused={isEditorFocused}
               content={editorContent}
               contentVersion={editorContentVersion}
-              command={editorCommand}
-              scrollEnabled={isEditorFocused}
+              editorCommand={editorCommand}
+              activeFormat={activeFormat}
+              showFormatMenu={showFormatMenu}
+              showColorMenu={showColorMenu}
+              setIsEditorFocused={setIsEditorFocused}
+              setShowFormatMenu={setShowFormatMenu}
+              setShowColorMenu={setShowColorMenu}
+              sendEditorCommand={sendEditorCommand}
+              toggleFormat={toggleFormat}
+              chooseColor={chooseColor}
+              scrollFormToEditor={scrollCreateFormToEditor}
               onContentChange={handleEditorContentChange}
               onFocus={() => {
                 editorFocusedRef.current = true;
@@ -378,9 +332,8 @@ export default function Outgoing({ navigation }: any) {
                 editorFocusedRef.current = false;
                 setIsEditorFocused(false);
               }}
+              containerStyle={styles.webEditorContainer}
             />
-          </View>
-        </View>
 
         {!isKeyboardVisible && (
         <View style={styles.bottomActions}>

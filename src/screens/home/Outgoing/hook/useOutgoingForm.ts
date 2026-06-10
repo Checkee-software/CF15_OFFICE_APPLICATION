@@ -22,7 +22,10 @@ import {
 export function useOutgoingForm() {
   const { userInfo } = useAuthStore();
   const createScrollRef = useRef<any>(null);
+  const editorRef = useRef<any>(null);
+  const editorReadyRef = useRef(false);
   const editorFocusedRef = useRef(false);
+  const editorContentRequestRef = useRef<((html: string) => void) | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isEditorFocused, setIsEditorFocused] = useState(false);
   const [editorCommand, setEditorCommand] = useState('');
@@ -135,20 +138,51 @@ export function useOutgoingForm() {
     sendEditorCommand(`foreColor:${color}`);
     setShowColorMenu(false);
   };
+  const commitEditorContent = useCallback((html: string, syncState = false) => {
+    const nextHtml = html || '';
+    editorContentRef.current = nextHtml;
+    if (syncState) {
+      setEditorContent(nextHtml);
+    }
+  }, []);
   const setEditorContentForLoad = useCallback((html: string) => {
-    editorContentRef.current = html;
-    setEditorContent(html);
+    commitEditorContent(html, true);
     setEditorContentVersion(prev => prev + 1);
-  }, []);
+  }, [commitEditorContent]);
   const handleEditorContentChange = useCallback((html: string) => {
-    editorContentRef.current = html;
-  }, []);
+    commitEditorContent(html);
+  }, [commitEditorContent]);
+  const requestEditorContent = useCallback(() => {
+    if (!editorRef.current || !editorReadyRef.current) {
+      return Promise.resolve(editorContentRef.current || editorContent);
+    }
+
+    return new Promise<string>(resolve => {
+      const timeout = setTimeout(() => {
+        editorContentRequestRef.current = null;
+        resolve(editorContentRef.current || editorContent);
+      }, 400);
+
+      editorContentRequestRef.current = (html: string) => {
+        clearTimeout(timeout);
+        editorContentRequestRef.current = null;
+        commitEditorContent(html);
+        resolve(html || '');
+      };
+
+      editorRef.current.injectJavaScript(
+        'window.__postContent && window.__postContent("request");true;',
+      );
+    });
+  }, [commitEditorContent, editorContent]);
 
   const openCreateForm = useCallback(() => {
     setEditingDocument(null);
     setTitleValue('');
     setCodeValue('');
     setEditorContentForLoad('');
+    editorReadyRef.current = false;
+    editorContentRequestRef.current = null;
     setSignedFilesNew([]);
     setAttachedFilesNew([]);
     setSelectedCategoryId('');
@@ -169,6 +203,8 @@ export function useOutgoingForm() {
     setTitleValue(item.title);
     setCodeValue(item.code);
     setEditorContentForLoad('');
+    editorReadyRef.current = false;
+    editorContentRequestRef.current = null;
     try {
       const detail = await getDocumentDetail(item.id);
       const fallbackDoc = (listDocument || []).find((doc: IDocument) => doc._id === item.id) || null;
@@ -296,10 +332,11 @@ export function useOutgoingForm() {
     const canCreateDraft = (isLeaderLevel || isDepartmentLevel || isStationaryLevel) && !isEditingOutgoing;
     const effectiveStatus: 'SENDING' | 'DRAFT' = canCreateDraft && targetStatus === 'DRAFT' ? 'DRAFT' : 'SENDING';
 
+    const latestEditorContent = await requestEditorContent();
+
     const formData = new FormData();
     formData.append('title', titleValue);
-    const latestEditorContent = editorContentRef.current || editorContent;
-    formData.append('content', latestEditorContent || titleValue);
+    formData.append('content', (latestEditorContent || editorContent || titleValue).trim());
     formData.append('priority', priorityValue);
     formData.append('registeredNumber', codeValue);
     formData.append('categoryId', selectedCategoryId);
@@ -395,7 +432,11 @@ export function useOutgoingForm() {
     editorCommand,
     editorContent,
     editorContentVersion,
+    editorContentRef,
+    editorContentRequestRef,
     editorFocusedRef,
+    editorReadyRef,
+    editorRef,
     errors,
     existingAttachedFiles,
     existingSignedFiles,

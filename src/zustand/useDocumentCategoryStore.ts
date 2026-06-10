@@ -183,7 +183,7 @@ const enrichFolderDocumentCounts = async <T extends MixedContentItem>(
   const countResults = await Promise.allSettled(
     folders.map(async folder => ({
       id: folder._id,
-      count: (await getDocumentsByCategory(folder._id)).count,
+      count: (await getDocumentsByCategory(folder._id)).documents.length,
     })),
   );
   const countById = new Map<string, number>();

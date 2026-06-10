@@ -111,7 +111,7 @@ export default function App() {
                     setIsUpdateRequired(true);
                 }
             } catch (error) {
-                console.log('Loi kiem tra phien ban:', error);
+                console.log('Lỗi kiểm tra phiên bản:', error);
             }
         };
         checkVersion();
