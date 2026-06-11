@@ -23,6 +23,9 @@ const DOCUMENT_TYPE_LABEL: Record<string, string> = {
   OUTGOING: 'Văn bản đi',
 };
 
+const DOCUMENT_CATEGORY_TYPES = ['INCOMING', 'OUTGOING'] as const;
+type DocumentCategoryDocumentType = (typeof DOCUMENT_CATEGORY_TYPES)[number];
+
 const getDocumentTypeLabel = (value?: string) => {
   const normalized = String(value || '').toUpperCase();
   return DOCUMENT_TYPE_LABEL[normalized] || value || 'Văn bản';
@@ -154,10 +157,17 @@ const mergeMixedContent = (...groups: Array<Array<any>>) => {
   return Array.from(merged.values());
 };
 
-const getDocumentsByCategory = async (categoryId: string, search?: string) => {
+const requestDocumentsByCategory = async (
+  categoryId: string,
+  search?: string,
+  documentType?: DocumentCategoryDocumentType,
+) => {
   const params: Record<string, string> = { rows: '1000' };
   if (search) {
     params.search = search;
+  }
+  if (documentType) {
+    params.type = documentType;
   }
 
   const response = await axiosClient.get(
@@ -169,6 +179,65 @@ const getDocumentsByCategory = async (categoryId: string, search?: string) => {
   return {
     documents,
     count: pickCountPayload(response.data, documents.length),
+    documentType,
+  };
+};
+
+const getDocumentsByCategory = async (categoryId: string, search?: string) => {
+  const results = await Promise.allSettled([
+    requestDocumentsByCategory(categoryId, search),
+    ...DOCUMENT_CATEGORY_TYPES.map(type =>
+      requestDocumentsByCategory(categoryId, search, type),
+    ),
+  ]);
+  const fulfilledResults = results
+    .filter(
+      (result): result is PromiseFulfilledResult<Awaited<ReturnType<typeof requestDocumentsByCategory>>> =>
+        result.status === 'fulfilled',
+    )
+    .map(result => result.value);
+
+  if (fulfilledResults.length === 0) {
+    const rejected = results.find(
+      (result): result is PromiseRejectedResult => result.status === 'rejected',
+    );
+    throw rejected?.reason || new Error('Cannot fetch category documents');
+  }
+
+  const merged = new Map<string, any>();
+  fulfilledResults.forEach(result => {
+    result.documents.forEach((document, index) => {
+      const key = String(
+        document?._id ||
+          document?.id ||
+          `${document?.registeredNumber || 'document'}_${index}_${merged.size}`,
+      );
+      merged.set(key, document);
+    });
+  });
+
+  const typedResults = fulfilledResults.filter(result => result.documentType);
+  const typedDocumentKeys = typedResults.flatMap(result =>
+    result.documents
+      .map(document => String(document?._id || document?.id || ''))
+      .filter(Boolean),
+  );
+  const typedUniqueKeyCount = new Set(typedDocumentKeys).size;
+  const typedResultsCoverBothTypes = DOCUMENT_CATEGORY_TYPES.every(type =>
+    typedResults.some(result => result.documentType === type),
+  );
+  const typedResultsHaveOverlap =
+    typedDocumentKeys.length > 0 && typedUniqueKeyCount < typedDocumentKeys.length;
+  const typedCount = typedResults.reduce((total, result) => total + result.count, 0);
+  const documents = Array.from(merged.values());
+  const count =
+    typedResultsCoverBothTypes && !typedResultsHaveOverlap
+      ? Math.max(typedCount, documents.length)
+      : documents.length;
+
+  return {
+    documents,
+    count,
   };
 };
 
@@ -183,7 +252,7 @@ const enrichFolderDocumentCounts = async <T extends MixedContentItem>(
   const countResults = await Promise.allSettled(
     folders.map(async folder => ({
       id: folder._id,
-      count: (await getDocumentsByCategory(folder._id)).documents.length,
+      count: (await getDocumentsByCategory(folder._id)).count,
     })),
   );
   const countById = new Map<string, number>();

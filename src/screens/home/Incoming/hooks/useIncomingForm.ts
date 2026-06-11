@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, InteractionManager, Keyboard, Platform, TextInput } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { errorCodes, isErrorWithCode, pick, types } from '@react-native-documents/picker';
 import { useAuthStore } from '@/stores/authStore';
@@ -31,6 +32,7 @@ import {
   todayIsoDate,
   type TDepartmentOption,
   type TDirectoryUser,
+  type TDropdownListOption,
   type TFocusableIncomingField,
   type TFormMode,
   type TIncomingAssignmentDraft,
@@ -39,6 +41,47 @@ import {
   type TTab,
   type TExistingFile,
 } from '../utils';
+
+const INCOMING_ASSIGNMENT_DRAFT_STORAGE_KEY = '@incomingAssignmentDrafts';
+
+const readStoredAssignmentDrafts = async (): Promise<Record<string, TIncomingAssignmentDraft>> => {
+  try {
+    const raw = await AsyncStorage.getItem(INCOMING_ASSIGNMENT_DRAFT_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+};
+
+const getStoredAssignmentDraft = async (documentId: string) => {
+  const drafts = await readStoredAssignmentDrafts();
+  return drafts[documentId];
+};
+
+const saveStoredAssignmentDraft = async (
+  documentId: string,
+  draft: TIncomingAssignmentDraft,
+) => {
+  const drafts = await readStoredAssignmentDrafts();
+  drafts[documentId] = draft;
+  await AsyncStorage.setItem(
+    INCOMING_ASSIGNMENT_DRAFT_STORAGE_KEY,
+    JSON.stringify(drafts),
+  );
+};
+
+const removeStoredAssignmentDraft = async (documentId: string) => {
+  const drafts = await readStoredAssignmentDrafts();
+  if (!drafts[documentId]) {
+    return;
+  }
+  delete drafts[documentId];
+  await AsyncStorage.setItem(
+    INCOMING_ASSIGNMENT_DRAFT_STORAGE_KEY,
+    JSON.stringify(drafts),
+  );
+};
 
 export const useIncomingForm = () => {
 
@@ -216,47 +259,52 @@ export const useIncomingForm = () => {
     return names.join(' / ');
   }, [destinationSelectionIds, categoryById]);
 
+  const directoryUserById = useMemo<Record<string, TDirectoryUser>>(() => {
+    const map: Record<string, TDirectoryUser> = {};
+    directoryUsers.forEach(user => {
+      map[user._id] = user;
+    });
+    return map;
+  }, [directoryUsers]);
+
+  const departmentOptionById = useMemo<Record<string, TDepartmentOption>>(() => {
+    const map: Record<string, TDepartmentOption> = {};
+    departmentOptions.forEach(option => {
+      map[option.id] = option;
+    });
+    return map;
+  }, [departmentOptions]);
+
   const selectedLeadDepartmentName = useMemo(() => {
-    return departmentOptions.find(item => item.id === leadDepartmentId)?.name || leadAgencyValue || '';
-  }, [departmentOptions, leadDepartmentId, leadAgencyValue]);
+    return departmentOptionById[leadDepartmentId]?.name || leadAgencyValue || '';
+  }, [departmentOptionById, leadDepartmentId, leadAgencyValue]);
 
   const selectedLeadDepartmentOption = useMemo(() => {
-    return departmentOptions.find(item => item.id === leadDepartmentId);
-  }, [departmentOptions, leadDepartmentId]);
+    return departmentOptionById[leadDepartmentId];
+  }, [departmentOptionById, leadDepartmentId]);
 
   const selectedReceiveToKnowText = useMemo(() => {
     if (receiveToKnowIds.length === 0) return receiveToKnowTextFallback || 'Chọn người nhận để biết';
     const names = receiveToKnowIds
-      .map(id => directoryUsers.find(user => user._id === id)?.fullName)
+      .map(id => directoryUserById[id]?.fullName)
       .filter(Boolean);
     return names.length > 0 ? names.join(', ') : receiveToKnowTextFallback || 'Chọn người nhận để biết';
-  }, [receiveToKnowIds, directoryUsers, receiveToKnowTextFallback]);
+  }, [receiveToKnowIds, directoryUserById, receiveToKnowTextFallback]);
 
   const selectedSupportDepartmentText = useMemo(() => {
     if (supportDepartmentIds.length === 0) return supportDepartmentTextFallback || 'Chọn cơ quan để phối hợp(chọn nhiều)';
     const names = supportDepartmentIds
-      .map(id => departmentOptions.find(dep => dep.id === id)?.name)
+      .map(id => departmentOptionById[id]?.name)
       .filter(Boolean);
     return names.length > 0 ? names.join(', ') : supportDepartmentTextFallback || 'Chọn cơ quan để phối hợp(chọn nhiều)';
-  }, [supportDepartmentIds, departmentOptions, supportDepartmentTextFallback]);
+  }, [supportDepartmentIds, departmentOptionById, supportDepartmentTextFallback]);
 
   const destinationDropdownOptions = useMemo(
     () =>
-      destinationLevelOptions.map((options, levelIndex) =>
+      destinationLevelOptions.map(options =>
         options.map((option: any) => ({
           key: option._id,
           label: option.name || '',
-          onPress: () => {
-            setDestinationSelectionIds(prev => {
-              const next = prev.slice(0, levelIndex);
-              next[levelIndex] = option._id;
-              return next;
-            });
-            setShowDestinationLevel(null);
-            setErrors(prev => (
-              prev.destinationCategoryId ? { ...prev, destinationCategoryId: undefined } : prev
-            ));
-          },
         })),
       ),
     [destinationLevelOptions],
@@ -268,15 +316,6 @@ export const useIncomingForm = () => {
         key: option.id,
         label: option.name,
         subLabel: option.code,
-        onPress: () => {
-          setLeadDepartmentId(option.id);
-          setLeadAgencyValue(option.name);
-          setLeadAgencyPayloadValue(option.code || option.id);
-          setShowLeadDepartmentMenu(false);
-          setErrors(prev => (
-            prev.leadDepartmentId ? { ...prev, leadDepartmentId: undefined } : prev
-          ));
-        },
       })),
     [departmentOptions],
   );
@@ -287,15 +326,8 @@ export const useIncomingForm = () => {
         key: user._id,
         label: user.fullName,
         subLabel: user.departmentName,
-        checked: receiveToKnowIds.includes(user._id),
-        onPress: () => {
-          setReceiveToKnowIds(prev => (
-            prev.includes(user._id) ? prev.filter(id => id !== user._id) : [...prev, user._id]
-          ));
-          setReceiveToKnowTextFallback('');
-        },
       })),
-    [directoryUsers, receiveToKnowIds],
+    [directoryUsers],
   );
 
   const supportDepartmentDropdownOptions = useMemo(
@@ -304,15 +336,8 @@ export const useIncomingForm = () => {
         key: dep.id,
         label: dep.name,
         subLabel: dep.code,
-        checked: supportDepartmentIds.includes(dep.id),
-        onPress: () => {
-          setSupportDepartmentIds(prev => (
-            prev.includes(dep.id) ? prev.filter(id => id !== dep.id) : [...prev, dep.id]
-          ));
-          setSupportDepartmentTextFallback('');
-        },
       })),
-    [departmentOptions, supportDepartmentIds],
+    [departmentOptions],
   );
 
   const categoryDropdownOptions = useMemo(
@@ -321,14 +346,6 @@ export const useIncomingForm = () => {
         key: category._id,
         label: category.name || '',
         subLabel: (category as any).code || '',
-        onPress: () => {
-          setCategoryIdValue(category._id);
-          setCategoryNameValue(category.name || '');
-          setShowCategoryMenu(false);
-          setErrors(prev => (
-            prev.categoryId ? { ...prev, categoryId: undefined } : prev
-          ));
-        },
       })),
     [categories],
   );
@@ -338,30 +355,82 @@ export const useIncomingForm = () => {
       (Object.values(EDocumentPriority) as EDocumentPriority[]).map(priority => ({
         key: priority,
         label: DOCUMENT_PRIORITY_LABEL[priority],
-        onPress: () => {
-          setPriorityValue(priority);
-          setShowPriorityMenu(false);
-          setErrors(prev => (
-            prev.priority ? { ...prev, priority: undefined } : prev
-          ));
-        },
       })),
     [],
   );
 
+  const selectDestinationOption = useCallback((levelIndex: number, option: TDropdownListOption) => {
+    setDestinationSelectionIds(prev => {
+      const next = prev.slice(0, levelIndex);
+      next[levelIndex] = option.key;
+      return next;
+    });
+    setShowDestinationLevel(null);
+    setErrors(prev => (
+      prev.destinationCategoryId ? { ...prev, destinationCategoryId: undefined } : prev
+    ));
+  }, []);
+
+  const selectLeadDepartmentOption = useCallback((option: TDropdownListOption) => {
+    const selectedDepartment = departmentOptionById[option.key];
+    if (!selectedDepartment) {
+      return;
+    }
+
+    setLeadDepartmentId(selectedDepartment.id);
+    setLeadAgencyValue(selectedDepartment.name);
+    setLeadAgencyPayloadValue(selectedDepartment.code || selectedDepartment.id);
+    setShowLeadDepartmentMenu(false);
+    setErrors(prev => (
+      prev.leadDepartmentId ? { ...prev, leadDepartmentId: undefined } : prev
+    ));
+  }, [departmentOptionById]);
+
+  const toggleReceiveToKnowOption = useCallback((option: TDropdownListOption) => {
+    setReceiveToKnowIds(prev => (
+      prev.includes(option.key) ? prev.filter(id => id !== option.key) : [...prev, option.key]
+    ));
+    setReceiveToKnowTextFallback('');
+  }, []);
+
+  const toggleSupportDepartmentOption = useCallback((option: TDropdownListOption) => {
+    setSupportDepartmentIds(prev => (
+      prev.includes(option.key) ? prev.filter(id => id !== option.key) : [...prev, option.key]
+    ));
+    setSupportDepartmentTextFallback('');
+  }, []);
+
+  const selectCategoryOption = useCallback((option: TDropdownListOption) => {
+    const selectedCategory = categoryById[option.key];
+    setCategoryIdValue(option.key);
+    setCategoryNameValue(selectedCategory?.name || option.label || '');
+    setShowCategoryMenu(false);
+    setErrors(prev => (
+      prev.categoryId ? { ...prev, categoryId: undefined } : prev
+    ));
+  }, [categoryById]);
+
+  const selectPriorityOption = useCallback((option: TDropdownListOption) => {
+    setPriorityValue(option.key as EDocumentPriority);
+    setShowPriorityMenu(false);
+    setErrors(prev => (
+      prev.priority ? { ...prev, priority: undefined } : prev
+    ));
+  }, []);
+
   const getReceiveToKnowNamesByIds = useCallback((ids: string[]) => {
     return ids
-      .map(id => directoryUsers.find(user => user._id === id)?.fullName)
+      .map(id => directoryUserById[id]?.fullName)
       .filter(Boolean)
       .join(', ');
-  }, [directoryUsers]);
+  }, [directoryUserById]);
 
   const getSupportDepartmentNamesByIds = useCallback((ids: string[]) => {
     return ids
-      .map(id => departmentOptions.find(dep => dep.id === id)?.name)
+      .map(id => departmentOptionById[id]?.name)
       .filter(Boolean)
       .join(', ');
-  }, [departmentOptions]);
+  }, [departmentOptionById]);
 
   const getLeadAgencyPayload = useCallback(() => {
     return (
@@ -961,14 +1030,33 @@ export const useIncomingForm = () => {
         );
       }
 
-      const leadDepartmentRaw: any =
+      const receivedDepartmentRaw: any =
         (doc as any).receiveDepartmentId ||
         (doc as any).receiveDepartment ||
+        '';
+      const savedLeadAgencyRaw: any =
+        (doc as any).leadAgency ||
+        (doc as any).leadDepartmentId ||
+        (doc as any).leadDepartment ||
+        '';
+      const fallbackDepartmentRaw: any =
         (doc as any).departmentId ||
         (doc as any).department ||
-        (doc as any).leadAgency ||
         '';
+      const leadDepartmentRaw: any =
+        receivedDepartmentRaw ||
+        savedLeadAgencyRaw ||
+        fallbackDepartmentRaw;
       const normalizedLeadDepartmentId = getEntityId(leadDepartmentRaw);
+      const hasExplicitLeadDepartmentFromDetail = Boolean(
+        getEntityId(receivedDepartmentRaw) ||
+        getEntityName(receivedDepartmentRaw) ||
+        getEntityId(savedLeadAgencyRaw) ||
+        getEntityName(savedLeadAgencyRaw) ||
+        normalizePrimitive((doc as any).leadAgencyName) ||
+        normalizePrimitive((doc as any).leadDepartmentName) ||
+        normalizePrimitive((doc as any).receiveDepartmentName),
+      );
       const normalizedLeadDepartmentName =
         getEntityName(leadDepartmentRaw) ||
         getEntityName((doc as any).receiveDepartment) ||
@@ -977,11 +1065,23 @@ export const useIncomingForm = () => {
         getEntityName((doc as any).leadDepartment) ||
         getEntityName((doc as any).leadDepartmentId) ||
         normalizePrimitive((doc as any).leadAgencyName) ||
+        normalizePrimitive((doc as any).leadDepartmentName) ||
         normalizePrimitive((doc as any).receiveDepartmentName) ||
         (!isObjectId(normalizedLeadDepartmentId) ? normalizedLeadDepartmentId : '');
       setLeadDepartmentId(isObjectId(normalizedLeadDepartmentId) ? normalizedLeadDepartmentId : '');
       setLeadAgencyValue(normalizedLeadDepartmentName);
-      setLeadAgencyPayloadValue(normalizePrimitive((doc as any).leadAgency));
+      setLeadAgencyPayloadValue(
+        normalizePrimitive((doc as any).leadAgency) ||
+        (
+          (doc as any).leadAgency &&
+          typeof (doc as any).leadAgency === 'object'
+            ? normalizePrimitive((doc as any).leadAgency.code)
+            : ''
+        ) ||
+        getEntityId((doc as any).leadAgency) ||
+        normalizePrimitive((doc as any).leadAgencyName) ||
+        '',
+      );
 
       const receiveIds = normalizeObjectIdList(
         (doc as any).receiveToKnow ||
@@ -1013,23 +1113,29 @@ export const useIncomingForm = () => {
       setSupportDepartmentTextFallback(supportFallback);
 
       const cachedAssignmentDraft = assignmentDraftsRef.current[id];
-      if (mode === 'LAYOUT_4' && cachedAssignmentDraft) {
-        if (!normalizedLeadDepartmentId && !normalizedLeadDepartmentName) {
-          setLeadDepartmentId(cachedAssignmentDraft.leadDepartmentId);
-          setLeadAgencyValue(cachedAssignmentDraft.leadAgencyValue);
-          setLeadAgencyPayloadValue(cachedAssignmentDraft.leadAgencyPayloadValue);
+      const storedAssignmentDraft = mode === 'LAYOUT_4'
+        ? cachedAssignmentDraft || await getStoredAssignmentDraft(id)
+        : undefined;
+      if (storedAssignmentDraft) {
+        assignmentDraftsRef.current[id] = storedAssignmentDraft;
+      }
+      if (mode === 'LAYOUT_4' && storedAssignmentDraft) {
+        if (!hasExplicitLeadDepartmentFromDetail) {
+          setLeadDepartmentId(storedAssignmentDraft.leadDepartmentId);
+          setLeadAgencyValue(storedAssignmentDraft.leadAgencyValue);
+          setLeadAgencyPayloadValue(storedAssignmentDraft.leadAgencyPayloadValue);
         }
         if (!finishedIso) {
-          setFinishedAtValue(cachedAssignmentDraft.finishedAtValue);
-          setFinishedAtDisplay(cachedAssignmentDraft.finishedAtDisplay);
+          setFinishedAtValue(storedAssignmentDraft.finishedAtValue);
+          setFinishedAtDisplay(storedAssignmentDraft.finishedAtDisplay);
         }
         if (receiveIds.length === 0 && !receiveFallback) {
-          setReceiveToKnowIds(cachedAssignmentDraft.receiveToKnowIds);
-          setReceiveToKnowTextFallback(cachedAssignmentDraft.receiveToKnowTextFallback);
+          setReceiveToKnowIds(storedAssignmentDraft.receiveToKnowIds);
+          setReceiveToKnowTextFallback(storedAssignmentDraft.receiveToKnowTextFallback);
         }
         if (supportIds.length === 0 && !supportFallback) {
-          setSupportDepartmentIds(cachedAssignmentDraft.supportDepartmentIds);
-          setSupportDepartmentTextFallback(cachedAssignmentDraft.supportDepartmentTextFallback);
+          setSupportDepartmentIds(storedAssignmentDraft.supportDepartmentIds);
+          setSupportDepartmentTextFallback(storedAssignmentDraft.supportDepartmentTextFallback);
         }
       }
 
@@ -1214,10 +1320,14 @@ export const useIncomingForm = () => {
     appendBaseFields(formData, undefined, contentOverride);
     formData.append('destinationCategoryId', selectedDestinationId);
     formData.append('leadAgency', getLeadAgencyPayload());
+    formData.append('departmentId', leadDepartmentId);
+    formData.append('leadDepartmentId', leadDepartmentId);
     formData.append('receiveDepartmentId', leadDepartmentId);
     formData.append('finishedAt', finishedAtValue);
     formData.append('receiveToKnow', JSON.stringify(receiveToKnowIds));
+    formData.append('receiveToKnowIds', JSON.stringify(receiveToKnowIds));
     formData.append('supportDepartmentId', JSON.stringify(supportDepartmentIds));
+    formData.append('supportDepartmentIds', JSON.stringify(supportDepartmentIds));
     formData.append('filesToRemove', JSON.stringify(filesToRemove));
     appendFilesForRegisterFlow(formData);
     return formData;
@@ -1233,10 +1343,14 @@ export const useIncomingForm = () => {
       formData.append('destinationCategoryId', selectedDestinationId);
     }
     formData.append('leadAgency', getLeadAgencyPayload());
+    formData.append('departmentId', leadDepartmentId);
+    formData.append('leadDepartmentId', leadDepartmentId);
     formData.append('receiveDepartmentId', leadDepartmentId);
     formData.append('finishedAt', finishedAtValue);
     formData.append('receiveToKnow', JSON.stringify(receiveToKnowIds));
+    formData.append('receiveToKnowIds', JSON.stringify(receiveToKnowIds));
     formData.append('supportDepartmentId', JSON.stringify(supportDepartmentIds));
+    formData.append('supportDepartmentIds', JSON.stringify(supportDepartmentIds));
     formData.append(
       'filesToRemove',
       JSON.stringify(options?.includeFilesToRemove === false ? [] : filesToRemove),
@@ -1265,7 +1379,9 @@ export const useIncomingForm = () => {
       const latestEditorContent = await requestEditorContent();
       const ok = await registerIncomingDocument(editingId, buildRegisterFormData(latestEditorContent));
       if (!ok) return;
-      assignmentDraftsRef.current[editingId] = buildCurrentAssignmentDraft();
+      const assignmentDraft = buildCurrentAssignmentDraft();
+      assignmentDraftsRef.current[editingId] = assignmentDraft;
+      await saveStoredAssignmentDraft(editingId, assignmentDraft);
       setShowForm(false);
       resetForm();
       getListDocument({ type: 'INCOMING' });
@@ -1294,6 +1410,7 @@ export const useIncomingForm = () => {
       );
       if (!ok) return;
       delete assignmentDraftsRef.current[editingId];
+      await removeStoredAssignmentDraft(editingId);
       setShowForm(false);
       resetForm();
       getListDocument({ type: 'INCOMING' });
@@ -1402,6 +1519,7 @@ export const useIncomingForm = () => {
     priorityDropdownOptions,
     priorityValue,
     receiveDropdownOptions,
+    receiveToKnowIds,
     registeredNumberInputRef,
     registeredNumberValue,
     requestDelete,
@@ -1409,6 +1527,10 @@ export const useIncomingForm = () => {
     resetMenus,
     scrollFormToEditor,
     searchText,
+    selectCategoryOption,
+    selectDestinationOption,
+    selectLeadDepartmentOption,
+    selectPriorityOption,
     selectedLeadDepartmentName,
     selectedReceiveToKnowText,
     selectedSupportDepartmentText,
@@ -1461,12 +1583,15 @@ export const useIncomingForm = () => {
     submitLayout3,
     submitLayout4,
     supportDepartmentDropdownOptions,
+    supportDepartmentIds,
     tabs,
     titleInputRef,
     titleValue,
     toggleDestinationMenu,
     toggleFormat,
     toggleMenu,
+    toggleReceiveToKnowOption,
+    toggleSupportDepartmentOption,
   };
 
 };

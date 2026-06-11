@@ -79,6 +79,13 @@ const DetailDocuments = ({route, navigation}: any) => {
         | undefined;
     const {documentDetail, stepsInfo, isLoading, fetchDetail} =
         useDocumentDetail({route, initialDocument: routeItemDocument});
+    const getDocumentCategoryId = useCallback((document?: IDocument | null) => {
+        const rawCategory = document?.categoryId;
+        if (typeof rawCategory === 'object' && rawCategory) {
+            return String(rawCategory._id || '').trim();
+        }
+        return String(rawCategory || '').trim();
+    }, []);
     const currentDocumentId = String(
         documentDetail?._id ||
             route?.params?.documentId ||
@@ -322,10 +329,12 @@ const DetailDocuments = ({route, navigation}: any) => {
                             },
                         );
                     } else if (approveActionMode === 'STATIONARY_ARCHIVE') {
+                        const categoryId = getDocumentCategoryId(documentDetail);
                         await axiosClient.patch(
                             `${ENV.BACKEND_URL}/resources/documents/outgoing/archive/${documentDetail._id}`,
                             {
                                 comment: decisionNote,
+                                ...(categoryId ? {categoryId} : {}),
                             },
                         );
                     } else {

@@ -81,6 +81,7 @@ export default function Incoming({ navigation }: any) {
     priorityDropdownOptions,
     priorityValue,
     receiveDropdownOptions,
+    receiveToKnowIds,
     registeredNumberInputRef,
     registeredNumberValue,
     requestDelete,
@@ -88,6 +89,10 @@ export default function Incoming({ navigation }: any) {
     resetMenus,
     scrollFormToEditor,
     searchText,
+    selectCategoryOption,
+    selectDestinationOption,
+    selectLeadDepartmentOption,
+    selectPriorityOption,
     selectedLeadDepartmentName,
     selectedReceiveToKnowText,
     selectedSupportDepartmentText,
@@ -134,12 +139,15 @@ export default function Incoming({ navigation }: any) {
     submitLayout3,
     submitLayout4,
     supportDepartmentDropdownOptions,
+    supportDepartmentIds,
     tabs,
     titleInputRef,
     titleValue,
     toggleDestinationMenu,
     toggleFormat,
     toggleMenu,
+    toggleReceiveToKnowOption,
+    toggleSupportDepartmentOption,
   } = useIncomingForm();
 
   const renderDatePickerModal = () => {
@@ -230,20 +238,32 @@ export default function Incoming({ navigation }: any) {
   const renderDropdownMenu = ({
     title,
     options,
+    selectedKeys,
     loading = false,
+    searchEnabled,
+    searchPlaceholder,
+    onSelect,
     emptyText = 'Không có dữ liệu để chọn',
   }: {
     title?: string;
     options: TDropdownListOption[];
+    selectedKeys?: string[];
     loading?: boolean;
     emptyText?: string;
+    searchEnabled?: boolean;
+    searchPlaceholder?: string;
+    onSelect?: (item: TDropdownListOption) => void;
   }) => (
     <DropdownModal
       visible
       title={title}
       options={options}
+      selectedKeys={selectedKeys}
       loading={loading}
       emptyText={emptyText}
+      searchEnabled={searchEnabled}
+      searchPlaceholder={searchPlaceholder}
+      onSelect={onSelect}
       onClose={resetMenus}
     />
   );
@@ -314,6 +334,9 @@ export default function Incoming({ navigation }: any) {
                       {showDestinationLevel === levelIndex && renderDropdownMenu({
                         title: 'Chọn sổ lưu trữ',
                         options: destinationDropdownOptions[levelIndex] || [],
+                        searchEnabled: true,
+                        searchPlaceholder: 'Tìm sổ lưu trữ...',
+                        onSelect: option => selectDestinationOption(levelIndex, option),
                         emptyText: 'Không có sổ lưu trữ để chọn',
                       })}
                     </View>
@@ -327,7 +350,7 @@ export default function Incoming({ navigation }: any) {
 
             {showAssignSection && (
               <>
-                <Text style={styles.blockTitle}>{isLayout4 ? 'Phân công phòng ban xử lý' : 'Phân công cơ quan xử lý'}</Text>
+                <Text style={styles.blockTitle}>{isLayout4 ? 'Phân công cơ quan xử lý' : 'Phân công phòng ban xử lý'}</Text>
 
                 <View style={styles.row}>
                   <View style={styles.half}>
@@ -347,6 +370,9 @@ export default function Incoming({ navigation }: any) {
                         title: 'Chọn cơ quan chủ trì',
                         loading: isLoadingAssignmentOptions,
                         options: leadDepartmentDropdownOptions,
+                        searchEnabled: true,
+                        searchPlaceholder: 'Tìm cơ quan chủ trì...',
+                        onSelect: selectLeadDepartmentOption,
                         emptyText: 'Chưa có danh sách cơ quan',
                       })}
                     </View>
@@ -388,6 +414,10 @@ export default function Incoming({ navigation }: any) {
                     title: 'Người nhận để biết',
                     loading: isLoadingAssignmentOptions,
                     options: receiveDropdownOptions,
+                    selectedKeys: receiveToKnowIds,
+                    searchEnabled: true,
+                    searchPlaceholder: 'Tìm người nhận...',
+                    onSelect: toggleReceiveToKnowOption,
                     emptyText: 'Chưa có danh sách người nhận',
                   })}
                 </View>
@@ -406,6 +436,10 @@ export default function Incoming({ navigation }: any) {
                     title: 'Cơ quan phối hợp',
                     loading: isLoadingAssignmentOptions,
                     options: supportDepartmentDropdownOptions,
+                    selectedKeys: supportDepartmentIds,
+                    searchEnabled: true,
+                    searchPlaceholder: 'Tìm cơ quan phối hợp...',
+                    onSelect: toggleSupportDepartmentOption,
                     emptyText: 'Chưa có danh sách cơ quan phối hợp',
                   })}
                 </View>
@@ -560,6 +594,9 @@ export default function Incoming({ navigation }: any) {
                   {showCategoryMenu && renderDropdownMenu({
                     title: 'Chọn loại tài liệu',
                     options: categoryDropdownOptions,
+                    searchEnabled: true,
+                    searchPlaceholder: 'Tìm loại tài liệu...',
+                    onSelect: selectCategoryOption,
                     emptyText: 'Chưa có loại tài liệu',
                   })}
                 </View>
@@ -584,6 +621,7 @@ export default function Incoming({ navigation }: any) {
                   {showPriorityMenu && renderDropdownMenu({
                     title: 'Chọn mức độ ưu tiên',
                     options: priorityDropdownOptions,
+                    onSelect: selectPriorityOption,
                   })}
                 </View>
                 {!!errors.priority && <Text style={styles.fieldError}>{errors.priority}</Text>}
