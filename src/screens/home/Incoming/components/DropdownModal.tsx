@@ -2,7 +2,6 @@ import React, { useCallback, useDeferredValue, useEffect, useMemo, useState } fr
 import {
   ActivityIndicator,
   FlatList,
-  InteractionManager,
   Modal,
   Platform,
   Text,
@@ -29,6 +28,47 @@ type DropdownModalProps = {
 
 const EMPTY_SELECTED_KEYS: string[] = [];
 
+type DropdownListItemProps = {
+  item: TDropdownListOption;
+  checked: boolean;
+  showCheckbox: boolean;
+  onPress: (item: TDropdownListOption) => void;
+};
+
+const DropdownListItem = React.memo(({
+  item,
+  checked,
+  showCheckbox,
+  onPress,
+}: DropdownListItemProps) => {
+  const handlePress = useCallback(() => {
+    onPress(item);
+  }, [item, onPress]);
+
+  return (
+    <TouchableOpacity
+      style={styles.dropdownItem}
+      onPress={handlePress}>
+      <View style={styles.multiItemRow}>
+        {showCheckbox ? (
+          <MaterialCommunityIcons
+            name={checked ? 'checkbox-marked' : 'checkbox-blank-outline'}
+            size={18}
+            color={checked ? '#4CAF50' : '#9A9A9A'}
+          />
+        ) : null}
+        <View style={styles.dropdownItemContent}>
+          <Text style={styles.dropdownItemText} numberOfLines={1}>{item.label}</Text>
+          {!!item.subLabel && (
+            <Text style={styles.dropdownItemSubText} numberOfLines={1}>{item.subLabel}</Text>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+});
+DropdownListItem.displayName = 'DropdownListItem';
+
 const DropdownModal = React.memo(({
   visible,
   title,
@@ -42,36 +82,21 @@ const DropdownModal = React.memo(({
   onClose,
 }: DropdownModalProps) => {
   const [searchText, setSearchText] = useState('');
-  const [isListReady, setIsListReady] = useState(false);
   const deferredSearchText = useDeferredValue(searchText);
-  const shouldDeferList = options.length > 30;
 
   useEffect(() => {
     if (!visible) {
       setSearchText('');
-      setIsListReady(false);
-      return undefined;
     }
-
-    if (!shouldDeferList) {
-      setIsListReady(true);
-      return undefined;
-    }
-
-    setIsListReady(false);
-    const task = InteractionManager.runAfterInteractions(() => {
-      setIsListReady(true);
-    });
-
-    return () => {
-      task.cancel?.();
-    };
-  }, [shouldDeferList, visible]);
+  }, [visible]);
 
   const selectedKeyList = selectedKeys ?? EMPTY_SELECTED_KEYS;
   const selectedKeySet = useMemo(() => new Set(selectedKeyList), [selectedKeyList]);
   const selectedKeySignature = useMemo(() => selectedKeyList.join('|'), [selectedKeyList]);
-  const normalizedSearchText = deferredSearchText.trim().toLocaleLowerCase('vi');
+  const normalizedSearchText = useMemo(
+    () => deferredSearchText.trim().toLocaleLowerCase('vi'),
+    [deferredSearchText],
+  );
   const shouldShowSearch = searchEnabled ?? options.length > 12;
   const filteredOptions = useMemo(() => {
     if (!normalizedSearchText) {
@@ -79,8 +104,10 @@ const DropdownModal = React.memo(({
     }
 
     return options.filter(item => {
-      const label = `${item.label || ''} ${item.subLabel || ''}`.toLocaleLowerCase('vi');
-      return label.includes(normalizedSearchText);
+      const searchableText =
+        item.searchText ||
+        `${item.label || ''} ${item.subLabel || ''}`.toLocaleLowerCase('vi');
+      return searchableText.includes(normalizedSearchText);
     });
   }, [normalizedSearchText, options]);
 
@@ -91,6 +118,24 @@ const DropdownModal = React.memo(({
     }
     item.onPress?.();
   }, [onSelect]);
+
+  const keyExtractor = useCallback((item: TDropdownListOption) => item.key, []);
+
+  const renderItem = useCallback(({ item }: { item: TDropdownListOption }) => {
+    const checked = typeof item.checked === 'boolean'
+      ? item.checked
+      : selectedKeySet.has(item.key);
+    const showCheckbox = typeof item.checked === 'boolean' || Array.isArray(selectedKeys);
+
+    return (
+      <DropdownListItem
+        item={item}
+        checked={checked}
+        showCheckbox={showCheckbox}
+        onPress={handleSelect}
+      />
+    );
+  }, [handleSelect, selectedKeySet, selectedKeys]);
 
   if (!visible) {
     return null;
@@ -133,24 +178,24 @@ const DropdownModal = React.memo(({
               )}
             </View>
           ) : null}
-          {loading || !isListReady ? (
+          {loading ? (
             <View style={styles.dropdownStateRow}>
               <ActivityIndicator size="small" color="#2196F3" />
               <Text style={styles.dropdownStateText}>
-                {loading ? 'Đang tải dữ liệu...' : 'Đang chuẩn bị danh sách...'}
+                Đang tải dữ liệu...
               </Text>
             </View>
           ) : (
             <FlatList
               data={filteredOptions}
               style={styles.dropdownList}
-              keyExtractor={item => item.key}
+              keyExtractor={keyExtractor}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              initialNumToRender={10}
-              maxToRenderPerBatch={10}
-              updateCellsBatchingPeriod={32}
-              windowSize={5}
+              initialNumToRender={16}
+              maxToRenderPerBatch={16}
+              updateCellsBatchingPeriod={16}
+              windowSize={7}
               removeClippedSubviews={Platform.OS === 'android'}
               extraData={selectedKeySignature}
               ListEmptyComponent={(
@@ -160,34 +205,7 @@ const DropdownModal = React.memo(({
                   </Text>
                 </View>
               )}
-              renderItem={({ item }) => {
-                const checked = typeof item.checked === 'boolean'
-                  ? item.checked
-                  : selectedKeySet.has(item.key);
-                const showCheckbox = typeof item.checked === 'boolean' || Array.isArray(selectedKeys);
-
-                return (
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => handleSelect(item)}>
-                    <View style={styles.multiItemRow}>
-                      {showCheckbox ? (
-                        <MaterialCommunityIcons
-                          name={checked ? 'checkbox-marked' : 'checkbox-blank-outline'}
-                          size={18}
-                          color={checked ? '#4CAF50' : '#9A9A9A'}
-                        />
-                      ) : null}
-                      <View style={styles.dropdownItemContent}>
-                        <Text style={styles.dropdownItemText} numberOfLines={1}>{item.label}</Text>
-                        {!!item.subLabel && (
-                          <Text style={styles.dropdownItemSubText} numberOfLines={1}>{item.subLabel}</Text>
-                        )}
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                );
-              }}
+              renderItem={renderItem}
             />
           )}
         </View>

@@ -4,6 +4,7 @@ import Snackbar from 'react-native-snackbar';
 import {Platform} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {IDocument} from '../shared-types/Response/DocumentResponse/DocumentResponse';
+import {EDocumentStatus} from '@/shared-types/common/Document/document';
 import ENV from '@/config/ENV';
 import RNFS from 'react-native-fs';
 import {encode} from 'base64-arraybuffer';
@@ -99,6 +100,15 @@ const requestDocumentList = async (
     } catch (error) {
         return {data: [], total: 0};
     }
+};
+
+const extractDocumentFromDetailResponse = (responseData: any): IDocument | null => {
+    const payload = responseData?.data?.data ?? responseData?.data ?? responseData;
+    const document = payload?.document ?? payload;
+
+    return document && typeof document === 'object'
+        ? (document as IDocument)
+        : null;
 };
 
 interface DocumentStore {
@@ -403,6 +413,21 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             set({isLoading: false});
             return true;
         } catch (error: any) {
+            try {
+                const detailResponse = await axiosClient.get(
+                    `${ENV.BACKEND_URL}/resources/documents/detail/${documentId}`,
+                );
+                const latestDocument = extractDocumentFromDetailResponse(
+                    detailResponse.data,
+                );
+
+                if (latestDocument?.status === EDocumentStatus.ASSIGNED) {
+                    set({isLoading: false});
+                    return true;
+                }
+            } catch {
+            }
+
             set({isLoading: false});
             Snackbar.show({
                 text:

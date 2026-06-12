@@ -43,6 +43,121 @@ import {
 } from '../utils';
 
 const INCOMING_ASSIGNMENT_DRAFT_STORAGE_KEY = '@incomingAssignmentDrafts';
+const ASSIGNMENT_OPTIONS_CACHE_TTL_MS = 5 * 60 * 1000;
+
+type TAssignmentOptionsSnapshot = {
+  users: TDirectoryUser[];
+  departments: TDepartmentOption[];
+  fetchedAt: number;
+};
+
+let incomingAssignmentOptionsCache: TAssignmentOptionsSnapshot | null = null;
+let incomingAssignmentOptionsPromise: Promise<TAssignmentOptionsSnapshot> | null = null;
+let incomingCategoryListPromise: Promise<void> | null = null;
+
+const normalizeSelectionList = (payload: any) => {
+  if (Array.isArray(payload?.data?.data)) return payload.data.data;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload)) return payload;
+  return [];
+};
+
+const buildOptionSearchText = (...values: Array<string | undefined>) =>
+  values
+    .map(value => String(value || '').trim())
+    .filter(Boolean)
+    .join(' ')
+    .toLocaleLowerCase('vi');
+
+const mapDirectoryUsers = (users: any[]): TDirectoryUser[] =>
+  users
+    .map((user: any) => ({
+      _id: String(user?._id || user?.id || user?.value || ''),
+      fullName: String(user?.fullName || user?.name || user?.label || ''),
+      departmentId: String(user?.userType?.department || user?.departmentId || ''),
+      departmentName: String(user?.departmentName || user?.department?.name || ''),
+    }))
+    .filter((user: TDirectoryUser) => !!user._id && !!user.fullName)
+    .sort((a: TDirectoryUser, b: TDirectoryUser) => a.fullName.localeCompare(b.fullName, 'vi'));
+
+const mapDepartmentOptions = (departments: any[]): TDepartmentOption[] =>
+  departments
+    .map((dep: any) => ({
+      id: String(dep?._id || dep?.id || dep?.value || ''),
+      name: String(dep?.name || dep?.departmentName || dep?.label || ''),
+      code: String(dep?.code || dep?.departmentCode || '').trim(),
+    }))
+    .filter((dep: TDepartmentOption) => !!dep.id && !!dep.name)
+    .sort((a: TDepartmentOption, b: TDepartmentOption) => a.name.localeCompare(b.name, 'vi'));
+
+const buildDepartmentFallbackFromUsers = (users: TDirectoryUser[]): TDepartmentOption[] => {
+  const depMap = new Map<string, string>();
+  users.forEach(user => {
+    if (!user.departmentId) return;
+    if (!depMap.has(user.departmentId)) {
+      depMap.set(user.departmentId, user.departmentName || user.departmentId);
+    }
+  });
+  return Array.from(depMap.entries())
+    .map(([id, name]) => ({
+      id,
+      name,
+      code: id,
+    }))
+    .sort((a: TDepartmentOption, b: TDepartmentOption) => a.name.localeCompare(b.name, 'vi'));
+};
+
+const isFreshAssignmentOptionsCache = () =>
+  !!incomingAssignmentOptionsCache &&
+  Date.now() - incomingAssignmentOptionsCache.fetchedAt < ASSIGNMENT_OPTIONS_CACHE_TTL_MS;
+
+const loadIncomingAssignmentOptions = async (): Promise<TAssignmentOptionsSnapshot> => {
+  if (isFreshAssignmentOptionsCache() && incomingAssignmentOptionsCache) {
+    return incomingAssignmentOptionsCache;
+  }
+
+  if (incomingAssignmentOptionsPromise) {
+    return incomingAssignmentOptionsPromise;
+  }
+
+  incomingAssignmentOptionsPromise = (async () => {
+    const [usersResult, departmentsResult] = await Promise.allSettled([
+      axiosClient.get(`${ENV.BACKEND_URL}/resources/users/selection`),
+      axiosClient.get(`${ENV.BACKEND_URL}/resources/departments/selection`),
+    ]);
+
+    const users = usersResult.status === 'fulfilled'
+      ? mapDirectoryUsers(normalizeSelectionList(usersResult.value?.data))
+      : [];
+    const departmentsFromApi = departmentsResult.status === 'fulfilled'
+      ? mapDepartmentOptions(normalizeSelectionList(departmentsResult.value?.data))
+      : [];
+    const departments = departmentsFromApi.length > 0
+      ? departmentsFromApi
+      : buildDepartmentFallbackFromUsers(users);
+    const hasSuccessfulSource =
+      usersResult.status === 'fulfilled' || departmentsResult.status === 'fulfilled';
+
+    if (users.length === 0 && departments.length === 0 && incomingAssignmentOptionsCache) {
+      return incomingAssignmentOptionsCache;
+    }
+    if (users.length === 0 && departments.length === 0 && !hasSuccessfulSource) {
+      throw new Error('Cannot load incoming assignment options');
+    }
+
+    const snapshot = {
+      users,
+      departments,
+      fetchedAt: Date.now(),
+    };
+    incomingAssignmentOptionsCache = snapshot;
+    return snapshot;
+  })().finally(() => {
+    incomingAssignmentOptionsPromise = null;
+  });
+
+  return incomingAssignmentOptionsPromise;
+};
 
 const readStoredAssignmentDrafts = async (): Promise<Record<string, TIncomingAssignmentDraft>> => {
   try {
@@ -94,6 +209,8 @@ export const useIncomingForm = () => {
   const editorContentRequestRef = useRef<((html: string) => void) | null>(null);
   const hasLoadedAssignmentOptionsRef = useRef(false);
   const assignmentDraftsRef = useRef<Record<string, TIncomingAssignmentDraft>>({});
+  const startEditLockRef = useRef(false);
+  const submitLayout4LockRef = useRef(false);
   const titleInputRef = useRef<TextInput>(null);
   const organizationInputRef = useRef<TextInput>(null);
   const senderInputRef = useRef<TextInput>(null);
@@ -109,7 +226,11 @@ export const useIncomingForm = () => {
     deleteDocument,
     isLoading,
   } = useDocumentStore();
-  const { categories, getCategoryList } = useDocumentCategoryStore();
+  const {
+    categories,
+    getCategoryList,
+    isLoading: isLoadingCategories,
+  } = useDocumentCategoryStore();
 
   const levelKey = getLevelKey(userInfo?.userType?.level as EOrganization);
   const isStationary = levelKey === 'STATIONARY';
@@ -212,6 +333,32 @@ export const useIncomingForm = () => {
   const showAssignSection = formMode === 'LAYOUT_3' || formMode === 'LAYOUT_4';
   const isLayout4 = formMode === 'LAYOUT_4';
   const isFormBusy = isPreparingForm || isSubmittingForm;
+  const isLoadingDestinationOptions = isLoadingCategories && categories.length === 0;
+
+  const ensureIncomingCategoryList = useCallback(() => {
+    const categoryState = useDocumentCategoryStore.getState();
+    if (categoryState.categories.length > 0) {
+      return Promise.resolve();
+    }
+    if (categoryState.isLoading && !incomingCategoryListPromise) {
+      return Promise.resolve();
+    }
+    if (incomingCategoryListPromise) {
+      return incomingCategoryListPromise;
+    }
+
+    incomingCategoryListPromise = getCategoryList(undefined, { isFromNumbering: true })
+      .finally(() => {
+        incomingCategoryListPromise = null;
+      });
+    return incomingCategoryListPromise;
+  }, [getCategoryList]);
+
+  const applyAssignmentOptionsSnapshot = useCallback((snapshot: TAssignmentOptionsSnapshot) => {
+    setDirectoryUsers(snapshot.users);
+    setDepartmentOptions(snapshot.departments);
+    hasLoadedAssignmentOptionsRef.current = true;
+  }, []);
 
   const categoryById = useMemo<Record<string, any>>(() => {
     const map: Record<string, any> = {};
@@ -305,6 +452,7 @@ export const useIncomingForm = () => {
         options.map((option: any) => ({
           key: option._id,
           label: option.name || '',
+          searchText: buildOptionSearchText(option.name, option.code),
         })),
       ),
     [destinationLevelOptions],
@@ -316,6 +464,7 @@ export const useIncomingForm = () => {
         key: option.id,
         label: option.name,
         subLabel: option.code,
+        searchText: buildOptionSearchText(option.name, option.code),
       })),
     [departmentOptions],
   );
@@ -326,6 +475,7 @@ export const useIncomingForm = () => {
         key: user._id,
         label: user.fullName,
         subLabel: user.departmentName,
+        searchText: buildOptionSearchText(user.fullName, user.departmentName),
       })),
     [directoryUsers],
   );
@@ -336,6 +486,7 @@ export const useIncomingForm = () => {
         key: dep.id,
         label: dep.name,
         subLabel: dep.code,
+        searchText: buildOptionSearchText(dep.name, dep.code),
       })),
     [departmentOptions],
   );
@@ -346,6 +497,7 @@ export const useIncomingForm = () => {
         key: category._id,
         label: category.name || '',
         subLabel: (category as any).code || '',
+        searchText: buildOptionSearchText(category.name, (category as any).code),
       })),
     [categories],
   );
@@ -575,73 +727,31 @@ export const useIncomingForm = () => {
   );
 
   useEffect(() => {
-    if (!showForm) return;
-    getCategoryList(undefined, { isFromNumbering: true });
-  }, [showForm, getCategoryList]);
+    if (!showForm) {
+      return;
+    }
+    ensureIncomingCategoryList();
+  }, [ensureIncomingCategoryList, showForm]);
 
   useEffect(() => {
-    if (!showForm || !showAssignSection || hasLoadedAssignmentOptionsRef.current) return;
+    if (!showForm || !showAssignSection) return undefined;
+
+    if (hasLoadedAssignmentOptionsRef.current && (directoryUsers.length > 0 || departmentOptions.length > 0)) {
+      return undefined;
+    }
+
     let isCancelled = false;
     const loadDirectories = async () => {
+      if (incomingAssignmentOptionsCache) {
+        applyAssignmentOptionsSnapshot(incomingAssignmentOptionsCache);
+        return;
+      }
+
       setIsLoadingAssignmentOptions(true);
       try {
-        const normalizeList = (payload: any) => {
-          if (Array.isArray(payload?.data?.data)) return payload.data.data;
-          if (Array.isArray(payload?.data)) return payload.data;
-          if (Array.isArray(payload)) return payload;
-          return [];
-        };
-
-        const usersResponse = await axiosClient.get(`${ENV.BACKEND_URL}/resources/users/selection`);
-        const users = normalizeList(usersResponse?.data);
-        const mappedUsers: TDirectoryUser[] = users
-          .map((user: any) => ({
-            _id: String(user?._id || user?.id || user?.value || ''),
-            fullName: String(user?.fullName || user?.name || user?.label || ''),
-            departmentId: String(user?.userType?.department || user?.departmentId || ''),
-            departmentName: String(user?.departmentName || user?.department?.name || ''),
-          }))
-          .filter((user: TDirectoryUser) => !!user._id && !!user.fullName)
-          .sort((a: TDirectoryUser, b: TDirectoryUser) => a.fullName.localeCompare(b.fullName, 'vi'));
-
-        // Nguồn "Người nhận để biết": danh sách user.
+        const snapshot = await loadIncomingAssignmentOptions();
         if (isCancelled) return;
-        setDirectoryUsers(mappedUsers);
-
-        // Nguồn "Cơ quan phối hợp": ưu tiên endpoint phòng ban, fallback từ user list.
-        let departmentData: TDepartmentOption[] = [];
-        try {
-          const departmentResponse = await axiosClient.get(`${ENV.BACKEND_URL}/resources/departments/selection`);
-          const departments = normalizeList(departmentResponse?.data);
-          departmentData = departments
-            .map((dep: any) => ({
-              id: String(dep?._id || dep?.id || dep?.value || ''),
-              name: String(dep?.name || dep?.departmentName || dep?.label || ''),
-              code: String(dep?.code || dep?.departmentCode || '').trim(),
-            }))
-            .filter((dep: TDepartmentOption) => !!dep.id && !!dep.name);
-        } catch (error) {
-        }
-
-        if (departmentData.length === 0) {
-          const depMap = new Map<string, string>();
-          mappedUsers.forEach(user => {
-            if (!user.departmentId) return;
-            if (!depMap.has(user.departmentId)) {
-              depMap.set(user.departmentId, user.departmentName || user.departmentId);
-            }
-          });
-          departmentData = Array.from(depMap.entries()).map(([id, name]) => ({
-            id,
-            name,
-            code: id,
-          }));
-        }
-
-        departmentData.sort((a: TDepartmentOption, b: TDepartmentOption) => a.name.localeCompare(b.name, 'vi'));
-        if (isCancelled) return;
-        setDepartmentOptions(departmentData);
-        hasLoadedAssignmentOptionsRef.current = true;
+        applyAssignmentOptionsSnapshot(snapshot);
       } catch (error) {
       } finally {
         if (!isCancelled) {
@@ -649,11 +759,18 @@ export const useIncomingForm = () => {
         }
       }
     };
+
     loadDirectories();
     return () => {
       isCancelled = true;
     };
-  }, [showAssignSection, showForm]);
+  }, [
+    applyAssignmentOptionsSnapshot,
+    departmentOptions.length,
+    directoryUsers.length,
+    showAssignSection,
+    showForm,
+  ]);
 
   useEffect(() => {
     setActiveTabKey('ALL');
@@ -664,10 +781,6 @@ export const useIncomingForm = () => {
       setActiveTabKey('ALL');
     }
   }, [tabs, activeTabKey]);
-
-
-
-
 
   useEffect(() => {
     if (!categoryIdValue || categoryNameValue || categories.length === 0) return;
@@ -804,6 +917,9 @@ export const useIncomingForm = () => {
 
   const toggleDestinationMenu = (levelIndex: number) => {
     const shouldOpen = showDestinationLevel !== levelIndex;
+    if (shouldOpen) {
+      ensureIncomingCategoryList();
+    }
     if (focusedField || editorFocusedRef.current) {
       Keyboard.dismiss();
     }
@@ -910,6 +1026,8 @@ export const useIncomingForm = () => {
     setSupportDepartmentTextFallback('');
     setShowCreatedDatePicker(false);
     setShowFinishedDatePicker(false);
+    startEditLockRef.current = false;
+    submitLayout4LockRef.current = false;
     setIsSubmittingForm(false);
     setFocusedField(null);
     setErrors({});
@@ -920,23 +1038,26 @@ export const useIncomingForm = () => {
     if (isPreparingForm) return;
     resetForm();
     setFormMode('CREATE');
+    ensureIncomingCategoryList();
     setShowForm(true);
-  }, [isPreparingForm, resetForm]);
-  
+  }, [ensureIncomingCategoryList, isPreparingForm, resetForm]);
+
   const startEdit = async (id: string, forcedMode?: Exclude<TFormMode, 'CREATE'>) => {
-    if (isPreparingForm) return;
+    if (isPreparingForm || startEditLockRef.current) {
+      return;
+    }
     resetForm();
+    startEditLockRef.current = true;
     setEditingId(id);
     setFormMode(forcedMode || 'LAYOUT_1');
     setIsPreparingForm(true);
     try {
       let latestCategoryById = categoryById;
       const detailPromise = getDocumentDetail(id);
-      await getCategoryList(undefined, { isFromNumbering: true });
-      const numberingCategoryById = buildCategoryById(useDocumentCategoryStore.getState().categories);
-      if (Object.keys(numberingCategoryById).length > 0) {
-        latestCategoryById = numberingCategoryById;
-      }
+      const assignmentOptionsPromise = loadIncomingAssignmentOptions().catch(() => undefined);
+      const categoryPromise = Object.keys(latestCategoryById).length === 0
+        ? ensureIncomingCategoryList().catch(() => undefined)
+        : Promise.resolve();
 
       const detail = await detailPromise;
       if (!detail) {
@@ -955,6 +1076,19 @@ export const useIncomingForm = () => {
           ? sourceDocRaw.document
           : (sourceDocRaw as IDocument);
       const mode = forcedMode || inferFormMode(doc, isStationary);
+      assignmentOptionsPromise.then(snapshot => {
+        if (snapshot) {
+          applyAssignmentOptionsSnapshot(snapshot);
+        }
+      });
+
+      if (mode !== 'LAYOUT_4') {
+        await categoryPromise;
+      }
+      const numberingCategoryById = buildCategoryById(useDocumentCategoryStore.getState().categories);
+      if (Object.keys(numberingCategoryById).length > 0) {
+        latestCategoryById = numberingCategoryById;
+      }
 
       setEditingId(id);
       setFormMode(mode);
@@ -1141,6 +1275,7 @@ export const useIncomingForm = () => {
 
       setShowForm(true);
     } finally {
+      startEditLockRef.current = false;
       setIsPreparingForm(false);
     }
   };
@@ -1222,7 +1357,7 @@ export const useIncomingForm = () => {
     formData.append('startAt', createdAtValue);
   };
 
-  const appendFilesForDraftCreate = (formData: FormData) => {
+  const appendNewFiles = (formData: FormData) => {
     mainFilesNew.forEach((file, index) => {
       formData.append('mainFiles', {
         uri: file.uri,
@@ -1239,21 +1374,16 @@ export const useIncomingForm = () => {
     });
   };
 
-  const appendFilesForRegisterFlow = (formData: FormData) => {
-    mainFilesNew.forEach((file, index) => {
-      formData.append('mainFiles', {
-        uri: file.uri,
-        name: file.name || `main-file-${index}.pdf`,
-        type: file.type || 'application/pdf',
-      } as any);
-    });
-    attachedFilesNew.forEach((file, index) => {
-      formData.append('attachedFiles', {
-        uri: file.uri,
-        name: file.name || `attached-file-${index}.pdf`,
-        type: file.type || 'application/pdf',
-      } as any);
-    });
+  const appendAssignmentFields = (formData: FormData) => {
+    formData.append('leadAgency', getLeadAgencyPayload());
+    formData.append('departmentId', leadDepartmentId);
+    formData.append('leadDepartmentId', leadDepartmentId);
+    formData.append('receiveDepartmentId', leadDepartmentId);
+    formData.append('finishedAt', finishedAtValue);
+    formData.append('receiveToKnow', JSON.stringify(receiveToKnowIds));
+    formData.append('receiveToKnowIds', JSON.stringify(receiveToKnowIds));
+    formData.append('supportDepartmentId', JSON.stringify(supportDepartmentIds));
+    formData.append('supportDepartmentIds', JSON.stringify(supportDepartmentIds));
   };
 
   const validateBaseFields = (nextErrors: any) => {
@@ -1300,7 +1430,7 @@ export const useIncomingForm = () => {
         ? EDocumentStatus.DRAFT
         : EDocumentStatus.STATIONARY_RECEIVED;
       appendBaseFields(formData, statusForSubmit, latestEditorContent);
-      appendFilesForDraftCreate(formData);
+      appendNewFiles(formData);
       if (editingId) {
         formData.append('filesToRemove', JSON.stringify(filesToRemove));
       }
@@ -1319,17 +1449,9 @@ export const useIncomingForm = () => {
     const formData = new FormData();
     appendBaseFields(formData, undefined, contentOverride);
     formData.append('destinationCategoryId', selectedDestinationId);
-    formData.append('leadAgency', getLeadAgencyPayload());
-    formData.append('departmentId', leadDepartmentId);
-    formData.append('leadDepartmentId', leadDepartmentId);
-    formData.append('receiveDepartmentId', leadDepartmentId);
-    formData.append('finishedAt', finishedAtValue);
-    formData.append('receiveToKnow', JSON.stringify(receiveToKnowIds));
-    formData.append('receiveToKnowIds', JSON.stringify(receiveToKnowIds));
-    formData.append('supportDepartmentId', JSON.stringify(supportDepartmentIds));
-    formData.append('supportDepartmentIds', JSON.stringify(supportDepartmentIds));
+    appendAssignmentFields(formData);
     formData.append('filesToRemove', JSON.stringify(filesToRemove));
-    appendFilesForRegisterFlow(formData);
+    appendNewFiles(formData);
     return formData;
   };
 
@@ -1342,21 +1464,13 @@ export const useIncomingForm = () => {
     if (selectedDestinationId) {
       formData.append('destinationCategoryId', selectedDestinationId);
     }
-    formData.append('leadAgency', getLeadAgencyPayload());
-    formData.append('departmentId', leadDepartmentId);
-    formData.append('leadDepartmentId', leadDepartmentId);
-    formData.append('receiveDepartmentId', leadDepartmentId);
-    formData.append('finishedAt', finishedAtValue);
-    formData.append('receiveToKnow', JSON.stringify(receiveToKnowIds));
-    formData.append('receiveToKnowIds', JSON.stringify(receiveToKnowIds));
-    formData.append('supportDepartmentId', JSON.stringify(supportDepartmentIds));
-    formData.append('supportDepartmentIds', JSON.stringify(supportDepartmentIds));
+    appendAssignmentFields(formData);
     formData.append(
       'filesToRemove',
       JSON.stringify(options?.includeFilesToRemove === false ? [] : filesToRemove),
     );
     if (options?.includeFiles) {
-      appendFilesForRegisterFlow(formData);
+      appendNewFiles(formData);
     }
     return formData;
   };
@@ -1391,30 +1505,40 @@ export const useIncomingForm = () => {
   };
 
   const submitLayout4 = async () => {
-    if (!editingId) return;
-    if (isSubmittingForm) return;
-    Keyboard.dismiss();
-    clearEditorFocus();
-    setFocusedField(null);
-    const nextErrors: any = {};
-    validateBaseFields(nextErrors);
-    validateAssignFields(nextErrors);
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
-    setIsSubmittingForm(true);
+    if (!editingId) {
+      return;
+    }
+    if (isSubmittingForm || submitLayout4LockRef.current) {
+      return;
+    }
+    submitLayout4LockRef.current = true;
     try {
+      Keyboard.dismiss();
+      clearEditorFocus();
+      setFocusedField(null);
+      const nextErrors: any = {};
+      validateBaseFields(nextErrors);
+      validateAssignFields(nextErrors);
+      setErrors(nextErrors);
+      if (Object.keys(nextErrors).length > 0) {
+        return;
+      }
+      setIsSubmittingForm(true);
       const latestEditorContent = await requestEditorContent();
       const ok = await assignIncomingDocument(
         editingId,
         buildAssignFormData({ includeFiles: true, includeFilesToRemove: true }, latestEditorContent),
       );
-      if (!ok) return;
+      if (!ok) {
+        return;
+      }
       delete assignmentDraftsRef.current[editingId];
       await removeStoredAssignmentDraft(editingId);
       setShowForm(false);
       resetForm();
       getListDocument({ type: 'INCOMING' });
     } finally {
+      submitLayout4LockRef.current = false;
       setIsSubmittingForm(false);
     }
   };
@@ -1452,7 +1576,6 @@ export const useIncomingForm = () => {
   return {
     activeFormat,
     activeTab,
-    activeTabKey,
     applyRelativeDate,
     attachedFilesNew,
     cancelDelete,
@@ -1460,7 +1583,6 @@ export const useIncomingForm = () => {
     categoryDropdownOptions,
     categoryNameValue,
     chooseColor,
-    clearEditorFocus,
     closeDatePicker,
     commitEditorContent,
     confirmDelete,
@@ -1505,9 +1627,9 @@ export const useIncomingForm = () => {
     isLayout4,
     isLoading,
     isLoadingAssignmentOptions,
+    isLoadingDestinationOptions,
     isPreparingForm,
     isStationary,
-    isSubmittingForm,
     initialEditorHtml,
     leadDepartmentDropdownOptions,
     mainFilesNew,
@@ -1538,24 +1660,18 @@ export const useIncomingForm = () => {
     senderInputRef,
     senderValue,
     setActiveTabKey,
-    setAttachedFilesNew,
     setDatePickerDraft,
     setDatePickerError,
     setErrors,
-    setFinishedAtDisplay,
-    setFinishedAtValue,
     setFocusedField,
     setInitialEditorHtml,
     setIsEditorFocused,
-    setLeadDepartmentId,
-    setMainFilesNew,
     setOrganizationValue,
     setRegisteredNumberValue,
     setSearchText,
     setSenderValue,
     setShowCategoryMenu,
     setShowColorMenu,
-    setShowFinishedDatePicker,
     setShowForm,
     setShowFormatMenu,
     setShowLeadDepartmentMenu,

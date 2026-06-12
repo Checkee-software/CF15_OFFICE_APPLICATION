@@ -41,6 +41,7 @@ export type TDropdownListOption = {
   key: string;
   label: string;
   subLabel?: string;
+  searchText?: string;
   checked?: boolean;
   onPress?: () => void;
 };

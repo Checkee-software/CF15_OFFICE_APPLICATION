@@ -162,8 +162,4 @@ const styles = StyleSheet.create({
   modalBtnDangerText: { color: '#FFF', fontSize: 18, fontWeight: '700' },
 });
 
-
-
-
-
 export default styles;

@@ -68,6 +68,7 @@ export default function Incoming({ navigation }: any) {
     isLayout4,
     isLoading,
     isLoadingAssignmentOptions,
+    isLoadingDestinationOptions,
     isPreparingForm,
     isStationary,
     initialEditorHtml,
@@ -333,6 +334,7 @@ export default function Incoming({ navigation }: any) {
                       </TouchableOpacity>
                       {showDestinationLevel === levelIndex && renderDropdownMenu({
                         title: 'Chọn sổ lưu trữ',
+                        loading: isLoadingDestinationOptions,
                         options: destinationDropdownOptions[levelIndex] || [],
                         searchEnabled: true,
                         searchPlaceholder: 'Tìm sổ lưu trữ...',
