@@ -49,10 +49,8 @@ export function useOutgoingForm() {
   const [existingSignedFiles, setExistingSignedFiles] = useState<TExistingFile[]>([]);
   const [existingAttachedFiles, setExistingAttachedFiles] = useState<TExistingFile[]>([]);
   const [filesToRemove, setFilesToRemove] = useState<string[]>([]);
-  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
-  const [showPriorityMenu, setShowPriorityMenu] = useState(false);
   const [priorityValue, setPriorityValue] = useState<EDocumentPriority | ''>('');
   const [signedDepartmentValue, setSignedDepartmentValue] = useState<ESignDepartment | ''>('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -682,18 +680,14 @@ export function useOutgoingForm() {
     setSelectedReceiveDeptName,
     setSelectedSignerUserId,
     setSelectedSignerUserName,
-    setShowCategoryMenu,
     setShowColorMenu,
     setShowFormatMenu,
-    setShowPriorityMenu,
     setSignedDepartmentValue,
     setSignerUserList,
     setSignedFilesNew,
     setTitleValue,
-    showCategoryMenu,
     showColorMenu,
     showFormatMenu,
-    showPriorityMenu,
     signerUserList,
     signedDepartmentValue,
     signedFilesNew,

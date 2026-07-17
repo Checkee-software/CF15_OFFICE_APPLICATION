@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Feather from 'react-native-vector-icons/Feather';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import DeleteModal from '@/utils/Modals/DeleteModal';
 import Loading from '@/screens/subscreen/Loading';
@@ -16,6 +17,12 @@ import styles from './styles';
 import { useOutgoingForm } from './hook/useOutgoingForm';
 import { applyDepartmentCodeToRegisteredFormat } from '../Outgoing/utils/index';
 import { formatFileSize } from '../Document/utils/documentHelpers';
+import { Dropdown } from 'react-native-element-dropdown';
+
+const priorityData = Object.values(EDocumentPriority).map(priority => ({
+  label: DOCUMENT_PRIORITY_LABEL[priority],
+  value: priority,
+}));
 
 const renderPickedFileRow = (name: string, size?: number, onRemove?: () => void) => (
   <View style={styles.fileRow}>
@@ -94,6 +101,10 @@ export default function Outgoing({ navigation }: any) {
     setIsCreating,
     setIsEditorFocused,
     setPriorityValue,
+    selectedApproverUserId,
+    selectedCategoryId,
+    selectedReceiveDeptId,
+    selectedSignerUserId,
     setSelectedApproverUserId,
     setSelectedApproverUserName,
     setSelectedCategoryId,
@@ -102,17 +113,13 @@ export default function Outgoing({ navigation }: any) {
     setSelectedReceiveDeptName,
     setSelectedSignerUserId,
     setSelectedSignerUserName,
-    setShowCategoryMenu,
     setShowColorMenu,
     setShowFormatMenu,
-    setShowPriorityMenu,
     setSignedDepartmentValue,
     setSignedFilesNew,
     setTitleValue,
-    showCategoryMenu,
     showColorMenu,
     showFormatMenu,
-    showPriorityMenu,
     signerUserList,
     signedDepartmentValue,
     signedFilesNew,
@@ -125,17 +132,6 @@ export default function Outgoing({ navigation }: any) {
   const isDirectorLevel = signedDepartmentValue === ESignDepartment.MANAGEMENT;
   const creatorDeptName = userInfo?.departmentName || userInfo?.userType?.department || 'Chưa xác định';
 
-  // State local điều khiển đóng/mở các dropdown menu chọn bộ phận, người ký/duyệt
-  const [showReceiveDeptMenu, setShowReceiveDeptMenu] = useState(false);
-  const [showSignerMenu, setShowSignerMenu] = useState(false);
-  const [showDirectorSignerMenu, setShowDirectorSignerMenu] = useState(false);
-
-  const isAnyMenuOpen =
-    showCategoryMenu ||
-    showPriorityMenu ||
-    showReceiveDeptMenu ||
-    showSignerMenu ||
-    showDirectorSignerMenu;
 
   const renderHeaderCreateButton = useCallback(() => (
     <OutgoingHeaderCreateButton
@@ -148,12 +144,36 @@ export default function Outgoing({ navigation }: any) {
   ), [canMutateOutgoing, isCreating, isLoading, isPreparingForm, openCreateForm]);
 
   useEffect(() => {
-    navigation?.setOptions?.({
-      headerShown: true,
-      title: 'VĂN BẢN ĐI',
-      headerRight: renderHeaderCreateButton,
-    });
-  }, [navigation, renderHeaderCreateButton]);
+    if (isCreating) {
+      navigation?.setOptions?.({
+        headerShown: true,
+        title: editingDocument ? 'CẬP NHẬT VĂN BẢN ĐI' : 'TẠO VĂN BẢN ĐI',
+        headerRight: () => null,
+        headerLeft: () => (
+          <TouchableOpacity
+            onPress={() => setIsCreating(false)}
+            style={{ marginRight: 16 }}
+          >
+            <Feather name="chevron-left" size={24} color="#000" />
+          </TouchableOpacity>
+        ),
+      });
+    } else {
+      navigation?.setOptions?.({
+        headerShown: true,
+        title: 'VĂN BẢN ĐI',
+        headerRight: renderHeaderCreateButton,
+        headerLeft: () => (
+          <TouchableOpacity
+            onPress={() => navigation?.goBack?.()}
+            style={{ marginRight: 16 }}
+          >
+            <Feather name="chevron-left" size={24} color="#000" />
+          </TouchableOpacity>
+        ),
+      });
+    }
+  }, [navigation, isCreating, editingDocument, renderHeaderCreateButton]);
 
   if (isLoading && !isCreating && documents.length === 0) {
     return <Loading />;
@@ -187,63 +207,61 @@ export default function Outgoing({ navigation }: any) {
           </View>
           {!!errors.title && <Text style={styles.fieldError}>Bắt buộc!</Text>}
 
-          <View style={[styles.row, { zIndex: showCategoryMenu || showPriorityMenu ? 100 : 20 }]}>
-            <View style={[styles.half, { zIndex: showCategoryMenu ? 101 : 20 }]}>
+          <View style={styles.row}>
+            <View style={styles.half}>
               <Text style={styles.fieldLabel}>Loại tài liệu <Text style={styles.required}>*</Text></Text>
-              <TouchableOpacity style={[styles.select, errors.categoryId && styles.inputWrapError]} onPress={() => setShowCategoryMenu(prev => !prev)}>
-                <Text style={styles.selectText}>{selectedCategoryName || 'Chọn loại'}</Text>
-                <MaterialCommunityIcons name="chevron-down" size={18} color="#666" />
-              </TouchableOpacity>
-              {showCategoryMenu && (
-                <View style={styles.dropdownMenu}>
-                  <ScrollView nestedScrollEnabled style={{ maxHeight: 200 }}>
-                    {categories.map(category => (
-                      <TouchableOpacity
-                        key={category._id}
-                        style={styles.dropdownItem}
-                        onPress={() => {
-                          setSelectedCategoryId(category._id);
-                          setSelectedCategoryName(category.name || '');
-                          if (category.format) {
-                            setCodeValue(applyDepartmentCodeToRegisteredFormat(category.format, creatorDepartmentCode));
-                          }
-                          setErrors(prev => ({ ...prev, categoryId: undefined, registeredNumber: undefined }));
-                          setShowCategoryMenu(false);
-                        }}>
-                        <Text style={styles.dropdownItemText}>{category.name} ({category.code})</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
+              <Dropdown
+                style={[styles.select, errors.categoryId && styles.inputWrapError]}
+                placeholderStyle={styles.selectText}
+                selectedTextStyle={[styles.selectText, { color: '#222' }]}
+                containerStyle={styles.dropdownMenuContainer}
+                activeColor="#EBF3FC"
+                data={categories}
+                labelField="name"
+                valueField="_id"
+                placeholder="Chọn loại"
+                value={selectedCategoryId}
+                onChange={item => {
+                  setSelectedCategoryId(item._id);
+                  setSelectedCategoryName(item.name || '');
+                  if (item.format) {
+                    setCodeValue(applyDepartmentCodeToRegisteredFormat(item.format, creatorDepartmentCode));
+                  }
+                  setErrors(prev => ({ ...prev, categoryId: undefined, registeredNumber: undefined }));
+                }}
+                renderItem={item => (
+                  <View style={styles.dropdownItem}>
+                    <Text style={styles.dropdownItemText}>{item.name} ({item.code})</Text>
+                  </View>
+                )}
+                maxHeight={220}
+              />
               {!!errors.categoryId && <Text style={styles.fieldError}>Vui lòng chọn!</Text>}
             </View>
-            <View style={[styles.half, { zIndex: showPriorityMenu ? 101 : 20 }]}>
+            <View style={styles.half}>
               <Text style={styles.fieldLabel}>Mức độ ưu tiên <Text style={styles.required}>*</Text></Text>
-              <TouchableOpacity style={styles.select} onPress={() => setShowPriorityMenu(prev => !prev)}>
-                <Text style={styles.selectText}>
-                  {priorityValue ? DOCUMENT_PRIORITY_LABEL[priorityValue] : 'Chọn mức độ'}
-                </Text>
-                <MaterialCommunityIcons name="chevron-down" size={18} color="#666" />
-              </TouchableOpacity>
-              {showPriorityMenu && (
-                <View style={styles.dropdownMenu}>
-                  <ScrollView nestedScrollEnabled style={{ maxHeight: 200 }}>
-                    {Object.values(EDocumentPriority).map(priority => (
-                      <TouchableOpacity
-                        key={priority}
-                        style={styles.dropdownItem}
-                        onPress={() => {
-                          setPriorityValue(priority);
-                          setShowPriorityMenu(false);
-                          setErrors(prev => ({ ...prev, priority: undefined }));
-                        }}>
-                        <Text style={styles.dropdownItemText}>{DOCUMENT_PRIORITY_LABEL[priority]}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
+              <Dropdown
+                style={[styles.select, errors.priority && styles.inputWrapError]}
+                placeholderStyle={styles.selectText}
+                selectedTextStyle={[styles.selectText, { color: '#222' }]}
+                containerStyle={styles.dropdownMenuContainer}
+                activeColor="#EBF3FC"
+                data={priorityData}
+                labelField="label"
+                valueField="value"
+                placeholder="Chọn mức độ"
+                value={priorityValue}
+                onChange={item => {
+                  setPriorityValue(item.value);
+                  setErrors(prev => ({ ...prev, priority: undefined }));
+                }}
+                renderItem={item => (
+                  <View style={styles.dropdownItem}>
+                    <Text style={styles.dropdownItemText}>{item.label}</Text>
+                  </View>
+                )}
+                maxHeight={220}
+              />
               {!!errors.priority && <Text style={styles.fieldError}>{errors.priority}</Text>}
             </View>
           </View>
@@ -293,139 +311,112 @@ export default function Outgoing({ navigation }: any) {
           {!!errors.signedDepartment && <Text style={styles.fieldErrorLeft}>{errors.signedDepartment}</Text>}
 
           {/* Bộ phận tiếp nhận + Người ký / Người ký nháy */}
-          <View style={[styles.row, { zIndex: showReceiveDeptMenu || showSignerMenu ? 100 : 18 }]}>
-            <View style={[styles.half, { zIndex: showReceiveDeptMenu ? 101 : 18 }]}>
+          <View style={styles.row}>
+            <View style={styles.half}>
               <Text style={styles.fieldLabel}>
                 {isDirectorLevel ? 'Phòng ban tiếp nhận' : 'Bộ phận tiếp nhận'}
                 {' '}<Text style={styles.required}>*</Text>
               </Text>
-              <TouchableOpacity
+              <Dropdown
                 style={styles.select}
-                onPress={() => {
-                  setShowReceiveDeptMenu(prev => !prev);
-                  setShowSignerMenu(false);
-                  setShowDirectorSignerMenu(false);
+                placeholderStyle={styles.selectText}
+                selectedTextStyle={[styles.selectText, { color: '#222' }]}
+                containerStyle={styles.dropdownMenuContainer}
+                activeColor="#EBF3FC"
+                data={departmentList}
+                labelField="name"
+                valueField="_id"
+                placeholder="Chọn bộ phận"
+                value={selectedReceiveDeptId}
+                onChange={item => {
+                  setSelectedReceiveDeptId(item._id);
+                  setSelectedReceiveDeptName(item.name);
                 }}
-              >
-                <Text style={styles.selectText} numberOfLines={1}>
-                  {selectedReceiveDeptName || 'Chọn bộ phận'}
-                </Text>
-                <MaterialCommunityIcons name="chevron-down" size={18} color="#666" />
-              </TouchableOpacity>
-              {showReceiveDeptMenu && (
-                <View style={[styles.dropdownMenu, { zIndex: 50 }]}>
-                  {isFetchingDepartments ? (
+                renderItem={item => (
+                  <View style={styles.dropdownItem}>
+                    <Text style={styles.dropdownItemText}>{item.name}</Text>
+                  </View>
+                )}
+                maxHeight={220}
+                flatListProps={{
+                  ListEmptyComponent: isFetchingDepartments ? (
                     <ActivityIndicator size="small" color="#1E88E5" style={{ padding: 12 }} />
-                  ) : departmentList.length === 0 ? (
-                    <Text style={[styles.dropdownItemText, { paddingHorizontal: 12, paddingVertical: 10, color: '#A0A0A0' }]}>Chưa có dữ liệu</Text>
                   ) : (
-                    <ScrollView nestedScrollEnabled style={{ maxHeight: 200 }}>
-                      {departmentList.map(dept => (
-                        <TouchableOpacity
-                          key={dept._id}
-                          style={styles.dropdownItem}
-                          onPress={() => {
-                            setSelectedReceiveDeptId(dept._id);
-                            setSelectedReceiveDeptName(dept.name);
-                            setShowReceiveDeptMenu(false);
-                          }}
-                        >
-                          <Text style={styles.dropdownItemText}>{dept.name}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  )}
-                </View>
-              )}
+                    <Text style={[styles.dropdownItemText, { paddingHorizontal: 12, paddingVertical: 10, color: '#A0A0A0' }]}>Chưa có dữ liệu</Text>
+                  ),
+                }}
+              />
             </View>
-            <View style={[styles.half, { zIndex: showSignerMenu ? 101 : 17 }]}>
+            <View style={styles.half}>
               <Text style={styles.fieldLabel}>
                 {isDirectorLevel ? 'Người ký nháy' : 'Người ký'}
                 {' '}<Text style={styles.required}>*</Text>
               </Text>
-              <TouchableOpacity
+              <Dropdown
                 style={styles.select}
-                onPress={() => {
-                  setShowSignerMenu(prev => !prev);
-                  setShowReceiveDeptMenu(false);
-                  setShowDirectorSignerMenu(false);
+                placeholderStyle={styles.selectText}
+                selectedTextStyle={[styles.selectText, { color: '#222' }]}
+                containerStyle={styles.dropdownMenuContainer}
+                activeColor="#EBF3FC"
+                data={signerUserList}
+                labelField="fullName"
+                valueField="_id"
+                placeholder="Chọn người ký"
+                value={selectedSignerUserId}
+                onChange={item => {
+                  setSelectedSignerUserId(item._id);
+                  setSelectedSignerUserName(item.fullName);
                 }}
-              >
-              <Text style={[styles.selectText, !selectedSignerUserName && { color: '#A0A0A0' }]} numberOfLines={1}>
-                  {selectedSignerUserName || 'Chọn người ký'}
-                </Text>
-                <MaterialCommunityIcons name="chevron-down" size={18} color="#666" />
-              </TouchableOpacity>
-              {showSignerMenu && (
-                <View style={[styles.dropdownMenu, { zIndex: 50 }]}>
-                  {isFetchingSigners ? (
+                renderItem={item => (
+                  <View style={styles.dropdownItem}>
+                    <Text style={styles.dropdownItemText}>{item.fullName}</Text>
+                  </View>
+                )}
+                maxHeight={220}
+                flatListProps={{
+                  ListEmptyComponent: isFetchingSigners ? (
                     <ActivityIndicator size="small" color="#4CAF50" style={{ padding: 12 }} />
-                  ) : signerUserList.length === 0 ? (
-                    <Text style={[styles.dropdownItemText, { paddingHorizontal: 12, paddingVertical: 10, color: '#A0A0A0' }]}>Chưa có dữ liệu</Text>
                   ) : (
-                    <ScrollView nestedScrollEnabled style={{ maxHeight: 200 }}>
-                      {signerUserList.map(user => (
-                        <TouchableOpacity
-                          key={user._id}
-                          style={styles.dropdownItem}
-                          onPress={() => {
-                            setSelectedSignerUserId(user._id);
-                            setSelectedSignerUserName(user.fullName);
-                            setShowSignerMenu(false);
-                          }}
-                        >
-                          <Text style={styles.dropdownItemText}>{user.fullName}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  )}
-                </View>
-              )}
+                    <Text style={[styles.dropdownItemText, { paddingHorizontal: 12, paddingVertical: 10, color: '#A0A0A0' }]}>Chưa có dữ liệu</Text>
+                  ),
+                }}
+              />
             </View>
           </View>
 
           {/* Thêm trường Ban giám đốc ký duyệt khi chọn Ban giám đốc */}
           {isDirectorLevel && (
-            <View style={[styles.fullDropdownWrap, { zIndex: showDirectorSignerMenu ? 100 : 16, marginTop: 4 }]}>
+            <View style={[styles.fullDropdownWrap, { marginTop: 4 }]}>
               <Text style={styles.fieldLabel}>Ban giám đốc ký duyệt <Text style={styles.required}>*</Text></Text>
-              <TouchableOpacity
+              <Dropdown
                 style={styles.select}
-                onPress={() => {
-                  setShowDirectorSignerMenu(prev => !prev);
-                  setShowReceiveDeptMenu(false);
-                  setShowSignerMenu(false);
+                placeholderStyle={styles.selectText}
+                selectedTextStyle={[styles.selectText, { color: '#222' }]}
+                containerStyle={styles.dropdownMenuContainer}
+                activeColor="#EBF3FC"
+                data={approverUserList}
+                labelField="fullName"
+                valueField="_id"
+                placeholder="Chọn ban giám đốc ký duyệt"
+                value={selectedApproverUserId}
+                onChange={item => {
+                  setSelectedApproverUserId(item._id);
+                  setSelectedApproverUserName(item.fullName);
                 }}
-              >
-              <Text style={[styles.selectText, !selectedApproverUserName && { color: '#A0A0A0' }]} numberOfLines={1}>
-                  {selectedApproverUserName || 'Chọn ban giám đốc ký duyệt'}
-                </Text>
-                <MaterialCommunityIcons name="chevron-down" size={18} color="#666" />
-              </TouchableOpacity>
-              {showDirectorSignerMenu && (
-                <View style={[styles.dropdownMenu, { zIndex: 50 }]}>
-                  {isFetchingSigners ? (
+                renderItem={item => (
+                  <View style={styles.dropdownItem}>
+                    <Text style={styles.dropdownItemText}>{item.fullName}</Text>
+                  </View>
+                )}
+                maxHeight={220}
+                flatListProps={{
+                  ListEmptyComponent: isFetchingSigners ? (
                     <ActivityIndicator size="small" color="#4CAF50" style={{ padding: 12 }} />
-                  ) : approverUserList.length === 0 ? (
-                    <Text style={[styles.dropdownItemText, { paddingHorizontal: 12, paddingVertical: 10, color: '#A0A0A0' }]}>Chưa có dữ liệu</Text>
                   ) : (
-                    <ScrollView nestedScrollEnabled style={{ maxHeight: 200 }}>
-                      {approverUserList.map(user => (
-                        <TouchableOpacity
-                          key={user._id}
-                          style={styles.dropdownItem}
-                          onPress={() => {
-                            setSelectedApproverUserId(user._id);
-                            setSelectedApproverUserName(user.fullName);
-                            setShowDirectorSignerMenu(false);
-                          }}
-                        >
-                          <Text style={styles.dropdownItemText}>{user.fullName}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  )}
-                </View>
-              )}
+                    <Text style={[styles.dropdownItemText, { paddingHorizontal: 12, paddingVertical: 10, color: '#A0A0A0' }]}>Chưa có dữ liệu</Text>
+                  ),
+                }}
+              />
             </View>
           )}
 
