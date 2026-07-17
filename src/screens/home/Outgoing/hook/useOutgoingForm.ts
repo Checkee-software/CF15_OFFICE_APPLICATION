@@ -18,6 +18,9 @@ import {
   pickByType,
   resolveCreatorDepartmentCode,
 } from '../utils/index';
+import axiosClient from '@/utils/axiosClient';
+import ENV from '@/config/ENV';
+import { IDepartmentSelection } from '@/shared-types/Response/DepartmentResponse/DepartmentResponse';
 
 export function useOutgoingForm() {
   const { userInfo } = useAuthStore();
@@ -50,12 +53,27 @@ export function useOutgoingForm() {
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
   const [showPriorityMenu, setShowPriorityMenu] = useState(false);
-  const [showSignDepartmentMenu, setShowSignDepartmentMenu] = useState(false);
   const [priorityValue, setPriorityValue] = useState<EDocumentPriority | ''>('');
   const [signedDepartmentValue, setSignedDepartmentValue] = useState<ESignDepartment | ''>('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [errors, setErrors] = useState<{ priority?: string; signedDepartment?: string; signedFiles?: string; title?: string; categoryId?: string; registeredNumber?: string }>({});
   const [isPreparingForm, setIsPreparingForm] = useState(false);
+
+  // Signer / Approver selection
+  type TSignerUser = { _id: string; fullName: string };
+  const [signerUserList, setSignerUserList] = useState<TSignerUser[]>([]);
+  const [approverUserList, setApproverUserList] = useState<TSignerUser[]>([]);
+  const [isFetchingSigners, setIsFetchingSigners] = useState(false);
+  const [selectedSignerUserId, setSelectedSignerUserId] = useState('');
+  const [selectedSignerUserName, setSelectedSignerUserName] = useState('');
+  const [selectedApproverUserId, setSelectedApproverUserId] = useState('');
+  const [selectedApproverUserName, setSelectedApproverUserName] = useState('');
+
+  // Receive department selection
+  const [departmentList, setDepartmentList] = useState<IDepartmentSelection[]>([]);
+  const [isFetchingDepartments, setIsFetchingDepartments] = useState(false);
+  const [selectedReceiveDeptId, setSelectedReceiveDeptId] = useState('');
+  const [selectedReceiveDeptName, setSelectedReceiveDeptName] = useState('');
   const { categories, getCategoryList } = useDocumentCategoryStore();
   const currentUserLevel = userInfo?.userType?.level as EOrganization | undefined;
   const levelKey = getLevelKey(userInfo?.userType?.level as EOrganization | undefined);
@@ -67,6 +85,136 @@ export function useOutgoingForm() {
   const isDepartmentLevel = currentUserLevel === EOrganization.DEPARTMENT;
   const isStationaryLevel = currentUserLevel === EOrganization.STATIONARY;
   const canMutateOutgoing = isStationaryLevel || isDepartmentLevel || isLeaderLevel;
+
+  // Keep track of the parameters used for fetching to prevent duplicate network calls / state resets
+  const lastFetchedParamsRef = useRef({ deptId: '', dept: '' });
+
+  // Fetch danh sách phòng ban nhận
+  const fetchDepartments = useCallback(async () => {
+    setIsFetchingDepartments(true);
+    try {
+      const res = await axiosClient.get(`${ENV.BACKEND_URL}/resources/departments/selection`);
+      const list: IDepartmentSelection[] = (res.data?.data || []).map((d: any) => ({
+        _id: d._id || '',
+        name: d.name || '',
+        code: d.code || '',
+      }));
+      setDepartmentList(list);
+      return list;
+    } catch (e) {
+      console.log('[useOutgoingForm] fetchDepartments error', e);
+      setDepartmentList([]);
+      return [];
+    } finally {
+      setIsFetchingDepartments(false);
+    }
+  }, []);
+
+  // Fetch danh sách người ký theo bộ phận + loại ký duyệt
+  const fetchSignerUsers = useCallback(async (
+    deptId: string,
+    dept: ESignDepartment,
+    currentSignerId?: string,
+    currentApproverId?: string
+  ) => {
+    if (!deptId) { return []; }
+    setIsFetchingSigners(true);
+    try {
+      const res = await axiosClient.get(
+        `${ENV.BACKEND_URL}/resources/users/selection-user-by-department`,
+        { params: { departmentId: deptId, signedDepartment: dept } },
+      );
+      const payload = res.data?.data?.data;
+
+      lastFetchedParamsRef.current = { deptId, dept };
+
+      if (dept === ESignDepartment.MANAGEMENT) {
+        const initialSigners: TSignerUser[] = (payload?.initialSigners || []).map((u: any) => ({
+          _id: u._id || '',
+          fullName: u.fullName || u.username || '',
+        }));
+        const approvers: TSignerUser[] = (payload?.approvers || []).map((u: any) => ({
+          _id: u._id || '',
+          fullName: u.fullName || u.username || '',
+        }));
+
+        setSignerUserList(initialSigners);
+        setApproverUserList(approvers);
+
+        if (currentSignerId) {
+          const found = initialSigners.find(u => u._id === currentSignerId);
+          if (found) {
+            setSelectedSignerUserName(found.fullName);
+          } else {
+            setSelectedSignerUserId('');
+            setSelectedSignerUserName('');
+          }
+        }
+        if (currentApproverId) {
+          const found = approvers.find(u => u._id === currentApproverId);
+          if (found) {
+            setSelectedApproverUserName(found.fullName);
+          } else {
+            setSelectedApproverUserId('');
+            setSelectedApproverUserName('');
+          }
+        }
+        return { initialSigners, approvers };
+      } else {
+        const approvers: TSignerUser[] = (payload?.approvers || []).map((u: any) => ({
+          _id: u._id || '',
+          fullName: u.fullName || u.username || '',
+        }));
+
+        setSignerUserList(approvers);
+        setApproverUserList([]);
+
+        if (currentSignerId) {
+          const found = approvers.find(u => u._id === currentSignerId);
+          if (found) {
+            setSelectedSignerUserName(found.fullName);
+          } else {
+            setSelectedSignerUserId('');
+            setSelectedSignerUserName('');
+          }
+        }
+        setSelectedApproverUserId('');
+        setSelectedApproverUserName('');
+        return { approvers };
+      }
+    } catch (e) {
+      console.log('[useOutgoingForm] fetchSignerUsers error', e);
+      setSignerUserList([]);
+      setApproverUserList([]);
+      return [];
+    } finally {
+      setIsFetchingSigners(false);
+    }
+  }, []);
+
+  // Tự động fetch khi signedDepartment thay đổi và đã có departmentId
+  useEffect(() => {
+    if (!signedDepartmentValue || !userInfo?.userType?.department) { return; }
+
+    // Only fetch if department or signed department type actually changed
+    if (
+      lastFetchedParamsRef.current.deptId !== userInfo.userType.department ||
+      lastFetchedParamsRef.current.dept !== signedDepartmentValue
+    ) {
+      fetchSignerUsers(
+        userInfo.userType.department,
+        signedDepartmentValue as ESignDepartment,
+        selectedSignerUserId,
+        selectedApproverUserId
+      );
+    }
+  }, [
+    signedDepartmentValue,
+    userInfo?.userType?.department,
+    fetchSignerUsers,
+    selectedSignerUserId,
+    selectedApproverUserId
+  ]);
   const sendEditorCommand = useCallback((command: string) => {
     setEditorCommand(`${command}|${Date.now()}`);
   }, []);
@@ -193,8 +341,17 @@ export function useOutgoingForm() {
     setExistingSignedFiles([]);
     setExistingAttachedFiles([]);
     setFilesToRemove([]);
+    setSignerUserList([]);
+    setApproverUserList([]);
+    setSelectedSignerUserId('');
+    setSelectedSignerUserName('');
+    setSelectedApproverUserId('');
+    setSelectedApproverUserName('');
+    setSelectedReceiveDeptId('');
+    setSelectedReceiveDeptName('');
+    fetchDepartments();
     setIsCreating(true);
-  }, [setEditorContentForLoad]);
+  }, [setEditorContentForLoad, fetchDepartments]);
 
   const openEditForm = async (item: TOutgoingItem) => {
     if (isLoading || isPreparingForm) { return; }
@@ -206,6 +363,7 @@ export function useOutgoingForm() {
     editorReadyRef.current = false;
     editorContentRequestRef.current = null;
     try {
+      const currentDepts = await fetchDepartments();
       const detail = await getDocumentDetail(item.id);
       const fallbackDoc = (listDocument || []).find((doc: IDocument) => doc._id === item.id) || null;
       const sourceDocRaw: IDocument | { document?: IDocument | null } | null =
@@ -230,6 +388,36 @@ export function useOutgoingForm() {
         setSelectedCategoryId(detailCategoryId);
         setSelectedCategoryName(detailCategoryName);
         setPriorityValue((sourceDoc.priority as EDocumentPriority) || '');
+
+        // Parse receive department
+        const rawReceiveDept = (sourceDoc as any).receiveDepartmentId;
+        let receiveDeptId = '';
+        let receiveDeptName = '';
+        if (rawReceiveDept) {
+          if (typeof rawReceiveDept === 'object') {
+            receiveDeptId = rawReceiveDept._id || rawReceiveDept.id || '';
+            receiveDeptName = rawReceiveDept.name || '';
+          } else {
+            receiveDeptId = rawReceiveDept.toString();
+          }
+        }
+        if (receiveDeptId) {
+          const matchedDept = currentDepts.find(d => d._id === receiveDeptId);
+          if (matchedDept) {
+            receiveDeptName = matchedDept.name;
+          }
+        }
+        setSelectedReceiveDeptId(receiveDeptId);
+        setSelectedReceiveDeptName(receiveDeptName);
+
+        // Load existing signer and approver IDs
+        const rawSignerUserId = (sourceDoc as any).signerUserId || '';
+        setSelectedSignerUserId(rawSignerUserId);
+
+        const rawApproverUserId = (sourceDoc as any).approverUserId || '';
+        setSelectedApproverUserId(rawApproverUserId);
+
+        // Set signedDepartmentValue to trigger the useEffect that resolves names and fetches signer list
         setSignedDepartmentValue((sourceDoc.signedDepartment as ESignDepartment) || '');
         const signed = [
           ...(Array.isArray(sourceDoc.signedFiles) ? sourceDoc.signedFiles : []),
@@ -342,9 +530,15 @@ export function useOutgoingForm() {
     formData.append('categoryId', selectedCategoryId);
     formData.append('departmentId', userInfo?.userType?.department || '');
     formData.append('version', '1.0');
-    formData.append('receiveDepartmentId', userInfo?.userType?.department || '');
+    formData.append('receiveDepartmentId', selectedReceiveDeptId || userInfo?.userType?.department || '');
     formData.append('status', effectiveStatus);
     formData.append('signedDepartment', signedDepartmentValue);
+    if (selectedSignerUserId) {
+      formData.append('signerUserId', selectedSignerUserId);
+    }
+    if (signedDepartmentValue === ESignDepartment.MANAGEMENT && selectedApproverUserId) {
+      formData.append('approverUserId', selectedApproverUserId);
+    }
 
     signedFilesNew.forEach((file, index) => {
       formData.append('signedFiles', {
@@ -394,7 +588,6 @@ export function useOutgoingForm() {
       setFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
     }
   };
-  const handleUpdateOutgoing = () => handleCreateOutgoing('SENDING');
   const askDeleteDocument = (item: TOutgoingItem) => {
     setDeletingDocument(item);
   };
@@ -415,6 +608,7 @@ export function useOutgoingForm() {
 
   return {
     activeFormat,
+    approverUserList,
     attachedFilesNew,
     askDeleteDocument,
     cancelDeleteDocument,
@@ -427,6 +621,7 @@ export function useOutgoingForm() {
     creatorDepartmentCode,
     currentUserLevel,
     deletingDocument,
+    departmentList,
     documents,
     editingDocument,
     editorCommand,
@@ -447,7 +642,8 @@ export function useOutgoingForm() {
     handleEditorContentChange,
     handleRemoveExistingAttachedFile,
     handleRemoveExistingSignedFile,
-    handleUpdateOutgoing,
+    isFetchingDepartments,
+    isFetchingSigners,
     isCreating,
     isDepartmentLevel,
     isEditorFocused,
@@ -461,9 +657,16 @@ export function useOutgoingForm() {
     openEditForm,
     priorityValue,
     scrollCreateFormToEditor,
+    selectedApproverUserId,
+    selectedApproverUserName,
     selectedCategoryId,
     selectedCategoryName,
+    selectedReceiveDeptId,
+    selectedReceiveDeptName,
+    selectedSignerUserId,
+    selectedSignerUserName,
     sendEditorCommand,
+    setApproverUserList,
     setAttachedFilesNew,
     setCodeValue,
     setEditorContent,
@@ -471,21 +674,27 @@ export function useOutgoingForm() {
     setIsCreating,
     setIsEditorFocused,
     setPriorityValue,
+    setSelectedApproverUserId,
+    setSelectedApproverUserName,
     setSelectedCategoryId,
     setSelectedCategoryName,
+    setSelectedReceiveDeptId,
+    setSelectedReceiveDeptName,
+    setSelectedSignerUserId,
+    setSelectedSignerUserName,
     setShowCategoryMenu,
     setShowColorMenu,
     setShowFormatMenu,
     setShowPriorityMenu,
-    setShowSignDepartmentMenu,
     setSignedDepartmentValue,
+    setSignerUserList,
     setSignedFilesNew,
     setTitleValue,
     showCategoryMenu,
     showColorMenu,
     showFormatMenu,
     showPriorityMenu,
-    showSignDepartmentMenu,
+    signerUserList,
     signedDepartmentValue,
     signedFilesNew,
     titleValue,

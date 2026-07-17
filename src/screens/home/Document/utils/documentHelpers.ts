@@ -22,7 +22,10 @@ export function getFileUrl(filePath: string) {
     return `${ENV.BACKEND_URL}/${normalizedPath}`;
 }
 
-export function formatFileSize(size: number) {
+export function formatFileSize(size?: number) {
+    if (!size || size <= 0) {
+        return '-';
+    }
     return size >= 1024 * 1024
         ? `${(size / (1024 * 1024)).toFixed(1)} mb`
         : `${(size / 1024).toFixed(1)} kb`;

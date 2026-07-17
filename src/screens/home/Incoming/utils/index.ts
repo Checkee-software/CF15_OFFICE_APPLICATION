@@ -314,11 +314,7 @@ export const normalizeDateInput = (value?: string) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-export const formatFileSize = (size?: number) => {
-  if (!size || size <= 0) return '-';
-  if (size >= 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(1)} mb`;
-  return `${(size / 1024).toFixed(1)} kb`;
-};
+export { formatFileSize } from '../../Document/utils/documentHelpers';
 
 export const isObjectId = (value?: string) => !!value && /^[a-fA-F0-9]{24}$/.test(value);
 

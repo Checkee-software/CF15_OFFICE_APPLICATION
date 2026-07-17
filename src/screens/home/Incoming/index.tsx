@@ -312,7 +312,7 @@ export default function Incoming({ navigation }: any) {
                 {!!destinationCategoryHint && <Text style={styles.blockHint}>Chi tiết nhánh: {destinationCategoryHint}</Text>}
 
                 <Text style={styles.fieldLabel}>Chọn sổ (thư mục) lưu trữ <Text style={styles.required}>*</Text></Text>
-                {destinationLevelOptions.map((options, levelIndex) => {
+                {destinationLevelOptions.map((options: any[], levelIndex: number) => {
                   const selectedIdAtLevel = destinationSelectionIds[levelIndex] || '';
                   const selectedName =
                     options.find((item: any) => item._id === selectedIdAtLevel)?.name ||

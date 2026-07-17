@@ -42,12 +42,12 @@ const styles = StyleSheet.create({
   inputWrap: { borderWidth: 1, borderColor: '#BFBFBF', borderRadius: 10, backgroundColor: '#F7F7F7', paddingHorizontal: 12 },
   inputWrapError: { borderColor: '#FF4D4F' },
   input: { height: 44, fontSize: 14, color: '#222', paddingVertical: 0, paddingLeft: 2, textAlignVertical: 'center', includeFontPadding: false },
-  row: { flexDirection: 'row', gap: 8, zIndex: 20 },
+  row: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', zIndex: 20 },
   half: { flex: 1, position: 'relative', zIndex: 20 },
   fullDropdownWrap: { position: 'relative', zIndex: 19 },
   select: { height: 44, borderWidth: 1, borderColor: '#BFBFBF', borderRadius: 10, backgroundColor: '#F7F7F7', paddingHorizontal: 12, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row' },
   selectText: { fontSize: 14, color: '#5A5A5A' },
-  dropdownMenu: { position: 'absolute', top: 46, left: 0, right: 0, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#DCDCDC', borderRadius: 10, maxHeight: 220, zIndex: 50, elevation: 8 },
+  dropdownMenu: { marginTop: 6, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#DCDCDC', borderRadius: 10, maxHeight: 220, zIndex: 50, elevation: 2 },
   dropdownItem: { paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   dropdownItemText: { fontSize: 14, color: '#333' },
   fieldError: { color: '#FF4D4F', fontSize: 12, marginTop: 4, textAlign: 'right' },
@@ -125,6 +125,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   toolbarDivider: { width: 1, height: 24, backgroundColor: '#D7DAE0', marginHorizontal: 8 },
+  // Radio buttons
+  radioRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4, marginBottom: 8, gap: 24 },
+  radioOption: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
+  radioOuter: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#BFBFBF', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' },
+  radioOuterActive: { borderColor: '#1E88E5' },
+  radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#1E88E5' },
+  radioLabel: { fontSize: 15, color: '#333', fontWeight: '500' },
+  // Multiline input for registered number
+  inputWrapMultiline: { borderWidth: 1, borderColor: '#BFBFBF', borderRadius: 10, backgroundColor: '#F7F7F7', paddingHorizontal: 12, paddingVertical: 8, minHeight: 72 },
+  inputMultiline: { fontSize: 14, color: '#222', textAlignVertical: 'top', minHeight: 58, paddingVertical: 0, paddingLeft: 2 },
 });
 
 export default styles;
