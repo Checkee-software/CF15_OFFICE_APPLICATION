@@ -79,6 +79,12 @@ export function useOutgoingForm() {
     () => resolveCreatorDepartmentCode(userInfo as any),
     [userInfo],
   );
+  const userDepartmentId = useMemo(() => {
+    const userDeptCode = userInfo?.userType?.department;
+    if (!userDeptCode) { return ''; }
+    const matched = departmentList.find(d => d.code === userDeptCode);
+    return matched ? matched._id : userDeptCode;
+  }, [userInfo?.userType?.department, departmentList]);
   const isLeaderLevel = currentUserLevel === EOrganization.LEADER;
   const isDepartmentLevel = currentUserLevel === EOrganization.DEPARTMENT;
   const isStationaryLevel = currentUserLevel === EOrganization.STATIONARY;
@@ -192,15 +198,15 @@ export function useOutgoingForm() {
 
   // Tự động fetch khi signedDepartment thay đổi và đã có departmentId
   useEffect(() => {
-    if (!signedDepartmentValue || !userInfo?.userType?.department) { return; }
+    if (!signedDepartmentValue || !userDepartmentId) { return; }
 
     // Only fetch if department or signed department type actually changed
     if (
-      lastFetchedParamsRef.current.deptId !== userInfo.userType.department ||
+      lastFetchedParamsRef.current.deptId !== userDepartmentId ||
       lastFetchedParamsRef.current.dept !== signedDepartmentValue
     ) {
       fetchSignerUsers(
-        userInfo.userType.department,
+        userDepartmentId,
         signedDepartmentValue as ESignDepartment,
         selectedSignerUserId,
         selectedApproverUserId
@@ -208,7 +214,7 @@ export function useOutgoingForm() {
     }
   }, [
     signedDepartmentValue,
-    userInfo?.userType?.department,
+    userDepartmentId,
     fetchSignerUsers,
     selectedSignerUserId,
     selectedApproverUserId
@@ -526,9 +532,9 @@ export function useOutgoingForm() {
     formData.append('priority', priorityValue);
     formData.append('registeredNumber', codeValue);
     formData.append('categoryId', selectedCategoryId);
-    formData.append('departmentId', userInfo?.userType?.department || '');
+    formData.append('departmentId', userDepartmentId || '');
     formData.append('version', '1.0');
-    formData.append('receiveDepartmentId', selectedReceiveDeptId || userInfo?.userType?.department || '');
+    formData.append('receiveDepartmentId', selectedReceiveDeptId || userDepartmentId || '');
     formData.append('status', effectiveStatus);
     formData.append('signedDepartment', signedDepartmentValue);
     if (selectedSignerUserId) {
