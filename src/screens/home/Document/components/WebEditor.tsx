@@ -74,6 +74,40 @@ const EDITOR_HTML = `
     }
     var isComposing = false;
     window.__postContent = postContent;
+    window.__ensureCaretVisible = function() {
+      var sel = window.getSelection();
+      if (!sel.rangeCount) return;
+      var range = sel.getRangeAt(0);
+      var rects = range.getClientRects();
+      if (!rects.length) {
+        var span = document.createElement("span");
+        if (span.getClientRects) {
+          span.appendChild(document.createTextNode("\u200b"));
+          range.insertNode(span);
+          rects = span.getClientRects();
+          var spanParent = span.parentNode;
+          spanParent.removeChild(span);
+          spanParent.normalize();
+        }
+      }
+      if (rects.length) {
+        var rect = rects[0];
+        var viewportHeight = window.innerHeight;
+        var caretTop = rect.top;
+        var caretBottom = rect.bottom;
+        var threshold = 40;
+        if (caretBottom > viewportHeight - threshold) {
+          window.scrollBy(0, caretBottom - viewportHeight + threshold);
+        } else if (caretTop < threshold) {
+          window.scrollBy(0, caretTop - threshold);
+        }
+      }
+    };
+    document.addEventListener('selectionchange', function() {
+      if (window.__ensureCaretVisible) {
+        window.__ensureCaretVisible();
+      }
+    });
     window.__apply = function(raw){
       if(!raw) return;
       var command = raw.split('|')[0];
@@ -84,6 +118,7 @@ const EDITOR_HTML = `
       if(command === 'redo'){ document.execCommand('redo'); return; }
       if(command.indexOf('foreColor:') === 0){ document.execCommand('foreColor', false, command.split(':')[1]); return; }
       if(command.indexOf('formatBlock:') === 0){ document.execCommand('formatBlock', false, command.split(':')[1]); return; }
+      if(command === 'ensureCaretVisible'){ if (window.__ensureCaretVisible) { window.__ensureCaretVisible(); } return; }
       postContent('command');
     };
     window.__setContent = function(html){
@@ -266,6 +301,7 @@ const WebEditor = React.memo(({
                 if (data.type === 'focus') {
                   editorFocusedRef.current = true;
                   setIsEditorFocused(true);
+                  scrollFormToEditor?.(Platform.OS === 'ios' ? 120 : 0);
                   onFocus?.();
                   return;
                 }

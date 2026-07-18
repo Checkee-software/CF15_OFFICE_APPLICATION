@@ -56,6 +56,7 @@ export function useOutgoingForm() {
   const [priorityValue, setPriorityValue] = useState<EDocumentPriority | ''>('');
   const [signedDepartmentValue, setSignedDepartmentValue] = useState<ESignDepartment | ''>('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [errors, setErrors] = useState<{ priority?: string; signedDepartment?: string; signedFiles?: string; title?: string; categoryId?: string; registeredNumber?: string }>({});
   const [isPreparingForm, setIsPreparingForm] = useState(false);
 
@@ -248,13 +249,17 @@ export function useOutgoingForm() {
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
     const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-    const showSub = Keyboard.addListener(showEvent, () => {
+    const showSub = Keyboard.addListener(showEvent, (e) => {
       setIsKeyboardVisible(true);
+      setKeyboardHeight(e.endCoordinates.height);
       if (editorFocusedRef.current) {
-        scrollCreateFormToEditor(Platform.OS === 'ios' ? 160 : 260);
+        scrollCreateFormToEditor(Platform.OS === 'ios' ? 160 : 0);
       }
     });
-    const hideSub = Keyboard.addListener(hideEvent, () => setIsKeyboardVisible(false));
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setIsKeyboardVisible(false);
+      setKeyboardHeight(0);
+    });
     return () => {
       showSub.remove();
       hideSub.remove();
@@ -334,6 +339,7 @@ export function useOutgoingForm() {
     setEditingDocument(null);
     setTitleValue('');
     setCodeValue('');
+    setKeyboardHeight(0);
     setEditorContentForLoad('');
     editorReadyRef.current = false;
     editorContentRequestRef.current = null;
@@ -476,6 +482,7 @@ export function useOutgoingForm() {
       setMainFilesToRemove([]);
       setSignedFilesNew([]);
       setAttachedFilesNew([]);
+      setKeyboardHeight(0);
       setIsCreating(true);
     } finally {
       setIsPreparingForm(false);
@@ -675,6 +682,7 @@ export function useOutgoingForm() {
     isDepartmentLevel,
     isEditorFocused,
     isKeyboardVisible,
+    keyboardHeight,
     isLeaderLevel,
     isLoading,
     isPreparingForm,

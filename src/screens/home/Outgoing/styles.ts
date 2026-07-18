@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
   createReset: { fontSize: 14, color: '#66BB6A' },
   createScrollView: { flex: 1 },
   createScroll: { paddingBottom: 12, paddingTop: 12, flexGrow: 1 },
-  createScrollKeyboard: { paddingBottom: 96 },
   fieldLabel: { fontSize: 17, color: '#222', marginBottom: 6, marginTop: 8 },
   required: { color: '#F05A5A' },
   inputWrap: { borderWidth: 1, borderColor: '#BFBFBF', borderRadius: 10, backgroundColor: '#F7F7F7', paddingHorizontal: 12 },

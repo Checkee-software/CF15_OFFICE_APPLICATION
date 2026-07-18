@@ -81,6 +81,7 @@ export default function Outgoing({ navigation }: any) {
     isDepartmentLevel,
     isEditorFocused,
     isKeyboardVisible,
+    keyboardHeight,
     isLeaderLevel,
     isLoading,
     isPreparingForm,
@@ -193,10 +194,13 @@ export default function Outgoing({ navigation }: any) {
           ref={createScrollRef}
           style={styles.createScrollView}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.createScroll, isKeyboardVisible && styles.createScrollKeyboard]}
+          contentContainerStyle={[
+            styles.createScroll,
+            isKeyboardVisible && { paddingBottom: Platform.OS === 'ios' ? keyboardHeight + 16 : 16 },
+          ]}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          enableOnAndroid
+          enableOnAndroid={false}
           enableAutomaticScroll={!isEditorFocused}
           enableResetScrollToCoords={false}
           extraScrollHeight={Platform.OS === 'ios' ? 24 : 96}
