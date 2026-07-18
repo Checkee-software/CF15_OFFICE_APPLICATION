@@ -14,7 +14,8 @@ export const useIncomingFormFiles = (formMode: TFormMode) => {
   const [attachedFilesNew, setAttachedFilesNew] = useState<TPickedFile[]>([]);
   const [existingMainFiles, setExistingMainFiles] = useState<TExistingFile[]>([]);
   const [existingAttachedFiles, setExistingAttachedFiles] = useState<TExistingFile[]>([]);
-  const [filesToRemove, setFilesToRemove] = useState<string[]>([]);
+  const [mainFilesToRemove, setMainFilesToRemove] = useState<string[]>([]);
+  const [attachedFilesToRemove, setAttachedFilesToRemove] = useState<string[]>([]);
 
   const handlePickMainFiles = useCallback(async (clearErrors: () => void) => {
     try {
@@ -59,14 +60,14 @@ export const useIncomingFormFiles = (formMode: TFormMode) => {
   const handleRemoveExistingMainFile = useCallback((file: TExistingFile) => {
     setExistingMainFiles(prev => prev.filter(item => item.fileKey !== file.fileKey));
     if (file.filename) {
-      setFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
+      setMainFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
     }
   }, []);
 
   const handleRemoveExistingAttachedFile = useCallback((file: TExistingFile) => {
     setExistingAttachedFiles(prev => prev.filter(item => item.fileKey !== file.fileKey));
     if (file.filename) {
-      setFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
+      setAttachedFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
     }
   }, []);
 
@@ -86,7 +87,8 @@ export const useIncomingFormFiles = (formMode: TFormMode) => {
     setAttachedFilesNew([]);
     setExistingMainFiles([]);
     setExistingAttachedFiles([]);
-    setFilesToRemove([]);
+    setMainFilesToRemove([]);
+    setAttachedFilesToRemove([]);
   }, []);
 
   return {
@@ -98,8 +100,10 @@ export const useIncomingFormFiles = (formMode: TFormMode) => {
     setExistingMainFiles,
     existingAttachedFiles,
     setExistingAttachedFiles,
-    filesToRemove,
-    setFilesToRemove,
+    mainFilesToRemove,
+    setMainFilesToRemove,
+    attachedFilesToRemove,
+    setAttachedFilesToRemove,
     handlePickMainFiles,
     handlePickAttachedFiles,
     handleRemoveExistingMainFile,

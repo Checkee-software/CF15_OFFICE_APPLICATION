@@ -48,7 +48,9 @@ export function useOutgoingForm() {
   const [attachedFilesNew, setAttachedFilesNew] = useState<TPickedFile[]>([]);
   const [existingSignedFiles, setExistingSignedFiles] = useState<TExistingFile[]>([]);
   const [existingAttachedFiles, setExistingAttachedFiles] = useState<TExistingFile[]>([]);
-  const [filesToRemove, setFilesToRemove] = useState<string[]>([]);
+  const [signedFilesToRemove, setSignedFilesToRemove] = useState<string[]>([]);
+  const [attachedFilesToRemove, setAttachedFilesToRemove] = useState<string[]>([]);
+  const [mainFilesToRemove, setMainFilesToRemove] = useState<string[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
   const [priorityValue, setPriorityValue] = useState<EDocumentPriority | ''>('');
@@ -344,7 +346,9 @@ export function useOutgoingForm() {
     setErrors({});
     setExistingSignedFiles([]);
     setExistingAttachedFiles([]);
-    setFilesToRemove([]);
+    setSignedFilesToRemove([]);
+    setAttachedFilesToRemove([]);
+    setMainFilesToRemove([]);
     setSignerUserList([]);
     setApproverUserList([]);
     setSelectedSignerUserId('');
@@ -423,13 +427,19 @@ export function useOutgoingForm() {
 
         // Set signedDepartmentValue to trigger the useEffect that resolves names and fetches signer list
         setSignedDepartmentValue((sourceDoc.signedDepartment as ESignDepartment) || '');
+        const wrapWithSource = (f: any, defaultSource: any) => {
+          if (f && typeof f === 'object') {
+            return { ...f, _source: f._source || defaultSource };
+          }
+          return { filename: String(f || ''), _source: defaultSource };
+        };
         const signed = [
-          ...(Array.isArray(sourceDoc.signedFiles) ? sourceDoc.signedFiles : []),
-          ...(Array.isArray(sourceDoc.mainFiles) ? sourceDoc.mainFiles : []),
-          ...(Array.isArray(sourceDoc.approvedFiles) ? sourceDoc.approvedFiles : []),
+          ...(Array.isArray(sourceDoc.signedFiles) ? sourceDoc.signedFiles : []).map(f => wrapWithSource(f, 'signedFiles')),
+          ...(Array.isArray(sourceDoc.mainFiles) ? sourceDoc.mainFiles : []).map(f => wrapWithSource(f, 'mainFiles')),
+          ...(Array.isArray(sourceDoc.approvedFiles) ? sourceDoc.approvedFiles : []).map(f => wrapWithSource(f, 'approvedFiles')),
         ];
         const attached = [
-          ...(Array.isArray(sourceDoc.attachedFiles) ? sourceDoc.attachedFiles : []),
+          ...(Array.isArray(sourceDoc.attachedFiles) ? sourceDoc.attachedFiles : []).map(f => wrapWithSource(f, 'attachedFiles')),
         ];
         const rawFiles = asArray((sourceDoc as any)?.files);
         const documentFiles = [
@@ -437,28 +447,33 @@ export function useOutgoingForm() {
           ...asArray((sourceDoc as any)?.documentFiles),
         ];
         const signedFromRaw = [
-          ...pickByType(rawFiles, ['SIGNED', 'SIGN', 'MAIN']),
-          ...documentFiles,
+          ...pickByType(rawFiles, ['SIGNED', 'SIGN', 'MAIN']).map(f => {
+            const t = String(f?.type || f?.fileType || f?.file?.type || f?.file?.fileType || '').toUpperCase();
+            return wrapWithSource(f, t === 'MAIN' ? 'mainFiles' : 'signedFiles');
+          }),
+          ...documentFiles.map(f => wrapWithSource(f, 'signedFiles')),
         ];
-        const attachedFromRaw = pickByType(rawFiles, ['ATTACHED', 'ATTACHMENT']);
+        const attachedFromRaw = pickByType(rawFiles, ['ATTACHED', 'ATTACHMENT']).map(f => wrapWithSource(f, 'attachedFiles'));
         const signedCandidates = signed.length > 0 ? [...signed, ...signedFromRaw] : [...signedFromRaw, ...rawFiles];
         const attachedCandidates = attached.length > 0 ? [...attached, ...attachedFromRaw] : attachedFromRaw;
         setExistingSignedFiles(
           dedupeExistingFiles(
             signedCandidates.map((f: any, index: number) =>
-              normalizeExistingFile(f, 'signed', index + 1),
+              normalizeExistingFile(f, 'signed', index + 1, f?._source),
             ),
           ),
         );
         setExistingAttachedFiles(
           dedupeExistingFiles(
             attachedCandidates.map((f: any, index: number) =>
-              normalizeExistingFile(f, 'attached', index + 1),
+              normalizeExistingFile(f, 'attached', index + 1, f?._source),
             ),
           ),
         );
       }
-      setFilesToRemove([]);
+      setSignedFilesToRemove([]);
+      setAttachedFilesToRemove([]);
+      setMainFilesToRemove([]);
       setSignedFilesNew([]);
       setAttachedFilesNew([]);
       setIsCreating(true);
@@ -570,7 +585,9 @@ export function useOutgoingForm() {
       // Send kept files explicitly so backend does not clear file lists on draft/rejected updates.
       formData.append('existingSignedFiles', JSON.stringify(keptSignedFiles));
       formData.append('existingAttachedFiles', JSON.stringify(keptAttachedFiles));
-      formData.append('filesToRemove', JSON.stringify(filesToRemove));
+      formData.append('signedFilesToRemove', JSON.stringify(signedFilesToRemove));
+      formData.append('attachedFilesToRemove', JSON.stringify(attachedFilesToRemove));
+      formData.append('mainFilesToRemove', JSON.stringify(mainFilesToRemove));
     }
     const ok = editingDocument?.id
       ? await updateOutgoingDocument(editingDocument.id, formData)
@@ -583,13 +600,17 @@ export function useOutgoingForm() {
   const handleRemoveExistingSignedFile = (file: TExistingFile) => {
     setExistingSignedFiles(prev => prev.filter(item => item.fileKey !== file.fileKey));
     if (file.filename) {
-      setFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
+      if (file.source === 'mainFiles') {
+        setMainFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
+      } else {
+        setSignedFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
+      }
     }
   };
   const handleRemoveExistingAttachedFile = (file: TExistingFile) => {
     setExistingAttachedFiles(prev => prev.filter(item => item.fileKey !== file.fileKey));
     if (file.filename) {
-      setFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
+      setAttachedFilesToRemove(prev => (prev.includes(file.filename) ? prev : [...prev, file.filename]));
     }
   };
   const askDeleteDocument = (item: TOutgoingItem) => {
@@ -639,7 +660,9 @@ export function useOutgoingForm() {
     errors,
     existingAttachedFiles,
     existingSignedFiles,
-    filesToRemove,
+    signedFilesToRemove,
+    attachedFilesToRemove,
+    mainFilesToRemove,
     handleCreateOutgoing,
     handlePickAttachedFiles,
     handlePickSignedFiles,

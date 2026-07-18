@@ -191,7 +191,8 @@ export const useIncomingFormSubmit = (
       resetMenus();
       filesHook.setMainFilesNew([]);
       filesHook.setAttachedFilesNew([]);
-      filesHook.setFilesToRemove([]);
+      filesHook.setMainFilesToRemove([]);
+      filesHook.setAttachedFilesToRemove([]);
       state.setErrors({});
 
       const mainFilesFromMain = Array.isArray(doc.mainFiles) ? doc.mainFiles : [];
@@ -446,7 +447,8 @@ export const useIncomingFormSubmit = (
       appendBaseFields(formData, statusForSubmit, latestEditorContent);
       appendNewFiles(formData);
       if (state.editingId) {
-        formData.append('filesToRemove', JSON.stringify(filesHook.filesToRemove));
+        formData.append('mainFilesToRemove', JSON.stringify(filesHook.mainFilesToRemove));
+        formData.append('attachedFilesToRemove', JSON.stringify(filesHook.attachedFilesToRemove));
       }
 
       const ok = state.editingId ? await updateIncomingDraft(state.editingId, formData) : await createIncomingDocument(formData);
@@ -464,7 +466,8 @@ export const useIncomingFormSubmit = (
     appendBaseFields(formData, undefined, contentOverride);
     formData.append('destinationCategoryId', assignmentHook.selectedDestinationId);
     appendAssignmentFields(formData);
-    formData.append('filesToRemove', JSON.stringify(filesHook.filesToRemove));
+    formData.append('mainFilesToRemove', JSON.stringify(filesHook.mainFilesToRemove));
+    formData.append('attachedFilesToRemove', JSON.stringify(filesHook.attachedFilesToRemove));
     appendNewFiles(formData);
     return formData;
   };
@@ -480,8 +483,12 @@ export const useIncomingFormSubmit = (
     }
     appendAssignmentFields(formData);
     formData.append(
-      'filesToRemove',
-      JSON.stringify(options?.includeFilesToRemove === false ? [] : filesHook.filesToRemove),
+      'mainFilesToRemove',
+      JSON.stringify(options?.includeFilesToRemove === false ? [] : filesHook.mainFilesToRemove),
+    );
+    formData.append(
+      'attachedFilesToRemove',
+      JSON.stringify(options?.includeFilesToRemove === false ? [] : filesHook.attachedFilesToRemove),
     );
     if (options?.includeFiles) {
       appendNewFiles(formData);

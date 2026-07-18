@@ -1,7 +1,7 @@
 import { getStatusLabel } from '@/shared-types/common/Document/document';
 import { EOrganization } from '@/shared-types/common/Permissions/Permissions';
 import { OUTGOING_STATUS_DISPLAY } from '../components/constants';
-import type { TExistingFile, TLevelKey } from '../types';
+import type { TExistingFile, TExistingFileSource, TLevelKey } from '../types';
 
 export const getSafeBaseName = (value?: string) => {
   const raw = String(value || '').trim();
@@ -26,6 +26,7 @@ export const normalizeExistingFile = (
   file: any,
   fallbackPrefix: string,
   index: number,
+  source?: TExistingFileSource,
 ): TExistingFile => {
   const rawString = typeof file === 'string' ? file : '';
   const backendFilenameCandidates = [
@@ -82,6 +83,7 @@ export const normalizeExistingFile = (
     fileKey: uiKey,
     filename: backendFilename,
     originalname: displayCandidates[0] || getSafeBaseName(backendFilename) || fallbackName,
+    source,
   };
 };
 

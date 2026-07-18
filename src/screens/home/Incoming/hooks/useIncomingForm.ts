@@ -111,7 +111,6 @@ export const useIncomingForm = () => {
     attachedFilesNew,
     existingMainFiles,
     existingAttachedFiles,
-    filesToRemove,
     handlePickMainFiles: rawHandlePickMainFiles,
     handlePickAttachedFiles: rawHandlePickAttachedFiles,
     handleRemoveExistingMainFile,
