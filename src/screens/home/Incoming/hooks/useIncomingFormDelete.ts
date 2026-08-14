@@ -20,7 +20,7 @@ export const useIncomingFormDelete = (
     }, []);
 
     const confirmDelete = useCallback(async () => {
-        if (!deletingId || isDeleting || isLoading) return;
+        if (!deletingId || isDeleting || isLoading) {return;}
         setIsDeleting(true);
         await deleteDocument(deletingId);
         setIsDeleting(false);

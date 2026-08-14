@@ -106,18 +106,18 @@ const DocumentCard = React.memo(
                                             );
                                         }}>
                                         <MaterialCommunityIcons
-                                            name='trash-can-outline'
+                                            name="trash-can-outline"
                                             size={16}
-                                            color='#F15B5B'
+                                            color="#F15B5B"
                                         />
                                     </TouchableOpacity>
                                 )}
                             </>
                         ) : null}
                         <MaterialCommunityIcons
-                            name='chevron-right'
+                            name="chevron-right"
                             size={18}
-                            color='#9E9E9E'
+                            color="#9E9E9E"
                         />
                     </View>
                 </View>

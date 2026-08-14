@@ -47,7 +47,7 @@ export const useIncomingFormEditor = (
     }, []);
 
     const clearEditorFocus = useCallback(() => {
-        if (!editorFocusedRef.current) return;
+        if (!editorFocusedRef.current) { return; }
         editorFocusedRef.current = false;
         setIsEditorFocused(false);
         editorRef.current?.injectJavaScript(
@@ -55,16 +55,11 @@ export const useIncomingFormEditor = (
         );
     }, []);
 
-    const commitEditorContent = useCallback(
-        (html: string, syncState = true) => {
-            const nextHtml = html || '';
-            editorContentRef.current = nextHtml;
-            if (syncState) {
-                setEditorContent(nextHtml);
-            }
-        },
-        [],
-    );
+    const commitEditorContent = useCallback((html: string, syncState = false) => {
+        const nextHtml = html || '';
+        editorContentRef.current = nextHtml;
+        if (syncState) { setEditorContent(nextHtml); }
+    }, []);
 
     const requestEditorContent = useCallback(() => {
         if (!editorRef.current) {
@@ -72,7 +67,9 @@ export const useIncomingFormEditor = (
         }
 
         return new Promise<string>(resolve => {
+            let isCancelled = false;
             const timeout = setTimeout(() => {
+                isCancelled = true;
                 editorContentRequestRef.current = null;
                 resolve(editorContentRef.current);
             }, 400);
@@ -81,14 +78,14 @@ export const useIncomingFormEditor = (
                 clearTimeout(timeout);
                 editorContentRequestRef.current = null;
                 commitEditorContent(html);
-                resolve(html || '');
+                if (!isCancelled) { resolve(html || ''); }
             };
 
             editorRef.current.injectJavaScript(
                 'window.__postContent && window.__postContent("request");true;',
             );
         });
-    }, []);
+    }, [commitEditorContent]);
 
     const sendEditorCommand = useCallback((command: string) => {
         setEditorCommand(`${command}|${Date.now()}`);
@@ -111,7 +108,7 @@ export const useIncomingFormEditor = (
     );
 
     useEffect(() => {
-        if (!showForm) return undefined;
+        if (!showForm) { return undefined; }
 
         const showEvent =
             Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -152,7 +149,7 @@ export const useIncomingFormEditor = (
         return () => {
             task.cancel?.();
         };
-    }, [editingId, formMode, showForm]);
+    }, [commitEditorContent, showForm, editingId, formMode, editorContent]);
 
     const resetEditor = useCallback(() => {
         commitEditorContent('');

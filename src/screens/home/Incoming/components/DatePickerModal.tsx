@@ -27,13 +27,13 @@ const DatePickerModal = React.memo(
         applyRelativeDate,
     }: DatePickerModalProps) => {
         const isVisible = showCreatedDatePicker || showFinishedDatePicker;
-        if (!isVisible) return null;
+        if (!isVisible) {return null;}
 
         return (
             <Modal
                 visible
                 transparent
-                animationType='fade'
+                animationType="fade"
                 onRequestClose={closeDatePicker}>
                 <View style={styles.dateModalOverlay}>
                     <View style={styles.dateModalCard}>
@@ -48,9 +48,9 @@ const DatePickerModal = React.memo(
                                 !!datePickerError && styles.inputWrapError,
                             ]}
                             value={datePickerDraft}
-                            placeholder='DD/MM/YYYY'
-                            placeholderTextColor='#A0A0A0'
-                            keyboardType='number-pad'
+                            placeholder="DD/MM/YYYY"
+                            placeholderTextColor="#A0A0A0"
+                            keyboardType="number-pad"
                             maxLength={10}
                             autoFocus
                             onChangeText={value => {

@@ -20,7 +20,7 @@ const DeleteModal = React.memo(
         onCancel,
         onConfirm,
     }: DeleteModalProps) => {
-        if (!visible) return null;
+        if (!visible) {return null;}
 
         return (
             <Modal visible={visible} transparent>

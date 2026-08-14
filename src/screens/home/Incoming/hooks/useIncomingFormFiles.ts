@@ -38,7 +38,7 @@ export const useIncomingFormFiles = (formMode: TFormMode) => {
             clearErrors();
         } catch (e: any) {
             if (isErrorWithCode(e) && e.code === errorCodes.OPERATION_CANCELED)
-                return;
+                {return;}
             Alert.alert(
                 'Lỗi chọn file',
                 'Thiếu module chọn file trong bản build hiện tại. Vui lòng build lại ứng dụng.',
@@ -66,7 +66,7 @@ export const useIncomingFormFiles = (formMode: TFormMode) => {
                     isErrorWithCode(e) &&
                     e.code === errorCodes.OPERATION_CANCELED
                 )
-                    return;
+                    {return;}
                 Alert.alert(
                     'Lỗi chọn file',
                     'Thiếu module chọn file trong bản build hiện tại. Vui lòng build lại ứng dụng.',

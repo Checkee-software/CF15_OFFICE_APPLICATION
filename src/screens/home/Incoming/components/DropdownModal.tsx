@@ -177,7 +177,7 @@ const DropdownModal = React.memo(
             <Modal
                 visible={visible}
                 transparent
-                animationType='none'
+                animationType="none"
                 hardwareAccelerated
                 statusBarTranslucent
                 onRequestClose={onClose}>
@@ -196,17 +196,17 @@ const DropdownModal = React.memo(
                         {shouldShowSearch && !loading ? (
                             <View style={styles.dropdownSearchWrap}>
                                 <MaterialCommunityIcons
-                                    name='magnify'
+                                    name="magnify"
                                     size={18}
-                                    color='#8A8A8A'
+                                    color="#8A8A8A"
                                 />
                                 <TextInput
                                     style={styles.dropdownSearchInput}
                                     value={searchText}
                                     placeholder={searchPlaceholder}
-                                    placeholderTextColor='#9A9A9A'
+                                    placeholderTextColor="#9A9A9A"
                                     autoCorrect={false}
-                                    autoCapitalize='none'
+                                    autoCapitalize="none"
                                     onChangeText={setSearchText}
                                 />
                                 {!!searchText && (
@@ -214,9 +214,9 @@ const DropdownModal = React.memo(
                                         style={styles.dropdownSearchClear}
                                         onPress={() => setSearchText('')}>
                                         <MaterialCommunityIcons
-                                            name='close-circle'
+                                            name="close-circle"
                                             size={18}
-                                            color='#8A8A8A'
+                                            color="#8A8A8A"
                                         />
                                     </TouchableOpacity>
                                 )}
@@ -225,8 +225,8 @@ const DropdownModal = React.memo(
                         {loading ? (
                             <View style={styles.dropdownStateRow}>
                                 <ActivityIndicator
-                                    size='small'
-                                    color='#2196F3'
+                                    size="small"
+                                    color="#2196F3"
                                 />
                                 <Text style={styles.dropdownStateText}>
                                     Đang tải dữ liệu...
@@ -237,7 +237,7 @@ const DropdownModal = React.memo(
                                 data={filteredOptions}
                                 style={styles.dropdownList}
                                 keyExtractor={keyExtractor}
-                                keyboardShouldPersistTaps='handled'
+                                keyboardShouldPersistTaps="handled"
                                 showsVerticalScrollIndicator={false}
                                 initialNumToRender={16}
                                 maxToRenderPerBatch={16}

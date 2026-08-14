@@ -49,8 +49,8 @@ export default function Incoming({navigation}: any) {
 
         return (
             <TouchableOpacity
-                accessibilityLabel='Tạo văn bản đến'
-                accessibilityRole='button'
+                accessibilityLabel="Tạo văn bản đến"
+                accessibilityRole="button"
                 disabled={isLoading || isPreparingForm}
                 onPress={openCreateForm}
                 style={[
@@ -58,7 +58,7 @@ export default function Incoming({navigation}: any) {
                     (isLoading || isPreparingForm) &&
                         styles.headerCreateButtonDisabled,
                 ]}>
-                <MaterialCommunityIcons name='plus' size={22} color='#FFFFFF' />
+                <MaterialCommunityIcons name="plus" size={22} color="#FFFFFF" />
             </TouchableOpacity>
         );
     }, [isLoading, isPreparingForm, isStationary, openCreateForm, showForm]);
@@ -92,23 +92,23 @@ export default function Incoming({navigation}: any) {
             <View style={styles.searchRow}>
                 <View style={styles.searchBox}>
                     <MaterialCommunityIcons
-                        name='magnify'
+                        name="magnify"
                         size={20}
-                        color='#9A9A9A'
+                        color="#9A9A9A"
                     />
                     <TextInput
                         style={styles.searchInput}
-                        placeholder='Tìm kiếm văn bản...'
-                        placeholderTextColor='#9A9A9A'
+                        placeholder="Tìm kiếm văn bản..."
+                        placeholderTextColor="#9A9A9A"
                         value={searchText}
                         onChangeText={setSearchText}
                     />
                 </View>
                 <TouchableOpacity style={styles.filterButton}>
                     <MaterialCommunityIcons
-                        name='tune-variant'
+                        name="tune-variant"
                         size={20}
-                        color='#858585'
+                        color="#858585"
                     />
                 </TouchableOpacity>
             </View>
