@@ -8,21 +8,7 @@ export type TTab = {
     statuses: EDocumentStatus[];
 };
 
-export type TPickedFile = {
-    uri: string;
-    name: string;
-    type: string;
-    size?: number;
-};
 
-export type TExistingFileSource = 'mainFiles' | 'signedFiles' | 'attachedFiles';
-
-export type TExistingFile = {
-    fileKey: string;
-    filename: string;
-    originalname: string;
-    source: TExistingFileSource;
-};
 
 export type TIncomingItem = {
     id: string;

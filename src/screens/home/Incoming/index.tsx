@@ -14,6 +14,8 @@ import DocumentCard from './components/DocumentCard';
 import IncomingForm from './components/IncomingForm';
 import DeleteModal from './components/DeleteModal';
 import {useIncomingForm} from './hooks/useIncomingForm';
+import HOME_SCREENS from '@/config/SCREEN_CONFIG/home';
+import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
 import styles from './styles';
 
 export default function Incoming({navigation}: any) {
@@ -66,7 +68,7 @@ export default function Incoming({navigation}: any) {
     useEffect(() => {
         navigation?.setOptions?.({
             headerShown: true,
-            title: 'Văn bản đến',
+            title: HOME_SCREENS.INCOMING.headerTitle,
             headerRight: renderHeaderCreateButton,
         });
     }, [navigation, renderHeaderCreateButton]);
@@ -155,7 +157,7 @@ export default function Incoming({navigation}: any) {
                         isStationary={isStationary}
                         isBusy={isLoading || isPreparingForm}
                         onOpenDetail={id =>
-                            navigation.navigate('DETAILDOCUMENTS', {
+                            navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key, {
                                 documentId: id,
                                 sourceModule: 'incomingDocument',
                             })

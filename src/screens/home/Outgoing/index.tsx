@@ -8,6 +8,8 @@ import Backdrop from '@/screens/subscreen/Loading/index2';
 import { EDocumentPriority, ESignDepartment } from './components/constants';
 import WebEditor from '../Document/components/WebEditor';
 import OutgoingList, { OutgoingHeaderCreateButton } from './components/OutgoingList';
+import HOME_SCREENS from '@/config/SCREEN_CONFIG/home';
+import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
 import OutgoingBaseFields from './components/OutgoingBaseFields';
 import OutgoingSignSection from './components/OutgoingSignSection';
 import OutgoingFileSection from './components/OutgoingFileSection';
@@ -140,7 +142,7 @@ export default function Outgoing({ navigation }: any) {
         } else {
             navigation?.setOptions?.({
                 headerShown: true,
-                title: 'VĂN BẢN ĐI',
+                title: HOME_SCREENS.OUTGOING.headerTitle,
                 headerRight: renderHeaderCreateButton,
                 headerLeft: () => (
                     <TouchableOpacity
@@ -306,7 +308,7 @@ export default function Outgoing({ navigation }: any) {
                 onEdit={openEditForm}
                 onDelete={askDeleteDocument}
                 onOpenDetail={(item) =>
-                    navigation.navigate('DETAILDOCUMENTS', {
+                    navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key, {
                         documentId: item.id,
                         sourceModule: 'outgoingDocument',
                     })

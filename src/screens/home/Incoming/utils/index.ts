@@ -10,9 +10,6 @@ import { EOrganization } from '@/shared-types/common/Permissions/Permissions';
 export type {
     TLevelKey,
     TTab,
-    TPickedFile,
-    TExistingFileSource,
-    TExistingFile,
     TIncomingItem,
     TFormMode,
     TIncomingCardAction,
@@ -22,6 +19,12 @@ export type {
     TIncomingAssignmentDraft,
     TFocusableIncomingField,
 } from '../types';
+
+export type {
+    TPickedFile,
+    TExistingFileSource,
+    TExistingFile,
+} from '../../shared/utils/fileHelpers';
 
 // Re-export constants
 export {

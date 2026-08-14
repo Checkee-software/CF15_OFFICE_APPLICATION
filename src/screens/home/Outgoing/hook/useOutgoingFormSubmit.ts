@@ -1,6 +1,7 @@
 import { ESignDepartment } from '../components/constants';
 import { useDocumentStore } from '@/stores/documentStore';
-import type { TOutgoingItem, TPickedFile, TExistingFile } from '../types';
+import type { TOutgoingItem } from '../types';
+import type { TPickedFile, TExistingFile } from '../../shared/utils/fileHelpers';
 
 export const useOutgoingFormSubmit = (
     titleValue: string,

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { pick, types, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
-import type { TExistingFile, TPickedFile } from '../types';
+import type { TExistingFile, TPickedFile } from '../../shared/utils/fileHelpers';
 
 export const useOutgoingFiles = () => {
     const [signedFilesNew, setSignedFilesNew] = useState<TPickedFile[]>([]);

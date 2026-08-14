@@ -1,5 +1,5 @@
 namespace ENV {
-    export const BACKEND_URL: string = 'https://mr1swghx-3015.asse.devtunnels.ms';
+    export const BACKEND_URL: string = 'https://87610jd3-3015.asse.devtunnels.ms';
     export const MYSIGN_ENABLED: boolean = false;
     // 'http://cf15dev.checkee.vn'
     //'https://zlhct5tw-3015.asse.devtunnels.ms'; //url pc Phuc

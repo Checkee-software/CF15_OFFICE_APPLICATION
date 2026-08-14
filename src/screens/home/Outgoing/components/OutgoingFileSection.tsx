@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FileRow from '../../shared/components/FileRow';
-import type { TExistingFile, TPickedFile } from '../types';
+import type { TExistingFile, TPickedFile } from '../../shared/utils/fileHelpers';
 
 type OutgoingFileSectionProps = {
     creatorDeptName: string;

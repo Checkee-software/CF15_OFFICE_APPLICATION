@@ -1,7 +1,8 @@
 import { getStatusLabel } from '@/shared-types/common/Document/document';
 import { EOrganization } from '@/shared-types/common/Permissions/Permissions';
 import { OUTGOING_STATUS_DISPLAY } from '../components/constants';
-import type { TExistingFile, TExistingFileSource, TLevelKey } from '../types';
+import type { TExistingFile, TExistingFileSource } from '../../shared/utils/fileHelpers';
+import type { TLevelKey } from '../types';
 
 export const getSafeBaseName = (value?: string) => {
   const raw = String(value || '').trim();
