@@ -1,5 +1,11 @@
-import React, { use, useEffect, useState } from "react";
-import { Text, View, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
+import React, {useEffect, useState} from "react";
+import {
+    Text,
+    View,
+    ScrollView,
+    StyleSheet,
+    ActivityIndicator,
+} from "react-native";
 
 /* components */
 import Row from "./components/Row";
@@ -22,13 +28,13 @@ interface IShow {
 interface IPlant {
     year: string;
     quantity: number;
-    data: string[]
+    data: string[];
 }
 
 type TPlant = IPlant[];
 
-const DetailTracking = ({ route }: any) => {
-    const { code } = route.params;
+const DetailTracking = ({route}: any) => {
+    const {code} = route.params;
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [shows, setShows] = useState<IShow>({
@@ -41,14 +47,14 @@ const DetailTracking = ({ route }: any) => {
         {
             year: "2023",
             quantity: 150,
-            data: ["A: 75", "B: 32", "C: 28", "D: 15"]
+            data: ["A: 75", "B: 32", "C: 28", "D: 15"],
         },
         {
             year: "2024",
             quantity: 50,
-            data: ["A: 40", "B: 10", "C: 0", "D: 0"]
+            data: ["A: 40", "B: 10", "C: 0", "D: 0"],
         },
-    ])
+    ]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -56,29 +62,39 @@ const DetailTracking = ({ route }: any) => {
         setTimeout(() => {
             setIsLoading(false);
         }, Math.random() * 1500);
-    }, [])
+    }, []);
 
     const handleShowChange = (key: keyof IShow) =>
-        setShows({ ...shows, [key]: !shows[key] });
+        setShows({...shows, [key]: !shows[key]});
 
     if (isLoading) {
         return (
-            <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+            <View
+                style={[
+                    styles.container,
+                    {justifyContent: "center", alignItems: "center"},
+                ]}>
                 <ActivityIndicator size={"large"} color={colors.primary} />
             </View>
-        )
+        );
     }
 
     return (
         <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll_wrapper}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scroll_wrapper}>
                 <View style={styles.qr_container}>
                     <QRCode value={code} size={256} />
                 </View>
 
                 <Section title="Thông tin khu vườn">
                     <Row label="Tên khu vườn" value={"Cà phê khoán K012-01"} />
-                    <Row label="Mã khu vườn" valueColor={colors.primary} value={"K012-01"} />
+                    <Row
+                        label="Mã khu vườn"
+                        valueColor={colors.primary}
+                        value={"K012-01"}
+                    />
 
                     <CollapsibleRow
                         label="Diện tích (m2)"
@@ -104,7 +120,11 @@ const DetailTracking = ({ route }: any) => {
                         expanded={shows.manager}
                         onToggle={() => handleShowChange("manager")}>
                         <Row label="Tổ" value={"Tổ 3"} />
-                        <Row label="Hợp đồng" valueColor={colors.gray} value={"Không"} />
+                        <Row
+                            label="Hợp đồng"
+                            valueColor={colors.gray}
+                            value={"Không"}
+                        />
 
                         <CollapsibleRow
                             label="Diện tích giao khoán (m2)"
@@ -112,7 +132,10 @@ const DetailTracking = ({ route }: any) => {
                             expanded={shows.realArea}
                             onToggle={() => handleShowChange("realArea")}>
                             <Row label="Chiều dài" value={String(350) + " m"} />
-                            <Row label="Chiều rộng" value={String(200) + " m"} />
+                            <Row
+                                label="Chiều rộng"
+                                value={String(200) + " m"}
+                            />
                         </CollapsibleRow>
                     </CollapsibleRow>
                 </Section>
@@ -120,23 +143,27 @@ const DetailTracking = ({ route }: any) => {
                 <Section title="Thông tin cây trồng">
                     <Row label="Tên giống cây" value={"Cà phê khoán"} />
                     <Row label="Số lượng giống cây" value={"200 cây"} />
-                    {
-                        plants.map((item: IPlant) => (
-                            <View style={styles.plant_container}>
-                                <View style={styles.plant_row}>
-                                    <Text style={styles.plant_text}>{item.year}</Text>
-                                    <Text style={styles.plant_text}>{String("Trồng " + item.quantity + " cây")}</Text>
-                                </View>
-                                <View style={styles.plant__data_container}>
-                                {
-                                    item.data.map((d: string, index: number) => (
-                                            <Text key={String(index)} style={styles.plant__data_text}>{d}</Text>
-                                        ))
-                                    }
-                                </View>
+                    {plants.map((item: IPlant) => (
+                        <View style={styles.plant_container}>
+                            <View style={styles.plant_row}>
+                                <Text style={styles.plant_text}>
+                                    {item.year}
+                                </Text>
+                                <Text style={styles.plant_text}>
+                                    {String("Trồng " + item.quantity + " cây")}
+                                </Text>
                             </View>
-                        ))
-                    }
+                            <View style={styles.plant__data_container}>
+                                {item.data.map((d: string, index: number) => (
+                                    <Text
+                                        key={String(index)}
+                                        style={styles.plant__data_text}>
+                                        {d}
+                                    </Text>
+                                ))}
+                            </View>
+                        </View>
+                    ))}
                 </Section>
 
                 <Section title="Thông tin cây trồng xen">
@@ -168,12 +195,12 @@ const styles = StyleSheet.create({
         display: "flex",
         borderBottomWidth: 1,
         flexDirection: "column",
-        borderBottomColor: colors.light_gray
+        borderBottomColor: colors.light_gray,
     },
     plant_row: {
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-around"
+        justifyContent: "space-around",
     },
     plant_text: {
         fontWeight: 500,
@@ -182,11 +209,11 @@ const styles = StyleSheet.create({
     plant__data_container: {
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-evenly"
+        justifyContent: "space-evenly",
     },
     plant__data_text: {
         flexGrow: 1,
         textAlign: "center",
         color: colors.gray,
-    }
+    },
 });

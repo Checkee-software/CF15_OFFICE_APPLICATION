@@ -1,10 +1,10 @@
-import SCREEN_INFO from './screenInfo';
-import {ScreenRegistry} from './types';
+import SCREEN_INFO from "./screenInfo";
+import {ScreenRegistry} from "./types";
 
 /* screens */
-import Login from '../../screens/onboarding/Login';
-import DetailTracking from '@/screens/onboarding/DetailTracking';
-import AutomaticTracing from '../../screens/onboarding/AutomaticTracing';
+import Login from "../../screens/onboarding/Login";
+import DetailTracking from "@/screens/onboarding/DetailTracking";
+import AutomaticTracing from "../../screens/onboarding/AutomaticTracing";
 /**
  * Declare user's screens before signing in
  * For handling route only

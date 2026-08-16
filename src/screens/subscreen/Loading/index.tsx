@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React from 'react';
-import {View, Text, StyleSheet, Animated, Easing} from 'react-native';
-import images from '../../../assets/images';
+import React from "react";
+import {View, Text, StyleSheet, Animated, Easing} from "react-native";
+import images from "../../../assets/images";
 
 export default function Loading() {
     const spinValue = React.useRef(new Animated.Value(0)).current;
@@ -19,7 +19,7 @@ export default function Loading() {
 
     const spin = spinValue.interpolate({
         inputRange: [0, 1],
-        outputRange: ['0deg', '360deg'],
+        outputRange: ["0deg", "360deg"],
     });
 
     return (
@@ -27,7 +27,7 @@ export default function Loading() {
             <Animated.Image
                 source={images.logoCF15}
                 style={[styles.image, {transform: [{rotate: spin}]}]}
-                resizeMode='contain'
+                resizeMode="contain"
             />
             <Text style={styles.text}>Đang tải dữ liệu...</Text>
         </View>
@@ -37,9 +37,9 @@ export default function Loading() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
     },
     image: {
         width: 80,
@@ -48,6 +48,6 @@ const styles = StyleSheet.create({
     text: {
         marginTop: 10,
         fontSize: 16,
-        color: '#666',
+        color: "#666",
     },
 });

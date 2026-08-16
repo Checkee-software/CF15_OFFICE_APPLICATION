@@ -4,8 +4,8 @@ import {
     TouchableWithoutFeedback,
     View,
     ActivityIndicator,
-} from 'react-native';
-import React from 'react';
+} from "react-native";
+import React from "react";
 
 interface BackdropProps {
     open: boolean;
@@ -23,7 +23,7 @@ const Backdrop: React.FC<BackdropProps> = ({
     return (
         <Modal
             transparent
-            animationType='fade'
+            animationType="fade"
             visible={open}
             onRequestClose={onClose}>
             <TouchableWithoutFeedback onPress={onClose}>
@@ -33,7 +33,7 @@ const Backdrop: React.FC<BackdropProps> = ({
                         {backgroundColor: `rgba(0,0,0,${opacity})`},
                     ]}>
                     {children}
-                    <ActivityIndicator size='large' color='white' />
+                    <ActivityIndicator size="large" color="white" />
                 </View>
             </TouchableWithoutFeedback>
         </Modal>
@@ -43,8 +43,8 @@ const Backdrop: React.FC<BackdropProps> = ({
 const styles = StyleSheet.create({
     backdrop: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
 });
 

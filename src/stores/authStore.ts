@@ -1,20 +1,20 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import asyncStorageHelper from '../utils/localStorageHelper/index';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import asyncStorageHelper from "../utils/localStorageHelper/index";
 import {
     ILogin,
     IUpdatePassword,
-} from '../shared-types/form-data/UserFormData/UserFormData';
-import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
-import UserType from '@/shared-types/common/UserType';
-import Address from '@/shared-types/common/Address';
-import {OneSignal} from 'react-native-onesignal';
+} from "../shared-types/form-data/UserFormData/UserFormData";
+import {EScheduleStatus} from "@/shared-types/Response/ScheduleResponse/ScheduleResponse";
+import UserType from "@/shared-types/common/UserType";
+import Address from "@/shared-types/common/Address";
+import {OneSignal} from "react-native-onesignal";
 import {
     EOrganization,
     IFunction,
-} from '@/shared-types/common/Permissions/Permissions';
-import ENV from '@/config/ENV';
+} from "@/shared-types/common/Permissions/Permissions";
+import ENV from "@/config/ENV";
 
 type tasks = {
     compeleted: string;
@@ -57,6 +57,7 @@ type AuthStore = {
     redirectDataRequestSchedule: string | null;
     otherRedirect: string | null;
     login: (userAccount: ILogin) => Promise<void>;
+    setTasksData: (payload: tasks) => void;
     autoLogin: () => Promise<void>;
     getScheduleCollection: () => Promise<
         | {
@@ -75,7 +76,7 @@ type AuthStore = {
 };
 
 const fixAvatarPath = (path: string) => {
-    const updatedPath = path.replace(/\\/g, '/');
+    const updatedPath = path.replace(/\\/g, "/");
     return updatedPath;
 };
 
@@ -102,7 +103,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     ...response.data.data,
                 };
 
-                OneSignal.User.addAlias('userId', userData._id);
+                OneSignal.User.addAlias("userId", userData._id);
 
                 if (response.data.data.avatar) {
                     userData.avatar = `${ENV.BACKEND_URL}${fixAvatarPath(
@@ -111,19 +112,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                             : response.data.data.avatar,
                     )}`;
                 } else {
-                    userData.avatar = '';
+                    userData.avatar = "";
                 }
 
-                if (
-                    response.data.data.userType.level ===
-                        EOrganization.DEPARTMENT ||
-                    response.data.data.userType.level ===
-                        EOrganization.LEADER ||
-                    response.data.data.userType.level === EOrganization.WORKER
-                ) {
-                    const getTasks = await get().getScheduleCollection();
-                    userData.tasks = getTasks;
-                }
+                // if (
+                //     response.data.data.userType.level ===
+                //         EOrganization.DEPARTMENT ||
+                //     response.data.data.userType.level ===
+                //         EOrganization.LEADER ||
+                //     response.data.data.userType.level === EOrganization.WORKER
+                // ) {
+                //     const getTasks = await get().getScheduleCollection();
+                //     userData.tasks = getTasks;
+                // }
 
                 if (
                     response.data.data.userType.level ===
@@ -160,7 +161,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -187,7 +188,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             setTimeout(() => {
                 if (_error.response.status === 404) {
                     Snackbar.show({
-                        text: 'Mật khẩu hiện tại không đúng! Hãy kiểm tra lại.',
+                        text: "Mật khẩu hiện tại không đúng! Hãy kiểm tra lại.",
                         //dòng dưới dùng khi api sửa lại đúng lỗi (hiện tại là Không tìm thấy người dùng!)
                         //text: _error.response.data,
                         duration: Snackbar.LENGTH_LONG,
@@ -196,7 +197,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -223,19 +224,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                             : response.data.data.avatar,
                     )}`;
                 } else {
-                    userData.avatar = '';
+                    userData.avatar = "";
                 }
 
-                if (
-                    response.data.data.userType.level ===
-                        EOrganization.DEPARTMENT ||
-                    response.data.data.userType.level ===
-                        EOrganization.LEADER ||
-                    response.data.data.userType.level === EOrganization.WORKER
-                ) {
-                    const getTasks = await get().getScheduleCollection();
-                    userData.tasks = getTasks;
-                }
+                // if (
+                //     response.data.data.userType.level ===
+                //         EOrganization.DEPARTMENT ||
+                //     response.data.data.userType.level ===
+                //         EOrganization.LEADER ||
+                //     response.data.data.userType.level === EOrganization.WORKER
+                // ) {
+                //     const getTasks = await get().getScheduleCollection();
+                //     userData.tasks = getTasks;
+                // }
 
                 if (
                     response.data.data.userType.level ===
@@ -266,7 +267,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -307,12 +308,24 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     setRedirectData: (type: string, data: string) =>
         set(
-            type === 'schdule'
+            type === "schdule"
                 ? {redirectData: data}
-                : type === 'request'
+                : type === "request"
                 ? {redirectDataRequestSchedule: data}
                 : {otherRedirect: type},
         ),
+    setTasksData: (payload: tasks) =>
+        set(state => ({
+            userInfo: {
+                ...state.userInfo,
+                tasks: {
+                    total: payload.total,
+                    compeleted: payload.compeleted ?? "0",
+                    processing: payload.processing,
+                    expired: payload.expired,
+                },
+            },
+        })),
     clearRedirectData: () =>
         set({
             redirectData: null,
@@ -336,10 +349,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     updateAvatar: async (userId: string, uri: string) => {
         try {
             const formData = new FormData();
-            formData.append('avatar', {
+            formData.append("avatar", {
                 uri,
-                name: 'avatar.jpg',
-                type: 'image/jpeg',
+                name: "avatar.jpg",
+                type: "image/jpeg",
             } as any);
 
             const res = await axiosClient.post(
@@ -347,7 +360,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
+                        "Content-Type": "multipart/form-data",
                     },
                 },
             );
@@ -365,14 +378,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 }));
 
                 Snackbar.show({
-                    text: 'Cập nhật ảnh đại diện thành công!',
+                    text: "Cập nhật ảnh đại diện thành công!",
                     duration: Snackbar.LENGTH_SHORT,
                 });
             }
         } catch (error: any) {
             console.log(error);
             Snackbar.show({
-                text: 'Không thể cập nhật ảnh đại diện!',
+                text: "Không thể cập nhật ảnh đại diện!",
                 duration: Snackbar.LENGTH_LONG,
             });
         }

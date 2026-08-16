@@ -8,19 +8,19 @@ import {
     TextInput,
     Image,
     SectionList,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import images from '../../../assets/images';
-import {useWorkerStore} from '../../../stores/workerStore';
-import Loading from '@/screens/subscreen/Loading';
-import {useAuthStore} from '../../../stores/authStore';
+} from "react-native";
+import React, {useEffect, useState} from "react";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
+import images from "../../../assets/images";
+import {useWorkerStore} from "../../../stores/workerStore";
+import Loading from "@/screens/subscreen/Loading";
+import {useAuthStore} from "../../../stores/authStore";
 import {
     EOrganization,
     organizations,
-} from '@/shared-types/common/Permissions/Permissions';
-import Snackbar from 'react-native-snackbar';
+} from "@/shared-types/common/Permissions/Permissions";
+import Snackbar from "react-native-snackbar";
 
 const Woker = ({navigation}: any) => {
     const {
@@ -33,8 +33,8 @@ const Woker = ({navigation}: any) => {
 
     const {userInfo} = useAuthStore();
 
-    const [searchWorker, setSearchWorker] = useState('');
-    const [selectedUnitCard, setSelectedUnitCard] = useState<string>('');
+    const [searchWorker, setSearchWorker] = useState("");
+    const [selectedUnitCard, setSelectedUnitCard] = useState<string>("");
 
     const filterWorkerBySearch = listWorker.filter(user =>
         user?.fullName.toLowerCase().includes(searchWorker.toLowerCase()),
@@ -43,7 +43,7 @@ const Woker = ({navigation}: any) => {
     const handleNavigate = (itemListWorker: any) => {
         if (
             userInfo.functions.some(
-                (item: any) => item._id === 'EMPLOYEES' && item.detail,
+                (item: any) => item._id === "EMPLOYEES" && item.detail,
             )
         ) {
             navigation.navigate(SCREEN_INFO.WORKERINFO.key, {
@@ -51,15 +51,15 @@ const Woker = ({navigation}: any) => {
             });
         } else {
             Snackbar.show({
-                text: 'Bạn không có quyền xem chi tiết nhân sự',
+                text: "Bạn không có quyền xem chi tiết nhân sự",
                 duration: Snackbar.LENGTH_SHORT,
             });
         }
     };
 
     const handleReFetch = () => {
-        setSelectedUnitCard('');
-        setSearchWorker('');
+        setSelectedUnitCard("");
+        setSearchWorker("");
         getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
     };
 
@@ -153,16 +153,16 @@ const Woker = ({navigation}: any) => {
                             setSelectedUnitCard(itemListWorker.groupId)
                         }>
                         <Text>
-                            {itemListWorker?.groupName || 'Đội này chưa có tên'}
+                            {itemListWorker?.groupName || "Đội này chưa có tên"}
                             {` (${itemListWorker?.quantity})`}
                         </Text>
                         <MaterialIcons
                             name={
                                 itemListWorker.groupId === selectedUnitCard
-                                    ? 'arrow-drop-up'
-                                    : 'arrow-drop-down'
+                                    ? "arrow-drop-up"
+                                    : "arrow-drop-down"
                             }
-                            color={'rgba(128, 128, 128, 1)'}
+                            color={"rgba(128, 128, 128, 1)"}
                             size={25}
                         />
                     </TouchableOpacity>
@@ -230,29 +230,31 @@ const Woker = ({navigation}: any) => {
         getListWorkerByDepartment(userInfo._id, userInfo.userType.level);
     }, []);
 
-    if (isLoading) return <Loading />;
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <View style={WokerStyles.container}>
             <View style={WokerStyles.searchInput}>
                 <MaterialIcons
-                    name='search'
-                    color={'rgba(128, 128, 128, 1)'}
+                    name="search"
+                    color={"rgba(128, 128, 128, 1)"}
                     size={22}
                 />
                 <TextInput
                     value={searchWorker}
-                    placeholder='Tìm kiếm nhân sự'
-                    placeholderTextColor={'rgba(128, 128, 128, 1)'}
+                    placeholder="Tìm kiếm nhân sự"
+                    placeholderTextColor={"rgba(128, 128, 128, 1)"}
                     style={WokerStyles.input}
                     onChangeText={setSearchWorker}
                 />
             </View>
 
-            {searchWorker !== '' ? (
+            {searchWorker !== "" ? (
                 <View style={WokerStyles.searchListWorker}>
                     <FlatList
-                        keyboardShouldPersistTaps='handled'
+                        keyboardShouldPersistTaps="handled"
                         contentContainerStyle={WokerStyles.sectionListWorker}
                         data={filterWorkerBySearch}
                         renderItem={({item}) => renderWorkerBySearch(item)}
@@ -264,7 +266,7 @@ const Woker = ({navigation}: any) => {
                                 <Image
                                     source={images.emptyWorkerList}
                                     style={WokerStyles.emptyWorkerImg}
-                                    resizeMode='contain'
+                                    resizeMode="contain"
                                 />
                                 <Text style={WokerStyles.emptyWorkerText}>
                                     {`Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`}
@@ -276,7 +278,7 @@ const Woker = ({navigation}: any) => {
             ) : (
                 <View style={WokerStyles.listWorker}>
                     <SectionList
-                        keyboardShouldPersistTaps='handled'
+                        keyboardShouldPersistTaps="handled"
                         contentContainerStyle={WokerStyles.sectionListWorker}
                         sections={listWorkerFilterByRole}
                         keyExtractor={(item, index) => index.toString()}
@@ -285,7 +287,7 @@ const Woker = ({navigation}: any) => {
                         renderItem={({item}) => renderListWorker(item)}
                         renderSectionHeader={({section}) => (
                             <Text style={WokerStyles.workerRole}>
-                                {section.title === 'Người lao động'
+                                {section.title === "Người lao động"
                                     ? `${section.title} (${section.data.reduce(
                                           (total, item) =>
                                               total + item.quantity,
@@ -299,7 +301,7 @@ const Woker = ({navigation}: any) => {
                                 <Image
                                     source={images.emptyWorkerList}
                                     style={WokerStyles.emptyWorkerImg}
-                                    resizeMode='contain'
+                                    resizeMode="contain"
                                 />
                                 <Text style={WokerStyles.emptyWorkerText}>
                                     Không tìm thấy danh sách nhân sự!
@@ -317,19 +319,19 @@ const WokerStyles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: 20,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     searchInput: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(211, 211, 211, 1)',
+        borderBottomColor: "rgba(211, 211, 211, 1)",
         gap: 4,
     },
     input: {
-        color: 'black',
-        width: '92%',
+        color: "black",
+        width: "92%",
     },
     listWorker: {
         marginTop: 10,
@@ -345,36 +347,36 @@ const WokerStyles = StyleSheet.create({
         marginTop: 10,
         fontWeight: 500,
         fontSize: 14,
-        color: 'rgba(0, 0, 0, 1)',
+        color: "rgba(0, 0, 0, 1)",
     },
     listWorkerMargin: {
         marginVertical: 12,
     },
     workerUnitCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         borderRadius: 8,
         //boxShadow: '0px 0px 2px 0px rgba(0, 0, 0, 0.25)',
-        boxShadow: '0 1 3 0 rgba(0, 0, 0, 0.25)',
+        boxShadow: "0 1 3 0 rgba(0, 0, 0, 0.25)",
         padding: 12,
         marginVertical: 6,
     },
     workerCard: {
         paddingHorizontal: 14,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     leftWorkerCard: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 13,
-        alignItems: 'center',
+        alignItems: "center",
         flex: 1,
     },
     workerAvatar: {
-        backgroundColor: 'rgba(211, 211, 211, 1)',
-        borderRadius: '50%',
+        backgroundColor: "rgba(211, 211, 211, 1)",
+        borderRadius: "50%",
         width: 56,
         height: 56,
     },
@@ -382,43 +384,43 @@ const WokerStyles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 24,
-        margin: 'auto',
+        margin: "auto",
     },
     workerNameAndUnit: {
         gap: 2,
-        width: '80%',
+        width: "80%",
     },
     workerName: {
-        color: 'rgba(76, 175, 80, 1)',
+        color: "rgba(76, 175, 80, 1)",
         fontWeight: 600,
         fontSize: 15,
-        textTransform: 'capitalize',
+        textTransform: "capitalize",
     },
     workerUnit: {
-        textTransform: 'capitalize',
+        textTransform: "capitalize",
         fontSize: 13,
         fontWeight: 400,
-        color: 'rgba(0, 0, 0, 1)',
+        color: "rgba(0, 0, 0, 1)",
     },
     workerOrder: {
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
         fontWeight: 400,
         fontSize: 14,
-        textTransform: 'uppercase',
+        textTransform: "uppercase",
     },
     workerEmpty: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     emptyWorkerImg: {
         height: 200,
     },
     emptyWorkerText: {
-        textAlign: 'center',
+        textAlign: "center",
         fontWeight: 400,
         fontSize: 14,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
     },
     searchListWorker: {
         paddingVertical: 10,

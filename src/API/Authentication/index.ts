@@ -1,10 +1,7 @@
 const signIn = async () => {
     try {
-        
-    } catch (error) {
-        
-    }
-}
+    } catch (error) {}
+};
 
 const authentication = Object.freeze({
     signIn,

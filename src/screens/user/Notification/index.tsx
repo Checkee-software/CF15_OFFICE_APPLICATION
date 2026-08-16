@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 import {
     View,
     Text,
@@ -6,7 +6,7 @@ import {
     Switch,
     SafeAreaView,
     StatusBar,
-} from 'react-native';
+} from "react-native";
 
 export default function Notification() {
     const [allNotifications, setAllNotifications] = React.useState(true);
@@ -16,7 +16,7 @@ export default function Notification() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle='dark-content' backgroundColor='#fff' />
+            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
             {/* Notification Settings */}
             <View style={styles.settingsContainer}>
@@ -25,8 +25,8 @@ export default function Notification() {
                     <Switch
                         value={allNotifications}
                         onValueChange={setAllNotifications}
-                        trackColor={{false: '#D3D3D3', true: '#2196F3'}}
-                        thumbColor='#fff'
+                        trackColor={{false: "#D3D3D3", true: "#2196F3"}}
+                        thumbColor="#fff"
                     />
                 </View>
 
@@ -35,8 +35,8 @@ export default function Notification() {
                     <Switch
                         value={documents}
                         onValueChange={setDocuments}
-                        trackColor={{false: '#D3D3D3', true: '#2196F3'}}
-                        thumbColor='#fff'
+                        trackColor={{false: "#D3D3D3", true: "#2196F3"}}
+                        thumbColor="#fff"
                     />
                 </View>
 
@@ -45,8 +45,8 @@ export default function Notification() {
                     <Switch
                         value={tasks}
                         onValueChange={setTasks}
-                        trackColor={{false: '#D3D3D3', true: '#2196F3'}}
-                        thumbColor='#fff'
+                        trackColor={{false: "#D3D3D3", true: "#2196F3"}}
+                        thumbColor="#fff"
                     />
                 </View>
 
@@ -55,8 +55,8 @@ export default function Notification() {
                     <Switch
                         value={news}
                         onValueChange={setNews}
-                        trackColor={{false: '#D3D3D3', true: '#2196F3'}}
-                        thumbColor='#fff'
+                        trackColor={{false: "#D3D3D3", true: "#2196F3"}}
+                        thumbColor="#fff"
                     />
                 </View>
             </View>
@@ -67,7 +67,7 @@ export default function Notification() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
 
     settingsContainer: {
@@ -75,9 +75,9 @@ const styles = StyleSheet.create({
         paddingTop: 20,
     },
     settingItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         paddingVertical: 12,
     },
     settingText: {

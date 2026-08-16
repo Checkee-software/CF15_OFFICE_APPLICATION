@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface garden {
     gardenId: string;
@@ -15,12 +15,14 @@ interface IClientStorage {
     userGardenNickname: userGardenNickname[];
 }
 
-const STORAGE_KEY = 'checkee';
+const STORAGE_KEY = "checkee";
 
 export default class LocalStorageHelper {
     private static _instance?: LocalStorageHelper;
     public static get instance() {
-        if (!this._instance) this._instance = new LocalStorageHelper();
+        if (!this._instance) {
+            this._instance = new LocalStorageHelper();
+        }
         return this._instance;
     }
 
@@ -31,7 +33,7 @@ export default class LocalStorageHelper {
 
     // ☣️ Khai báo field cần lưu ở đây
     private data: IClientStorage = {
-        token: '',
+        token: "",
         userGardenNickname: [],
     };
 
@@ -76,7 +78,7 @@ export default class LocalStorageHelper {
         this._isLoad = true;
         const strData = await AsyncStorage.getItem(STORAGE_KEY);
 
-        if (typeof strData !== 'string') {
+        if (typeof strData !== "string") {
             this._isLoad = false;
             this.save();
             return;
@@ -110,7 +112,7 @@ export default class LocalStorageHelper {
     }
 
     public async clearToken() {
-        this.data.token = '';
+        this.data.token = "";
         await this.save();
     }
 

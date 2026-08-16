@@ -1,6 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from "react";
 import {
     View,
     Text,
@@ -9,18 +8,18 @@ import {
     Image,
     FlatList,
     TextInput,
-} from 'react-native';
+} from "react-native";
 import {
     useFocusEffect,
     useNavigation,
     useRoute,
-} from '@react-navigation/native';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Loading from '../../subscreen/Loading';
-import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
-import {IJob} from '../../../shared-types/Response/ScheduleResponse/ScheduleResponse';
+} from "@react-navigation/native";
+import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Loading from "../../subscreen/Loading";
+import {useWorkScheduleStore} from "../../../stores/workScheduleStore";
+import {IJob} from "../../../shared-types/Response/ScheduleResponse/ScheduleResponse";
 
 const JobListWorker = () => {
     const navigation = useNavigation() as any;
@@ -30,7 +29,7 @@ const JobListWorker = () => {
 
     const {listJobs, getListJobs, isLoading} = useWorkScheduleStore();
 
-    const [searchText, setSearchText] = useState('');
+    const [searchText, setSearchText] = useState("");
     const [filteredJobs, setFilteredJobs] = useState<IJob[]>([]);
 
     useEffect(() => {
@@ -45,10 +44,10 @@ const JobListWorker = () => {
 
     useEffect(() => {
         const processingJobs = listJobs.filter(
-            job => job.status === 'PROCESSING',
+            job => job.status === "PROCESSING",
         );
 
-        if (searchText === '') {
+        if (searchText === "") {
             setFilteredJobs(processingJobs as any);
         } else {
             const filtered = processingJobs.filter(job =>
@@ -63,16 +62,22 @@ const JobListWorker = () => {
         const end = new Date(endDateStr);
         const diffMs = end.getTime() - now.getTime();
 
-        if (diffMs <= 0) return 'Đã kết thúc';
+        if (diffMs <= 0) {
+            return "Đã kết thúc";
+        }
 
         const totalMinutes = Math.floor(diffMs / (1000 * 60));
         const days = Math.floor(totalMinutes / (60 * 24));
         const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
         const minutes = totalMinutes % 60;
 
-        let result = 'Còn ';
-        if (days > 0) result += `${days} ngày `;
-        if (hours > 0) result += `${hours} giờ `;
+        let result = "Còn ";
+        if (days > 0) {
+            result += `${days} ngày `;
+        }
+        if (hours > 0) {
+            result += `${hours} giờ `;
+        }
         result += `${minutes} phút`;
 
         return result.trim();
@@ -88,9 +93,9 @@ const JobListWorker = () => {
                 })
             }>
             <Image
-                source={require('../../../assets/images/garden.png')}
+                source={require("../../../assets/images/garden.png")}
                 style={styles.image}
-                resizeMode='contain'
+                resizeMode="contain"
             />
             <View style={styles.cardContent}>
                 <View style={styles.cardTextContainer}>
@@ -98,29 +103,29 @@ const JobListWorker = () => {
                     <Text style={styles.cardSubtitle}>{item.productName}</Text>
                     <View
                         style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
+                            flexDirection: "row",
+                            alignItems: "center",
                             marginTop: 6,
                         }}>
                         <MaterialCommunityIcons
-                            name='playlist-check'
+                            name="playlist-check"
                             size={16}
-                            color='#555'
+                            color="#555"
                         />
                         <Text style={{fontSize: 12, marginLeft: 4}}>
                             {item.totalChildTask}
                         </Text>
                         <MaterialCommunityIcons
-                            name='clock'
+                            name="clock"
                             size={16}
-                            color='#555'
+                            color="#555"
                             style={{marginLeft: 16}}
                         />
                         <Text
                             style={{
                                 fontSize: 12,
                                 marginLeft: 4,
-                                fontStyle: 'italic',
+                                fontStyle: "italic",
                             }}>
                             {formatRemainingTime(item.finishedDate)}
                         </Text>
@@ -130,7 +135,9 @@ const JobListWorker = () => {
         </TouchableOpacity>
     );
 
-    if (isLoading) return <Loading />;
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <View style={styles.container}>
@@ -139,25 +146,25 @@ const JobListWorker = () => {
                     <View style={styles.searchBoxWrapper}>
                         <View style={styles.searchBox}>
                             <Icon
-                                name='search'
+                                name="search"
                                 size={20}
-                                color='#888'
+                                color="#888"
                                 style={styles.searchIcon}
                             />
                             <TextInput
                                 style={styles.searchInput}
-                                placeholder='Tìm quy trình'
+                                placeholder="Tìm quy trình"
                                 value={searchText}
                                 onChangeText={setSearchText}
-                                placeholderTextColor='#888'
+                                placeholderTextColor="#888"
                             />
                             {searchText.length > 0 && (
                                 <TouchableOpacity
-                                    onPress={() => setSearchText('')}>
+                                    onPress={() => setSearchText("")}>
                                     <Icon
-                                        name='close'
+                                        name="close"
                                         size={20}
-                                        color='#888'
+                                        color="#888"
                                         style={styles.clearIcon}
                                     />
                                 </TouchableOpacity>
@@ -175,7 +182,7 @@ const JobListWorker = () => {
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         {searchText.trim() ? (
-                            <View style={{alignItems: 'center'}}>
+                            <View style={{alignItems: "center"}}>
                                 <Text style={styles.emptyText}>
                                     Không tìm thấy công việc liên quan tới
                                 </Text>
@@ -200,7 +207,7 @@ export default JobListWorker;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         paddingTop: 16,
     },
     searchContainer: {
@@ -208,16 +215,16 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     searchRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
     },
     searchBoxWrapper: {
         flex: 1,
     },
     searchBox: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F0F0F0',
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F0F0F0",
         borderRadius: 8,
         paddingHorizontal: 8,
         height: 40,
@@ -228,7 +235,7 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         fontSize: 14,
-        color: '#000',
+        color: "#000",
         paddingVertical: 0,
     },
     clearIcon: {
@@ -238,14 +245,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
     },
     card: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F8F8F8',
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F8F8F8",
         borderRadius: 12,
         paddingVertical: 12,
         paddingHorizontal: 16,
         marginBottom: 12,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
@@ -257,33 +264,33 @@ const styles = StyleSheet.create({
     },
     cardContent: {
         flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
     },
     cardTextContainer: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: "center",
     },
     cardTitle: {
         fontSize: 14,
-        fontWeight: '600',
-        color: '#000',
+        fontWeight: "600",
+        color: "#000",
     },
     cardSubtitle: {
         fontSize: 12,
-        color: '#2E7D32',
+        color: "#2E7D32",
         marginTop: 4,
     },
     emptyContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         paddingTop: 350,
     },
     emptyText: {
         fontSize: 16,
-        color: 'gray',
-        fontStyle: 'italic',
+        color: "gray",
+        fontStyle: "italic",
     },
 });

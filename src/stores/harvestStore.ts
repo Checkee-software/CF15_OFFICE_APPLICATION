@@ -1,7 +1,7 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import ENV from '@/config/ENV';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import ENV from "@/config/ENV";
 
 export type TypeGroupId = {
     _id: string;
@@ -114,69 +114,69 @@ type HarvestStore = {
 };
 
 export const fixAvatarPath = (path: string) => {
-    const updatedPath = path.replace(/\\/g, '/');
+    const updatedPath = path.replace(/\\/g, "/");
     return `${ENV.BACKEND_URL}${updatedPath}`;
 };
 
 export const useHarvestStore = create<HarvestStore>(set => ({
     schedulesHarvest: [],
     schedulesHarvestDetail: {
-        createdBy: {_id: '', fullName: ''},
-        description: '',
+        createdBy: {_id: "", fullName: ""},
+        description: "",
         employeeIds: [
             {
-                _id: '',
-                fullName: '',
+                _id: "",
+                fullName: "",
                 avatar: {
-                    path: '',
+                    path: "",
                 },
-                groupId: {_id: '', name: '', code: ''},
+                groupId: {_id: "", name: "", code: ""},
             },
         ],
         employeeProgress: [
             {
-                createdAt: '',
+                createdAt: "",
                 gardens: [
                     {
                         gardenId: {
-                            _id: '',
-                            code: '',
+                            _id: "",
+                            code: "",
                         },
                         quantity: 0,
                     },
                 ],
-                groupId: {_id: '', name: '', code: ''},
+                groupId: {_id: "", name: "", code: ""},
                 isDelete: false,
                 modificationDetails: [],
-                updatedAt: '',
+                updatedAt: "",
                 userId: {
-                    _id: '',
-                    fullName: '',
-                    groupId: '',
+                    _id: "",
+                    fullName: "",
+                    groupId: "",
                 },
             },
         ],
         groupProgress: [],
-        finishedDate: '',
+        finishedDate: "",
         followerIds: [
             {
-                _id: '',
-                fullName: '',
+                _id: "",
+                fullName: "",
                 avatar: {
-                    path: '',
+                    path: "",
                 },
-                groupId: {_id: '', name: '', code: ''},
+                groupId: {_id: "", name: "", code: ""},
             },
         ],
         isDelete: false,
         modificationDetails: [],
-        ownerId: '',
-        productId: {_id: '', name: ''},
-        productTypeId: {_id: '', name: ''},
-        startedDate: '',
-        status: '',
-        title: '',
-        _id: '',
+        ownerId: "",
+        productId: {_id: "", name: ""},
+        productTypeId: {_id: "", name: ""},
+        startedDate: "",
+        status: "",
+        title: "",
+        _id: "",
     },
 
     getListScheduleHarvest: async () => {
@@ -197,7 +197,7 @@ export const useHarvestStore = create<HarvestStore>(set => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Không tải được danh sách quy trình thu hoạch',
+                        text: "Không tải được danh sách quy trình thu hoạch",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -222,7 +222,7 @@ export const useHarvestStore = create<HarvestStore>(set => ({
                     response.data.data.employeeProgress.reduce(
                         (
                             acc: TypeGroupProgress[],
-                            item: TypeDetailScheduleHarvest['employeeProgress'][number],
+                            item: TypeDetailScheduleHarvest["employeeProgress"][number],
                         ) => {
                             const gId = item.groupId._id;
 
@@ -265,7 +265,7 @@ export const useHarvestStore = create<HarvestStore>(set => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Không tải được chi tiết quy trình thu hoạch',
+                        text: "Không tải được chi tiết quy trình thu hoạch",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }

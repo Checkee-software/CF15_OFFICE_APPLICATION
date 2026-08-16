@@ -1,25 +1,25 @@
-import feedBack from './feedback.png';
-import garden from './garden.png';
-import toDoList from './to-do-list.png';
-import workers from './workers.png';
-import logoCF15 from './LOGO-CF15.png';
+import feedBack from "./feedback.png";
+import garden from "./garden.png";
+import toDoList from "./to-do-list.png";
+import workers from "./workers.png";
+import logoCF15 from "./LOGO-CF15.png";
 //import backgroundLogin from './loginbg.png';
-import megaphone from './megaphone.png';
-import document from './document.png';
-import gardener from './gardener.png';
-import fileTypeDocument from './file-type-document.png';
+import megaphone from "./megaphone.png";
+import document from "./document.png";
+import gardener from "./gardener.png";
+import fileTypeDocument from "./file-type-document.png";
 //import avatar from './avt.png';
-import pieChart from './pie-chart.png';
-import emptyNotificationList from './empty-notification-list.png';
-import emptyWorkerList from './empty-worker-list.png';
-import emptyDocumentList from './empty-document-list.png';
-import emptyScheduleList from './empty-schedule-list.png';
-import emptyHistoryList from './empty-history-list.png';
-import emptyWorkList from './empty-work-list.png';
-import approve from './approve.png';
-import approveHarvest from './approve-harvest.png';
-import harvestSchedule from './harvest-schedule.png';
-import harvestChart from './harvest-chart.png';
+import pieChart from "./pie-chart.png";
+import emptyNotificationList from "./empty-notification-list.png";
+import emptyWorkerList from "./empty-worker-list.png";
+import emptyDocumentList from "./empty-document-list.png";
+import emptyScheduleList from "./empty-schedule-list.png";
+import emptyHistoryList from "./empty-history-list.png";
+import emptyWorkList from "./empty-work-list.png";
+import approve from "./approve.png";
+import approveHarvest from "./approve-harvest.png";
+import harvestSchedule from "./harvest-schedule.png";
+import harvestChart from "./harvest-chart.png";
 
 const images = {
     feedBack: feedBack,
@@ -45,14 +45,14 @@ const images = {
     harvestSchedule: harvestSchedule,
     harvestChart: harvestChart,
 
-    backgroundLogin: require('./picloginbg.png'),
-    avatar: require('./picavt.png'),
-    plant1: require('./plant1.jpg'),
-    plant2: require('./plant2.jpg'),
-    emptyNews: require('./empty-schedule-list.png'),
-    emptyGarden: require('./not-found-any-garden.png'),
-    app_store: require('./app_store_logo.png'),
-    play_store: require('./google_play_logo.png'),
+    backgroundLogin: require("./picloginbg.png"),
+    avatar: require("./picavt.png"),
+    plant1: require("./plant1.jpg"),
+    plant2: require("./plant2.jpg"),
+    emptyNews: require("./empty-schedule-list.png"),
+    emptyGarden: require("./not-found-any-garden.png"),
+    app_store: require("./app_store_logo.png"),
+    play_store: require("./google_play_logo.png"),
 };
 
 export default images;

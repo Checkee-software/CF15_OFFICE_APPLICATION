@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
+
 import {
     View,
     Text,
@@ -9,27 +9,27 @@ import {
     FlatList,
     Image,
     Modal,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Feather from 'react-native-vector-icons/Feather';
-import RNFS from 'react-native-fs';
-import Snackbar from 'react-native-snackbar';
-import {List} from 'react-native-paper';
-import moment from 'moment';
+} from "react-native";
+import React, {useEffect, useState} from "react";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Feather from "react-native-vector-icons/Feather";
+import RNFS from "react-native-fs";
+import Snackbar from "react-native-snackbar";
+import {List} from "react-native-paper";
+import moment from "moment";
 import {
     EScheduleStatus,
     ETaskStatus,
-} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
-import images from '../../../assets/images';
-import {useWorkScheduleStore} from '@/stores/workScheduleStore';
-import {useAuthStore} from '@/stores/authStore';
-import Loading from '@/screens/subscreen/Loading';
-import ENV from '@/config/ENV';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import {useWindowDimensions} from 'react-native';
-import {EStatus} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
+} from "@/shared-types/Response/ScheduleResponse/ScheduleResponse";
+import images from "../../../assets/images";
+import {useWorkScheduleStore} from "@/stores/workScheduleStore";
+import {useAuthStore} from "@/stores/authStore";
+import Loading from "@/screens/subscreen/Loading";
+import ENV from "@/config/ENV";
+import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
+import {useWindowDimensions} from "react-native";
+import {EStatus} from "@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData";
 
 const ScheduleDetail = ({route}: any) => {
     const {userInfo} = useAuthStore();
@@ -57,11 +57,11 @@ const ScheduleDetail = ({route}: any) => {
     };
 
     const processesTitle = [
-        {name: 'Loại'},
-        {name: 'Tên'},
-        {name: 'Định mức'},
-        {name: 'Đơn giá'},
-        {name: 'Thành tiền'},
+        {name: "Loại"},
+        {name: "Tên"},
+        {name: "Định mức"},
+        {name: "Đơn giá"},
+        {name: "Thành tiền"},
     ];
 
     const fixEncoding = (input: string): string => {
@@ -83,7 +83,7 @@ const ScheduleDetail = ({route}: any) => {
     };
 
     const formatNumber = (num: number) => {
-        return new Intl.NumberFormat('vi-VN').format(num);
+        return new Intl.NumberFormat("vi-VN").format(num);
     };
 
     const formattedGardenArea = (totalSquare: any) => {
@@ -156,18 +156,18 @@ const ScheduleDetail = ({route}: any) => {
             const result = await RNFS.downloadFile(options).promise;
             if (result.statusCode === 200) {
                 Snackbar.show({
-                    text: 'Đã tải tập tin về điện thoại của bạn!',
+                    text: "Đã tải tập tin về điện thoại của bạn!",
                     duration: Snackbar.LENGTH_LONG,
                 });
             } else {
                 Snackbar.show({
-                    text: 'Tải file không thành công!',
+                    text: "Tải file không thành công!",
                     duration: Snackbar.LENGTH_LONG,
                 });
             }
         } catch (error) {
             Snackbar.show({
-                text: 'Có lỗi xảy ra khi tải file.',
+                text: "Có lỗi xảy ra khi tải file.",
                 duration: Snackbar.LENGTH_LONG,
             });
         }
@@ -176,25 +176,25 @@ const ScheduleDetail = ({route}: any) => {
     console.log(scheduleDetail);
 
     const fixFilePath = (path: string) => {
-        const updatedPath = path.replace(/\\/g, '/');
+        const updatedPath = path.replace(/\\/g, "/");
         return `${ENV.BACKEND_URL}${updatedPath}`;
     };
 
     const renderScheduleRemain = (finishedDate: string) => {
         if (scheduleDetail?.status === EScheduleStatus.COMPLETED) {
-            return 'Hoàn thành';
+            return "Hoàn thành";
         }
 
         const now = moment();
 
-        const deadline = moment(finishedDate, 'DD/MM/YYYY'); // Chuyển string thành moment object với đúng định dạng
+        const deadline = moment(finishedDate, "DD/MM/YYYY"); // Chuyển string thành moment object với đúng định dạng
 
         // Tính khoảng cách
         const duration = moment.duration(deadline.diff(now));
 
         // Nếu thời gian đã trễ
         if (duration.asMilliseconds() < 0) {
-            return 'Trễ hạn';
+            return "Trễ hạn";
         }
 
         // Tính số ngày, giờ, phút
@@ -209,8 +209,8 @@ const ScheduleDetail = ({route}: any) => {
         <View style={ScheduleDetailStyles.cardDocument}>
             <View style={ScheduleDetailStyles.leftCardDocument}>
                 <MaterialCommunityIcons
-                    name='text-box'
-                    color={'rgba(255, 78, 69, 1)'}
+                    name="text-box"
+                    color={"rgba(255, 78, 69, 1)"}
                     size={28}
                 />
                 <View style={ScheduleDetailStyles.infoDocument}>
@@ -231,8 +231,8 @@ const ScheduleDetail = ({route}: any) => {
                     )
                 }>
                 <Feather
-                    name='download'
-                    color={'rgba(33, 150, 243, 1)'}
+                    name="download"
+                    color={"rgba(33, 150, 243, 1)"}
                     size={22}
                 />
             </TouchableOpacity>
@@ -343,19 +343,19 @@ const ScheduleDetail = ({route}: any) => {
                     <View style={ScheduleDetailStyles.participant}>
                         <View style={ScheduleDetailStyles.statusTask}>
                             <MaterialIcons
-                                name='check-circle'
+                                name="check-circle"
                                 size={20}
                                 color={
                                     itemStaff.item.status ===
                                     ETaskStatus.WAITING
-                                        ? '#808080'
+                                        ? "#808080"
                                         : itemStaff.item.status ===
                                           ETaskStatus.PROCESSING
-                                        ? '#2196F3'
+                                        ? "#2196F3"
                                         : itemStaff.item.status ===
                                           ETaskStatus.COMPLETED
-                                        ? '#4CAF50'
-                                        : '#FF4E45'
+                                        ? "#4CAF50"
+                                        : "#FF4E45"
                                 }
                             />
                         </View>
@@ -380,23 +380,23 @@ const ScheduleDetail = ({route}: any) => {
                                 {itemStaff.item.status === ETaskStatus.CANCELED
                                     ? `(${moment(
                                           itemStaff.item.canceledTime,
-                                      ).format('L')}) Lý do: ${
+                                      ).format("L")}) Lý do: ${
                                           itemStaff.item.canceledNote
                                       }`
-                                    : 'Đã làm ' +
+                                    : "Đã làm " +
                                       formatNumber(
                                           itemStaff.item.processingRate,
                                       ) +
-                                      '/' +
+                                      "/" +
                                       formattedGardenArea(
                                           itemStaff.item.totalSquare,
                                       ) +
-                                      ' (ha) ' +
+                                      " (ha) " +
                                       (itemStaff.item.completedTime === null
-                                          ? ''
+                                          ? ""
                                           : `${moment(
                                                 itemStaff.item.completedTime,
-                                            ).format('L')}`)}
+                                            ).format("L")}`)}
                             </Text>
                         </View>
                     </View>
@@ -410,10 +410,10 @@ const ScheduleDetail = ({route}: any) => {
             style={[
                 ScheduleDetailStyles.childTaskInfo,
                 {
-                    backgroundColor: '#F5F5F5',
+                    backgroundColor: "#F5F5F5",
                     borderRadius: 12,
                     padding: 12,
-                    boxShadow: '0 1 2 0 #00000040',
+                    boxShadow: "0 1 2 0 #00000040",
                 },
             ]}>
             <Text style={ScheduleDetailStyles.taskTitle}>
@@ -423,12 +423,10 @@ const ScheduleDetail = ({route}: any) => {
 
                 {userInfo.userType.level !== EOrganization.DEPARTMENT && (
                     <Text
-                        style={{color: '#2196F3', fontSize: 12}}
+                        style={{color: "#2196F3", fontSize: 12}}
                         onPress={() => {
-                            setOpenModal(!openModal),
-                                setDataWorkerRenderForLeader(
-                                    itemChildTask.staff,
-                                );
+                            setOpenModal(!openModal);
+                            setDataWorkerRenderForLeader(itemChildTask.staff);
                         }}>
                         xem thêm
                     </Text>
@@ -447,8 +445,8 @@ const ScheduleDetail = ({route}: any) => {
                                 <View
                                     style={{
                                         width: itemWidth,
-                                        alignItems: 'flex-start',
-                                        justifyContent: 'flex-start',
+                                        alignItems: "flex-start",
+                                        justifyContent: "flex-start",
                                     }}>
                                     <View>
                                         <Text
@@ -457,8 +455,8 @@ const ScheduleDetail = ({route}: any) => {
                                                 fontWeight: 500,
                                                 textAlign:
                                                     index === 4 || index === 5
-                                                        ? 'right'
-                                                        : 'left',
+                                                        ? "right"
+                                                        : "left",
                                             }}>
                                             {item.name}
                                         </Text>
@@ -471,18 +469,18 @@ const ScheduleDetail = ({route}: any) => {
                                                     textAlign:
                                                         index === 0 ||
                                                         index === 1
-                                                            ? 'left'
+                                                            ? "left"
                                                             : index === 3 ||
                                                               index === 4
-                                                            ? 'right'
-                                                            : 'center',
+                                                            ? "right"
+                                                            : "center",
                                                     color:
                                                         index === 0
-                                                            ? '#2196F3'
-                                                            : 'black',
+                                                            ? "#2196F3"
+                                                            : "black",
                                                 }}>
                                                 {index === 0
-                                                    ? 'Nhân công'
+                                                    ? "Nhân công"
                                                     : index === 1
                                                     ? itemChildTask.labour
                                                           .processName
@@ -518,20 +516,20 @@ const ScheduleDetail = ({route}: any) => {
                                                                     index ===
                                                                         0 ||
                                                                     index === 1
-                                                                        ? 'left'
+                                                                        ? "left"
                                                                         : index ===
                                                                               3 ||
                                                                           index ===
                                                                               4
-                                                                        ? 'right'
-                                                                        : 'center',
+                                                                        ? "right"
+                                                                        : "center",
                                                                 color:
                                                                     index === 0
-                                                                        ? '#2196F3'
-                                                                        : 'black',
+                                                                        ? "#2196F3"
+                                                                        : "black",
                                                             }}>
                                                             {index === 0
-                                                                ? 'Vật tư'
+                                                                ? "Vật tư"
                                                                 : index === 1
                                                                 ? itemMaterials.processName
                                                                 : index === 2
@@ -566,20 +564,20 @@ const ScheduleDetail = ({route}: any) => {
                                                                     index ===
                                                                         0 ||
                                                                     index === 1
-                                                                        ? 'left'
+                                                                        ? "left"
                                                                         : index ===
                                                                               3 ||
                                                                           index ===
                                                                               4
-                                                                        ? 'right'
-                                                                        : 'center',
+                                                                        ? "right"
+                                                                        : "center",
                                                                 color:
                                                                     index === 0
-                                                                        ? '#2196F3'
-                                                                        : 'black',
+                                                                        ? "#2196F3"
+                                                                        : "black",
                                                             }}>
                                                             {index === 0
-                                                                ? 'Ca máy'
+                                                                ? "Ca máy"
                                                                 : index === 1
                                                                 ? itemMachines.processName
                                                                 : index === 2
@@ -613,7 +611,7 @@ const ScheduleDetail = ({route}: any) => {
         } else {
             if (
                 userInfo.functions.some(
-                    (item: any) => item._id === 'SCHEDULE' && item.detail,
+                    (item: any) => item._id === "SCHEDULE" && item.detail,
                 )
             ) {
                 getScheduleDetail(route.params._id);
@@ -622,7 +620,7 @@ const ScheduleDetail = ({route}: any) => {
                     <View
                         style={[
                             ScheduleDetailStyles.container,
-                            {justifyContent: 'center', alignItems: 'center'},
+                            {justifyContent: "center", alignItems: "center"},
                         ]}>
                         <Text style={ScheduleDetailStyles.mainWorkTitle}>
                             Bạn không có quyền xem chi tiết tài liệu
@@ -639,14 +637,16 @@ const ScheduleDetail = ({route}: any) => {
 
     //console.log(scheduleDetail);
 
-    if (isLoadingGet) return <Loading />;
+    if (isLoadingGet) {
+        return <Loading />;
+    }
 
     return (
         <View style={ScheduleDetailStyles.container}>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 bounces={false}
-                overScrollMode='never'
+                overScrollMode="never"
                 contentContainerStyle={ScheduleDetailStyles.scrollViewStyle}>
                 <Text style={ScheduleDetailStyles.mainWorkTitle}>
                     {scheduleDetail?.title}
@@ -662,8 +662,8 @@ const ScheduleDetail = ({route}: any) => {
                                     ScheduleDetailStyles.mainWorkProgressSection,
                                     {
                                         borderBottomWidth: 1.5,
-                                        borderStyle: 'dashed',
-                                        borderBottomColor: '#d3d3d3',
+                                        borderStyle: "dashed",
+                                        borderBottomColor: "#d3d3d3",
                                         paddingBottom: 10,
                                     },
                                 ]}>
@@ -708,7 +708,7 @@ const ScheduleDetail = ({route}: any) => {
                             ]}>
                             {renderScheduleRemain(
                                 moment(scheduleDetail?.finishedDate).format(
-                                    'L',
+                                    "L",
                                 ),
                             )}
                         </Text>
@@ -759,7 +759,7 @@ const ScheduleDetail = ({route}: any) => {
                                         style={ScheduleDetailStyles.infoValue}>
                                         {moment(
                                             scheduleDetail?.startedDate,
-                                        ).format('L')}
+                                        ).format("L")}
                                     </Text>
                                 </View>
 
@@ -774,7 +774,7 @@ const ScheduleDetail = ({route}: any) => {
                                         style={ScheduleDetailStyles.infoValue}>
                                         {moment(
                                             scheduleDetail?.finishedDate,
-                                        ).format('L')}
+                                        ).format("L")}
                                     </Text>
                                 </View>
 
@@ -811,17 +811,17 @@ const ScheduleDetail = ({route}: any) => {
                                                 <Text
                                                     style={[
                                                         ScheduleDetailStyles.infoLabel,
-                                                        {width: '100%'},
+                                                        {width: "100%"},
                                                     ]}
                                                     key={item._id}>{`${
                                                     item.name
-                                                }: ${' '} ${item.value} ${
+                                                }: ${" "} ${item.value} ${
                                                     item.unit
                                                 } = ${new Intl.NumberFormat(
-                                                    'vi-VN',
+                                                    "vi-VN",
                                                     {
-                                                        style: 'currency',
-                                                        currency: 'VND',
+                                                        style: "currency",
+                                                        currency: "VND",
                                                     },
                                                 ).format(
                                                     item?.price ?? 0,
@@ -841,8 +841,8 @@ const ScheduleDetail = ({route}: any) => {
                                 ScheduleDetailStyles.listChildTasks,
                                 {
                                     borderBottomWidth: 1,
-                                    borderColor: '#ccc',
-                                    borderStyle: 'dashed',
+                                    borderColor: "#ccc",
+                                    borderStyle: "dashed",
                                     paddingBottom: 12,
                                 },
                             ]}>
@@ -860,7 +860,7 @@ const ScheduleDetail = ({route}: any) => {
                             <Text style={ScheduleDetailStyles.timeWorkEnd}>
                                 {renderScheduleRemain(
                                     moment(scheduleDetail?.finishedDate).format(
-                                        'L',
+                                        "L",
                                     ),
                                 )}
                             </Text>
@@ -966,7 +966,7 @@ const ScheduleDetail = ({route}: any) => {
                                             }>
                                             {moment(
                                                 scheduleDetail?.startedDate,
-                                            ).format('L')}
+                                            ).format("L")}
                                         </Text>
                                     </View>
 
@@ -987,7 +987,7 @@ const ScheduleDetail = ({route}: any) => {
                                             }>
                                             {moment(
                                                 scheduleDetail?.finishedDate,
-                                            ).format('L')}
+                                            ).format("L")}
                                         </Text>
                                     </View>
 
@@ -1018,19 +1018,19 @@ const ScheduleDetail = ({route}: any) => {
                                                         <Text
                                                             style={[
                                                                 ScheduleDetailStyles.infoLabel,
-                                                                {width: '100%'},
+                                                                {width: "100%"},
                                                             ]}
                                                             key={item._id}>{`${
                                                             item.name
-                                                        }: ${' '} ${
+                                                        }: ${" "} ${
                                                             item.value
                                                         } ${
                                                             item.unit
                                                         } = ${new Intl.NumberFormat(
-                                                            'vi-VN',
+                                                            "vi-VN",
                                                             {
-                                                                style: 'currency',
-                                                                currency: 'VND',
+                                                                style: "currency",
+                                                                currency: "VND",
                                                             },
                                                         ).format(
                                                             item?.price ?? 0,
@@ -1076,7 +1076,7 @@ const ScheduleDetail = ({route}: any) => {
                         titleStyle={ScheduleDetailStyles.titleAccordion1}
                         title={`Cán bộ quản lý (${scheduleDetail?.followers?.length})`}
                         style={ScheduleDetailStyles.boxAccordion}
-                        id='1'>
+                        id="1">
                         <FlatList
                             scrollEnabled={false}
                             data={scheduleDetail?.followers as any}
@@ -1095,7 +1095,7 @@ const ScheduleDetail = ({route}: any) => {
                                 }
                                 title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}
                                 style={ScheduleDetailStyles.boxAccordion}
-                                id='2'>
+                                id="2">
                                 <View
                                     style={ScheduleDetailStyles.listChildTasks}>
                                     <FlatList
@@ -1116,7 +1116,7 @@ const ScheduleDetail = ({route}: any) => {
                                     }
                                     title={`Người lao động (${scheduleDetail?.employees?.length})`}
                                     style={ScheduleDetailStyles.boxAccordion}
-                                    id='3'>
+                                    id="3">
                                     <FlatList
                                         scrollEnabled={false}
                                         data={scheduleDetail?.employees as any}
@@ -1137,7 +1137,7 @@ const ScheduleDetail = ({route}: any) => {
                             titleStyle={ScheduleDetailStyles.titleAccordion2}
                             title={`Danh sách quy trình (${scheduleDetail?.childTasks.length})`}
                             style={ScheduleDetailStyles.boxAccordion}
-                            id='2'>
+                            id="2">
                             <View style={ScheduleDetailStyles.listChildTasks}>
                                 <FlatList
                                     scrollEnabled={false}
@@ -1169,18 +1169,18 @@ const ScheduleDetail = ({route}: any) => {
                     </List.Accordion> */}
                 </View>
 
-                <Modal visible={openModal} animationType='slide'>
+                <Modal visible={openModal} animationType="slide">
                     <View style={ScheduleDetailStyles.workerProgressModal}>
                         <TouchableOpacity
                             style={ScheduleDetailStyles.btnCloseModal}
                             onPress={() => {
-                                setOpenModal(!openModal),
-                                    setDataWorkerRenderForLeader([]);
+                                setOpenModal(!openModal);
+                                setDataWorkerRenderForLeader([]);
                             }}>
                             <MaterialIcons
-                                name='arrow-back'
+                                name="arrow-back"
                                 size={22}
-                                color='#AB47BC'
+                                color="#AB47BC"
                             />
                             <Text style={ScheduleDetailStyles.btnCloseText}>
                                 Quay lại
@@ -1209,23 +1209,23 @@ const ScheduleDetail = ({route}: any) => {
                                                 name={
                                                     itemStaff.item.status ===
                                                     ETaskStatus.CANCELED
-                                                        ? 'cancel'
-                                                        : 'check-circle'
+                                                        ? "cancel"
+                                                        : "check-circle"
                                                 }
                                                 size={20}
                                                 color={
                                                     itemStaff.item.status ===
                                                     ETaskStatus.WAITING
-                                                        ? '#808080'
+                                                        ? "#808080"
                                                         : itemStaff.item
                                                               .status ===
                                                           ETaskStatus.PROCESSING
-                                                        ? '#2196F3'
+                                                        ? "#2196F3"
                                                         : itemStaff.item
                                                               .status ===
                                                           ETaskStatus.COMPLETED
-                                                        ? '#4CAF50'
-                                                        : '#FF4E45'
+                                                        ? "#4CAF50"
+                                                        : "#FF4E45"
                                                 }
                                             />
                                         </View>
@@ -1260,29 +1260,29 @@ const ScheduleDetail = ({route}: any) => {
                                                     ? `(${moment(
                                                           itemStaff.item
                                                               .canceledTime,
-                                                      ).format('L')}) Lý do: ${
+                                                      ).format("L")}) Lý do: ${
                                                           itemStaff.item
                                                               .canceledNote
                                                       }`
-                                                    : 'Đã làm ' +
+                                                    : "Đã làm " +
                                                       formatNumber(
                                                           itemStaff.item
                                                               .processingRate,
                                                       ) +
-                                                      '/' +
+                                                      "/" +
                                                       formattedGardenArea(
                                                           itemStaff.item
                                                               .totalSquare,
                                                       ) +
-                                                      ' (ha) ' +
+                                                      " (ha) " +
                                                       (itemStaff.item
                                                           .completedTime ===
                                                       null
-                                                          ? ''
+                                                          ? ""
                                                           : `${moment(
                                                                 itemStaff.item
                                                                     .completedTime,
-                                                            ).format('L')}`)}
+                                                            ).format("L")}`)}
                                             </Text>
                                         </View>
                                     </View>
@@ -1299,49 +1299,49 @@ const ScheduleDetail = ({route}: any) => {
 const ScheduleDetailStyles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        position: 'relative',
+        backgroundColor: "#fff",
+        position: "relative",
     },
     scrollViewStyle: {
         gap: 10,
         paddingHorizontal: 20,
     },
     mainWorkTitle: {
-        color: '#000000',
+        color: "#000000",
         fontWeight: 600,
         fontSize: 16,
     },
     mainWorkProgressSection: {
-        flexDirection: 'row',
+        flexDirection: "row",
         paddingHorizontal: 12,
         paddingVertical: 10,
         gap: 20,
 
-        justifyContent: 'space-between',
+        justifyContent: "space-between",
     },
     warpMainWork: {
         gap: 12,
         marginBottom: 8,
-        alignItems: 'center',
+        alignItems: "center",
     },
     mainWorkSummary: {
         fontSize: 13,
         fontWeight: 400,
-        color: '#000000',
+        color: "#000000",
     },
     statusText: {
         fontWeight: 500,
         fontSize: 13,
-        color: '#2196F3',
-        margin: 'auto',
+        color: "#2196F3",
+        margin: "auto",
     },
     timeWorkEnd: {
         marginTop: 12,
         fontWeight: 600,
-        fontStyle: 'italic',
+        fontStyle: "italic",
         fontSize: 16,
-        color: '#212121',
-        textAlign: 'center',
+        color: "#212121",
+        textAlign: "center",
     },
     workInfoSection: {
         marginVertical: 10,
@@ -1357,41 +1357,41 @@ const ScheduleDetailStyles = StyleSheet.create({
     },
     warpLabelValue: {
         paddingVertical: 12,
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
     },
     warpLabel: {
         gap: 10,
-        width: '50%',
+        width: "50%",
     },
     infoLabel: {
         fontWeight: 400,
         fontSize: 13,
-        color: '#212121',
-        width: '50%',
+        color: "#212121",
+        width: "50%",
     },
     infoValue: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 500,
         fontSize: 13,
-        textAlign: 'right',
-        width: '50%',
+        textAlign: "right",
+        width: "50%",
     },
     jobDescription: {
         gap: 10,
         marginVertical: 10,
     },
     description: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 500,
         fontSize: 13,
-        textAlign: 'center',
+        textAlign: "center",
     },
     detail: {
         fontWeight: 400,
         fontSize: 13,
-        color: '#212121',
+        color: "#212121",
     },
     attachedFile: {
         marginVertical: 10,
@@ -1401,27 +1401,27 @@ const ScheduleDetailStyles = StyleSheet.create({
         borderRadius: 8,
         padding: 10,
         flex: 1,
-        backgroundColor: 'rgba(128, 128, 128, 0.15)',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        backgroundColor: "rgba(128, 128, 128, 0.15)",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         marginBottom: 10,
     },
     leftCardDocument: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         flex: 1,
         gap: 10,
     },
     infoDocument: {
-        width: '85%',
+        width: "85%",
     },
     infoDocumentText: {
         fontSize: 11,
     },
     infoDocumentSizeText: {
         fontSize: 11,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
     },
     listAccordion: {
         gap: 10,
@@ -1431,7 +1431,7 @@ const ScheduleDetailStyles = StyleSheet.create({
     boxAccordion: {
         paddingRight: 6,
         paddingVertical: 0,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     titleAccordion1: {
         marginLeft: -4,
@@ -1448,18 +1448,18 @@ const ScheduleDetailStyles = StyleSheet.create({
     },
     workerCard: {
         marginHorizontal: 15,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
     },
     leftWorkerCard: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 16,
-        alignItems: 'center',
-        width: '98%',
+        alignItems: "center",
+        width: "98%",
     },
     workerAvatar: {
-        backgroundColor: 'rgba(211, 211, 211, 1)',
-        borderRadius: '50%',
+        backgroundColor: "rgba(211, 211, 211, 1)",
+        borderRadius: "50%",
         width: 48,
         height: 48,
     },
@@ -1467,26 +1467,26 @@ const ScheduleDetailStyles = StyleSheet.create({
         width: 42,
         height: 42,
         borderRadius: 24,
-        margin: 'auto',
+        margin: "auto",
     },
     workerNameAndUnit: {
         gap: 2,
-        width: '70%',
+        width: "70%",
     },
     workerName: {
-        color: 'rgba(76, 175, 80, 1)',
+        color: "rgba(76, 175, 80, 1)",
         fontWeight: 600,
         fontSize: 15,
-        textTransform: 'capitalize',
+        textTransform: "capitalize",
     },
     workerUnit: {
-        textTransform: 'capitalize',
+        textTransform: "capitalize",
         fontSize: 13,
         fontWeight: 400,
-        color: 'rgba(0, 0, 0, 1)',
+        color: "rgba(0, 0, 0, 1)",
     },
     workerOrder: {
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
         fontWeight: 400,
         fontSize: 13,
     },
@@ -1498,8 +1498,8 @@ const ScheduleDetailStyles = StyleSheet.create({
     },
     historyInfo: {
         marginVertical: 8,
-        width: '100%',
-        backgroundColor: '#2196F31A',
+        width: "100%",
+        backgroundColor: "#2196F31A",
         borderRadius: 14,
         paddingVertical: 10,
         paddingHorizontal: 12,
@@ -1508,22 +1508,22 @@ const ScheduleDetailStyles = StyleSheet.create({
     historyInfoLabel: {
         fontWeight: 600,
         fontSize: 14,
-        color: '#212121',
+        color: "#212121",
     },
     historyInfoValue: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 400,
         fontSize: 13,
-        width: '50%',
+        width: "50%",
         flexShrink: 1,
     },
     childTaskInfo: {
         gap: 12,
-        justifyContent: 'center',
+        justifyContent: "center",
         marginVertical: 10,
     },
     taskTitle: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 600,
         fontSize: 14,
     },
@@ -1531,18 +1531,18 @@ const ScheduleDetailStyles = StyleSheet.create({
         paddingVertical: 5,
         marginBottom: 5,
         borderTopWidth: 1,
-        borderTopColor: 'black',
+        borderTopColor: "black",
     },
     taskEndIn: {
         fontSize: 12,
-        fontStyle: 'italic',
+        fontStyle: "italic",
         fontWeight: 400,
         flexShrink: 1,
-        textAlign: 'right',
+        textAlign: "right",
     },
     participant: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         paddingLeft: 5,
     },
     statusTask: {
@@ -1562,29 +1562,29 @@ const ScheduleDetailStyles = StyleSheet.create({
         fontWeight: 400,
     },
     participantStatus1: {
-        color: '#808080', //chưa làm
+        color: "#808080", //chưa làm
     },
     participantStatus2: {
-        color: '#2196F3', //đang làm
+        color: "#2196F3", //đang làm
     },
     participantStatus3: {
-        color: '#FF4E45', //đã hủy
+        color: "#FF4E45", //đã hủy
     },
     participantStatus4: {
-        color: '#4CAF50', //đã xong
+        color: "#4CAF50", //đã xong
     },
     workerProgressModal: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: "#F5F5F5",
         padding: 15,
     },
     btnCloseModal: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 10,
-        alignItems: 'center',
+        alignItems: "center",
     },
     btnCloseText: {
-        color: '#AB47BC',
+        color: "#AB47BC",
         fontWeight: 500,
     },
 });

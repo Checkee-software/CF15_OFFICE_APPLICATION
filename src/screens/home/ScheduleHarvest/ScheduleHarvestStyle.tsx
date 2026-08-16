@@ -1,54 +1,54 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet} from "react-native";
 
 const ScheduleHarvestStyles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        position: 'relative',
+        backgroundColor: "#fff",
+        position: "relative",
     },
     scrollViewStyle: {
         gap: 10,
         paddingHorizontal: 20,
     },
     mainWorkTitle: {
-        color: '#000000',
+        color: "#000000",
         fontWeight: 600,
         fontSize: 16,
     },
     mainWorkProgressSection: {
-        flexDirection: 'row',
+        flexDirection: "row",
         paddingHorizontal: 12,
         paddingVertical: 10,
         gap: 20,
-        justifyContent: 'center',
+        justifyContent: "center",
         borderBottomWidth: 1.5,
-        borderStyle: 'dashed',
-        borderBottomColor: '#d3d3d3',
+        borderStyle: "dashed",
+        borderBottomColor: "#d3d3d3",
         paddingBottom: 10,
     },
     warpMainWork: {
         gap: 12,
         marginBottom: 8,
-        alignItems: 'center',
+        alignItems: "center",
     },
     mainWorkSummary: {
         fontSize: 13,
         fontWeight: 400,
-        color: '#000000',
+        color: "#000000",
     },
     statusText: {
         fontWeight: 500,
         fontSize: 13,
-        color: '#2196F3',
-        margin: 'auto',
+        color: "#2196F3",
+        margin: "auto",
     },
     timeWorkEnd: {
         marginTop: 12,
         fontWeight: 600,
-        fontStyle: 'italic',
+        fontStyle: "italic",
         fontSize: 16,
-        color: '#212121',
-        textAlign: 'center',
+        color: "#212121",
+        textAlign: "center",
     },
     workInfoSection: {
         marginVertical: 10,
@@ -64,41 +64,41 @@ const ScheduleHarvestStyles = StyleSheet.create({
     },
     warpLabelValue: {
         paddingVertical: 12,
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
     },
     warpLabel: {
         gap: 10,
-        width: '50%',
+        width: "50%",
     },
     infoLabel: {
         fontWeight: 400,
         fontSize: 13,
-        color: '#212121',
-        width: '50%',
+        color: "#212121",
+        width: "50%",
     },
     infoValue: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 500,
         fontSize: 13,
-        textAlign: 'right',
-        width: '50%',
+        textAlign: "right",
+        width: "50%",
     },
     jobDescription: {
         gap: 10,
         marginVertical: 10,
     },
     description: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 500,
         fontSize: 13,
-        textAlign: 'center',
+        textAlign: "center",
     },
     detail: {
         fontWeight: 400,
         fontSize: 13.5,
-        color: '#212121',
+        color: "#212121",
     },
     attachedFile: {
         marginVertical: 10,
@@ -108,27 +108,27 @@ const ScheduleHarvestStyles = StyleSheet.create({
         borderRadius: 8,
         padding: 10,
         flex: 1,
-        backgroundColor: 'rgba(128, 128, 128, 0.15)',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        backgroundColor: "rgba(128, 128, 128, 0.15)",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         marginBottom: 10,
     },
     leftCardDocument: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         flex: 1,
         gap: 10,
     },
     infoDocument: {
-        width: '85%',
+        width: "85%",
     },
     infoDocumentText: {
         fontSize: 11,
     },
     infoDocumentSizeText: {
         fontSize: 11,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
     },
     listAccordion: {
         gap: 10,
@@ -138,7 +138,7 @@ const ScheduleHarvestStyles = StyleSheet.create({
     boxAccordion: {
         paddingRight: 6,
         paddingVertical: 0,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     titleAccordion1: {
         marginLeft: -4,
@@ -160,18 +160,18 @@ const ScheduleHarvestStyles = StyleSheet.create({
     },
     workerCard: {
         marginHorizontal: 15,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
     },
     leftWorkerCard: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 16,
-        alignItems: 'center',
-        width: '98%',
+        alignItems: "center",
+        width: "98%",
     },
     workerAvatar: {
-        backgroundColor: 'rgba(211, 211, 211, 1)',
-        borderRadius: '50%',
+        backgroundColor: "rgba(211, 211, 211, 1)",
+        borderRadius: "50%",
         width: 48,
         height: 48,
     },
@@ -179,26 +179,26 @@ const ScheduleHarvestStyles = StyleSheet.create({
         width: 42,
         height: 42,
         borderRadius: 24,
-        margin: 'auto',
+        margin: "auto",
     },
     workerNameAndUnit: {
         gap: 2,
-        width: '70%',
+        width: "70%",
     },
     workerName: {
-        color: 'rgba(76, 175, 80, 1)',
+        color: "rgba(76, 175, 80, 1)",
         fontWeight: 600,
         fontSize: 15,
-        textTransform: 'capitalize',
+        textTransform: "capitalize",
     },
     workerUnit: {
-        textTransform: 'capitalize',
+        textTransform: "capitalize",
         fontSize: 13,
         fontWeight: 400,
-        color: 'rgba(0, 0, 0, 1)',
+        color: "rgba(0, 0, 0, 1)",
     },
     workerOrder: {
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
         fontWeight: 400,
         fontSize: 13,
     },
@@ -210,8 +210,8 @@ const ScheduleHarvestStyles = StyleSheet.create({
     },
     historyInfo: {
         marginVertical: 8,
-        width: '100%',
-        backgroundColor: '#2196F31A',
+        width: "100%",
+        backgroundColor: "#2196F31A",
         borderRadius: 14,
         paddingVertical: 10,
         paddingHorizontal: 12,
@@ -220,32 +220,32 @@ const ScheduleHarvestStyles = StyleSheet.create({
     historyInfoLabel: {
         fontWeight: 600,
         fontSize: 14,
-        color: '#212121',
+        color: "#212121",
     },
     historyInfoValue: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 400,
         fontSize: 13,
-        width: '50%',
+        width: "50%",
         flexShrink: 1,
     },
     childTaskInfo: {
         gap: 12,
-        justifyContent: 'center',
+        justifyContent: "center",
         marginVertical: 10,
     },
     childTaskInfo2: {
         gap: 12,
-        justifyContent: 'center',
+        justifyContent: "center",
         marginVertical: 10,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: "#F5F5F5",
         borderRadius: 12,
         paddingHorizontal: 10,
         paddingVertical: 15,
-        boxShadow: '0 1 2 0 #00000040',
+        boxShadow: "0 1 2 0 #00000040",
     },
     taskTitle: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 600,
         fontSize: 14,
     },
@@ -253,18 +253,18 @@ const ScheduleHarvestStyles = StyleSheet.create({
         paddingVertical: 5,
         marginBottom: 5,
         borderTopWidth: 1,
-        borderTopColor: 'black',
+        borderTopColor: "black",
     },
     taskEndIn: {
         fontSize: 12,
-        fontStyle: 'italic',
+        fontStyle: "italic",
         fontWeight: 400,
         flexShrink: 1,
-        textAlign: 'right',
+        textAlign: "right",
     },
     participant: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         paddingLeft: 5,
     },
     statusTask: {
@@ -284,29 +284,29 @@ const ScheduleHarvestStyles = StyleSheet.create({
         fontWeight: 400,
     },
     participantStatus1: {
-        color: '#808080', //chưa làm
+        color: "#808080", //chưa làm
     },
     participantStatus2: {
-        color: '#2196F3', //đang làm
+        color: "#2196F3", //đang làm
     },
     participantStatus3: {
-        color: '#FF4E45', //đã hủy
+        color: "#FF4E45", //đã hủy
     },
     participantStatus4: {
-        color: '#4CAF50', //đã xong
+        color: "#4CAF50", //đã xong
     },
     workerProgressModal: {
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: "#F5F5F5",
         padding: 15,
     },
     btnCloseModal: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 10,
-        alignItems: 'center',
+        alignItems: "center",
     },
     btnCloseText: {
-        color: '#AB47BC',
+        color: "#AB47BC",
         fontWeight: 500,
     },
 });

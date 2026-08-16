@@ -13,14 +13,14 @@ import {
 import colors from "../assets/colors";
 
 /* packages */
-import { DrawerContentScrollView } from "@react-navigation/drawer";
+import {DrawerContentScrollView} from "@react-navigation/drawer";
 
 /* screens */
 import FeatherIcon from "react-native-vector-icons/Feather";
 import SCREEN_INFO from "../config/SCREEN_CONFIG/screenInfo";
 
-const DrawerPanel = ({ navigation }: { navigation: any }) => {
-    const { height } = useWindowDimensions();
+const DrawerPanel = ({navigation}: {navigation: any}) => {
+    const {height} = useWindowDimensions();
 
     const menuButtons = [
         {
@@ -50,9 +50,9 @@ const DrawerPanel = ({ navigation }: { navigation: any }) => {
 
     return (
         <DrawerContentScrollView
-            style={{ flex: 1, backgroundColor: colors.white }}>
-            <View style={[styles.container, { height: height }]}>
-                <View style={{ flex: 1, flexDirection: "column" }}>
+            style={{flex: 1, backgroundColor: colors.white}}>
+            <View style={[styles.container, {height: height}]}>
+                <View style={{flex: 1, flexDirection: "column"}}>
                     {menuButtons
                         .filter((item, index) => index < 3)
                         .map((item, index) => (
@@ -77,7 +77,7 @@ const DrawerPanel = ({ navigation }: { navigation: any }) => {
                             </TouchableOpacity>
                         ))}
                 </View>
-                <View style={{ height: height * 0.12 }}>
+                <View style={{height: height * 0.12}}>
                     {menuButtons
                         .filter((_, index) => index > 1)
                         .map((item, index) => (
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         height: 64,
         backgroundColor: colors.white,
         alignItems: "center",
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: {width: 0, height: 1},
         shadowColor: "rgba(0, 0, 0, 0.25)",
         shadowOpacity: 0.25,
         shadowRadius: 2,

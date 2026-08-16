@@ -1,18 +1,18 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
 import {
     EScheduleStatus,
     ISchedule,
-} from '../shared-types/Response/ScheduleResponse/ScheduleResponse';
+} from "../shared-types/Response/ScheduleResponse/ScheduleResponse";
 import {
     IRequest,
     IRequestMaterial,
-} from '@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData';
-import ENV from '@/config/ENV';
-import {IProductType} from '@/shared-types/Response/ProductTypeResponse/ProductTypeResponse';
-import moment from 'moment';
-import asyncStorageHelper from '../utils/localStorageHelper/index';
+} from "@/shared-types/form-data/ScheduleRequestFormData/ScheduleRequestFormData";
+import ENV from "@/config/ENV";
+import {IProductType} from "@/shared-types/Response/ProductTypeResponse/ProductTypeResponse";
+import moment from "moment";
+import asyncStorageHelper from "../utils/localStorageHelper/index";
 
 interface IList {
     _id: string;
@@ -45,7 +45,7 @@ interface workScheduleStore {
     getListJobs: () => Promise<void>;
     detailWorkSchedule: ISchedule | null;
     scheduleDetail: ISchedule | null;
-    getListWorkSchedule: () => Promise<void>;
+    getListWorkSchedule: (page: number, rows?: number) => Promise<void>;
     getScheduleDetail: (id: string) => Promise<void>;
     filterByStatus: (status: string) => void;
     filterWorkSchedule: (
@@ -59,18 +59,18 @@ interface workScheduleStore {
     requestPersonalTask: (
         scheduleId: string,
         childTaskId: string,
-        data: Omit<IRequest, 'scheduleId' | 'childTaskId'>,
+        data: Omit<IRequest, "scheduleId" | "childTaskId">,
     ) => Promise<void>;
     requestAdditionalMaterial: (
         scheduleId: string,
-        data: Omit<IRequestMaterial, 'scheduleId'>,
+        data: Omit<IRequestMaterial, "scheduleId">,
     ) => Promise<void>;
     getProductType: () => Promise<void>;
     getProduct: () => Promise<void>;
 }
 
 const fixAvatarPath = (path: string) => {
-    const updatedPath = path.replace(/\\/g, '/');
+    const updatedPath = path.replace(/\\/g, "/");
     return `${ENV.BACKEND_URL}${updatedPath}`;
 };
 
@@ -98,7 +98,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     requestPersonalTask: async (
         scheduleId: string,
         childTaskId: string,
-        data: Omit<IRequest, 'scheduleId' | 'childTaskId'>,
+        data: Omit<IRequest, "scheduleId" | "childTaskId">,
     ) => {
         set({isLoading: true});
         try {
@@ -107,7 +107,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 data,
             );
             Snackbar.show({
-                text: 'Gửi yêu cầu thành công!',
+                text: "Gửi yêu cầu thành công!",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
@@ -115,7 +115,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             Snackbar.show({
                 text: error.response.data
                     ? error.response.data
-                    : 'Gửi yêu cầu thất bại!',
+                    : "Gửi yêu cầu thất bại!",
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
@@ -131,16 +131,16 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                 data,
             );
             Snackbar.show({
-                text: 'Gửi yêu cầu cung ứng vật tư thành công!',
+                text: "Gửi yêu cầu cung ứng vật tư thành công!",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
             console.error(
-                '❌ Error sending additional material request:',
+                "❌ Error sending additional material request:",
                 error,
             );
             Snackbar.show({
-                text: 'Gửi yêu cầu cung ứng vật tư thất bại!',
+                text: "Gửi yêu cầu cung ứng vật tư thất bại!",
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
@@ -200,7 +200,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             }
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể tải chi tiết công việc',
+                text: "Không thể tải chi tiết công việc",
                 duration: Snackbar.LENGTH_LONG,
             });
             set({detailWorkSchedule: null});
@@ -223,7 +223,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             }
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể tải danh sách công việc khu vườn',
+                text: "Không thể tải danh sách công việc khu vườn",
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
@@ -246,7 +246,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -267,7 +267,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -275,30 +275,35 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
         }
     },
 
-    getListWorkSchedule: async () => {
+    getListWorkSchedule: async (page: number, rows?: number) => {
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
-                `${ENV.BACKEND_URL}/resources/schedules/collection`,
+                `${ENV.BACKEND_URL}/resources/schedules/collection?page=${
+                    page || 1
+                }&rows=${rows || 20}`,
             );
+
+            console.log("response-schedule: ", response);
 
             if (response.data.data.length !== 0) {
                 const convertedTime = response.data.data.map((item: any) => ({
                     ...item,
                     startedDateVN: moment(item.startedDate).format(
-                        'DD/MM/YYYY',
+                        "DD/MM/YYYY",
                     ),
                     finishedDateVN: moment(item.finishedDate).format(
-                        'DD/MM/YYYY',
+                        "DD/MM/YYYY",
                     ),
                 }));
-
                 set({
-                    listWorkSchedule: convertedTime,
                     listWorkScheduleFilter: convertedTime.filter(
                         (item: any) =>
                             item.status === EScheduleStatus.PROCESSING,
                     ),
+                });
+                set({
+                    listWorkSchedule: convertedTime,
                 });
             } else {
                 set({
@@ -316,7 +321,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -365,7 +370,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -389,7 +394,9 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                         const start = moment(task.startedDate); // ISO
                         const end = moment(task.finishedDate); // ISO
 
-                        if (!start.isValid() || !end.isValid()) return false;
+                        if (!start.isValid() || !end.isValid()) {
+                            return false;
+                        }
 
                         // Tổng thời gian của tiến trình
                         const totalDuration = end.diff(start);
@@ -401,13 +408,13 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
                         const threshold = totalDuration * 0.3;
 
                         if (status === EScheduleStatus.EXPIRED) {
-                            return end.isBefore(today, 'day'); // finishedDate < hôm nay
+                            return end.isBefore(today, "day"); // finishedDate < hôm nay
                         }
 
                         if (status === EScheduleStatus.ALMOST_EXPIRE) {
                             // còn hạn nhưng <= 30% thời gian
                             return (
-                                end.isAfter(today, 'day') &&
+                                end.isAfter(today, "day") &&
                                 remaining <= threshold
                             );
                         }
@@ -428,7 +435,7 @@ export const useWorkScheduleStore = create<workScheduleStore>(set => ({
     filterWorkSchedule: (fromDate, toDate, productTypeId, productId) =>
         set(state => {
             const parseDate = (dateStr: string) => {
-                const [day, month, year] = dateStr.split('/').map(Number);
+                const [day, month, year] = dateStr.split("/").map(Number);
                 return new Date(year, month - 1, day);
             };
 

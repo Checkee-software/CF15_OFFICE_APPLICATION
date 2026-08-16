@@ -1,20 +1,20 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import {NavigationContainer} from "@react-navigation/native";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import Loading from "../screens/subscreen/Loading";
 import SCREEN_INFO from "../config/SCREEN_CONFIG/screenInfo";
-import { UNAUTHENTICATION_SCREENS } from "../config/SCREEN_CONFIG/unauthentication";
-import { AUTHENTICATION_SCREENS } from "../config/SCREEN_CONFIG/authentication";
+import {UNAUTHENTICATION_SCREENS} from "../config/SCREEN_CONFIG/unauthentication";
+import {AUTHENTICATION_SCREENS} from "../config/SCREEN_CONFIG/authentication";
 import BottomTabsNavigator from "./BottomTabsNavigator";
-import { useAuthStore } from "../stores/authStore";
+import {useAuthStore} from "../stores/authStore";
 import Feather from "react-native-vector-icons/Feather";
-import { TouchableOpacity } from "react-native";
+import {TouchableOpacity} from "react-native";
 
 const Stack = createNativeStackNavigator();
 
 export default function Router() {
-    const { isLogin } = useAuthStore();
+    const {isLogin} = useAuthStore();
 
     const isLoggedIn: unknown = isLogin;
 
@@ -53,7 +53,7 @@ export default function Router() {
                         <Stack.Screen
                             name="Home"
                             component={BottomTabsNavigator}
-                            options={{ headerShown: false }}
+                            options={{headerShown: false}}
                         />
 
                         <Stack.Group>
@@ -62,7 +62,7 @@ export default function Router() {
                                     key={index}
                                     name={screen.name}
                                     component={screen.component}
-                                    options={(navigation) => ({
+                                    options={navigation => ({
                                         ...screen.options,
                                         headerLeft: () => (
                                             <TouchableOpacity

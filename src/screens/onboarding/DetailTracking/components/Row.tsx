@@ -1,6 +1,6 @@
 import colors from "@/assets/colors";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {View, Text, StyleSheet} from "react-native";
 
 interface IRowProps {
     label: string;
@@ -8,10 +8,10 @@ interface IRowProps {
     valueColor?: string;
 }
 
-const Row = ({ label, value, valueColor }: IRowProps) => (
+const Row = ({label, value, valueColor}: IRowProps) => (
     <View style={styles.container}>
         <Text style={styles.label}>{label}</Text>
-        <Text style={[styles.value, { color: valueColor }]}>{value}</Text>
+        <Text style={[styles.value, {color: valueColor}]}>{value}</Text>
     </View>
 );
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState} from "react";
 import {
     View,
     Text,
@@ -7,73 +7,74 @@ import {
     Image,
     TouchableOpacity,
     ScrollView,
-} from 'react-native';
-import images from '../../../assets/images';
-import 'moment/locale/vi';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import {useAuthStore} from '../../../stores/authStore';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import useNotificationStore from '@/stores/notificationStore';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {Marquee} from '@animatereactnative/marquee';
-import {useIsFocused} from '@react-navigation/native';
+} from "react-native";
+import images from "../../../assets/images";
+import "moment/locale/vi";
+import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
+import {useAuthStore} from "../../../stores/authStore";
+import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
+import useNotificationStore from "@/stores/notificationStore";
+import {GestureHandlerRootView} from "react-native-gesture-handler";
+import {Marquee} from "@animatereactnative/marquee";
+import {useIsFocused} from "@react-navigation/native";
 
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
-    const [announcement, setAnnouncement] = useState('');
+    console.log("user-info: ", userInfo);
+    const [announcement, setAnnouncement] = useState("");
     const isFocused = useIsFocused();
 
     //console.log(userInfo);
 
     const menuItems = [
         {
-            function: 'GARDEN',
-            key: 'gardenForWorker',
-            label: 'Khu vườn',
+            function: "GARDEN",
+            key: "gardenForWorker",
+            label: "Khu vườn",
             buttonImage: images.garden,
             navigateTo: SCREEN_INFO.GARDENINFOWORKER.key,
             navigateNext: SCREEN_INFO.GARDENWORKER.key,
         },
         {
-            function: '',
-            key: 'gardenDeclareForWorker',
-            label: 'Báo cáo quy trình',
+            function: "",
+            key: "gardenDeclareForWorker",
+            label: "Báo cáo quy trình",
             buttonImage: images.gardener,
             navigateTo: SCREEN_INFO.GARDENINFOWORKER1.key,
             navigateNext: SCREEN_INFO.GARDENDECLAREWORKER.key,
         },
         {
-            function: 'GARDEN',
-            key: 'gardenInfo',
-            label: 'Thông tin khu vườn',
+            function: "GARDEN",
+            key: "gardenInfo",
+            label: "Thông tin khu vườn",
             buttonImage: images.garden,
             navigateTo: SCREEN_INFO.GARDENINFO.key,
         },
         {
-            function: 'EMPLOYEES',
-            key: 'unit',
-            label: 'Nhân sự',
+            function: "EMPLOYEES",
+            key: "unit",
+            label: "Nhân sự",
             buttonImage: images.workers,
             navigateTo: SCREEN_INFO.UNIT.key,
         },
         {
-            function: 'EMPLOYEES',
-            key: 'employee',
-            label: 'Nhân sự',
+            function: "EMPLOYEES",
+            key: "employee",
+            label: "Nhân sự",
             buttonImage: images.workers,
             navigateTo: SCREEN_INFO.WORKER.key,
         },
         {
-            function: 'SCHEDULE',
-            key: 'workschedule',
-            label: 'Lịch sử quy trình',
+            function: "SCHEDULE",
+            key: "workschedule",
+            label: "Lịch sử quy trình",
             buttonImage: images.toDoList,
             navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
         },
         {
-            function: 'STATISTIC',
-            key: 'statistic',
-            label: 'Báo cáo thống kê',
+            function: "STATISTIC",
+            key: "statistic",
+            label: "Báo cáo thống kê",
             buttonImage: images.pieChart,
             navigateTo: SCREEN_INFO.STATISTIC.key,
         },
@@ -85,51 +86,51 @@ export default function Main({navigation}: any) {
         //     navigateTo: SCREEN_INFO.STATISTIC_HARVEST.key,
         // },
         {
-            function: '',
-            key: 'browseaddmaterial',
-            label: 'Duyệt đầu tư tăng thêm',
+            function: "",
+            key: "browseaddmaterial",
+            label: "Duyệt đầu tư tăng thêm",
             buttonImage: images.approve,
             navigateTo: SCREEN_INFO.BROWSEADDMATERIALS.key,
         },
         {
-            function: '',
-            key: 'browseharvest',
-            label: 'Duyệt thu hoạch',
+            function: "",
+            key: "browseharvest",
+            label: "Duyệt thu hoạch",
             buttonImage: images.approveHarvest,
             navigateTo: SCREEN_INFO.BROWSE_HARVEST.key,
         },
         {
-            function: '',
-            key: 'harvest',
-            label: 'Thu hoạch',
+            function: "",
+            key: "harvest",
+            label: "Thu hoạch",
             buttonImage: images.approveHarvest,
             navigateTo: SCREEN_INFO.HARVEST.key,
         },
         {
-            function: '',
-            key: 'harvestschedule',
-            label: 'Quy trình thu hoạch',
+            function: "",
+            key: "harvestschedule",
+            label: "Quy trình thu hoạch",
             buttonImage: images.harvestSchedule,
             navigateTo: SCREEN_INFO.HARVEST_SCHEDULE.key,
         },
         {
-            function: 'FEEDBACK',
-            key: 'feedback',
-            label: 'Góp ý',
+            function: "FEEDBACK",
+            key: "feedback",
+            label: "Góp ý",
             buttonImage: images.feedBack,
             navigateTo: SCREEN_INFO.FEEDBACK.key,
         },
         {
-            function: 'DOCUMENT',
-            key: 'document',
-            label: 'Tài liệu',
+            function: "DOCUMENT",
+            key: "document",
+            label: "Tài liệu",
             buttonImage: images.document,
             navigateTo: SCREEN_INFO.DOCUMENT.key,
         },
         {
-            function: '',
-            key: 'news',
-            label: 'Tin tức',
+            function: "",
+            key: "news",
+            label: "Tin tức",
             buttonImage: images.megaphone,
             navigateTo: SCREEN_INFO.NEWS.key,
         },
@@ -146,7 +147,7 @@ export default function Main({navigation}: any) {
         if (notification?.message) {
             setAnnouncement(notification.message);
         } else {
-            setAnnouncement('');
+            setAnnouncement("");
         }
     }, [notification]);
 
@@ -154,8 +155,8 @@ export default function Main({navigation}: any) {
         const hour = new Date().getHours();
         if (hour >= 5 && hour < 13) {
             const valueGreeting = {
-                greetingText: 'Chào buổi sáng',
-                colorGreetingText: 'rgba(76, 175, 80, 1)',
+                greetingText: "Chào buổi sáng",
+                colorGreetingText: "rgba(76, 175, 80, 1)",
             };
             return valueGreeting;
         }
@@ -164,20 +165,20 @@ export default function Main({navigation}: any) {
         // }
         else if (hour >= 13 && hour < 18) {
             const valueGreeting = {
-                greetingText: 'Chào buổi chiều',
-                colorGreetingText: 'rgba(255, 152, 0, 1)',
+                greetingText: "Chào buổi chiều",
+                colorGreetingText: "rgba(255, 152, 0, 1)",
             };
             return valueGreeting;
         } else if (hour >= 18 && hour < 22) {
             const valueGreeting = {
-                greetingText: 'Chào buổi tối',
-                colorGreetingText: 'rgba(33, 150, 243, 1)',
+                greetingText: "Chào buổi tối",
+                colorGreetingText: "rgba(33, 150, 243, 1)",
             };
             return valueGreeting;
         } else {
             const valueGreeting = {
-                greetingText: 'Chúc ngủ ngon!',
-                colorGreetingText: 'rgba(66, 31, 25, 1)',
+                greetingText: "Chúc ngủ ngon!",
+                colorGreetingText: "rgba(66, 31, 25, 1)",
             };
             return valueGreeting;
         }
@@ -188,7 +189,7 @@ export default function Main({navigation}: any) {
             return userInfo.functions.some(
                 func =>
                     (func._id === functionKey && func.access) ||
-                    (func._id === functionKey.split('_')[0] && func.access),
+                    (func._id === functionKey.split("_")[0] && func.access),
             );
         };
 
@@ -197,12 +198,12 @@ export default function Main({navigation}: any) {
         if (role === EOrganization.MANAGEMENT) {
             filteredMenu = menuItems.filter(
                 item =>
-                    item.key !== 'gardenForWorker' &&
-                    item.key !== 'gardenDeclareForWorker' &&
-                    item.key !== 'unit' &&
-                    item.key !== 'browseaddmaterial' &&
-                    item.key !== 'browseharvest' &&
-                    item.key !== 'harvest',
+                    item.key !== "gardenForWorker" &&
+                    item.key !== "gardenDeclareForWorker" &&
+                    item.key !== "unit" &&
+                    item.key !== "browseaddmaterial" &&
+                    item.key !== "browseharvest" &&
+                    item.key !== "harvest",
             );
             return filteredMenu.filter(
                 item => !item.function || hasAccessToFunction(item.function),
@@ -212,12 +213,12 @@ export default function Main({navigation}: any) {
         if (role === EOrganization.DEPARTMENT) {
             filteredMenu = menuItems.filter(
                 item =>
-                    item.key !== 'gardenForWorker' &&
-                    item.key !== 'gardenDeclareForWorker' &&
-                    item.key !== 'unit' &&
-                    item.key !== 'browseaddmaterial' &&
-                    item.key !== 'browseharvest' &&
-                    item.key !== 'harvest',
+                    item.key !== "gardenForWorker" &&
+                    item.key !== "gardenDeclareForWorker" &&
+                    item.key !== "unit" &&
+                    item.key !== "browseaddmaterial" &&
+                    item.key !== "browseharvest" &&
+                    item.key !== "harvest",
             );
             return filteredMenu.filter(
                 item => !item.function || hasAccessToFunction(item.function),
@@ -227,13 +228,13 @@ export default function Main({navigation}: any) {
         if (role === EOrganization.LEADER) {
             filteredMenu = menuItems.filter(item => {
                 const excludeKeys =
-                    item.key !== 'gardenForWorker' &&
-                    item.key !== 'gardenDeclareForWorker' &&
-                    item.key !== 'employee' &&
-                    item.key !== 'harvest';
+                    item.key !== "gardenForWorker" &&
+                    item.key !== "gardenDeclareForWorker" &&
+                    item.key !== "employee" &&
+                    item.key !== "harvest";
 
                 const excludeStatistic =
-                    userInfo.groupId === '' ? item.key !== 'statistic' : true;
+                    userInfo.groupId === "" ? item.key !== "statistic" : true;
 
                 return excludeKeys && excludeStatistic;
             });
@@ -246,17 +247,17 @@ export default function Main({navigation}: any) {
         if (role === EOrganization.WORKER) {
             filteredMenu = menuItems.filter(
                 item =>
-                    item.key !== 'unit' &&
-                    item.key !== 'employee' &&
-                    item.key !== 'gardenInfo' &&
-                    item.key !== 'browseaddmaterial' &&
-                    item.key !== 'browseharvest' &&
-                    item.key !== 'harvestschedule',
+                    item.key !== "unit" &&
+                    item.key !== "employee" &&
+                    item.key !== "gardenInfo" &&
+                    item.key !== "browseaddmaterial" &&
+                    item.key !== "browseharvest" &&
+                    item.key !== "harvestschedule",
             );
 
             return filteredMenu.filter(item => {
                 // Chỉ kiểm tra quyền access đối với STATISTIC
-                if (item.function === 'STATISTIC') {
+                if (item.function === "STATISTIC") {
                     return hasAccessToFunction(item.function);
                 }
                 return true;
@@ -275,7 +276,7 @@ export default function Main({navigation}: any) {
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 bounces={false}
-                overScrollMode='never'>
+                overScrollMode="never">
                 <View style={MainStyles.welcomeUser}>
                     <View style={MainStyles.helloTime}>
                         <Text
@@ -296,7 +297,7 @@ export default function Main({navigation}: any) {
 
                     <TouchableOpacity
                         style={MainStyles.avatarUser}
-                        onPress={() => navigation.navigate('Hồ sơ')}>
+                        onPress={() => navigation.navigate("Hồ sơ")}>
                         <Image
                             source={
                                 userInfo.avatar
@@ -354,35 +355,35 @@ export default function Main({navigation}: any) {
 const MainStyles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: "#FFFFFF",
         paddingHorizontal: 10,
     },
     welcomeUser: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        color: 'rgba(76, 175, 80, 1)',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        color: "rgba(76, 175, 80, 1)",
+        justifyContent: "space-between",
         marginBottom: 10,
     },
     helloTime: {
-        width: '75%',
+        width: "75%",
     },
     helloTimeText: {
         fontSize: 13,
         fontWeight: 400,
     },
     helloUserText: {
-        fontWeight: '600',
+        fontWeight: "600",
         fontSize: 15,
     },
     avatarUser: {
-        borderRadius: '50%',
-        backgroundColor: 'rgba(128, 128, 128, 0.15)',
+        borderRadius: "50%",
+        backgroundColor: "rgba(128, 128, 128, 0.15)",
         width: 60,
         height: 60,
     },
     avatar: {
-        margin: 'auto',
+        margin: "auto",
         width: 50,
         height: 52,
         borderRadius: 25,
@@ -391,26 +392,26 @@ const MainStyles = StyleSheet.create({
         marginVertical: 5,
     },
     mainMenuTitle: {
-        color: 'rgba(128, 128, 128, 1)',
-        fontWeight: '500',
+        color: "rgba(128, 128, 128, 1)",
+        fontWeight: "500",
     },
     warpMenuButton: {
         marginTop: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
         gap: 10,
     },
     menuButton: {
-        width: '48%',
+        width: "48%",
         gap: 10,
         paddingVertical: 24,
         paddingHorizontal: 15,
         borderRadius: 18,
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: '0 1 3 0 rgba(0, 0, 0, 0.25)',
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: "0 1 3 0 rgba(0, 0, 0, 0.25)",
     },
     menuButtonImage: {
         width: 80,
@@ -420,18 +421,18 @@ const MainStyles = StyleSheet.create({
     menuButtonText: {
         fontSize: 12,
         flexShrink: 1,
-        textAlign: 'center',
+        textAlign: "center",
     },
     announcementContainer: {
-        backgroundColor: 'rgba(55, 156, 58, 1)',
+        backgroundColor: "rgba(55, 156, 58, 1)",
         borderRadius: 8,
         paddingVertical: 10,
-        overflow: 'hidden',
+        overflow: "hidden",
         marginVertical: 6,
     },
     announcementText: {
-        color: 'white',
-        fontWeight: '700',
+        color: "white",
+        fontWeight: "700",
         fontSize: 22,
         marginLeft: 10,
     },

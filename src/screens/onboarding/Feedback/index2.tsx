@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState} from "react";
 import {
     View,
     Text,
@@ -7,15 +7,15 @@ import {
     StyleSheet,
     ActivityIndicator,
     ScrollView,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import useFeedbackStore from '../../../stores/feedbackStore';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+} from "react-native";
+import {useNavigation} from "@react-navigation/native";
+import useFeedbackStore from "../../../stores/feedbackStore";
+import Icon from "react-native-vector-icons/MaterialIcons";
 export default function Feedback1() {
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
-    const [errorTitle, setErrorTitle] = useState('');
-    const [errorContent, setErrorContent] = useState('');
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+    const [errorTitle, setErrorTitle] = useState("");
+    const [errorContent, setErrorContent] = useState("");
     const [loading, setLoading] = useState(false);
 
     const {submitFeedback} = useFeedbackStore();
@@ -24,27 +24,29 @@ export default function Feedback1() {
     const handleSubmit = async () => {
         let hasError = false;
 
-        if (title.trim() === '') {
-            setErrorTitle('Bắt buộc!');
+        if (title.trim() === "") {
+            setErrorTitle("Bắt buộc!");
             hasError = true;
         } else {
-            setErrorTitle('');
+            setErrorTitle("");
         }
 
-        if (content.trim() === '') {
-            setErrorContent('Bắt buộc!');
+        if (content.trim() === "") {
+            setErrorContent("Bắt buộc!");
             hasError = true;
         } else {
-            setErrorContent('');
+            setErrorContent("");
         }
 
-        if (hasError) return;
+        if (hasError) {
+            return;
+        }
 
         setLoading(true);
         await submitFeedback({title, content});
         setLoading(false);
-        setTitle('');
-        setContent('');
+        setTitle("");
+        setContent("");
         navigation.goBack();
     };
 
@@ -61,16 +63,18 @@ export default function Feedback1() {
                     ]}>
                     <TextInput
                         style={styles.inputWithIcon}
-                        placeholderTextColor={'black'}
+                        placeholderTextColor={"black"}
                         value={title}
                         onChangeText={text => {
                             setTitle(text);
-                            if (text.trim()) setErrorTitle('');
+                            if (text.trim()) {
+                                setErrorTitle("");
+                            }
                         }}
                     />
-                    {title !== '' && (
-                        <TouchableOpacity onPress={() => setTitle('')}>
-                            <Icon name='close' size={20} color='gray' />
+                    {title !== "" && (
+                        <TouchableOpacity onPress={() => setTitle("")}>
+                            <Icon name="close" size={20} color="gray" />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -86,11 +90,13 @@ export default function Feedback1() {
                         styles.textArea,
                         errorContent ? styles.inputError : null,
                     ]}
-                    placeholder='Nhập nội dung'
+                    placeholder="Nhập nội dung"
                     value={content}
                     onChangeText={text => {
                         setContent(text);
-                        if (text.trim()) setErrorContent('');
+                        if (text.trim()) {
+                            setErrorContent("");
+                        }
                     }}
                     multiline
                     numberOfLines={4}
@@ -105,7 +111,7 @@ export default function Feedback1() {
                 onPress={handleSubmit}
                 disabled={loading}>
                 {loading ? (
-                    <ActivityIndicator color='#fff' />
+                    <ActivityIndicator color="#fff" />
                 ) : (
                     <Text style={styles.buttonText}>Xác nhận</Text>
                 )}
@@ -118,8 +124,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: 16,
-        backgroundColor: '#fff',
-        justifyContent: 'space-between',
+        backgroundColor: "#fff",
+        justifyContent: "space-between",
     },
     form: {
         flex: 1,
@@ -130,48 +136,48 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     required: {
-        color: 'red',
+        color: "red",
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: "#ccc",
         borderRadius: 6,
         padding: 10,
         marginBottom: 8,
     },
     textArea: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: "#ccc",
         borderRadius: 6,
         padding: 10,
         height: 120,
-        textAlignVertical: 'top',
+        textAlignVertical: "top",
         marginBottom: 8,
     },
     inputError: {
-        borderColor: 'red',
+        borderColor: "red",
     },
     errorText: {
-        color: 'red',
+        color: "red",
         marginBottom: 8,
         fontSize: 13,
     },
     button: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         padding: 16,
         borderRadius: 6,
-        alignItems: 'center',
+        alignItems: "center",
         marginBottom: 16,
     },
     buttonText: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 16,
     },
     inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: "#ccc",
         borderRadius: 6,
         paddingHorizontal: 10,
         marginBottom: 8,

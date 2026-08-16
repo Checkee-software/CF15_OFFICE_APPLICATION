@@ -1,23 +1,23 @@
 /* eslint-disable curly */
-/* eslint-disable react-native/no-inline-styles */
+
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect} from "react";
 
 /* configurations */
-import UpdateRequiredModal from '@/utils/useForceUpdate';
-import {useAuthStore} from './src/stores/authStore';
-import asyncStorageHelper from './src/utils/localStorageHelper/index';
+import UpdateRequiredModal from "@/utils/useForceUpdate";
+import {useAuthStore} from "./src/stores/authStore";
+import asyncStorageHelper from "./src/utils/localStorageHelper/index";
 
 /* packages */
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {OneSignal, LogLevel} from 'react-native-onesignal';
-import VersionCheck from 'react-native-version-check';
-import 'react-native-reanimated';
+import {SafeAreaView} from "react-native-safe-area-context";
+import {OneSignal, LogLevel} from "react-native-onesignal";
+import VersionCheck from "react-native-version-check";
+import "react-native-reanimated";
 
 /* screens */
-import Router from './src/router';
-import Loading from './src/screens/subscreen/Loading';
-import {StatusBar} from 'react-native';
+import Router from "./src/router";
+import Loading from "./src/screens/subscreen/Loading";
+import {StatusBar} from "react-native";
 
 const InitApp = () => {
     const {autoLogin, setRedirectData} = useAuthStore();
@@ -27,13 +27,13 @@ const InitApp = () => {
     useEffect(() => {
         const init = async () => {
             OneSignal.Debug.setLogLevel(LogLevel.Verbose);
-            OneSignal.initialize('69a6acdf-b649-4589-a9b8-88aaa525fa45');
+            OneSignal.initialize("69a6acdf-b649-4589-a9b8-88aaa525fa45");
 
             OneSignal.Notifications.requestPermission(true);
 
             const token = asyncStorageHelper.token;
 
-            if (token !== '') {
+            if (token !== "") {
                 await autoLogin();
             }
 
@@ -48,29 +48,29 @@ const InitApp = () => {
         const handleNotificationClick = (event: any) => {
             const data = event.notification.additionalData;
 
-            console.log('notification-click: ', data);
+            console.log("notification-click: ", data);
 
-            if (data?.action === 'SCHEDULE') {
+            if (data?.action === "SCHEDULE") {
                 //điều hướng xem chi tiết quy trình
-                setRedirectData('schdule', data?._id);
-            } else if (data?.action === 'REQUEST') {
+                setRedirectData("schdule", data?._id);
+            } else if (data?.action === "REQUEST") {
                 //điều hướng duyệt quy trình khi người ld gửi lên
-                setRedirectData('request', data?._id);
-            } else if (data?.action === 'HARVEST') {
+                setRedirectData("request", data?._id);
+            } else if (data?.action === "HARVEST") {
                 //điều hướng duyệt thu hoạch khi người ld gửi lên
-                setRedirectData('harvest', data?._id);
+                setRedirectData("harvest", data?._id);
             }
         };
 
         OneSignal.Notifications.addEventListener(
-            'click',
+            "click",
             handleNotificationClick,
         );
 
         // clean khi component unmount
         return () => {
             OneSignal.Notifications.removeEventListener(
-                'click',
+                "click",
                 handleNotificationClick,
             );
         };
@@ -87,7 +87,7 @@ export default function App() {
     const {isLogin} = useAuthStore();
     const [isUpdateRequired, setIsUpdateRequired] = useState<boolean>(false);
 
-    console.log('get-update-version: ', isUpdateRequired);
+    console.log("get-update-version: ", isUpdateRequired);
 
     useEffect(() => {
         const checkVersion = async () => {
@@ -98,8 +98,8 @@ export default function App() {
 
                 // Hàm so sánh phiên bản, ví dụ: "1.2.10" với "1.2.9"
                 function compareVersions(v1: string, v2: string): number {
-                    const arr1 = v1.split('.').map(Number);
-                    const arr2 = v2.split('.').map(Number);
+                    const arr1 = v1.split(".").map(Number);
+                    const arr2 = v2.split(".").map(Number);
                     const maxLen = Math.max(arr1.length, arr2.length);
 
                     for (let i = 0; i < maxLen; i++) {
@@ -115,15 +115,15 @@ export default function App() {
                     setIsUpdateRequired(true);
                 }
             } catch (error) {
-                console.log('Lỗi kiểm tra phiên bản:', error);
+                console.log("Lỗi kiểm tra phiên bản:", error);
             }
         };
         checkVersion();
     }, []);
 
     return (
-        <SafeAreaView style={{flex: 1}} edges={['bottom']}>
-            <StatusBar barStyle={isLogin ? 'dark-content' : 'light-content'} />
+        <SafeAreaView style={{flex: 1}} edges={["bottom"]}>
+            <StatusBar barStyle={isLogin ? "dark-content" : "light-content"} />
             <InitApp />
             {/* Modal yêu cầu cập nhật */}
             <UpdateRequiredModal

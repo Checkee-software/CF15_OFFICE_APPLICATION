@@ -1,8 +1,8 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import ENV from '@/config/ENV';
-import {IRecord} from '@/shared-types/Response/RecordResponse/RecordResponse';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import ENV from "@/config/ENV";
+import {IRecord} from "@/shared-types/Response/RecordResponse/RecordResponse";
 
 interface HistoryRecordsStore {
     isLoading: boolean;
@@ -31,7 +31,7 @@ export const useHistoryRecordsStore = create<HistoryRecordsStore>(set => ({
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }

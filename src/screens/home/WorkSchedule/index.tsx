@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
+
 import {
     View,
     Text,
@@ -8,24 +8,24 @@ import {
     TextInput,
     Image,
     Modal,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+} from "react-native";
+import React, {useEffect, useState} from "react";
+import {TouchableOpacity} from "react-native";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 // import * as Progress from 'react-native-progress';
-import moment from 'moment';
-import images from '../../../assets/images';
-import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
-import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
-import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
-import Loading from '@/screens/subscreen/Loading';
-import colors from '@/assets/colors';
-import {Dropdown} from 'react-native-element-dropdown';
-import Snackbar from 'react-native-snackbar';
-import {useAuthStore} from '../../../stores/authStore';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import Feather from 'react-native-vector-icons/Feather';
+import moment from "moment";
+import images from "../../../assets/images";
+import {useWorkScheduleStore} from "../../../stores/workScheduleStore";
+import {EScheduleStatus} from "@/shared-types/Response/ScheduleResponse/ScheduleResponse";
+import SCREEN_INFO from "@/config/SCREEN_CONFIG/screenInfo";
+import Loading from "@/screens/subscreen/Loading";
+import colors from "@/assets/colors";
+import {Dropdown} from "react-native-element-dropdown";
+import Snackbar from "react-native-snackbar";
+import {useAuthStore} from "../../../stores/authStore";
+import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
+import Feather from "react-native-vector-icons/Feather";
 
 const WorkSchedule = ({navigation}: any) => {
     const {
@@ -41,31 +41,33 @@ const WorkSchedule = ({navigation}: any) => {
         listProduct,
     } = useWorkScheduleStore();
 
+    console.log("listWorkScheduleFilter: ", listWorkScheduleFilter);
+
     const {userInfo} = useAuthStore();
 
     const statusList = [
-        {label: 'Đang làm', value: 2},
-        {label: 'Sắp hết hạn', value: 4},
-        {label: 'Trễ hạn', value: 5},
-        {label: 'Hoàn thành', value: 3},
-        {label: 'Đang chờ', value: 6},
-        {label: 'Tất cả', value: 1},
-        {label: 'Đã huỷ', value: 7},
+        {label: "Đang làm", value: 2},
+        {label: "Sắp hết hạn", value: 4},
+        {label: "Trễ hạn", value: 5},
+        {label: "Hoàn thành", value: 3},
+        {label: "Đang chờ", value: 6},
+        {label: "Tất cả", value: 1},
+        {label: "Đã huỷ", value: 7},
     ];
 
     const listMonth = [
-        {_id: '1', name: 'Tháng 1'},
-        {_id: '2', name: 'Tháng 2'},
-        {_id: '3', name: 'Tháng 3'},
-        {_id: '4', name: 'Tháng 4'},
-        {_id: '5', name: 'Tháng 5'},
-        {_id: '6', name: 'Tháng 6'},
-        {_id: '7', name: 'Tháng 7'},
-        {_id: '8', name: 'Tháng 8'},
-        {_id: '9', name: 'Tháng 9'},
-        {_id: '10', name: 'Tháng 10'},
-        {_id: '11', name: 'Tháng 11'},
-        {_id: '12', name: 'Tháng 12'},
+        {_id: "1", name: "Tháng 1"},
+        {_id: "2", name: "Tháng 2"},
+        {_id: "3", name: "Tháng 3"},
+        {_id: "4", name: "Tháng 4"},
+        {_id: "5", name: "Tháng 5"},
+        {_id: "6", name: "Tháng 6"},
+        {_id: "7", name: "Tháng 7"},
+        {_id: "8", name: "Tháng 8"},
+        {_id: "9", name: "Tháng 9"},
+        {_id: "10", name: "Tháng 10"},
+        {_id: "11", name: "Tháng 11"},
+        {_id: "12", name: "Tháng 12"},
     ];
 
     const generateYears = (startYear = 2025) => {
@@ -85,12 +87,14 @@ const WorkSchedule = ({navigation}: any) => {
     const listYear = generateYears();
 
     const [selectedStatus, setSelectedStatus] = useState(2);
-    const [searchSchedule, setSearchSchedule] = useState('');
+    const [searchSchedule, setSearchSchedule] = useState("");
     const [showForm, setShowForm] = useState(false);
-    const [selectedMonth, setSelectedMonth] = useState('');
-    const [selectedYear, setSelectedYear] = useState('');
-    const [selectedProductType, setSelectedProductType] = useState('');
-    const [selectedProduct, setSelectedProduct] = useState('');
+    const [selectedMonth, setSelectedMonth] = useState("");
+    const [selectedYear, setSelectedYear] = useState("");
+    const [selectedProductType, setSelectedProductType] = useState("");
+    const [selectedProduct, setSelectedProduct] = useState("");
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
 
     // const renderCircleColor = (status: string) => {
     //     switch (status) {
@@ -109,6 +113,45 @@ const WorkSchedule = ({navigation}: any) => {
     //             return undefined;
     //     }
     // };
+    console.log("page: ", page);
+    const handleGetListWorkSchedule = async () => {
+        resetData();
+        await getListWorkSchedule(1);
+        getProductType();
+        getProduct();
+        if (searchSchedule !== "") {
+            setSearchSchedule("");
+        }
+        setSelectedStatus(2);
+    };
+
+    useEffect(() => {
+        getProductType();
+        getProduct();
+        getListWorkSchedule(page);
+        setSelectedStatus(2);
+    }, []);
+
+    const fetchData = async (pageNumber: number) => {
+        if (isLoading || !hasMore) {
+            return;
+        }
+
+        await getListWorkSchedule(page);
+        setSelectedStatus(2);
+
+        if (filterWorkSchedule.length < 20) {
+            setHasMore(false);
+        }
+
+        setPage(pageNumber);
+    };
+
+    const handleLoadMore = () => {
+        if (!isLoading && hasMore) {
+            fetchData(page + 1);
+        }
+    };
 
     const handleNavigate = (itemWorkSchedule: any) => {
         if (userInfo.userType.level === EOrganization.WORKER) {
@@ -118,7 +161,7 @@ const WorkSchedule = ({navigation}: any) => {
         } else {
             if (
                 userInfo.functions.some(
-                    (item: any) => item._id === 'SCHEDULE' && item.detail,
+                    (item: any) => item._id === "SCHEDULE" && item.detail,
                 )
             ) {
                 navigation.navigate(SCREEN_INFO.SCHEDULEDETAIL.key, {
@@ -126,7 +169,7 @@ const WorkSchedule = ({navigation}: any) => {
                 });
             } else {
                 Snackbar.show({
-                    text: 'Bạn không có quyền xem chi tiết lịch sử quy trình',
+                    text: "Bạn không có quyền xem chi tiết lịch sử quy trình",
                     duration: Snackbar.LENGTH_SHORT,
                 });
             }
@@ -203,7 +246,7 @@ const WorkSchedule = ({navigation}: any) => {
         const duration = moment.duration(targetTime.diff(now));
 
         // chuyển ngày bắt đầu sang giờ Việt Nam
-        const startedDateVN = moment.utc(startedDate).add(7, 'hours');
+        const startedDateVN = moment.utc(startedDate).add(7, "hours");
         const nowVN = moment().utcOffset(7);
 
         // tính khoảng cách ngày bắt đầu
@@ -217,10 +260,13 @@ const WorkSchedule = ({navigation}: any) => {
         const startedMinutes = durationStartedDateVN.minutes();
 
         // tạo chuỗi kết quả
-        let resultstartedDays = 'Bắt đầu sau ';
-        if (startedDays > 0) resultstartedDays += `${startedDays} ngày, `;
-        if (startedHours > 0 || startedDays > 0)
+        let resultstartedDays = "Bắt đầu sau ";
+        if (startedDays > 0) {
+            resultstartedDays += `${startedDays} ngày, `;
+        }
+        if (startedHours > 0 || startedDays > 0) {
             resultstartedDays += `${startedHours} giờ, `;
+        }
         resultstartedDays += `${startedMinutes} phút`;
 
         // Nếu thời gian đã trễ
@@ -232,7 +278,7 @@ const WorkSchedule = ({navigation}: any) => {
                 <Text
                     style={[
                         styles.expiredAndCancelTextTime,
-                        {textAlign: 'right'},
+                        {textAlign: "right"},
                     ]}>
                     Hết hạn
                 </Text>
@@ -244,17 +290,17 @@ const WorkSchedule = ({navigation}: any) => {
         const hours = duration.hours();
         const minutes = duration.minutes();
 
-        const day = moment(finishedDate).format('L');
-        const hour = moment(finishedDate).format('LT');
+        const day = moment(finishedDate).format("L");
+        const hour = moment(finishedDate).format("LT");
 
         switch (status) {
             case EScheduleStatus.PENDING:
                 return (
                     <View style={styles.workScheduleTime}>
                         <FontAwesome6
-                            name='clock'
+                            name="clock"
                             size={16}
-                            color={'#FF9800'}
+                            color={"#FF9800"}
                         />
 
                         <Text style={styles.startInText}>
@@ -268,9 +314,9 @@ const WorkSchedule = ({navigation}: any) => {
                 return (
                     <View style={styles.workScheduleTime}>
                         <FontAwesome6
-                            name='clock'
+                            name="clock"
                             size={16}
-                            color={'#808080'}
+                            color={"#808080"}
                         />
 
                         <Text style={styles.remainingText}>
@@ -283,9 +329,9 @@ const WorkSchedule = ({navigation}: any) => {
                 return (
                     <View style={styles.workScheduleTime}>
                         <FontAwesome6
-                            name='clock'
+                            name="clock"
                             size={16}
-                            color={'#808080'}
+                            color={"#808080"}
                         />
 
                         <Text style={styles.completedTextTime}>
@@ -298,9 +344,9 @@ const WorkSchedule = ({navigation}: any) => {
                 return (
                     <View style={styles.workScheduleTime}>
                         <FontAwesome6
-                            name='clock'
+                            name="clock"
                             size={16}
-                            color={'#FF4E45'}
+                            color={"#FF4E45"}
                         />
 
                         <Text style={styles.expiredAndCancelTextTime}>
@@ -313,9 +359,9 @@ const WorkSchedule = ({navigation}: any) => {
                 return (
                     <View style={styles.workScheduleTime}>
                         <FontAwesome6
-                            name='clock'
+                            name="clock"
                             size={16}
-                            color={'#FF4E45'}
+                            color={"#FF4E45"}
                         />
 
                         <Text style={styles.expiredAndCancelTextTime}>
@@ -341,25 +387,25 @@ const WorkSchedule = ({navigation}: any) => {
             !selectedProduct
         ) {
             Snackbar.show({
-                text: 'Hãy chọn một trường để lọc',
+                text: "Hãy chọn một trường để lọc",
                 duration: Snackbar.LENGTH_LONG,
             });
         } else {
-            if (selectedMonth !== '' && selectedYear === '') {
+            if (selectedMonth !== "" && selectedYear === "") {
                 const currentYear = moment().year();
 
                 const startDate = moment({
                     year: currentYear,
                     month: Number(selectedMonth) - 1,
                     day: 1,
-                }).format('DD/MM/YYYY');
+                }).format("DD/MM/YYYY");
 
                 const endDate = moment({
                     year: currentYear,
                     month: Number(selectedMonth) - 1,
                 })
-                    .endOf('month')
-                    .format('DD/MM/YYYY');
+                    .endOf("month")
+                    .format("DD/MM/YYYY");
 
                 filterWorkSchedule(
                     startDate,
@@ -367,19 +413,19 @@ const WorkSchedule = ({navigation}: any) => {
                     selectedProductType,
                     selectedProduct,
                 );
-            } else if (selectedMonth === '' && selectedYear !== '') {
+            } else if (selectedMonth === "" && selectedYear !== "") {
                 const startDate = moment({
                     year: Number(selectedYear),
                     month: 0,
                     day: 1,
-                }).format('DD/MM/YYYY');
+                }).format("DD/MM/YYYY");
 
                 const endDate = moment({
                     year: Number(selectedYear),
                     month: 11,
                 })
-                    .endOf('month')
-                    .format('DD/MM/YYYY');
+                    .endOf("month")
+                    .format("DD/MM/YYYY");
 
                 filterWorkSchedule(
                     startDate,
@@ -392,14 +438,14 @@ const WorkSchedule = ({navigation}: any) => {
                     year: Number(selectedYear),
                     month: Number(selectedMonth) - 1,
                     day: 1,
-                }).format('DD/MM/YYYY');
+                }).format("DD/MM/YYYY");
 
                 const endDate = moment({
                     year: Number(selectedYear),
                     month: Number(selectedMonth) - 1,
                 })
-                    .endOf('month')
-                    .format('DD/MM/YYYY');
+                    .endOf("month")
+                    .format("DD/MM/YYYY");
 
                 filterWorkSchedule(
                     startDate,
@@ -414,10 +460,10 @@ const WorkSchedule = ({navigation}: any) => {
 
     const resetFilter = () => {
         resetData();
-        setSelectedMonth('');
-        setSelectedYear('');
-        setSelectedProductType('');
-        setSelectedProduct('');
+        setSelectedMonth("");
+        setSelectedYear("");
+        setSelectedProductType("");
+        setSelectedProduct("");
         setShowForm(!showForm);
     };
 
@@ -470,8 +516,8 @@ const WorkSchedule = ({navigation}: any) => {
                     <View style={styles.warpChildTasksAndStaffs}>
                         <View style={styles.warpIconAndValue}>
                             <MaterialIcons
-                                name='checklist-rtl'
-                                color={'#808080'}
+                                name="checklist-rtl"
+                                color={"#808080"}
                                 size={20}
                             />
 
@@ -490,8 +536,8 @@ const WorkSchedule = ({navigation}: any) => {
 
                         <View style={styles.warpIconAndValueStaff}>
                             <FontAwesome6
-                                name='user-group'
-                                color={'#808080'}
+                                name="user-group"
+                                color={"#808080"}
                                 size={14}
                             />
 
@@ -511,22 +557,11 @@ const WorkSchedule = ({navigation}: any) => {
         </TouchableOpacity>
     );
 
-    const handleGetListWorkSchedule = async () => {
-        resetData();
-        await getListWorkSchedule();
-        getProductType();
-        getProduct();
-        if (searchSchedule !== '') {
-            setSearchSchedule('');
-        }
-        setSelectedStatus(2);
-    };
+    // console.log("filter-schedule: ", filterSchedule);
 
-    useEffect(() => {
-        handleGetListWorkSchedule();
-    }, []);
-
-    if (isLoading) return <Loading />;
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <View style={styles.container}>
@@ -534,7 +569,7 @@ const WorkSchedule = ({navigation}: any) => {
                 <FlatList
                     data={statusList}
                     horizontal
-                    keyboardShouldPersistTaps='handled'
+                    keyboardShouldPersistTaps="handled"
                     showsHorizontalScrollIndicator={false}
                     keyExtractor={item => item.label}
                     renderItem={({item}) => (
@@ -547,8 +582,8 @@ const WorkSchedule = ({navigation}: any) => {
                             ]}>
                             {item.value === 7 ? (
                                 <Feather
-                                    name='trash-2'
-                                    color={'#FF4E45'}
+                                    name="trash-2"
+                                    color={"#FF4E45"}
                                     size={25}
                                 />
                             ) : (
@@ -570,12 +605,12 @@ const WorkSchedule = ({navigation}: any) => {
                 <View style={styles.searchInput}>
                     <View style={styles.warpIconTextInput}>
                         <MaterialIcons
-                            name='search'
-                            color={'rgba(128, 128, 128, 1)'}
+                            name="search"
+                            color={"rgba(128, 128, 128, 1)"}
                             size={22}
                         />
                         <TextInput
-                            placeholder='Tìm quy trình'
+                            placeholder="Tìm quy trình"
                             placeholderTextColor={colors.gray}
                             style={styles.input}
                             onChangeText={setSearchSchedule}
@@ -586,8 +621,8 @@ const WorkSchedule = ({navigation}: any) => {
                         style={styles.btnFilter}
                         onPress={() => setShowForm(!showForm)}>
                         <MaterialIcons
-                            name='manage-search'
-                            color={'#fff'}
+                            name="manage-search"
+                            color={"#fff"}
                             size={22}
                         />
                     </TouchableOpacity>
@@ -596,29 +631,32 @@ const WorkSchedule = ({navigation}: any) => {
                 <FlatList
                     contentContainerStyle={styles.flatListSchedule}
                     data={filterSchedule}
+                    // data={[]}
                     showsVerticalScrollIndicator={false}
                     keyExtractor={item => item._id}
                     renderItem={({item}) => renderItemWorkSchedule(item)}
                     onRefresh={handleGetListWorkSchedule}
                     refreshing={isLoading}
+                    onEndReached={handleLoadMore}
+                    onEndReachedThreshold={0.3}
                     ListEmptyComponent={
                         <View style={styles.scheduleListEmpty}>
                             <Image
                                 source={images.emptyScheduleList}
                                 style={styles.emptyScheduleListImg}
-                                resizeMode='contain'
+                                resizeMode="contain"
                             />
                             <Text style={styles.emptyScheduleListText}>
                                 {searchSchedule.length !== 0
                                     ? `Không tìm thấy quy trình phù hợp với \n“${searchSchedule}"`
-                                    : 'Không tìm thấy danh sách quy trình!'}
+                                    : "Không tìm thấy danh sách quy trình!"}
                             </Text>
                         </View>
                     }
                 />
             </View>
 
-            <Modal visible={showForm} animationType='fade' transparent={true}>
+            <Modal visible={showForm} animationType="fade" transparent={true}>
                 <View style={styles.modalBackdrop}>
                     <View style={styles.modalContent}>
                         <Text style={styles.text1}>Lọc quy trình</Text>
@@ -631,9 +669,9 @@ const WorkSchedule = ({navigation}: any) => {
                                 iconStyle={styles.iconStyle}
                                 data={listMonth}
                                 maxHeight={300}
-                                labelField='name'
-                                valueField='_id'
-                                placeholder='Chọn tháng'
+                                labelField="name"
+                                valueField="_id"
+                                placeholder="Chọn tháng"
                                 value={selectedMonth}
                                 onChange={itemValue =>
                                     setSelectedMonth(itemValue._id)
@@ -641,18 +679,18 @@ const WorkSchedule = ({navigation}: any) => {
                             />
 
                             <Dropdown
-                                mode='modal'
+                                mode="modal"
                                 style={styles.dropdown1}
                                 search
-                                searchPlaceholder='Tìm năm'
+                                searchPlaceholder="Tìm năm"
                                 placeholderStyle={styles.placeholderStyle}
                                 selectedTextStyle={styles.selectedTextStyle}
                                 iconStyle={styles.iconStyle}
                                 data={listYear}
                                 maxHeight={300}
-                                labelField='name'
-                                valueField='_id'
-                                placeholder='Chọn năm'
+                                labelField="name"
+                                valueField="_id"
+                                placeholder="Chọn năm"
                                 value={selectedYear}
                                 onChange={itemValue =>
                                     setSelectedYear(itemValue._id)
@@ -661,18 +699,18 @@ const WorkSchedule = ({navigation}: any) => {
                         </View>
 
                         <Dropdown
-                            mode='modal'
+                            mode="modal"
                             style={styles.dropdown}
                             search
-                            searchPlaceholder='Tìm loại cây trồng'
+                            searchPlaceholder="Tìm loại cây trồng"
                             placeholderStyle={styles.placeholderStyle}
                             selectedTextStyle={styles.selectedTextStyle}
                             iconStyle={styles.iconStyle}
                             data={listProductType}
                             maxHeight={300}
-                            labelField='name'
-                            valueField='_id'
-                            placeholder='Chọn loại cây trồng'
+                            labelField="name"
+                            valueField="_id"
+                            placeholder="Chọn loại cây trồng"
                             value={selectedProductType}
                             onChange={itemValue =>
                                 setSelectedProductType(itemValue._id)
@@ -680,18 +718,18 @@ const WorkSchedule = ({navigation}: any) => {
                         />
 
                         <Dropdown
-                            mode='modal'
+                            mode="modal"
                             style={styles.dropdown}
                             search
-                            searchPlaceholder='Tìm cây trồng'
+                            searchPlaceholder="Tìm cây trồng"
                             placeholderStyle={styles.placeholderStyle}
                             selectedTextStyle={styles.selectedTextStyle}
                             iconStyle={styles.iconStyle}
                             data={listProduct}
                             maxHeight={300}
-                            labelField='name'
-                            valueField='_id'
-                            placeholder='Chọn cây trồng'
+                            labelField="name"
+                            valueField="_id"
+                            placeholder="Chọn cây trồng"
                             value={selectedProduct}
                             onChange={itemValue =>
                                 setSelectedProduct(itemValue._id)
@@ -702,13 +740,13 @@ const WorkSchedule = ({navigation}: any) => {
                             <TouchableOpacity
                                 style={[
                                     styles.btnModal,
-                                    {backgroundColor: '#4CAF50'},
+                                    {backgroundColor: "#4CAF50"},
                                 ]}
                                 onPress={additionalFilter}>
                                 <Text
                                     style={[
                                         styles.btnCloseModalText,
-                                        {color: '#fff'},
+                                        {color: "#fff"},
                                     ]}>
                                     Lọc
                                 </Text>
@@ -716,13 +754,13 @@ const WorkSchedule = ({navigation}: any) => {
                             <TouchableOpacity
                                 style={[
                                     styles.btnModal,
-                                    {backgroundColor: '#FF4E45'},
+                                    {backgroundColor: "#FF4E45"},
                                 ]}
                                 onPress={resetFilter}>
                                 <Text
                                     style={[
                                         styles.btnCloseModalText,
-                                        {color: '#fff'},
+                                        {color: "#fff"},
                                     ]}>
                                     Đặt lại
                                 </Text>
@@ -745,27 +783,27 @@ const WorkSchedule = ({navigation}: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     workScheduleTypeHorizontalScroll: {
-        backgroundColor: '#F5F5F5',
+        backgroundColor: "#F5F5F5",
     },
     statusBtn: {
         width: 128,
         height: 48,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     selectedStatusBtn: {
-        borderBottomColor: '#4CAF50',
+        borderBottomColor: "#4CAF50",
         borderBottomWidth: 2,
     },
     statusBtnText: {
         fontWeight: 500,
-        color: '#212121',
+        color: "#212121",
     },
     selectedStatusBtnText: {
-        color: '#4CAF50',
+        color: "#4CAF50",
         fontWeight: 500,
     },
     listWorkSchedule: {
@@ -776,8 +814,8 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         borderRadius: 22,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         backgroundColor: colors.white,
         borderColor: colors.light_gray,
         borderWidth: 0.5,
@@ -786,21 +824,21 @@ const styles = StyleSheet.create({
     },
     warpIconTextInput: {
         paddingHorizontal: 10,
-        width: '85%',
-        flexDirection: 'row',
-        alignItems: 'center',
+        width: "85%",
+        flexDirection: "row",
+        alignItems: "center",
     },
     input: {
         color: colors.black,
-        width: '85%',
+        width: "85%",
     },
     btnFilter: {
         width: 40,
         height: 40,
         borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#4CAF50',
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#4CAF50",
     },
     flatListSchedule: {
         flexGrow: 1,
@@ -811,103 +849,103 @@ const styles = StyleSheet.create({
         gap: 12,
         padding: 12,
         borderRadius: 8,
-        flexDirection: 'row',
-        backgroundColor: '#F5F5F5',
-        boxShadow: '0 1 2 0 #00000040',
+        flexDirection: "row",
+        backgroundColor: "#F5F5F5",
+        boxShadow: "0 1 2 0 #00000040",
     },
     progressValue: {
-        color: 'black',
-        fontWeight: '400',
+        color: "black",
+        fontWeight: "400",
         fontSize: 10,
     },
     warpInfoWork: {
         gap: 12,
-        width: '100%',
+        width: "100%",
     },
     pendingAndAlmostExpireText: {
-        color: '#FF9800',
+        color: "#FF9800",
         fontSize: 13,
         fontWeight: 500,
     },
     processingText: {
-        color: '#2196F3',
+        color: "#2196F3",
         fontSize: 13,
         fontWeight: 500,
     },
     completedText: {
-        color: '#4CAF50',
+        color: "#4CAF50",
         fontSize: 13,
         fontWeight: 500,
     },
     expiredAndCanceledText: {
-        color: '#FF4E45',
+        color: "#FF4E45",
         fontSize: 13,
         fontWeight: 500,
     },
     mainWorkTitle: {
-        color: '#000000',
+        color: "#000000",
         fontWeight: 500,
         fontSize: 14,
     },
     warpChildTasksAndStaffs: {
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-between",
     },
     warpIconAndValue: {
         flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         gap: 4,
     },
     warpIconAndValueStaff: {
         flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         gap: 4,
     },
     value: {
-        color: '#808080',
+        color: "#808080",
         fontSize: 12,
         fontWeight: 500,
     },
     workScheduleTime: {
         gap: 4,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
     },
     startInText: {
         marginLeft: 5,
-        color: '#FF9800',
+        color: "#FF9800",
         fontWeight: 500,
         fontSize: 11,
-        fontStyle: 'italic',
+        fontStyle: "italic",
     },
     remainingText: {
         marginLeft: 5,
-        color: '#212121',
+        color: "#212121",
         fontWeight: 500,
         fontSize: 11,
-        fontStyle: 'italic',
+        fontStyle: "italic",
     },
     completedTextTime: {
         // marginLeft: 5,
-        color: '#808080',
+        color: "#808080",
         fontWeight: 500,
         fontSize: 12,
-        fontStyle: 'italic',
+        fontStyle: "italic",
     },
     expiredAndCancelTextTime: {
-        color: '#FF4E45',
+        color: "#FF4E45",
         fontSize: 12,
         fontWeight: 500,
-        fontStyle: 'italic',
+        fontStyle: "italic",
     },
     scheduleListEmpty: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     emptyScheduleListImg: {
         height: 200,
@@ -915,49 +953,49 @@ const styles = StyleSheet.create({
     emptyScheduleListText: {
         fontWeight: 400,
         fontSize: 13,
-        color: 'rgba(128, 128, 128, 1)',
-        textAlign: 'center',
+        color: "rgba(128, 128, 128, 1)",
+        textAlign: "center",
     },
     modalBackdrop: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        justifyContent: "center",
+        alignItems: "center",
     },
     modalContent: {
-        backgroundColor: '#f5f5f5',
+        backgroundColor: "#f5f5f5",
         paddingVertical: 20,
         paddingHorizontal: 15,
         borderRadius: 12,
-        width: '94%',
+        width: "94%",
         gap: 12,
     },
     text1: {
         fontWeight: 600,
     },
     warpDropdown: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
     },
     dropdown: {
         height: 52,
-        minWidth: '100%',
-        borderColor: '#9A9A9A',
+        minWidth: "100%",
+        borderColor: "#9A9A9A",
         borderWidth: 1,
         paddingHorizontal: 8,
         borderRadius: 8,
     },
     dropdown1: {
         height: 52,
-        minWidth: '48%',
-        borderColor: '#9A9A9A',
+        minWidth: "48%",
+        borderColor: "#9A9A9A",
         borderWidth: 1,
         paddingHorizontal: 8,
         borderRadius: 8,
     },
     placeholderStyle: {
         fontSize: 15,
-        color: '#666666',
+        color: "#666666",
         fontWeight: 400,
     },
     selectedTextStyle: {
@@ -969,19 +1007,19 @@ const styles = StyleSheet.create({
         height: 20,
     },
     warpButton: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 8,
         marginTop: 10,
     },
     btnModal: {
-        alignItems: 'center',
-        backgroundColor: '#D3D3D3',
+        alignItems: "center",
+        backgroundColor: "#D3D3D3",
         borderRadius: 10,
         padding: 12,
         flex: 1,
     },
     btnCloseModalText: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 600,
         fontSize: 15,
     },

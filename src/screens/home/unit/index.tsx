@@ -7,22 +7,22 @@ import {
     TouchableOpacity,
     TextInput,
     Image,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import images from '../../../assets/images';
-import {useWorkerStore} from '../../../stores/workerStore';
-import Loading from '@/screens/subscreen/Loading';
-import {useAuthStore} from '../../../stores/authStore';
-import Snackbar from 'react-native-snackbar';
-import {organizations} from '@/shared-types/common/Permissions/Permissions';
+} from "react-native";
+import React, {useEffect, useState} from "react";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
+import images from "../../../assets/images";
+import {useWorkerStore} from "../../../stores/workerStore";
+import Loading from "@/screens/subscreen/Loading";
+import {useAuthStore} from "../../../stores/authStore";
+import Snackbar from "react-native-snackbar";
+import {organizations} from "@/shared-types/common/Permissions/Permissions";
 
 const Unit = ({navigation}: any) => {
     const {listWorker, getListWorkerByLeader, isLoading} = useWorkerStore();
     const {userInfo} = useAuthStore();
 
-    const [searchWorker, setSearchWorker] = useState('');
+    const [searchWorker, setSearchWorker] = useState("");
 
     const filterWorkerBySearch = listWorker.filter(user =>
         user?.fullName.toLowerCase().includes(searchWorker.toLowerCase()),
@@ -31,7 +31,7 @@ const Unit = ({navigation}: any) => {
     const handleNavigate = (itemListWorker: any) => {
         if (
             userInfo.functions.some(
-                (item: any) => item._id === 'EMPLOYEES' && item.detail,
+                (item: any) => item._id === "EMPLOYEES" && item.detail,
             )
         ) {
             navigation.navigate(SCREEN_INFO.WORKERINFO.key, {
@@ -39,7 +39,7 @@ const Unit = ({navigation}: any) => {
             });
         } else {
             Snackbar.show({
-                text: 'Bạn không có quyền xem chi tiết người lao động',
+                text: "Bạn không có quyền xem chi tiết người lao động",
                 duration: Snackbar.LENGTH_SHORT,
             });
         }
@@ -47,7 +47,7 @@ const Unit = ({navigation}: any) => {
 
     const handleReFetch = () => {
         if (searchWorker.length !== 0) {
-            setSearchWorker('');
+            setSearchWorker("");
         }
         getListWorkerByLeader();
     };
@@ -82,7 +82,7 @@ const Unit = ({navigation}: any) => {
                                         org.code ===
                                         itemListWorker.userType.level,
                                 )?.label
-                            }{' '}
+                            }{" "}
                             {itemListWorker.userType.unit &&
                                 `- ${itemListWorker.userType.unit}`}
                         </Text>
@@ -102,7 +102,9 @@ const Unit = ({navigation}: any) => {
         getListWorkerByLeader();
     }, []);
 
-    if (isLoading) return <Loading />;
+    if (isLoading) {
+        return <Loading />;
+    }
 
     console.log(filterWorkerBySearch);
 
@@ -110,13 +112,13 @@ const Unit = ({navigation}: any) => {
         <View style={UnitStyles.container}>
             <View style={UnitStyles.searchInput}>
                 <MaterialIcons
-                    name='search'
-                    color={'rgba(128, 128, 128, 1)'}
+                    name="search"
+                    color={"rgba(128, 128, 128, 1)"}
                     size={22}
                 />
                 <TextInput
-                    placeholder='Tìm kiếm người lao động'
-                    placeholderTextColor={'rgba(128, 128, 128, 1)'}
+                    placeholder="Tìm kiếm người lao động"
+                    placeholderTextColor={"rgba(128, 128, 128, 1)"}
                     style={UnitStyles.input}
                     onChangeText={setSearchWorker}
                 />
@@ -130,18 +132,18 @@ const Unit = ({navigation}: any) => {
                     keyExtractor={(item, index) => index.toString()}
                     onRefresh={handleReFetch}
                     refreshing={isLoading}
-                    keyboardShouldPersistTaps='handled'
+                    keyboardShouldPersistTaps="handled"
                     ListEmptyComponent={
                         <View style={UnitStyles.workerEmpty}>
                             <Image
                                 source={images.emptyWorkerList}
                                 style={UnitStyles.emptyWorkerImg}
-                                resizeMode='contain'
+                                resizeMode="contain"
                             />
                             <Text style={UnitStyles.emptyWorkerText}>
                                 {searchWorker.length !== 0
                                     ? `Không tìm thấy nhân sự phù hợp với \n “${searchWorker}"`
-                                    : 'Không tìm thấy danh sách nhân sự!'}
+                                    : "Không tìm thấy danh sách nhân sự!"}
                             </Text>
                         </View>
                     }
@@ -155,19 +157,19 @@ const UnitStyles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: 20,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     searchInput: {
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(211, 211, 211, 1)',
+        borderBottomColor: "rgba(211, 211, 211, 1)",
         gap: 4,
     },
     input: {
-        color: 'black',
-        width: '92%',
+        color: "black",
+        width: "92%",
     },
     listWorker: {
         flex: 1,
@@ -181,19 +183,19 @@ const UnitStyles = StyleSheet.create({
     },
     workerCard: {
         paddingHorizontal: 14,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     leftWorkerCard: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 13,
-        alignItems: 'center',
+        alignItems: "center",
         flex: 1,
     },
     workerAvatar: {
-        backgroundColor: 'rgba(211, 211, 211, 1)',
-        borderRadius: '50%',
+        backgroundColor: "rgba(211, 211, 211, 1)",
+        borderRadius: "50%",
         width: 56,
         height: 56,
     },
@@ -201,43 +203,43 @@ const UnitStyles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 24,
-        margin: 'auto',
+        margin: "auto",
     },
     workerNameAndUnit: {
         gap: 2,
-        width: '80%',
+        width: "80%",
     },
     workerName: {
-        color: 'rgba(76, 175, 80, 1)',
+        color: "rgba(76, 175, 80, 1)",
         fontWeight: 600,
         fontSize: 15,
-        textTransform: 'capitalize',
+        textTransform: "capitalize",
     },
     workerUnit: {
-        textTransform: 'capitalize',
+        textTransform: "capitalize",
         fontSize: 13,
         fontWeight: 400,
-        color: 'rgba(0, 0, 0, 1)',
+        color: "rgba(0, 0, 0, 1)",
     },
     workerOrder: {
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
         fontWeight: 400,
         fontSize: 14,
-        textTransform: 'uppercase',
+        textTransform: "uppercase",
     },
     workerEmpty: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     emptyWorkerImg: {
         height: 200,
     },
     emptyWorkerText: {
-        textAlign: 'center',
+        textAlign: "center",
         fontWeight: 400,
         fontSize: 14,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
     },
 });
 

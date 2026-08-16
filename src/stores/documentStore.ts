@@ -1,10 +1,10 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import {IDocument} from '../shared-types/Response/DocumentResponse/DocumentResponse';
-import ENV from '@/config/ENV';
-import RNFS from 'react-native-fs';
-import {encode} from 'base64-arraybuffer';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import {IDocument} from "../shared-types/Response/DocumentResponse/DocumentResponse";
+import ENV from "@/config/ENV";
+import RNFS from "react-native-fs";
+import {encode} from "base64-arraybuffer";
 interface DocumentStore {
     isLoading: boolean;
     listDocument: IDocument[];
@@ -21,22 +21,22 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             const response = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/downloads/${fileName}`,
                 {
-                    responseType: 'arraybuffer',
+                    responseType: "arraybuffer",
                 },
             );
             const base64Data = encode(response.data);
 
             const filePath = `${RNFS.DownloadDirectoryPath}/${fileName}`;
-            await RNFS.writeFile(filePath, base64Data, 'base64');
+            await RNFS.writeFile(filePath, base64Data, "base64");
 
             Snackbar.show({
-                text: 'Đã tải file thành công',
+                text: "Đã tải file thành công",
                 duration: Snackbar.LENGTH_LONG,
             });
 
             return filePath;
         } catch (error) {
-            console.error('Download failed:', error);
+            console.error("Download failed:", error);
         }
     },
 
@@ -57,7 +57,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }

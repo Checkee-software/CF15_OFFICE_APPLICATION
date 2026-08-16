@@ -5,15 +5,15 @@ import {
     ScrollView,
     TouchableOpacity,
     FlatList,
-} from 'react-native';
-import React, {useState} from 'react';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import moment from 'moment';
-import AutoHeightWebView from 'react-native-autoheight-webview';
-import ENV from '@/config/ENV';
-import {Dimensions} from 'react-native';
-import ModalPdfView from '../../../utils/Modals/ModalPdfView';
+} from "react-native";
+import React, {useState} from "react";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import moment from "moment";
+import AutoHeightWebView from "react-native-autoheight-webview";
+import ENV from "@/config/ENV";
+import {Dimensions} from "react-native";
+import ModalPdfView from "../../../utils/Modals/ModalPdfView";
 
 const DetailDocuments = ({route}: any) => {
     const [showModalPdf, setShowModalPdf] = useState<boolean>(false);
@@ -72,7 +72,7 @@ const DetailDocuments = ({route}: any) => {
     };
 
     const handleOpenPdf = (path: string) => {
-        const fixedPath = path.replace(/\\/g, '/');
+        const fixedPath = path.replace(/\\/g, "/");
         setSelectedPdf(`${ENV.BACKEND_URL}${fixedPath}`);
         setShowModalPdf(true);
     };
@@ -81,8 +81,8 @@ const DetailDocuments = ({route}: any) => {
         <View style={DetailDocumentsStyles.cardDocument}>
             <View style={DetailDocumentsStyles.leftCardDocument}>
                 <MaterialCommunityIcons
-                    name='text-box'
-                    color={'rgba(255, 78, 69, 1)'}
+                    name="text-box"
+                    color={"rgba(255, 78, 69, 1)"}
                     size={28}
                 />
                 <View style={DetailDocumentsStyles.infoDocument}>
@@ -98,8 +98,8 @@ const DetailDocuments = ({route}: any) => {
             <TouchableOpacity
                 onPress={() => handleOpenPdf(itemAttachedFiles.path)}>
                 <FontAwesome
-                    name='eye'
-                    color={'rgba(33, 150, 243, 1)'}
+                    name="eye"
+                    color={"rgba(33, 150, 243, 1)"}
                     size={22}
                 />
             </TouchableOpacity>
@@ -122,16 +122,16 @@ const DetailDocuments = ({route}: any) => {
                 <View style={DetailDocumentsStyles.body}>
                     <View style={DetailDocumentsStyles.warpCreateAndPromulgate}>
                         <Text style={DetailDocumentsStyles.dateTimeCreate}>
-                            Tạo lúc:{' '}
+                            Tạo lúc:{" "}
                             {moment(route.params.itemDocument.createdAt).format(
-                                'HH:mm DD/MM/YYYY',
+                                "HH:mm DD/MM/YYYY",
                             )}
                         </Text>
                         <Text style={DetailDocumentsStyles.dateTimePromulgate}>
-                            Ngày BH:{' '}
+                            Ngày BH:{" "}
                             {moment(
                                 route.params.itemDocument.dateOfIssue,
-                            ).format('HH:mm DD/MM/YYYY')}
+                            ).format("HH:mm DD/MM/YYYY")}
                         </Text>
                     </View>
 
@@ -140,7 +140,7 @@ const DetailDocuments = ({route}: any) => {
                             * { font-size: 16px; word-break: break-word; }
                             img { max-width: 100%; height: auto; }
                         `}
-                        originWhitelist={['*']}
+                        originWhitelist={["*"]}
                         source={{html: htmlContent}}
                         style={DetailDocumentsStyles.documentContent}
                         scrollEnabled={false}
@@ -176,7 +176,7 @@ const DetailDocuments = ({route}: any) => {
 
             <ModalPdfView
                 visible={showModalPdf}
-                pdfFilePath={selectedPdf || ''}
+                pdfFilePath={selectedPdf || ""}
                 onClose={() => setShowModalPdf(false)}
             />
         </View>
@@ -188,20 +188,20 @@ export default DetailDocuments;
 const DetailDocumentsStyles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         paddingHorizontal: 12,
     },
     header: {
         gap: 6,
-        borderColor: 'gray',
+        borderColor: "gray",
         borderBottomWidth: 0.2,
     },
     headerTitle: {
-        fontWeight: '500',
+        fontWeight: "500",
         fontSize: 15,
     },
     creator: {
-        color: 'rgba(33, 150, 243, 1)',
+        color: "rgba(33, 150, 243, 1)",
         fontSize: 13,
         fontWeight: 300,
         marginBottom: 6,
@@ -212,31 +212,31 @@ const DetailDocumentsStyles = StyleSheet.create({
     },
     warpCreateAndPromulgate: {
         marginTop: 6,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
     },
     dateTimeCreate: {
         fontSize: 11,
-        color: 'rgba(128, 128, 128, 1)',
-        fontWeight: '400',
+        color: "rgba(128, 128, 128, 1)",
+        fontWeight: "400",
     },
     dateTimePromulgate: {
         fontSize: 11,
-        color: 'rgba(33, 150, 243, 1)',
-        textAlign: 'right',
+        color: "rgba(33, 150, 243, 1)",
+        textAlign: "right",
     },
     documentContent: {
         marginVertical: 10,
-        width: Dimensions.get('window').width - 15,
+        width: Dimensions.get("window").width - 15,
     },
     attachedDocuments: {
         //marginBottom: 15,
     },
     attachedDocumentsText: {
-        borderTopColor: 'rgba(211, 211, 211, 1)',
+        borderTopColor: "rgba(211, 211, 211, 1)",
         borderBottomWidth: 0.5,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
         fontSize: 13,
         paddingVertical: 10,
     },
@@ -247,36 +247,36 @@ const DetailDocumentsStyles = StyleSheet.create({
         borderRadius: 8,
         padding: 10,
         flex: 1,
-        backgroundColor: 'rgba(128, 128, 128, 0.15)',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        backgroundColor: "rgba(128, 128, 128, 0.15)",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         marginBottom: 10,
     },
     leftCardDocument: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         flex: 1,
         gap: 10,
     },
     infoDocument: {
         gap: 4,
-        width: '85%',
+        width: "85%",
     },
     infoDocumentText: {
         fontSize: 11,
     },
     infoDocumentSizeText: {
         fontSize: 11,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
     },
     emptyContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     emptyText: {
         fontSize: 15,
-        color: 'black',
+        color: "black",
     },
 });

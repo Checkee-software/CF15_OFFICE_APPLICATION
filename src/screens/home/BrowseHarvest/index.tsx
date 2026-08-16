@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
     View,
@@ -8,20 +7,20 @@ import {
     TouchableOpacity,
     Image,
     TextInput,
-} from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
-import {IGardenHarvest, useGardenWorkStore} from '@/stores/gardenWorkStore';
-import Loading from '@/screens/subscreen/Loading';
+} from "react-native";
+import React, {useEffect, useRef, useState} from "react";
+import {IGardenHarvest, useGardenWorkStore} from "@/stores/gardenWorkStore";
+import Loading from "@/screens/subscreen/Loading";
 import {
     EStatusData,
     STATUS_DATA,
-} from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
-import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
-import images from '@/assets/images';
-import moment from 'moment';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import HarvestHistoryResponse from '@/shared-types/Response/HarvestHistoryResponse';
-import Snackbar from 'react-native-snackbar';
+} from "@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse";
+import {KeyboardAwareFlatList} from "react-native-keyboard-aware-scroll-view";
+import images from "@/assets/images";
+import moment from "moment";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import HarvestHistoryResponse from "@/shared-types/Response/HarvestHistoryResponse";
+import Snackbar from "react-native-snackbar";
 
 const BrowseHarvest = () => {
     interface listRadioBtn {
@@ -39,7 +38,7 @@ const BrowseHarvest = () => {
     } = useGardenWorkStore();
 
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState('NONE');
+    const [selectedStatus, setSelectedStatus] = useState("NONE");
     const [showComfirmView, setShowComfirmView] = useState<initialRadioState>(
         [],
     );
@@ -93,7 +92,7 @@ const BrowseHarvest = () => {
                         item.gardenSquare === item.area + item.processingRate
                             ? true
                             : false,
-                    message: item.message || '',
+                    message: item.message || "",
                 }),
             );
 
@@ -106,7 +105,7 @@ const BrowseHarvest = () => {
             const formRateReport: any = {
                 status: HarvestHistoryResponse.EStatusData.VERIFIED,
                 gardenId: itemRadioState.gardenId,
-                message: '',
+                message: "",
             };
 
             setIsLoading(true);
@@ -122,9 +121,9 @@ const BrowseHarvest = () => {
                 setIsLoading(false);
             }
         } else if (itemRadioState.radioSelectedType === 3) {
-            if (itemRadioState.message === '') {
+            if (itemRadioState.message === "") {
                 Snackbar.show({
-                    text: 'Bạn chưa nhập lý do từ chối',
+                    text: "Bạn chưa nhập lý do từ chối",
                     duration: Snackbar.LENGTH_LONG,
                 });
             } else {
@@ -159,11 +158,11 @@ const BrowseHarvest = () => {
                 {
                     borderColor:
                         itemGardenWork.status === EStatusData.DENIED
-                            ? '#FF4E45'
-                            : '#000000',
+                            ? "#FF4E45"
+                            : "#000000",
                     marginBottom:
                         index + 1 === listHarvestsBrowseFilter.length &&
-                        selectedStatus === 'NONE'
+                        selectedStatus === "NONE"
                             ? 220
                             : 0,
                 },
@@ -182,7 +181,7 @@ const BrowseHarvest = () => {
 
                     <Text style={styles.value}>
                         {moment(itemGardenWork.createdAt).format(
-                            'HH:mm DD/MM/YYYY',
+                            "HH:mm DD/MM/YYYY",
                         )}
                     </Text>
                 </View>
@@ -190,21 +189,21 @@ const BrowseHarvest = () => {
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Người thực hiện</Text>
                     <Text style={styles.value}>
-                        {itemGardenWork.ownerName || ''}
+                        {itemGardenWork.ownerName || ""}
                     </Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Cây trồng</Text>
                     <Text style={styles.workValue}>
-                        {itemGardenWork.productTypeName || ''}
+                        {itemGardenWork.productTypeName || ""}
                     </Text>
                 </View>
 
                 <View style={styles.warpLabelAndValue}>
                     <Text style={styles.label}>Khu vườn</Text>
                     <Text style={styles.workValue}>
-                        {itemGardenWork.productName || ''}
+                        {itemGardenWork.productName || ""}
                     </Text>
                 </View>
 
@@ -213,7 +212,7 @@ const BrowseHarvest = () => {
                     <Text style={styles.value}>
                         {Number.isInteger(itemGardenWork.amount)
                             ? itemGardenWork.amount
-                            : itemGardenWork.amount.toFixed(2) || ''}{' '}
+                            : itemGardenWork.amount.toFixed(2) || ""}{" "}
                         (KG)
                     </Text>
                 </View>
@@ -223,11 +222,11 @@ const BrowseHarvest = () => {
                     <View style={styles.warpLabelAndValue}>
                         <Text style={styles.label}>
                             {itemGardenWork.status === EStatusData.VERIFIED
-                                ? 'Người duyệt'
-                                : 'Người từ chối'}
+                                ? "Người duyệt"
+                                : "Người từ chối"}
                         </Text>
                         <Text style={styles.value}>
-                            {itemGardenWork.verifierName || ''}
+                            {itemGardenWork.verifierName || ""}
                         </Text>
                     </View>
                 )}
@@ -249,14 +248,14 @@ const BrowseHarvest = () => {
                                             name={
                                                 itemComfirm.radioSelectedType ===
                                                 2
-                                                    ? 'radio-button-checked'
-                                                    : 'radio-button-off'
+                                                    ? "radio-button-checked"
+                                                    : "radio-button-off"
                                             }
                                             color={
                                                 itemComfirm.radioSelectedType ===
                                                 2
-                                                    ? '#2196F3'
-                                                    : '#49454f'
+                                                    ? "#2196F3"
+                                                    : "#49454f"
                                             }
                                             size={20}
                                         />
@@ -285,14 +284,14 @@ const BrowseHarvest = () => {
                                             name={
                                                 itemComfirm.radioSelectedType ===
                                                 3
-                                                    ? 'radio-button-checked'
-                                                    : 'radio-button-off'
+                                                    ? "radio-button-checked"
+                                                    : "radio-button-off"
                                             }
                                             color={
                                                 itemComfirm.radioSelectedType ===
                                                 3
-                                                    ? '#2196F3'
-                                                    : '#49454f'
+                                                    ? "#2196F3"
+                                                    : "#49454f"
                                             }
                                             size={20}
                                         />
@@ -308,8 +307,8 @@ const BrowseHarvest = () => {
                                     <View style={styles.comfirmContent}>
                                         <Text style={styles.comfirmText}>
                                             {itemComfirm.radioSelectedType === 2
-                                                ? 'Bạn chắc chắn muốn duyệt thu hoạch này?'
-                                                : 'Bạn chắc chắn muốn từ chối thu hoạch này?'}
+                                                ? "Bạn chắc chắn muốn duyệt thu hoạch này?"
+                                                : "Bạn chắc chắn muốn từ chối thu hoạch này?"}
                                         </Text>
 
                                         {itemComfirm.radioSelectedType ===
@@ -323,8 +322,8 @@ const BrowseHarvest = () => {
                                                 style={
                                                     styles.cancelProgressInput
                                                 }
-                                                placeholder='Nhập lý do từ chối...'
-                                                placeholderTextColor={'#808080'}
+                                                placeholder="Nhập lý do từ chối..."
+                                                placeholderTextColor={"#808080"}
                                                 multiline
                                                 numberOfLines={5}
                                                 value={itemComfirm.message}
@@ -378,8 +377,8 @@ const BrowseHarvest = () => {
                                                     }>
                                                     {itemComfirm.radioSelectedType ===
                                                     3
-                                                        ? 'Từ chối'
-                                                        : 'Duyệt'}
+                                                        ? "Từ chối"
+                                                        : "Duyệt"}
                                                 </Text>
                                             </TouchableOpacity>
                                         </View>
@@ -424,17 +423,17 @@ const BrowseHarvest = () => {
                                         selectedStatus === item.code &&
                                             styles.selectedStatusBtnText,
                                     ]}>
-                                    {item.name === 'Tất cả'
-                                        ? 'Đang chờ'
+                                    {item.name === "Tất cả"
+                                        ? "Đang chờ"
                                         : item.name}
                                 </Text>
 
-                                {item._id === '00001' &&
+                                {item._id === "00001" &&
                                 badgeHarvestsUnBrowse !== 0 ? (
                                     <View style={styles.newBrowseWork}>
                                         <Text style={styles.newBrowseWorkText}>
                                             {badgeHarvestsUnBrowse > 9
-                                                ? '9+'
+                                                ? "9+"
                                                 : badgeHarvestsUnBrowse}
                                         </Text>
                                     </View>
@@ -459,15 +458,15 @@ const BrowseHarvest = () => {
                     removeClippedSubviews={false}
                     enableOnAndroid={true}
                     extraHeight={250}
-                    keyboardShouldPersistTaps='handled'
+                    keyboardShouldPersistTaps="handled"
                     ListEmptyComponent={
                         <View style={styles.emptyContainer}>
-                            {selectedStatus === 'NONE' ? (
+                            {selectedStatus === "NONE" ? (
                                 <>
                                     <Image
                                         source={images.emptyWorkList}
                                         style={styles.emptyImage}
-                                        resizeMode='contain'
+                                        resizeMode="contain"
                                     />
                                     <Text style={styles.emptyText}>
                                         Hiện tại không có yêu cầu thu hoạch để
@@ -492,11 +491,11 @@ export default BrowseHarvest;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     gardenWorkList: {
         flex: 1,
-        height: '100%',
+        height: "100%",
         paddingHorizontal: 20,
         paddingVertical: 20,
     },
@@ -506,14 +505,14 @@ const styles = StyleSheet.create({
     },
     gardenCard: {
         marginBottom: 15,
-        borderStyle: 'dashed',
+        borderStyle: "dashed",
         borderWidth: 1,
         gap: 16,
         padding: 12,
     },
     gardenTitleSection: {
-        justifyContent: 'center',
-        alignItems: 'flex-start',
+        justifyContent: "center",
+        alignItems: "flex-start",
     },
     gardenContentSection: {
         gap: 10,
@@ -526,70 +525,70 @@ const styles = StyleSheet.create({
     gardenId: {
         fontSize: 14,
         fontWeight: 500,
-        color: '#4CAF50',
+        color: "#4CAF50",
         lineHeight: 24,
     },
     warpLabelAndValue: {
-        flexDirection: 'row',
+        flexDirection: "row",
     },
     warpComfirmedView: {
-        flexDirection: 'column',
+        flexDirection: "column",
         gap: 4,
     },
     warpValueComfirmed: {
-        flexDirection: 'row',
+        flexDirection: "row",
     },
     label: {
-        width: '50%',
-        color: '#212121',
+        width: "50%",
+        color: "#212121",
         fontWeight: 500,
         fontSize: 14,
     },
     value: {
-        width: '50%',
-        color: '#212121',
+        width: "50%",
+        color: "#212121",
         fontWeight: 500,
         fontSize: 14,
-        textAlign: 'right',
+        textAlign: "right",
     },
     valueRemaining: {
         marginTop: 4,
         fontWeight: 400,
-        fontStyle: 'italic',
-        color: 'rgba(128, 128, 128, 1)',
+        fontStyle: "italic",
+        color: "rgba(128, 128, 128, 1)",
     },
     reasonValue: {
-        width: '50%',
-        color: '#FF4E45',
+        width: "50%",
+        color: "#FF4E45",
         fontWeight: 400,
         fontSize: 14,
-        textAlign: 'right',
-        fontStyle: 'italic',
+        textAlign: "right",
+        fontStyle: "italic",
     },
     workValue: {
-        width: '50%',
+        width: "50%",
         fontWeight: 600,
         fontSize: 14,
-        textAlign: 'right',
-        color: '#FF9800',
+        textAlign: "right",
+        color: "#FF9800",
     },
     comfirmView: {
         gap: 10,
     },
     listRadioButton: {
         borderTopWidth: 1,
-        borderTopColor: '#D3D3D3',
+        borderTopColor: "#D3D3D3",
         paddingTop: 20,
         paddingHorizontal: 10,
         marginBottom: 10,
         gap: 25,
-        flexDirection: 'row',
-        justifyContent: 'center',
+        flexDirection: "row",
+        justifyContent: "center",
     },
     warpRadioText: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 5,
-        alignItems: 'center',
+        alignItems: "center",
     },
     radioBtnText: {
         fontWeight: 500,
@@ -597,122 +596,122 @@ const styles = StyleSheet.create({
     },
     comfirmContent: {
         gap: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     comfirmText: {
-        textAlign: 'center',
+        textAlign: "center",
         fontWeight: 400,
         fontSize: 13,
         marginBottom: 6,
     },
     approveRequestBtn: {
-        backgroundColor: '#2196F3',
+        backgroundColor: "#2196F3",
         padding: 12,
         borderRadius: 4,
-        width: '48%',
+        width: "48%",
     },
     completeRequestBtn: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         padding: 12,
         borderRadius: 4,
-        width: '48%',
+        width: "48%",
     },
     approveRequestText: {
         fontWeight: 500,
         fontSize: 15,
-        color: '#F5F5F5',
-        textAlign: 'center',
+        color: "#F5F5F5",
+        textAlign: "center",
     },
     cancelWorkBtn: {
-        backgroundColor: '#FF4E45',
+        backgroundColor: "#FF4E45",
         padding: 12,
         borderRadius: 4,
-        width: '48%',
+        width: "48%",
     },
     cancelWorkBtnText: {
         fontWeight: 500,
         fontSize: 15,
-        color: '#F5F5F5',
-        textAlign: 'center',
+        color: "#F5F5F5",
+        textAlign: "center",
     },
     emptyContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     emptyImage: {
         height: 180,
     },
     emptyText: {
-        textAlign: 'center',
+        textAlign: "center",
         fontSize: 14,
-        color: '#808080',
+        color: "#808080",
     },
     cancelProgressInput: {
         fontSize: 13,
-        color: '#000',
-        textAlignVertical: 'top',
-        borderColor: '#FF4E45',
+        color: "#000",
+        textAlignVertical: "top",
+        borderColor: "#FF4E45",
         borderWidth: 1,
         borderRadius: 8,
-        backgroundColor: '#FF4E4526',
+        backgroundColor: "#FF4E4526",
         paddingHorizontal: 15,
-        width: '100%',
+        width: "100%",
         minHeight: 80,
         marginBottom: 5,
     },
     listComfirmButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "100%",
     },
     statusBrowse: {
         borderTopWidth: 1,
-        borderColor: '#D3D3D3',
+        borderColor: "#D3D3D3",
     },
     browseInfo: {
         marginTop: 10,
         gap: 4,
     },
     workScheduleTypeHorizontalScroll: {
-        borderBottomColor: '#cac4d0',
+        borderBottomColor: "#cac4d0",
         borderBottomWidth: 1,
-        width: '100%',
-        alignItems: 'center',
+        width: "100%",
+        alignItems: "center",
     },
     statusBtn: {
         width: 110,
         height: 48,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     selectedStatusBtn: {
-        borderBottomColor: '#4CAF50',
+        borderBottomColor: "#4CAF50",
         borderBottomWidth: 2,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
     },
     statusBtnText: {
         fontWeight: 500,
-        color: '#212121',
+        color: "#212121",
         fontSize: 14,
     },
     selectedStatusBtnText: {
-        color: '#4CAF50',
+        color: "#4CAF50",
         fontWeight: 500,
     },
     warpTextAndBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
     },
     newBrowseWork: {
-        borderRadius: '50%',
-        backgroundColor: '#B3261E',
-        justifyContent: 'center',
-        alignItems: 'center',
+        borderRadius: "50%",
+        backgroundColor: "#B3261E",
+        justifyContent: "center",
+        alignItems: "center",
         marginLeft: 5,
         width: 20,
         height: 20,
@@ -720,12 +719,12 @@ const styles = StyleSheet.create({
     newBrowseWorkText: {
         fontWeight: 500,
         fontSize: 11,
-        color: '#FFFFFF',
-        textAlign: 'center',
+        color: "#FFFFFF",
+        textAlign: "center",
     },
     loadingView: {
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         gap: 10,
     },
 });

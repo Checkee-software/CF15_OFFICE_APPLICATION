@@ -1,20 +1,20 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
 import {
     THarvestHistory,
     TCollection,
     IHavestHistory,
-} from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
-import ENV from '@/config/ENV';
-import asyncStorageHelper from '../utils/localStorageHelper/index';
+} from "@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse";
+import ENV from "@/config/ENV";
+import asyncStorageHelper from "../utils/localStorageHelper/index";
 import {
     IArea,
     ILocation,
     IManagement,
     ISidePlant,
     ITotalProductByYear,
-} from '@/shared-types/Response/GardenResponse/GardenResponse';
+} from "@/shared-types/Response/GardenResponse/GardenResponse";
 
 export interface IGarden {
     _id: string /* Id khu vườn */;
@@ -50,7 +50,7 @@ type GardenState = {
     searchGardens: (id: string, userId: string) => Promise<void>;
     postHarvestStatus: (
         _id: string,
-        status: '0' | '1',
+        status: "0" | "1",
         harvestId?: string,
     ) => Promise<void>;
     postHarvestReport: (_id: string, amount: number) => Promise<void>;
@@ -92,7 +92,7 @@ const useGardenStore = create<GardenState>(set => ({
 
                 const user = userGardenNickname.find(u => u.userId === userId);
                 const newGardenNickname = res.data.data?.map((item: any) => {
-                    let gardenNickname = '';
+                    let gardenNickname = "";
 
                     if (user) {
                         const matchedGarden = user.garden.find(
@@ -116,7 +116,7 @@ const useGardenStore = create<GardenState>(set => ({
             }
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể tải danh sách khu vườn',
+                text: "Không thể tải danh sách khu vườn",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
@@ -134,7 +134,7 @@ const useGardenStore = create<GardenState>(set => ({
             set({selectedGarden: res.data?.data || null});
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể tải chi tiết khu vườn',
+                text: "Không thể tải chi tiết khu vườn",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
@@ -164,7 +164,7 @@ const useGardenStore = create<GardenState>(set => ({
             set({gardenDetail: newDetailGardenNickname || null});
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể tìm thấy khu vườn',
+                text: "Không thể tìm thấy khu vườn",
                 duration: Snackbar.LENGTH_SHORT,
             });
             set({gardens: []});
@@ -175,24 +175,25 @@ const useGardenStore = create<GardenState>(set => ({
 
     postHarvestStatus: async (
         _id: string,
-        status: '0' | '1',
+        status: "0" | "1",
         harvestId?: string,
     ) => {
         set({isLoading: true});
         try {
             let url = `${ENV.BACKEND_URL}/resources/gardens/harvest?_id=${_id}&status=${status}`;
-            if (status === '0' && harvestId) {
+            if (status === "0" && harvestId) {
                 url += `&harvestId=${harvestId}`;
             }
-            const res = await axiosClient.post(url);
+
+            await axiosClient.post(url);
 
             Snackbar.show({
-                text: 'Cập nhật trạng thái thu hoạch thành công',
+                text: "Cập nhật trạng thái thu hoạch thành công",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể cập nhật trạng thái thu hoạch',
+                text: "Không thể cập nhật trạng thái thu hoạch",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
@@ -208,12 +209,12 @@ const useGardenStore = create<GardenState>(set => ({
             console.log(res);
 
             Snackbar.show({
-                text: 'Báo cáo thu hoạch thành công',
+                text: "Báo cáo thu hoạch thành công",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể báo cáo thu hoạch',
+                text: "Không thể báo cáo thu hoạch",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
@@ -261,7 +262,7 @@ const useGardenStore = create<GardenState>(set => ({
         }, 500);
         setTimeout(() => {
             Snackbar.show({
-                text: 'Đổi tên khu vườn thành công',
+                text: "Đổi tên khu vườn thành công",
                 duration: Snackbar.LENGTH_SHORT,
             });
         }, 600);
@@ -270,7 +271,7 @@ const useGardenStore = create<GardenState>(set => ({
     filterGarden: async ({
         groupId,
         productId,
-        searchValue = '',
+        searchValue = "",
         productTypeId,
         userId,
     }: {
@@ -282,11 +283,18 @@ const useGardenStore = create<GardenState>(set => ({
     }) => {
         try {
             const queryParams = new URLSearchParams();
-            if (groupId) queryParams.append('groupId', groupId);
-            if (productId) queryParams.append('productId', productId);
-            if (searchValue) queryParams.append('searchValue', searchValue);
-            if (productTypeId)
-                queryParams.append('productTypeId', productTypeId);
+            if (groupId) {
+                queryParams.append("groupId", groupId);
+            }
+            if (productId) {
+                queryParams.append("productId", productId);
+            }
+            if (searchValue) {
+                queryParams.append("searchValue", searchValue);
+            }
+            if (productTypeId) {
+                queryParams.append("productTypeId", productTypeId);
+            }
 
             const res = await axiosClient.get(
                 `${
@@ -302,7 +310,7 @@ const useGardenStore = create<GardenState>(set => ({
                 const user = userGardenNickname.find(u => u.userId === userId);
 
                 const newGardenNickname = res.data.data?.map((item: any) => {
-                    let gardenNickname = '';
+                    let gardenNickname = "";
 
                     if (user) {
                         const matchedGarden = user.garden.find(
@@ -330,7 +338,7 @@ const useGardenStore = create<GardenState>(set => ({
             }
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể lọc danh sách khu vườn',
+                text: "Không thể lọc danh sách khu vườn",
                 duration: Snackbar.LENGTH_SHORT,
             });
             set({gardens: []});
@@ -338,7 +346,9 @@ const useGardenStore = create<GardenState>(set => ({
     },
 
     getPlantGarden: async (typeId?: string) => {
-        if (!typeId) return;
+        if (!typeId) {
+            return;
+        }
         set({isLoading2: true});
         try {
             const res = await axiosClient.get(
@@ -347,7 +357,7 @@ const useGardenStore = create<GardenState>(set => ({
             set({plantsGarden: res?.data?.data || []});
         } catch (error: any) {
             Snackbar.show({
-                text: 'Không thể tải danh sách cây trồng',
+                text: "Không thể tải danh sách cây trồng",
                 duration: Snackbar.LENGTH_SHORT,
             });
             set({plantsGarden: []});

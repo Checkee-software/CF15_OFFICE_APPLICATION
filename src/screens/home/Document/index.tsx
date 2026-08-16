@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
     View,
     Text,
@@ -6,27 +7,26 @@ import {
     StyleSheet,
     TouchableOpacity,
     FlatList,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import images from '../../../assets/images';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import {useDocumentStore} from '../../../stores/documentStore';
-import moment from 'moment';
-import Loading from '@/screens/subscreen/Loading';
-import {useAuthStore} from '../../../stores/authStore';
-import Snackbar from 'react-native-snackbar';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+} from "react-native";
+import React, {useEffect, useState} from "react";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import images from "../../../assets/images";
+import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
+import {useDocumentStore} from "../../../stores/documentStore";
+import moment from "moment";
+import Loading from "@/screens/subscreen/Loading";
+import {useAuthStore} from "../../../stores/authStore";
+import Snackbar from "react-native-snackbar";
+import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
 
 const Document = ({navigation}: any) => {
     const {listDocument, getListDocument, isLoading} = useDocumentStore();
     const {userInfo} = useAuthStore();
 
-    const [searchTitle, setSearchTitle] = useState('');
+    const [searchTitle, setSearchTitle] = useState("");
 
     useEffect(() => {
         getListDocument();
-        // eslint-disable-next-line
     }, []);
 
     type itemDocument = {
@@ -46,7 +46,7 @@ const Document = ({navigation}: any) => {
         } else {
             if (
                 userInfo.functions.some(
-                    (item: any) => item._id === 'DOCUMENT' && item.detail,
+                    (item: any) => item._id === "DOCUMENT" && item.detail,
                 )
             ) {
                 navigation.navigate(SCREEN_INFO.DETAILDOCUMENTS.key, {
@@ -54,7 +54,7 @@ const Document = ({navigation}: any) => {
                 });
             } else {
                 Snackbar.show({
-                    text: 'Bạn không có quyền xem chi tiết tài liệu',
+                    text: "Bạn không có quyền xem chi tiết tài liệu",
                     duration: Snackbar.LENGTH_SHORT,
                 });
             }
@@ -66,8 +66,8 @@ const Document = ({navigation}: any) => {
     );
 
     const handleReFetch = () => {
-        if (searchTitle !== '') {
-            setSearchTitle('');
+        if (searchTitle !== "") {
+            setSearchTitle("");
         }
         getListDocument();
     };
@@ -80,7 +80,7 @@ const Document = ({navigation}: any) => {
                 <Image
                     style={DocumentStyles.iconDocumentImage}
                     source={images.fileTypeDocument}
-                    resizeMode='contain'
+                    resizeMode="contain"
                 />
             </View>
 
@@ -94,26 +94,28 @@ const Document = ({navigation}: any) => {
                 </Text>
 
                 <Text style={DocumentStyles.documentTimeSent}>
-                    {moment(itemDocument.createdAt).format('HH:mm DD/MM/YYYY')}
+                    {moment(itemDocument.createdAt).format("HH:mm DD/MM/YYYY")}
                 </Text>
             </View>
         </TouchableOpacity>
     );
 
-    if (isLoading) return <Loading />;
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <View style={DocumentStyles.container}>
             <View style={DocumentStyles.warpSearchInputAndIcon}>
                 <MaterialCommunityIcons
-                    name='feature-search'
+                    name="feature-search"
                     size={24}
-                    color={'rgba(128, 128, 128, 1)'}
+                    color={"rgba(128, 128, 128, 1)"}
                 />
                 <TextInput
                     style={DocumentStyles.searchInput}
-                    placeholder='Tìm kiếm tài liệu...'
-                    placeholderTextColor={'rgba(128, 128, 128, 1)'}
+                    placeholder="Tìm kiếm tài liệu..."
+                    placeholderTextColor={"rgba(128, 128, 128, 1)"}
                     value={searchTitle}
                     onChangeText={setSearchTitle}
                 />
@@ -128,18 +130,18 @@ const Document = ({navigation}: any) => {
                     onRefresh={handleReFetch}
                     refreshing={isLoading}
                     showsVerticalScrollIndicator={false}
-                    keyboardShouldPersistTaps='handled'
+                    keyboardShouldPersistTaps="handled"
                     ListEmptyComponent={
                         <View style={DocumentStyles.documentEmpty}>
                             <Image
                                 source={images.emptyDocumentList}
                                 style={DocumentStyles.emptyDocumentImg}
-                                resizeMode='contain'
+                                resizeMode="contain"
                             />
                             <Text style={DocumentStyles.emptyDocumentText}>
-                                {searchTitle !== ''
+                                {searchTitle !== ""
                                     ? `Không tìm thấy tài liệu phù hợp với \n“${searchTitle}"`
-                                    : 'Không tìm thấy danh sách tài liệu!'}
+                                    : "Không tìm thấy danh sách tài liệu!"}
                             </Text>
                         </View>
                     }
@@ -155,24 +157,24 @@ const DocumentStyles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: 12,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     warpSearchInputAndIcon: {
-        backgroundColor: 'rgba(128, 128, 128, 0.15)',
+        backgroundColor: "rgba(128, 128, 128, 0.15)",
         borderRadius: 22,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         gap: 8,
         paddingHorizontal: 14,
     },
     searchInput: {
         paddingVertical: 12,
-        color: 'black',
-        width: '100%',
+        color: "black",
+        width: "100%",
     },
     listDocument: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         marginTop: 15,
         gap: 20,
     },
@@ -181,15 +183,15 @@ const DocumentStyles = StyleSheet.create({
     },
     warpDocumentContentAndIcon: {
         marginBottom: 15,
-        flexDirection: 'row',
+        flexDirection: "row",
         flex: 1,
         gap: 8,
     },
     iconDocument: {
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         borderRadius: 50,
-        backgroundColor: 'rgba(76, 175, 80, 0.15)',
+        backgroundColor: "rgba(76, 175, 80, 0.15)",
         height: 72,
         width: 72,
     },
@@ -206,29 +208,29 @@ const DocumentStyles = StyleSheet.create({
         flexShrink: 1,
     },
     documentAuthor: {
-        color: 'rgba(76, 175, 80, 1)',
+        color: "rgba(76, 175, 80, 1)",
         fontSize: 12,
         fontWeight: 300,
         flexShrink: 1,
     },
     documentTimeSent: {
         fontSize: 11,
-        color: 'rgba(128, 128, 128, 1)',
-        alignSelf: 'flex-end',
+        color: "rgba(128, 128, 128, 1)",
+        alignSelf: "flex-end",
         flexShrink: 1,
     },
     documentEmpty: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     emptyDocumentImg: {
         height: 180,
     },
     emptyDocumentText: {
-        textAlign: 'center',
+        textAlign: "center",
         fontWeight: 400,
         fontSize: 14,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
     },
 });

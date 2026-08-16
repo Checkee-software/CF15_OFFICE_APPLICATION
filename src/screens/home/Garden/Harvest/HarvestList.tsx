@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from "react";
 import {
     View,
     Text,
@@ -7,28 +7,28 @@ import {
     TouchableOpacity,
     Image,
     TextInput,
-} from 'react-native';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import SCREEN_INFO from '../../../../config/SCREEN_CONFIG/screenInfo';
-import useGardenStore from '../../../../stores/gardenStore';
-import Loading from '../../../subscreen/Loading';
-import {IGarden} from '../../../../stores/gardenStore';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useAuthStore} from '../../../../stores/authStore';
-import {useRoute} from '@react-navigation/native';
-import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import asyncStorageHelper from '@/utils/localStorageHelper';
+} from "react-native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
+import SCREEN_INFO from "../../../../config/SCREEN_CONFIG/screenInfo";
+import useGardenStore from "../../../../stores/gardenStore";
+import Loading from "../../../subscreen/Loading";
+import {IGarden} from "../../../../stores/gardenStore";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import {useAuthStore} from "../../../../stores/authStore";
+import {useRoute} from "@react-navigation/native";
+import {KeyboardAwareFlatList} from "react-native-keyboard-aware-scroll-view";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import asyncStorageHelper from "@/utils/localStorageHelper";
 
 const HarvestList = () => {
     const navigation = useNavigation() as any;
 
     const {gardens, fetchGardens, isLoading, setGardenData} = useGardenStore();
-    const [searchText, setSearchText] = useState('');
+    const [searchText, setSearchText] = useState("");
     const [filteredGardens, setFilteredGardens] = useState<IGarden[]>([]);
-    const [gardenNameInput, setGardenNameInput] = useState({_id: '', name: ''});
+    const [gardenNameInput, setGardenNameInput] = useState({_id: "", name: ""});
     const [showInputGardenName, setShowInputGardenName] = useState({
-        _id: '',
+        _id: "",
         check: false,
     });
 
@@ -48,7 +48,7 @@ const HarvestList = () => {
         const userGardenNickname = asyncStorageHelper.userGardenNickname;
         const user = userGardenNickname.find(u => u.userId === userInfo._id);
         return newGardens?.map((item: any) => {
-            let gardenNickname = '';
+            let gardenNickname = "";
             if (user) {
                 const matchedGarden = user.garden.find(
                     g => g.gardenId === item._id,
@@ -62,7 +62,7 @@ const HarvestList = () => {
     };
 
     const saveGardenName = () => {
-        if (gardenNameInput.name !== '') {
+        if (gardenNameInput.name !== "") {
             asyncStorageHelper.setStorageUserGardens(
                 userInfo._id,
                 gardenNameInput._id,
@@ -71,8 +71,8 @@ const HarvestList = () => {
             const newGardenNickname = getStorageUserGardens();
             setGardenData(newGardenNickname);
         }
-        setGardenNameInput({_id: '', name: ''});
-        setShowInputGardenName({_id: '', check: false});
+        setGardenNameInput({_id: "", name: ""});
+        setShowInputGardenName({_id: "", check: false});
     };
 
     useEffect(() => {
@@ -90,7 +90,7 @@ const HarvestList = () => {
 
         let filtered = gardenList.filter((garden: IGarden) => garden.isHarvest);
 
-        if (searchText !== '') {
+        if (searchText !== "") {
             filtered = filtered.filter(
                 (garden: IGarden) =>
                     garden.name
@@ -99,7 +99,7 @@ const HarvestList = () => {
                     garden.code
                         .toLowerCase()
                         .includes(searchText.toLowerCase()) ||
-                    (garden.gardenNickname ?? '')
+                    (garden.gardenNickname ?? "")
                         .toLowerCase()
                         .includes(searchText.toLowerCase()),
             );
@@ -114,18 +114,18 @@ const HarvestList = () => {
             onPress={() => handleNavigate(item.code)}
             activeOpacity={0.7}>
             <Image
-                source={require('../../../../assets/images/garden.png')}
+                source={require("../../../../assets/images/garden.png")}
                 style={styles.image}
-                resizeMode='contain'
+                resizeMode="contain"
             />
             <View style={styles.cardContent}>
                 <View>
                     <Text style={styles.cardTitle}>{item.name}</Text>
                     {showInputGardenName._id === item._id ? (
                         <TextInput
-                            style={{width: '90%', padding: 0, margin: 0}}
-                            placeholder='Hãy đặt tên khu vườn'
-                            placeholderTextColor={'black'}
+                            style={{width: "90%", padding: 0, margin: 0}}
+                            placeholder="Hãy đặt tên khu vườn"
+                            placeholderTextColor={"black"}
                             autoFocus={gardenNameInput._id === item._id}
                             onChangeText={value =>
                                 setGardenNameInput({
@@ -136,7 +136,7 @@ const HarvestList = () => {
                             value={gardenNameInput.name}
                         />
                     ) : (
-                        item.gardenNickname !== '' && (
+                        item.gardenNickname !== "" && (
                             <Text style={styles.cardTitle}>
                                 {item.gardenNickname}
                             </Text>
@@ -148,7 +148,7 @@ const HarvestList = () => {
 
             {showInputGardenName._id === item._id ? (
                 <TouchableOpacity onPress={saveGardenName}>
-                    <FontAwesome name='check' size={24} color={'#2196F3'} />
+                    <FontAwesome name="check" size={24} color={"#2196F3"} />
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity
@@ -158,16 +158,18 @@ const HarvestList = () => {
                             _id: item._id,
                             name: item.gardenNickname
                                 ? item.gardenNickname
-                                : '',
+                                : "",
                         });
                     }}>
-                    <FontAwesome name='pencil' size={24} color={'#FF4E45'} />
+                    <FontAwesome name="pencil" size={24} color={"#FF4E45"} />
                 </TouchableOpacity>
             )}
         </TouchableOpacity>
     );
 
-    if (isLoading) return <Loading />;
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <View style={styles.container}>
@@ -176,25 +178,25 @@ const HarvestList = () => {
                     <View style={styles.searchBoxWrapper}>
                         <View style={styles.searchBox}>
                             <Icon
-                                name='search'
+                                name="search"
                                 size={20}
-                                color='#888'
+                                color="#888"
                                 style={styles.searchIcon}
                             />
                             <TextInput
                                 style={styles.searchInput}
-                                placeholder='Tìm kiếm khu vườn'
+                                placeholder="Tìm kiếm khu vườn"
                                 value={searchText}
                                 onChangeText={setSearchText}
-                                placeholderTextColor='#888'
+                                placeholderTextColor="#888"
                             />
                             {searchText.length > 0 && (
                                 <TouchableOpacity
-                                    onPress={() => setSearchText('')}>
+                                    onPress={() => setSearchText("")}>
                                     <Icon
-                                        name='close'
+                                        name="close"
                                         size={20}
-                                        color='#888'
+                                        color="#888"
                                         style={styles.clearIcon}
                                     />
                                 </TouchableOpacity>
@@ -202,7 +204,7 @@ const HarvestList = () => {
                         </View>
                     </View>
 
-                    {userInfo?.userType?.level === 'WORKER' && (
+                    {userInfo?.userType?.level === "WORKER" && (
                         <TouchableOpacity
                             style={styles.qrButtonWrapper}
                             onPress={() =>
@@ -215,9 +217,9 @@ const HarvestList = () => {
                             }>
                             <View style={styles.qrButton}>
                                 <Icon
-                                    name='qr-code-scanner'
+                                    name="qr-code-scanner"
                                     size={24}
-                                    color='#2E7D32'
+                                    color="#2E7D32"
                                 />
                             </View>
                         </TouchableOpacity>
@@ -229,14 +231,14 @@ const HarvestList = () => {
                 data={filteredGardens}
                 extraHeight={100}
                 renderItem={renderItem}
-                keyboardShouldPersistTaps='handled'
+                keyboardShouldPersistTaps="handled"
                 keyExtractor={item => item._id}
                 contentContainerStyle={styles.listContainer}
                 enableOnAndroid
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         {searchText.trim() ? (
-                            <View style={{alignItems: 'center'}}>
+                            <View style={{alignItems: "center"}}>
                                 <Text style={styles.emptyText}>
                                     Không tìm thấy khu vườn liên quan tới
                                 </Text>
@@ -262,26 +264,26 @@ export default HarvestList;
 
 const styles = StyleSheet.create({
     cardContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '70%',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "70%",
     },
 
     harvestIcon: {
-        color: '#2E7D32',
+        color: "#2E7D32",
     },
 
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         paddingTop: 16,
     },
     listContainer: {
         paddingHorizontal: 16,
     },
     row: {
-        justifyContent: 'space-between',
+        justifyContent: "space-between",
         marginBottom: 16,
     },
 
@@ -296,7 +298,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 14,
         paddingVertical: 0,
-        color: '#000',
+        color: "#000",
     },
     clearIcon: {
         marginLeft: 8,
@@ -304,24 +306,24 @@ const styles = StyleSheet.create({
 
     emptyContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         paddingTop: 350,
     },
     emptyText: {
         fontSize: 16,
-        color: 'gray',
-        fontStyle: 'italic',
+        color: "gray",
+        fontStyle: "italic",
     },
     card: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F8F8F8',
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F8F8F8",
         borderRadius: 12,
         paddingVertical: 12,
         paddingHorizontal: 16,
         marginBottom: 12,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
@@ -336,23 +338,23 @@ const styles = StyleSheet.create({
 
     cardTextContainer: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: "center",
     },
 
     cardTitle: {
         fontSize: 14,
-        fontWeight: '600',
-        color: '#000',
+        fontWeight: "600",
+        color: "#000",
     },
 
     cardSubtitle: {
         fontSize: 12,
-        color: '#888',
+        color: "#888",
         marginTop: 4,
     },
     searchRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
     },
 
     searchBoxWrapper: {
@@ -361,22 +363,22 @@ const styles = StyleSheet.create({
 
     qrButtonWrapper: {
         flex: 1.5,
-        alignItems: 'flex-end',
-        justifyContent: 'center',
+        alignItems: "flex-end",
+        justifyContent: "center",
     },
 
     qrButton: {
-        backgroundColor: '#E6F4EA',
+        backgroundColor: "#E6F4EA",
         padding: 8,
         borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
 
     searchBox: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F0F0F0',
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F0F0F0",
         borderRadius: 8,
         paddingHorizontal: 8,
         height: 40,

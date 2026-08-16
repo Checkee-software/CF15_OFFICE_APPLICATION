@@ -1,23 +1,23 @@
-import { ScreenInformation } from './types';
+import {ScreenInformation} from "./types";
 
 const ONBOARDING_SCREENS = {
     INDEX: {
-        key: 'INDEX',
+        key: "INDEX",
         isOpenQRCamera: false,
     } as ScreenInformation,
     LOGIN: {
-        key: 'LOGIN',
-        headerTitle: 'TRA CỨU THỦ CÔNG',
+        key: "LOGIN",
+        headerTitle: "TRA CỨU THỦ CÔNG",
         isOpenQRCamera: false,
     } as ScreenInformation,
     AUTOMATIC_TRACING: {
-        key: 'AUTOMATIC_TRACING',
-        headerTitle: 'TRUY XUẤT TỰ ĐỘNG',
+        key: "AUTOMATIC_TRACING",
+        headerTitle: "TRUY XUẤT TỰ ĐỘNG",
         isOpenQRCamera: false,
     } as ScreenInformation,
     DETAIL_TRACKING: {
-        key: 'DETAIL_TRACKING',
-        headerTitle: 'THÔNG TIN TRUY XUẤT',
+        key: "DETAIL_TRACKING",
+        headerTitle: "THÔNG TIN TRUY XUẤT",
         isOpenQRCamera: false,
     } as ScreenInformation,
 };

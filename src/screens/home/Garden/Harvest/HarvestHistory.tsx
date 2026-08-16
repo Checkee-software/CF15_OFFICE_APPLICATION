@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import {useEffect} from "react";
 import {
     View,
     Text,
@@ -6,26 +6,26 @@ import {
     ScrollView,
     SafeAreaView,
     StatusBar,
-} from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import useGardenStore from '../../../../stores/gardenStore';
+} from "react-native";
+import {useRoute, RouteProp} from "@react-navigation/native";
+import useGardenStore from "../../../../stores/gardenStore";
 
 const STATUS_COLORS = {
-    VERIFIED: '#4CAF50',
-    NONE: '#FFA500',
-    DENIED: '#F44336',
+    VERIFIED: "#4CAF50",
+    NONE: "#FFA500",
+    DENIED: "#F44336",
 };
 
 type RootStackParamList = {
-    GardenHistory: { gardenId: string };
+    GardenHistory: {gardenId: string};
 };
 
-type RouteParams = RouteProp<RootStackParamList, 'GardenHistory'>;
+type RouteParams = RouteProp<RootStackParamList, "GardenHistory">;
 
 const HarvestHistory = () => {
     const route = useRoute<RouteParams>();
-    const { fetchHarvestHistory, harvestHistory, isLoading } = useGardenStore();
-    const { gardenId } = route.params;
+    const {fetchHarvestHistory, harvestHistory} = useGardenStore();
+    const {gardenId} = route.params;
 
     useEffect(() => {
         if (gardenId) {
@@ -35,14 +35,16 @@ const HarvestHistory = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle='dark-content' backgroundColor='#FFFFFF' />
+            <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
             <ScrollView
                 style={styles.container}
                 showsVerticalScrollIndicator={false}>
                 {harvestHistory.length === 0 ? (
                     <View style={styles.emptyBox}>
-                        <Text style={styles.emptyText}>Không có lịch sử thu hoạch</Text>
+                        <Text style={styles.emptyText}>
+                            Không có lịch sử thu hoạch
+                        </Text>
                     </View>
                 ) : (
                     (harvestHistory as any[]).map((item, index) => (
@@ -52,7 +54,8 @@ const HarvestHistory = () => {
                                 styles.card,
                                 {
                                     borderColor:
-                                        (STATUS_COLORS as any)[item.status] || '#000',
+                                        (STATUS_COLORS as any)[item.status] ||
+                                        "#000",
                                 },
                             ]}>
                             <View style={styles.headerRow}>
@@ -62,15 +65,16 @@ const HarvestHistory = () => {
                                         styles.statusText,
                                         {
                                             color:
-                                                (STATUS_COLORS as any)[item.status] ||
-                                                '#000',
+                                                (STATUS_COLORS as any)[
+                                                    item.status
+                                                ] || "#000",
                                         },
                                     ]}>
-                                    {item?.status === 'VERIFIED'
-                                        ? 'Đã duyệt'
-                                        : item.status === 'DENIED'
-                                            ? 'Đã huỷ'
-                                            : 'Chờ xét duyệt'}
+                                    {item?.status === "VERIFIED"
+                                        ? "Đã duyệt"
+                                        : item.status === "DENIED"
+                                        ? "Đã huỷ"
+                                        : "Chờ xét duyệt"}
                                 </Text>
                             </View>
 
@@ -85,7 +89,7 @@ const HarvestHistory = () => {
                                 </View>
                             )}
 
-                            {item.status === 'DENIED' && item.verifierName && (
+                            {item.status === "DENIED" && item.verifierName && (
                                 <View style={styles.row}>
                                     <Text style={styles.label}>Lí do huỷ</Text>
                                     <Text
@@ -107,7 +111,9 @@ const HarvestHistory = () => {
                                 </Text>
                             </View>
                             <View style={styles.row}>
-                                <Text style={styles.label}>Khối lượng (KG)</Text>
+                                <Text style={styles.label}>
+                                    Khối lượng (KG)
+                                </Text>
                                 <Text style={styles.value}>{item.amount}</Text>
                             </View>
                         </View>
@@ -121,11 +127,11 @@ const HarvestHistory = () => {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: "#FFFFFF",
     },
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: "#FFFFFF",
         paddingHorizontal: 16,
     },
     card: {
@@ -133,69 +139,68 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
-        borderStyle: 'dashed',
-        backgroundColor: '#FFFFFF',
+        borderStyle: "dashed",
+        backgroundColor: "#FFFFFF",
     },
     row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         marginTop: 8,
-        alignItems: 'center',
+        alignItems: "center",
     },
     headerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         marginBottom: 8,
-        alignItems: 'center',
+        alignItems: "center",
     },
     typeText: {
-        fontWeight: '600',
+        fontWeight: "600",
         fontSize: 16,
-        color: '#000000',
+        color: "#000000",
     },
     statusText: {
-        fontWeight: '500',
+        fontWeight: "500",
         fontSize: 15,
     },
     label: {
         fontSize: 14,
-        color: '#666666',
+        color: "#666666",
     },
     value: {
-        fontWeight: '400',
+        fontWeight: "400",
         fontSize: 14,
-        color: '#000000',
-        textAlign: 'right',
+        color: "#000000",
+        textAlign: "right",
     },
     valueBlue: {
-        fontWeight: '500',
+        fontWeight: "500",
         fontSize: 14,
-        color: '#2196F3',
-        textAlign: 'right',
+        color: "#2196F3",
+        textAlign: "right",
     },
     valueRed: {
-        fontWeight: '500',
+        fontWeight: "500",
         fontSize: 14,
-        color: '#F44336',
-        textAlign: 'right',
+        color: "#F44336",
+        textAlign: "right",
     },
     reasonText: {
-        maxWidth: '60%',
+        maxWidth: "60%",
     },
     bottomPadding: {
         height: 20,
     },
     emptyBox: {
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         padding: 20,
     },
     emptyText: {
         fontSize: 16,
-        color: '#888',
-        fontStyle: 'italic',
+        color: "#888",
+        fontStyle: "italic",
     },
-
 });
 
 export default HarvestHistory;

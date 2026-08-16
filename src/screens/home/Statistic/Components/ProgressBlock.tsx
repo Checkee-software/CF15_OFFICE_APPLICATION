@@ -1,5 +1,5 @@
-import {View, Text, StyleSheet} from 'react-native';
-import React from 'react';
+import {View, Text, StyleSheet} from "react-native";
+import React from "react";
 
 const MAX_HEIGHT = 150;
 
@@ -28,7 +28,7 @@ const ProgressBlock = (data: {
             />
             <View style={styles.warp}>
                 <Text style={[styles.fontWeight1]}>
-                    {totalQuantity.toLocaleString()}{' '}
+                    {totalQuantity.toLocaleString()}{" "}
                 </Text>
                 <Text>sản lượng</Text>
             </View>
@@ -54,8 +54,8 @@ export default ProgressBlock;
 const styles = StyleSheet.create({
     container: {
         height: MAX_HEIGHT,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         borderRadius: 20,
         gap: 6,
     },
@@ -63,18 +63,18 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         width: 160,
         marginBottom: 8,
-        alignSelf: 'center',
+        alignSelf: "center",
     },
     text: {
-        textAlign: 'center',
+        textAlign: "center",
     },
     warp: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: "row",
+        flexWrap: "wrap",
+        alignItems: "center",
+        justifyContent: "center",
     },
     fontWeight1: {
-        fontWeight: '600',
+        fontWeight: "600",
     },
 });

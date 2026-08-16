@@ -17,6 +17,19 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin"),
         classpath("com.google.gms:google-services:4.4.2")
     }
+    subprojects {
+        afterEvaluate { project ->
+            if (project.hasProperty("android")) {
+                project.android {
+                    defaultConfig {
+                        ndk {
+                            abiFilters.clear()
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 apply plugin: "com.facebook.react.rootproject"

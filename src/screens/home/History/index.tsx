@@ -1,12 +1,12 @@
 /* eslint-disable curly */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect} from 'react';
-import {View, Text, StyleSheet, Image, FlatList} from 'react-native';
-import images from '../../../assets/images';
-import {useHistoryRecordsStore} from '@/stores/historyRecordsStore';
-import Loading from '@/screens/subscreen/Loading';
-import moment from 'moment';
-import {useIsFocused} from '@react-navigation/native';
+import React, {useEffect} from "react";
+import {View, Text, StyleSheet, Image, FlatList} from "react-native";
+import images from "../../../assets/images";
+import {useHistoryRecordsStore} from "@/stores/historyRecordsStore";
+import Loading from "@/screens/subscreen/Loading";
+import moment from "moment";
+import {useIsFocused} from "@react-navigation/native";
 
 const History = () => {
     const isFocused = useIsFocused();
@@ -25,8 +25,8 @@ const History = () => {
 
     const renderMessage = (message: string, value: string) => {
         // nếu message có @ thay bằng value
-        if (message.includes('@')) {
-            return message.replace('@', value);
+        if (message.includes("@")) {
+            return message.replace("@", value);
         }
 
         // nếu không có @ thì nối thêm value vào cuối
@@ -70,7 +70,7 @@ const History = () => {
                         <Image
                             source={images.emptyHistoryList}
                             style={styles.emptyImage}
-                            resizeMode='contain'
+                            resizeMode="contain"
                         />
                         <Text style={styles.emptyText}>
                             Lịch sử hoạt động trống!
@@ -85,7 +85,7 @@ const History = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     flatListHistory: {
         flexGrow: 1,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     historyItemContainer: {
         marginLeft: 18,
         borderLeftWidth: 2,
-        borderLeftColor: '#4caf50',
+        borderLeftColor: "#4caf50",
     },
     historyItem: {
         gap: 10,
@@ -101,37 +101,37 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     historyHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     historyItemTitle: {
-        fontWeight: '600',
+        fontWeight: "600",
         fontSize: 13,
     },
     historyItemTime: {
-        fontStyle: 'italic',
+        fontStyle: "italic",
         fontSize: 12.5,
-        fontWeight: '500',
-        color: '#808080',
+        fontWeight: "500",
+        color: "#808080",
     },
     historyItemContent: {
-        fontWeight: '400',
+        fontWeight: "400",
         fontSize: 14,
     },
     emptyContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     emptyImage: {
         height: 180,
     },
     emptyText: {
-        textAlign: 'center',
+        textAlign: "center",
         fontWeight: 400,
         fontSize: 14,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
     },
 });
 

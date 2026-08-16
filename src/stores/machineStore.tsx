@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import {create} from "zustand";
 import Snackbar from "react-native-snackbar";
 import axiosClient from "@/utils/axiosClient";
 import {
@@ -26,11 +26,11 @@ interface MachineStore {
     getActiveMachine: (scheduleId: string) => Promise<IActiveMachineItem[]>;
 }
 
-export const useMachineStore = create<MachineStore>((set) => ({
+export const useMachineStore = create<MachineStore>(set => ({
     isStarting: false,
 
-    startMachine: async ({ scheduleId, machineId, startAt }) => {
-        set({ isStarting: true });
+    startMachine: async ({scheduleId, machineId, startAt}) => {
+        set({isStarting: true});
 
         try {
             const url = `${ENV.BACKEND_URL}/resources/schedules/machine-start/${scheduleId}`;
@@ -59,12 +59,12 @@ export const useMachineStore = create<MachineStore>((set) => ({
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
-            set({ isStarting: false });
+            set({isStarting: false});
         }
     },
 
-    stopMachine: async ({ scheduleId, machineId, endAt }) => {
-        set({ isStarting: true });
+    stopMachine: async ({scheduleId, machineId, endAt}) => {
+        set({isStarting: true});
 
         try {
             const url = `${ENV.BACKEND_URL}/resources/schedules/machine-end/${scheduleId}`;
@@ -93,7 +93,7 @@ export const useMachineStore = create<MachineStore>((set) => ({
                 duration: Snackbar.LENGTH_LONG,
             });
         } finally {
-            set({ isStarting: false });
+            set({isStarting: false});
         }
     },
 

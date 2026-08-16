@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useEffect, useState} from "react";
 import {
     View,
     Text,
@@ -7,13 +8,13 @@ import {
     TouchableOpacity,
     SafeAreaView,
     TextInput,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import useGardenStore from '../../../../stores/gardenStore';
-import {useAuthStore} from '../../../../stores/authStore';
-import SCREEN_INFO from '../../../../config/SCREEN_CONFIG/screenInfo';
-import Loading from '@/screens/subscreen/Loading';
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import {useNavigation, useRoute} from "@react-navigation/native";
+import useGardenStore from "../../../../stores/gardenStore";
+import {useAuthStore} from "../../../../stores/authStore";
+import SCREEN_INFO from "../../../../config/SCREEN_CONFIG/screenInfo";
+import Loading from "@/screens/subscreen/Loading";
 
 const HarvestDetail = () => {
     const navigation = useNavigation() as any;
@@ -23,7 +24,7 @@ const HarvestDetail = () => {
     const {gardenDetail, searchGardens, postHarvestReport, isLoading} =
         useGardenStore();
 
-    const [weight, setWeight] = useState('');
+    const [weight, setWeight] = useState("");
     const [confirmMode, setConfirmMode] = useState(false);
 
     useEffect(() => {
@@ -43,14 +44,16 @@ const HarvestDetail = () => {
         setConfirmMode(true);
     };
     const handleConfirm = async () => {
-        if (!gardenDetail?._id) return;
+        if (!gardenDetail?._id) {
+            return;
+        }
 
         try {
             await postHarvestReport(gardenDetail._id, Number(weight));
             setConfirmMode(false);
             navigation.goBack();
         } catch (error) {
-            console.log('Báo cáo thất bại:', error);
+            console.log("Báo cáo thất bại:", error);
         }
     };
 
@@ -58,9 +61,11 @@ const HarvestDetail = () => {
         setConfirmMode(false);
     };
 
-    const showReport = weight.trim() !== '';
+    const showReport = weight.trim() !== "";
 
-    if (isLoading) return <Loading />;
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <SafeAreaView style={styles.safeContainer}>
@@ -74,9 +79,9 @@ const HarvestDetail = () => {
                             Cây trồng/Khu vườn
                         </Text>
                         <View style={styles.productRow}>
-                            <Icon name='group-work' color='green' size={20} />
+                            <Icon name="group-work" color="green" size={20} />
                             <Text style={styles.productText}>
-                                {gardenDetail?.productName}
+                                {(gardenDetail as any)?.productName}
                             </Text>
                         </View>
                     </View>
@@ -95,16 +100,16 @@ const HarvestDetail = () => {
                     </Text>
                     <TextInput
                         style={styles.input}
-                        placeholder='Nhập khối lượng'
-                        keyboardType='numeric'
+                        placeholder="Nhập khối lượng"
+                        keyboardType="numeric"
                         value={Number(weight).toLocaleString()}
                         onChangeText={text => {
-                            let formatted = text.replace(/[^0-9]/g, '');
+                            let formatted = text.replace(/[^0-9]/g, "");
                             if (
                                 formatted.length > 1 &&
-                                formatted.startsWith('0')
+                                formatted.startsWith("0")
                             ) {
-                                formatted = formatted.replace(/^0+/, '');
+                                formatted = formatted.replace(/^0+/, "");
                             }
 
                             setWeight(formatted);
@@ -132,7 +137,7 @@ const HarvestDetail = () => {
 
                         //     setWeight(formatted);
                         // }}
-                        placeholderTextColor='#000'
+                        placeholderTextColor="#000"
                     />
                 </View>
             </ScrollView>
@@ -164,7 +169,7 @@ const HarvestDetail = () => {
                     <View
                         style={[
                             styles.footerRow,
-                            !showReport && {justifyContent: 'center'},
+                            !showReport && {justifyContent: "center"},
                         ]}>
                         <TouchableOpacity
                             style={[
@@ -173,9 +178,9 @@ const HarvestDetail = () => {
                             ]}
                             onPress={handleExit}>
                             <Icon
-                                name='arrow-circle-left'
+                                name="arrow-circle-left"
                                 size={22}
-                                color='white'
+                                color="white"
                                 style={{marginRight: 10}}
                             />
                             <Text style={styles.exitText1}>Thoát ra</Text>
@@ -198,95 +203,95 @@ const HarvestDetail = () => {
 export default HarvestDetail;
 
 const styles = StyleSheet.create({
-    safeContainer: {flex: 1, backgroundColor: '#fff'},
+    safeContainer: {flex: 1, backgroundColor: "#fff"},
     scrollContent: {padding: 16, paddingBottom: 100},
-    infoContainer: {backgroundColor: '#fff', borderRadius: 8, marginBottom: 16},
-    gardenName: {fontSize: 16, fontWeight: '600'},
-    gardenCode: {color: 'green', fontWeight: '500', marginTop: 2},
+    infoContainer: {backgroundColor: "#fff", borderRadius: 8, marginBottom: 16},
+    gardenName: {fontSize: 16, fontWeight: "600"},
+    gardenCode: {color: "green", fontWeight: "500", marginTop: 2},
     productBox: {
         marginTop: 12,
-        backgroundColor: '#4CAF5026',
+        backgroundColor: "#4CAF5026",
         padding: 10,
         borderRadius: 6,
     },
-    productLabel: {fontSize: 14, fontWeight: '500', marginBottom: 4},
-    productRow: {flexDirection: 'row', alignItems: 'center'},
-    productText: {fontSize: 14, color: '#333', marginLeft: 4},
+    productLabel: {fontSize: 14, fontWeight: "500", marginBottom: 4},
+    productRow: {flexDirection: "row", alignItems: "center"},
+    productText: {fontSize: 14, color: "#333", marginLeft: 4},
     headerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         marginBottom: 8,
     },
-    taskHeader: {fontSize: 14, fontWeight: '500'},
-    linkText: {color: '#2196F3', textDecorationLine: 'underline'},
+    taskHeader: {fontSize: 14, fontWeight: "500"},
+    linkText: {color: "#2196F3", textDecorationLine: "underline"},
     inputBox: {
-        backgroundColor: '#E3F2FD',
+        backgroundColor: "#E3F2FD",
         padding: 16,
         borderRadius: 8,
         marginTop: 8,
     },
-    inputLabel: {fontSize: 14, fontWeight: '500', marginBottom: 6},
+    inputLabel: {fontSize: 14, fontWeight: "500", marginBottom: 6},
     input: {
         borderWidth: 1,
-        borderColor: '#bbb',
+        borderColor: "#bbb",
         borderRadius: 6,
         padding: 8,
         fontSize: 20,
-        backgroundColor: '#E3F2FD',
-        textAlign: 'center',
-        color: '#000',
+        backgroundColor: "#E3F2FD",
+        textAlign: "center",
+        color: "#000",
     },
     footer: {
-        position: 'absolute',
+        position: "absolute",
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         padding: 16,
         borderTopWidth: 1,
-        borderColor: '#eee',
+        borderColor: "#eee",
     },
-    footerRow: {flexDirection: 'row', justifyContent: 'space-between'},
+    footerRow: {flexDirection: "row", justifyContent: "space-between"},
     exitButton1: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
         padding: 12,
-        backgroundColor: 'red',
+        backgroundColor: "red",
         borderRadius: 26,
     },
     exitButtonSmall: {flex: 0.9, marginRight: 10},
-    exitText1: {color: 'white', fontWeight: '600', fontSize: 16},
+    exitText1: {color: "white", fontWeight: "600", fontSize: 16},
     reportButton: {
         flex: 1,
         paddingVertical: 12,
-        alignItems: 'center',
+        alignItems: "center",
         borderWidth: 1,
-        borderColor: 'green',
+        borderColor: "green",
         borderRadius: 26,
     },
-    reportText: {color: 'green', fontWeight: '600', fontSize: 16},
+    reportText: {color: "green", fontWeight: "600", fontSize: 16},
     confirmText: {
-        textAlign: 'center',
+        textAlign: "center",
         marginBottom: 12,
         fontSize: 14,
-        fontWeight: '400',
+        fontWeight: "400",
     },
     cancelButton: {
         flex: 1,
         paddingVertical: 12,
-        alignItems: 'center',
+        alignItems: "center",
         borderRadius: 26,
-        backgroundColor: '#eee',
+        backgroundColor: "#eee",
         marginRight: 10,
     },
-    cancelText: {color: '#333', fontWeight: '600', fontSize: 16},
+    cancelText: {color: "#333", fontWeight: "600", fontSize: 16},
     confirmButton: {
         flex: 1,
         paddingVertical: 12,
-        alignItems: 'center',
+        alignItems: "center",
         borderRadius: 26,
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
     },
-    confirmButtonText: {color: 'white', fontWeight: '600', fontSize: 16},
+    confirmButtonText: {color: "white", fontWeight: "600", fontSize: 16},
 });
