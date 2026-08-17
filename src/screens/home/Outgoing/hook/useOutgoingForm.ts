@@ -70,7 +70,7 @@ export function useOutgoingForm() {
         setSignerUserList,
         setApproverUserList,
     } = useOutgoingData(
-        userInfo?.userType?.department || '',
+        selectedReceiveDeptId,
         signedDepartmentValue,
         selectedSignerUserId,
         selectedApproverUserId,
