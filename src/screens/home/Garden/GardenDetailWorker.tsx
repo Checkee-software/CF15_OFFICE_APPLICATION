@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {useRoute} from '@react-navigation/native';
 import useGardenStore from '../../../stores/gardenStore';
-import {useDocumentStore} from '@/stores/documentStore';
+import {useDocumentStore, buildDownloadUrl} from '@/stores/documentStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useAuthStore} from '../../../stores/authStore';
@@ -73,13 +73,8 @@ const GardenWorker = () => {
         }
     };
 
-    const fixFilePath = (path: string) => {
-        const updatedPath = path.replace(/\\/g, '/');
-        return `${ENV.BACKEND_URL}${updatedPath}`;
-    };
-
     const pdfFilePath = gardenDetail?.management?.files?.[0]?.path
-        ? fixFilePath(gardenDetail.management.files[0].path)
+        ? buildDownloadUrl(gardenDetail.management.files[0].path)
         : '';
 
     const formatFileSize = (size: number) => {

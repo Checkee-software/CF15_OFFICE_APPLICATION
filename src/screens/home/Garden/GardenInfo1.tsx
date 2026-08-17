@@ -13,7 +13,7 @@ import {
 import {useRoute} from '@react-navigation/native';
 import QRCode from 'react-native-qrcode-svg';
 import useGardenStore from '../../../stores/gardenStore';
-import {useDocumentStore} from '@/stores/documentStore';
+import {useDocumentStore, buildDownloadUrl} from '@/stores/documentStore';
 import Loading from '../../subscreen/Loading';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ENV from '@/config/ENV';
@@ -74,14 +74,9 @@ const GardenDetailScreen = () => {
         }
     };
 
-    const fixFilePath = (path: string) => {
-        const updatedPath = path.replace(/\\/g, '/');
-        return `${ENV.BACKEND_URL}${updatedPath}`;
-    };
-
     // Example: Use the first file in selectedGarden.management?.files as PDF source
     const pdfFilePath = selectedGarden?.management?.files?.[0]?.path
-        ? fixFilePath(selectedGarden.management.files[0].path)
+        ? buildDownloadUrl(selectedGarden.management.files[0].path)
         : '';
 
     const formatFileSize = (size: number) => {

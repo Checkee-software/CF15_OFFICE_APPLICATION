@@ -9,6 +9,7 @@ import {
 import React from 'react';
 import Pdf from 'react-native-pdf';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import asyncStorageHelper from '../localStorageHelper';
 
 const ModalPdfView = (props: {
     visible: boolean;
@@ -31,7 +32,13 @@ const ModalPdfView = (props: {
                 </TouchableOpacity>
                 <Pdf
                     trustAllCerts={false}
-                    source={{uri: pdfFilePath, cache: false}}
+                    source={{
+                        uri: pdfFilePath,
+                        cache: false,
+                        headers: asyncStorageHelper.token
+                            ? {Authorization: asyncStorageHelper.token}
+                            : undefined,
+                    }}
                     style={styles.modalContent}
                     onError={error => {
                         console.log('PDF error:', error);

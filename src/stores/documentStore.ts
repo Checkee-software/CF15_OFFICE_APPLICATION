@@ -13,7 +13,7 @@ import asyncStorageHelper from '@/utils/localStorageHelper';
 type DocumentListParams = {type?: string; page?: number; rows?: number};
 type DocumentListWithTotal = {data: IDocument[]; total: number};
 type DocumentDetailPayload = IDocument | {document?: IDocument | null; stepsInfo?: any[]};
-const DOWNLOAD_ENDPOINT_FOLDERS = ['files', 'signedFiles', 'attachedFiles'];
+const DOWNLOAD_ENDPOINT_FOLDERS = ['files', 'signedFiles', 'attachedFiles', 'mainFiles'];
 
 const normalizeFilePath = (value: string) => String(value || '').replace(/\\/g, '/').trim();
 
@@ -33,7 +33,7 @@ const sanitizeFileName = (value: string) =>
         .replace(/[\\/:*?"<>|]/g, '_')
         .trim();
 
-const buildDownloadUrl = (fileSource: string) => {
+export const buildDownloadUrl = (fileSource: string) => {
     const normalizedSource = normalizeFilePath(fileSource);
     const fileName = getLastPathSegment(normalizedSource);
 

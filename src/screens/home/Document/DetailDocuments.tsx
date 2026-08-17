@@ -18,7 +18,7 @@ import {
 } from '@/shared-types/common/Document/document';
 import {IDocument} from '@/shared-types/Response/DocumentResponse/DocumentResponse';
 import {useAuthStore} from '@/stores/authStore';
-import {useDocumentStore} from '@/stores/documentStore';
+import {useDocumentStore, buildDownloadUrl} from '@/stores/documentStore';
 import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
 import {useDispatch} from 'react-redux';
 import type {AppDispatch} from '@/redux/store';
@@ -1086,8 +1086,8 @@ const DetailDocuments = ({route, navigation}: any) => {
             return;
         }
 
-        const fixed = file.path.replace(/\\/g, '/');
-        setSelectedPdf(`${ENV.BACKEND_URL}${fixed}`);
+        const fixed = buildDownloadUrl(file.path);
+        setSelectedPdf(fixed);
         setShowModalPdf(true);
     };
 
