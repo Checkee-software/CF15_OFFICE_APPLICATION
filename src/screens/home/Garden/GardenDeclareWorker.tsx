@@ -1,20 +1,19 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useRef, useState} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import ActionButtons from './ActionButtons';
-import {useAuthStore} from '../../../stores/authStore';
-import {useWorkScheduleStore} from '../../../stores/workScheduleStore';
-import TaskListSection from './TaskListSection';
-import AdditionalSupplySection from './AdditionalSupplySection';
-import MachineShiftSelector from './MachineShiftSelector';
-import {EProcessesType} from '@/shared-types/form-data/ProcessesFormData/ProcessesFormData';
-import Backdrop from '../../subscreen/Loading/index2';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {Dropdown} from 'react-native-element-dropdown';
-import Snackbar from 'react-native-snackbar';
+import React, {useEffect, useRef, useState} from "react";
+import {View, Text, StyleSheet, TouchableOpacity} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import {useNavigation, useRoute} from "@react-navigation/native";
+import ActionButtons from "./ActionButtons";
+import {useAuthStore} from "../../../stores/authStore";
+import {useWorkScheduleStore} from "../../../stores/workScheduleStore";
+import TaskListSection from "./TaskListSection";
+import AdditionalSupplySection from "./AdditionalSupplySection";
+import MachineShiftSelector from "./MachineShiftSelector";
+import {EProcessesType} from "@/shared-types/form-data/ProcessesFormData/ProcessesFormData";
+import Backdrop from "../../subscreen/Loading/index2";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {Dropdown} from "react-native-element-dropdown";
+import Snackbar from "react-native-snackbar";
 
 type TaskInput = {
     taskId: string;
@@ -33,19 +32,19 @@ type AdditionalSupply = {
 
 const GardenDeclare = () => {
     const [machineShifts, setMachineShifts] = useState<any[]>([
-        {processId: '', area: ''},
+        {processId: "", area: ""},
     ]);
     const [availableMachines, setAvailableMachines] = useState<any[]>([]); //! fix type later
     const [loading, setLoading] = useState(false);
     const [selectedGarden, setSelectedGarden] = useState({
-        gardenId: '',
+        gardenId: "",
         totalSquare: 0,
         area: 0,
     });
 
     const handleMachineShiftChange = (
         index: number,
-        field: 'processId' | 'area',
+        field: "processId" | "area",
         value: string,
     ) => {
         setMachineShifts(prev => {
@@ -68,7 +67,7 @@ const GardenDeclare = () => {
     const [taskInputs, setTaskInputs] = useState<TaskInput[]>([]);
     const [additionalSupplies, setAdditionalSupplies] = useState<
         AdditionalSupply[]
-    >([{name: '', unit: '', value: '', price: ''}]);
+    >([{name: "", unit: "", value: "", price: ""}]);
 
     const {userInfo} = useAuthStore();
     const {
@@ -83,11 +82,11 @@ const GardenDeclare = () => {
     const navigation = useNavigation();
     const hasLogged = useRef(false);
     const [showExitAlert, setShowExitAlert] = useState(false);
-    const [isSaved, setIsSaved] = useState(false);
-    const [onlyShowReportButton, setOnlyShowReportButton] = useState(false);
+    // const [isSaved, setIsSaved] = useState(false);
+    const [onlyShowReportButton] = useState(false);
     const [showReportConfirmation, setShowReportConfirmation] = useState(false);
 
-    const handleInputChange = (index: number, field: 'area', value: string) => {
+    const handleInputChange = (index: number, field: "area", value: string) => {
         setTaskInputs(prev => {
             const updated = [...prev];
             updated[index][field] = value;
@@ -98,7 +97,7 @@ const GardenDeclare = () => {
     const handleExit = () => navigation.goBack();
 
     const isTaskValid = (task: TaskInput) => {
-        return !task.disabled && task.area.trim() !== '';
+        return !task.disabled && task.area.trim() !== "";
     };
 
     const handleReport = () => {
@@ -115,7 +114,7 @@ const GardenDeclare = () => {
     const handleCancelReport = () => setShowReportConfirmation(false);
 
     const isMachineShiftValid = (shift: any) => {
-        return shift?.processId?.trim() !== '' && shift?.area?.trim() !== '';
+        return shift?.processId?.trim() !== "" && shift?.area?.trim() !== "";
     };
 
     const hasDeclarations =
@@ -123,7 +122,9 @@ const GardenDeclare = () => {
 
     const handleConfirmReport = async () => {
         setShowReportConfirmation(false);
-        if (!detailWorkSchedule?._id) return;
+        if (!detailWorkSchedule?._id) {
+            return;
+        }
 
         try {
             setLoading(true);
@@ -155,7 +156,9 @@ const GardenDeclare = () => {
                         ),
                 );
 
-                if (!matchingTask) continue;
+                if (!matchingTask) {
+                    continue;
+                }
 
                 const payload = {
                     area: parseFloat(shift.area),
@@ -163,7 +166,7 @@ const GardenDeclare = () => {
                     machineId: shift.processId,
                     type: EProcessesType.CA_MAY,
                 };
-                console.log('📤 Gửi ca máy:', {
+                console.log("📤 Gửi ca máy:", {
                     scheduleId: detailWorkSchedule._id,
                     taskId: matchingTask._id,
                     payload,
@@ -178,25 +181,25 @@ const GardenDeclare = () => {
                 }
             }
 
-            setIsSaved(true);
-            setTimeout(() => setIsSaved(false), 1000);
+            // setIsSaved(true);
+            // setTimeout(() => setIsSaved(false), 1000);
 
             setTaskInputs(prev =>
                 prev.map(task => ({
                     ...task,
-                    area: '',
+                    area: "",
                 })),
             );
 
             setMachineShifts(prev =>
                 prev.map(shift => ({
                     ...shift,
-                    processId: '',
-                    area: '',
+                    processId: "",
+                    area: "",
                 })),
             );
         } catch (err) {
-            console.error('❌ Lỗi khi gửi báo cáo:', err);
+            console.error("❌ Lỗi khi gửi báo cáo:", err);
         } finally {
             setTimeout(() => {
                 setLoading(false);
@@ -207,7 +210,7 @@ const GardenDeclare = () => {
     const handleAddSupply = () => {
         setAdditionalSupplies(prev => [
             ...prev,
-            {name: '', unit: '', value: '', price: ''},
+            {name: "", unit: "", value: "", price: ""},
         ]);
     };
 
@@ -224,11 +227,13 @@ const GardenDeclare = () => {
     };
 
     const handleSubmitAdditionalSupplies = async () => {
-        if (!detailWorkSchedule?._id) return;
+        if (!detailWorkSchedule?._id) {
+            return;
+        }
 
-        if (selectedGarden.gardenId === '') {
+        if (selectedGarden.gardenId === "") {
             Snackbar.show({
-                text: 'Bạn chưa chọn khu vườn cần gửi đầu tư tăng thêm',
+                text: "Bạn chưa chọn khu vườn cần gửi đầu tư tăng thêm",
                 duration: Snackbar.LENGTH_SHORT,
             });
             return;
@@ -247,9 +252,9 @@ const GardenDeclare = () => {
                 });
             }
 
-            setAdditionalSupplies([{name: '', unit: '', value: '', price: ''}]);
+            setAdditionalSupplies([{name: "", unit: "", value: "", price: ""}]);
         } catch (err) {
-            console.error('❌ Lỗi khi gửi vật tư thêm:', err);
+            console.error("❌ Lỗi khi gửi vật tư thêm:", err);
         } finally {
             setTimeout(() => {
                 setLoading(false);
@@ -258,12 +263,14 @@ const GardenDeclare = () => {
     };
 
     useEffect(() => {
-        if (id) getDetailWorkSchedule(id, userInfo._id);
+        if (id) {
+            getDetailWorkSchedule(id, userInfo._id);
+        }
     }, []);
 
     useEffect(() => {
         setSelectedGarden({
-            gardenId: '',
+            gardenId: "",
             totalSquare: 0,
             area: 0,
         });
@@ -291,10 +298,10 @@ const GardenDeclare = () => {
     }, [detailWorkSchedule]);
 
     useEffect(() => {
-        console.log('📦 Chi tiết công việc:', detailWorkSchedule);
+        console.log("📦 Chi tiết công việc:", detailWorkSchedule);
         if (detailWorkSchedule?.childTasks?.length) {
             let inputs;
-            if (selectedGarden.gardenId === '') {
+            if (selectedGarden.gardenId === "") {
                 inputs = detailWorkSchedule.childTasks.map((task: any) => {
                     const userInTask = task.staff?.find(
                         (s: any) => s.userId === userInfo?._id,
@@ -302,7 +309,7 @@ const GardenDeclare = () => {
                     return {
                         taskId: task._id,
                         taskName: task.name,
-                        area: '',
+                        area: "",
                         totalSquare: selectedGarden.totalSquare,
                         currentArea: selectedGarden.area,
                         taskStatus: userInTask?.status || task.status,
@@ -317,7 +324,7 @@ const GardenDeclare = () => {
                     return {
                         taskId: task._id,
                         taskName: task.name,
-                        area: '',
+                        area: "",
                         totalSquare:
                             userInTask.gardens.find(
                                 (g: any) =>
@@ -377,7 +384,7 @@ const GardenDeclare = () => {
             <KeyboardAwareScrollView
                 showsVerticalScrollIndicator={false}
                 bounces={false}
-                overScrollMode='never'
+                overScrollMode="never"
                 contentContainerStyle={styles.container}
                 enableOnAndroid
                 extraHeight={150}>
@@ -391,7 +398,7 @@ const GardenDeclare = () => {
                             Cây trồng/Loại cây trồng
                         </Text>
                         <View style={styles.productRow}>
-                            <Icon name='group-work' color='green' size={20} />
+                            <Icon name="group-work" color="green" size={20} />
                             <Text style={styles.productText}>
                                 {detailWorkSchedule.productName}
                             </Text>
@@ -402,10 +409,10 @@ const GardenDeclare = () => {
                         task?.staff.some(staff => staff?.gardens.length > 1),
                     ) && (
                         <Dropdown
-                            mode='modal'
+                            mode="modal"
                             style={styles.dropdown}
                             search
-                            searchPlaceholder='Tìm khu vườn'
+                            searchPlaceholder="Tìm khu vườn"
                             placeholderStyle={styles.placeholderStyle}
                             selectedTextStyle={styles.selectedTextStyle}
                             iconStyle={styles.iconStyle}
@@ -414,9 +421,9 @@ const GardenDeclare = () => {
                                     .gardens
                             }
                             maxHeight={300}
-                            labelField='name'
-                            valueField='gardenId'
-                            placeholder='Chọn khu vườn cần làm'
+                            labelField="name"
+                            valueField="gardenId"
+                            placeholder="Chọn khu vườn cần làm"
                             value={selectedGarden.gardenId}
                             onChange={itemValue =>
                                 setSelectedGarden({
@@ -439,7 +446,7 @@ const GardenDeclare = () => {
                     taskInputs={taskInputs}
                     handleInputChange={handleInputChange}
                     styles={styles}
-                    gardenAreaType={'ha'}
+                    gardenAreaType={"ha"}
                     gardenArea={
                         //detailWorkSchedule?.childTasks[0].staff[0].totalSquare
 
@@ -457,7 +464,7 @@ const GardenDeclare = () => {
                     gardenId={selectedGarden.gardenId}
                     machines={availableMachines}
                     machineShifts={machineShifts}
-                    gardenAreaType={'ha'}
+                    gardenAreaType={"ha"}
                     onChange={handleMachineShiftChange}
                     gardenArea={selectedGarden.totalSquare}
                     processingRate={selectedGarden.area}
@@ -478,13 +485,13 @@ const GardenDeclare = () => {
                     onPress={handleExit}>
                     <View
                         style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
+                            flexDirection: "row",
+                            alignItems: "center",
                         }}>
                         <Icon
-                            name='arrow-circle-left'
+                            name="arrow-circle-left"
                             size={22}
-                            color='white'
+                            color="white"
                             style={{marginRight: 10}}
                         />
                         <Text style={styles.exitText1}>Thoát ra</Text>
@@ -498,66 +505,66 @@ const GardenDeclare = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {paddingHorizontal: 16, backgroundColor: 'white'},
-    centered: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+    container: {paddingHorizontal: 16, backgroundColor: "white"},
+    centered: {flex: 1, justifyContent: "center", alignItems: "center"},
     infoContainer: {marginBottom: 16},
-    gardenName: {fontSize: 20, fontWeight: 'bold'},
-    gardenCode: {fontSize: 16, color: 'green', fontWeight: 'bold'},
+    gardenName: {fontSize: 20, fontWeight: "bold"},
+    gardenCode: {fontSize: 16, color: "green", fontWeight: "bold"},
     productBox: {
         marginTop: 12,
-        backgroundColor: '#4CAF5026',
+        backgroundColor: "#4CAF5026",
         padding: 10,
         borderRadius: 8,
     },
-    productLabel: {fontSize: 14, color: 'black'},
-    productRow: {flexDirection: 'row', alignItems: 'center', marginTop: 4},
+    productLabel: {fontSize: 14, color: "black"},
+    productRow: {flexDirection: "row", alignItems: "center", marginTop: 4},
     productText: {marginLeft: 8, fontSize: 16},
-    footer: {padding: 16, borderTopWidth: 1, borderColor: '#eee'},
+    footer: {padding: 16, borderTopWidth: 1, borderColor: "#eee"},
     exitButton1: {
         padding: 12,
-        backgroundColor: 'red',
+        backgroundColor: "red",
         borderRadius: 26,
-        alignItems: 'center',
+        alignItems: "center",
     },
-    exitText1: {color: 'white', fontWeight: '600', fontSize: 16},
-    label: {fontWeight: '500', marginBottom: 4},
+    exitText1: {color: "white", fontWeight: "600", fontSize: 16},
+    label: {fontWeight: "500", marginBottom: 4},
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: "#ccc",
         borderRadius: 6,
         padding: 8,
         marginBottom: 8,
         height: 55,
-        color: 'black',
+        color: "black",
     },
 
     sectionTitle: {
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: "600",
         marginBottom: 12,
     },
 
     saveButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         borderRadius: 24,
         paddingVertical: 12,
-        alignItems: 'center',
+        alignItems: "center",
         marginTop: 10,
     },
     saveButtonText: {
-        color: 'white',
-        fontWeight: '600',
+        color: "white",
+        fontWeight: "600",
         fontSize: 16,
     },
     warningText: {
-        color: 'red',
+        color: "red",
         fontSize: 12,
         marginTop: 4,
     },
     dropdown: {
         height: 52,
-        minWidth: '100%',
-        borderColor: '#9A9A9A',
+        minWidth: "100%",
+        borderColor: "#9A9A9A",
         borderWidth: 1,
         paddingHorizontal: 8,
         borderRadius: 8,
@@ -565,7 +572,7 @@ const styles = StyleSheet.create({
     },
     placeholderStyle: {
         fontSize: 15,
-        color: '#666666',
+        color: "#666666",
         fontWeight: 400,
     },
     selectedTextStyle: {

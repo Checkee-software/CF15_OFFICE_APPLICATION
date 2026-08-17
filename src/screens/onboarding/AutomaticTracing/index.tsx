@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState} from "react";
 import {
     View,
     Text,
@@ -7,52 +7,52 @@ import {
     TextInput,
     StyleSheet,
     TouchableOpacity,
-} from 'react-native';
+} from "react-native";
 import {
     Camera,
     useCameraDevice,
     useCodeScanner,
     CameraPermissionRequestResult,
-} from 'react-native-vision-camera';
+} from "react-native-vision-camera";
 // import images from '../../../assets/images';
-import colors from '@/assets/colors';
-import Snackbar from 'react-native-snackbar';
-import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
+import colors from "@/assets/colors";
+import Snackbar from "react-native-snackbar";
+import SCREEN_INFO from "@/config/SCREEN_CONFIG/screenInfo";
 
 const AutomaticTracing = ({navigation}: any) => {
     /** create state */
-    const [codeInput, setCodeInput] = useState<string>('');
+    const [codeInput, setCodeInput] = useState<string>("");
     const [hasScanned, setHasScanned] = useState<boolean>(false);
     const [cameraStyles, setCameraStyles] = useState<ViewStyle>({
         width: 0,
         height: 0,
     });
     const [permissionState, setPermissionState] =
-        useState<CameraPermissionRequestResult>('denied');
+        useState<CameraPermissionRequestResult>("denied");
 
     /** use camera */
-    const device = useCameraDevice('back');
+    const device = useCameraDevice("back");
     const getPermission = async () => {
         const permission = await Camera.requestCameraPermission();
         setPermissionState(permission);
     };
 
-    console.log('navigation: ', navigation);
+    console.log("navigation: ", navigation);
 
     useEffect(() => {
         getPermission();
     }, []);
 
     const handleSearch = async (code: string) => {
-        if (code !== 'efab158e-8167-456b-bbe5-04760c820e49') {
+        if (code !== "efab158e-8167-456b-bbe5-04760c820e49") {
             return Snackbar.show({
-                text: 'Không tìm thấy thông tin mã này!',
+                text: "Không tìm thấy thông tin mã này!",
                 duration: Snackbar.LENGTH_LONG,
             });
         }
 
         return navigation.navigate(SCREEN_INFO.DETAIL_TRACKING.key, {
-            code: 'efab158e-8167-456b-bbe5-04760c820e49',
+            code: "efab158e-8167-456b-bbe5-04760c820e49",
         });
 
         // //console.log('[SEARCH] Searching for garden with code:', code);
@@ -73,7 +73,7 @@ const AutomaticTracing = ({navigation}: any) => {
     };
 
     const codeScanner = useCodeScanner({
-        codeTypes: ['qr'],
+        codeTypes: ["qr"],
         onCodeScanned: async codes => {
             if (hasScanned) {
                 return;
@@ -86,16 +86,16 @@ const AutomaticTracing = ({navigation}: any) => {
 
             setHasScanned(true);
             setCodeInput(scannedCode);
-            if (scannedCode !== 'efab158e-8167-456b-bbe5-04760c820e49') {
+            if (scannedCode !== "efab158e-8167-456b-bbe5-04760c820e49") {
                 return Snackbar.show({
-                    text: 'Không tìm thấy thông tin trên mã QR này',
+                    text: "Không tìm thấy thông tin trên mã QR này",
                     duration: Snackbar.LENGTH_LONG,
                 });
             }
 
             setHasScanned(false);
             navigation.navigate(SCREEN_INFO.DETAIL_TRACKING.key, {
-                code: 'efab158e-8167-456b-bbe5-04760c820e49',
+                code: "efab158e-8167-456b-bbe5-04760c820e49",
             });
             // await handleSearch(scannedCode);
         },
@@ -105,7 +105,7 @@ const AutomaticTracing = ({navigation}: any) => {
         const code = codeInput.trim();
         if (!code.length) {
             return Snackbar.show({
-                text: 'Vui lòng nhập mã!',
+                text: "Vui lòng nhập mã!",
                 duration: Snackbar.LENGTH_LONG,
             });
         }
@@ -124,7 +124,7 @@ const AutomaticTracing = ({navigation}: any) => {
 
     return (
         <>
-            {permissionState === 'granted' ? (
+            {permissionState === "granted" ? (
                 <View style={styles.container}>
                     <Camera
                         codeScanner={codeScanner}
@@ -139,7 +139,7 @@ const AutomaticTracing = ({navigation}: any) => {
                     <View style={styles.inputView}>
                         <TextInput
                             placeholder="Nhập mã khu vườn"
-                            placeholderTextColor={'#808080'}
+                            placeholderTextColor={"#808080"}
                             style={styles.inputManualSearch}
                             value={codeInput}
                             onChangeText={setCodeInput}
@@ -174,21 +174,21 @@ const AutomaticTracing = ({navigation}: any) => {
 const styles = StyleSheet.create({
     noDeivce__container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5F5F5',
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#F5F5F5",
     },
     container: {
         padding: 20,
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: "#F5F5F5",
     },
     denied__container: {
         flex: 1,
         gap: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#F5F5F5',
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#F5F5F5",
     },
     denied__text: {
         color: colors.black,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     denied__pressed_text: {
         color: colors.blue,
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: "500",
     },
     camera: {
         flex: 1,
@@ -204,87 +204,87 @@ const styles = StyleSheet.create({
     },
     inputView: {
         flex: 1,
-        alignItems: 'center',
+        alignItems: "center",
         gap: 14,
     },
     inputManualSearch: {
-        textAlignVertical: 'center',
-        textAlign: 'center',
-        width: '100%',
-        backgroundColor: '#FFFFFF',
-        borderColor: '#D3D3D3',
+        textAlignVertical: "center",
+        textAlign: "center",
+        width: "100%",
+        backgroundColor: "#FFFFFF",
+        borderColor: "#D3D3D3",
         borderWidth: 1,
         padding: 12,
         borderRadius: 8,
         marginTop: 22,
-        color: '#212121',
+        color: "#212121",
         fontWeight: 500,
         fontSize: 14,
     },
     confirmManualSearchBtn: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         borderRadius: 24,
-        borderColor: '#D3D3D3',
+        borderColor: "#D3D3D3",
         borderWidth: 1,
         paddingVertical: 12,
         paddingHorizontal: 24,
     },
     confirmManualSearchText: {
-        color: '#F5F5F5',
+        color: "#F5F5F5",
         fontWeight: 500,
         fontSize: 16,
     },
     viewRequestCameraPermission: {
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     notHavePermission: {
-        backgroundColor: 'black',
+        backgroundColor: "black",
     },
     requestPermissionContainer: {
         paddingHorizontal: 20,
-        backgroundColor: 'black',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "center",
         flex: 1,
         gap: 20,
     },
     requestPermissionText: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 16,
-        textAlign: 'center',
+        textAlign: "center",
     },
 
     notFoundContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff",
         paddingHorizontal: 20,
     },
     notFoundText: {
         fontSize: 16,
-        color: '#333',
-        textAlign: 'center',
+        color: "#333",
+        textAlign: "center",
         marginBottom: 16,
     },
     goBackButton: {
-        borderColor: '#4CAF50',
+        borderColor: "#4CAF50",
         borderWidth: 1,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 20,
     },
     goBackText: {
-        color: '#4CAF50',
+        color: "#4CAF50",
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: "500",
     },
     headerText: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: "bold",
         marginBottom: 12,
     },
 });

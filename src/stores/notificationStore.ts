@@ -1,7 +1,7 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import ENV from '@/config/ENV';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import ENV from "@/config/ENV";
 
 export interface INotification {
     _id: string;
@@ -58,11 +58,11 @@ const useNotificationStore = create<NotificationStore>(set => ({
         } catch (error: unknown) {
             const err = error as any;
             console.log(
-                'FETCH_ACTIVE_NOTIFICATION_ERROR:',
+                "FETCH_ACTIVE_NOTIFICATION_ERROR:",
                 err?.response?.data || err?.message,
             );
             Snackbar.show({
-                text: 'Không thể tải thông báo.',
+                text: "Không thể tải thông báo.",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
@@ -87,11 +87,11 @@ const useNotificationStore = create<NotificationStore>(set => ({
         } catch (error: unknown) {
             const err = error as any;
             console.log(
-                'FETCH_BELL_NOTIFICATIONS_ERROR:',
+                "FETCH_BELL_NOTIFICATIONS_ERROR:",
                 err?.response?.data || err?.message,
             );
             Snackbar.show({
-                text: 'Không thể tải danh sách chuông thông báo.',
+                text: "Không thể tải danh sách chuông thông báo.",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
@@ -127,11 +127,11 @@ const useNotificationStore = create<NotificationStore>(set => ({
         } catch (error: unknown) {
             const err = error as any;
             console.log(
-                'MARK_AS_READ_ERROR:',
+                "MARK_AS_READ_ERROR:",
                 err?.response?.data || err?.message,
             );
             Snackbar.show({
-                text: 'Không thể đánh dấu thông báo.',
+                text: "Không thể đánh dấu thông báo.",
                 duration: Snackbar.LENGTH_SHORT,
             });
         }
@@ -152,17 +152,17 @@ const useNotificationStore = create<NotificationStore>(set => ({
             }));
 
             Snackbar.show({
-                text: 'Tất cả thông báo đã được đánh dấu là đã đọc.',
+                text: "Tất cả thông báo đã được đánh dấu là đã đọc.",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } catch (error: unknown) {
             const err = error as any;
             console.log(
-                'MARK_ALL_AS_READ_ERROR:',
+                "MARK_ALL_AS_READ_ERROR:",
                 err?.response?.data || err?.message,
             );
             Snackbar.show({
-                text: 'Không thể đánh dấu tất cả thông báo.',
+                text: "Không thể đánh dấu tất cả thông báo.",
                 duration: Snackbar.LENGTH_SHORT,
             });
         }

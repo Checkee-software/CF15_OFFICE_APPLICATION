@@ -1,11 +1,11 @@
-import { ScreenName } from './screenName';
-import { ScreenInformation } from './types';
+import {ScreenName} from "./screenName";
+import {ScreenInformation} from "./types";
 
-import USER_SCREENS from './user';
-import HOME_SCREENS from './home';
-import SUBSCREENS from './subscreen';
-import GLOBAL_SCREENS from './global';
-import ONBOARDING_SCREENS from './onboarding';
+import USER_SCREENS from "./user";
+import HOME_SCREENS from "./home";
+import SUBSCREENS from "./subscreen";
+import GLOBAL_SCREENS from "./global";
+import ONBOARDING_SCREENS from "./onboarding";
 
 type Screens = Record<ScreenName, Readonly<ScreenInformation>>;
 

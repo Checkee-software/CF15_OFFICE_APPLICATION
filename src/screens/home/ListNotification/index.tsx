@@ -5,17 +5,17 @@ import {
     TouchableOpacity,
     FlatList,
     Image,
-} from 'react-native';
-import React from 'react';
-import {useRoute} from '@react-navigation/native';
-import images from '@/assets/images';
-import moment from 'moment';
-import useNotificationStore from '@/stores/notificationStore';
-import SCREEN_INFO from '@/config/SCREEN_CONFIG/screenInfo';
+} from "react-native";
+import React from "react";
+import {useRoute} from "@react-navigation/native";
+import images from "@/assets/images";
+import moment from "moment";
+import useNotificationStore from "@/stores/notificationStore";
+import SCREEN_INFO from "@/config/SCREEN_CONFIG/screenInfo";
 
 const ListNotification = ({navigation}: any) => {
     const route = useRoute();
-    const {notifications = [], unreadCount = 0}: any = route.params || {};
+    const {notifications = []}: any = route.params || {};
     const {markAsRead, markAllAsRead, bellNotifications} =
         useNotificationStore();
 
@@ -25,27 +25,27 @@ const ListNotification = ({navigation}: any) => {
         }
         console.log(item.type);
         switch (item.type) {
-            case 'DOCUMENT':
+            case "DOCUMENT":
                 navigation.navigate(SCREEN_INFO.DOCUMENT.key, {
                     _id: item.referenceId,
                 });
                 break;
-            case 'FEEDBACK':
+            case "FEEDBACK":
                 navigation.navigate(SCREEN_INFO.FEEDBACK.key, {
                     _id: item.referenceId,
                 });
                 break;
-            case 'SCHEDULE':
+            case "SCHEDULE":
                 navigation.navigate(SCREEN_INFO.WORKSCHEDULE.key, {
                     _id: item.referenceId,
                 });
                 break;
-            case 'HARVEST':
+            case "HARVEST":
                 navigation.navigate(SCREEN_INFO.HARVEST_SCHEDULE.key, {
                     _id: item.referenceId,
                 });
                 break;
-            case 'NEWS':
+            case "NEWS":
                 navigation.navigate(SCREEN_INFO.NEWS.key, {
                     _id: item.referenceId,
                 });
@@ -72,7 +72,7 @@ const ListNotification = ({navigation}: any) => {
                 <View style={NotificationStyle.headerNotifi}>
                     <View style={NotificationStyle.warpLeftHeader}>
                         <Text style={NotificationStyle.headerLabel}>
-                            {item.title || 'Thông báo'}
+                            {item.title || "Thông báo"}
                         </Text>
                     </View>
                     <Text style={NotificationStyle.notifiTime}>
@@ -87,7 +87,7 @@ const ListNotification = ({navigation}: any) => {
                     <Text
                         style={[
                             NotificationStyle.notifiContentText,
-                            {textAlign: 'right'},
+                            {textAlign: "right"},
                         ]}>
                         {item.actor?.fullName}
                     </Text>
@@ -120,7 +120,7 @@ const ListNotification = ({navigation}: any) => {
                             <Image
                                 source={images.emptyNotificationList}
                                 style={NotificationStyle.emptyImage}
-                                resizeMode='contain'
+                                resizeMode="contain"
                             />
                             <Text style={NotificationStyle.emptyListNotifyText}>
                                 Hiện tại bạn không có thông báo!
@@ -136,7 +136,7 @@ const ListNotification = ({navigation}: any) => {
 const NotificationStyle = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         paddingHorizontal: 10,
     },
     warpNotifi: {
@@ -147,7 +147,7 @@ const NotificationStyle = StyleSheet.create({
         paddingBottom: 20,
     },
     cardNotifi: {
-        backgroundColor: '#F9F9F9',
+        backgroundColor: "#F9F9F9",
         padding: 12,
         marginBottom: 10,
         gap: 10,
@@ -157,34 +157,34 @@ const NotificationStyle = StyleSheet.create({
     },
 
     headerNotifi: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     warpLeftHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
     },
     headerLabel: {
         fontSize: 16,
-        fontWeight: '700',
-        color: '#333',
+        fontWeight: "700",
+        color: "#333",
     },
     notifiTime: {
         fontSize: 12,
-        color: 'gray',
+        color: "gray",
     },
     notifiContent: {
         marginTop: 6,
     },
     notifiContentText: {
         fontSize: 14,
-        color: '#555',
-        fontWeight: '600',
+        color: "#555",
+        fontWeight: "600",
     },
     emptyListNotifyView: {
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         marginTop: 80,
     },
     emptyImage: {
@@ -193,13 +193,13 @@ const NotificationStyle = StyleSheet.create({
         marginBottom: 10,
     },
     emptyListNotifyText: {
-        color: 'gray',
+        color: "gray",
         fontSize: 14,
     },
     linkText: {
-        color: '#2196F3',
-        textDecorationLine: 'underline',
-        textAlign: 'right',
+        color: "#2196F3",
+        textDecorationLine: "underline",
+        textAlign: "right",
         marginTop: 8,
     },
 });

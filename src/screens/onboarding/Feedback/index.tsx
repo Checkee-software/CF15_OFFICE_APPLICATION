@@ -1,4 +1,5 @@
-import React, {useCallback} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useCallback} from "react";
 import {
     View,
     Text,
@@ -6,15 +7,15 @@ import {
     FlatList,
     Image,
     TouchableOpacity,
-} from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import useFeedbackStore from '../../../stores/feedbackStore';
-import dayjs from 'dayjs';
-import images from '../../../assets/images';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import {useAuthStore} from '../../../stores/authStore';
+} from "react-native";
+import {useFocusEffect} from "@react-navigation/native";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
+import useFeedbackStore from "../../../stores/feedbackStore";
+import dayjs from "dayjs";
+import images from "../../../assets/images";
+import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
+import {useAuthStore} from "../../../stores/authStore";
 
 export default function FeedbackScreen({navigation}: any) {
     const {userInfo} = useAuthStore();
@@ -25,7 +26,7 @@ export default function FeedbackScreen({navigation}: any) {
     let hasFeedbackEditPermission = true;
     if (userInfo.userType.level !== EOrganization.WORKER) {
         hasFeedbackEditPermission = userInfo.functions.some(
-            (item: any) => item._id === 'FEEDBACK' && item.edit,
+            (item: any) => item._id === "FEEDBACK" && item.edit,
         );
     }
 
@@ -33,14 +34,13 @@ export default function FeedbackScreen({navigation}: any) {
         try {
             await fetchFeedbacks();
         } catch (err) {
-            console.error('Lỗi khi fetch:', err);
+            console.error("Lỗi khi fetch:", err);
         }
     };
 
     useFocusEffect(
         useCallback(() => {
             fetchData();
-            // eslint-disable-next-line
         }, []),
     );
 
@@ -58,7 +58,7 @@ export default function FeedbackScreen({navigation}: any) {
                     />
                     <View style={styles.nameContainer}>
                         <Text style={styles.name}>
-                            {item.fullName || 'Không rõ tên'}
+                            {item.fullName || "Không rõ tên"}
                         </Text>
                         <Text style={styles.role}>{item.roleName}</Text>
                     </View>
@@ -66,7 +66,7 @@ export default function FeedbackScreen({navigation}: any) {
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.feedback}>{item.content}</Text>
                 <Text style={styles.time}>
-                    {dayjs(item.createdAt).format('HH:mm DD/MM/YYYY')}
+                    {dayjs(item.createdAt).format("HH:mm DD/MM/YYYY")}
                 </Text>
             </View>
         );
@@ -84,7 +84,7 @@ export default function FeedbackScreen({navigation}: any) {
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>
-                            {isLoading ? 'Đang tải...' : 'Chưa có góp ý nào'}
+                            {isLoading ? "Đang tải..." : "Chưa có góp ý nào"}
                         </Text>
                     </View>
                 }
@@ -98,9 +98,9 @@ export default function FeedbackScreen({navigation}: any) {
                             navigation.navigate(SCREEN_INFO.FEEDBACK1.key)
                         }>
                         <MaterialCommunityIcons
-                            name='pencil'
+                            name="pencil"
                             size={18}
-                            color='#fff'
+                            color="#fff"
                             style={styles.icon}
                         />
                         <Text style={styles.buttonText}>Tạo góp ý</Text>
@@ -113,7 +113,7 @@ export default function FeedbackScreen({navigation}: any) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     list: {
         padding: 16,
@@ -121,13 +121,13 @@ const styles = StyleSheet.create({
     },
     itemContainer: {
         marginBottom: 16,
-        backgroundColor: '#f7f7f7',
+        backgroundColor: "#f7f7f7",
         padding: 12,
         borderRadius: 8,
     },
     row: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
+        flexDirection: "row",
+        alignItems: "flex-start",
     },
     avatar: {
         width: 48,
@@ -136,18 +136,18 @@ const styles = StyleSheet.create({
         marginRight: 8,
     },
     nameContainer: {
-        flexDirection: 'column',
+        flexDirection: "column",
     },
     name: {
         fontSize: 16,
     },
     role: {
-        color: '#3182CE',
+        color: "#3182CE",
         fontSize: 14,
     },
     title: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "bold",
         marginTop: 8,
         marginBottom: 4,
     },
@@ -157,38 +157,38 @@ const styles = StyleSheet.create({
     },
     time: {
         fontSize: 12,
-        color: '#888',
-        alignSelf: 'flex-end',
+        color: "#888",
+        alignSelf: "flex-end",
         marginTop: 5,
     },
     button: {
-        position: 'absolute',
+        position: "absolute",
         bottom: 44,
         right: 24,
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         paddingVertical: 13,
         paddingHorizontal: 10,
         borderRadius: 15,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         elevation: 3,
     },
     icon: {
         marginRight: 8,
     },
     buttonText: {
-        color: '#fff',
-        fontWeight: '600',
+        color: "#fff",
+        fontWeight: "600",
         fontSize: 16,
     },
     emptyContainer: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         paddingTop: 50,
     },
     emptyText: {
         fontSize: 16,
-        color: '#888',
+        color: "#888",
     },
 });

@@ -3,13 +3,13 @@ export interface ScreenInformation {
     icon?: string;
     headerTitle?: string;
     buttonLabel?: string;
-    keyContinue?:string,
-    isOpenQRCamera: boolean,
-    contentDescription?: string
+    keyContinue?: string;
+    isOpenQRCamera: boolean;
+    contentDescription?: string;
 }
 
 export type ScreenRegistry = {
-    name: string,
-    component: any,
-    options: any
+    name: string;
+    component: any;
+    options: any;
 };

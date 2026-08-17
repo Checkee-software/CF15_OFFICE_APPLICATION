@@ -1,31 +1,31 @@
 /* eslint-disable react/no-unstable-nested-components */
-/* eslint-disable jsx-quotes */
+
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect} from 'react';
+import React, {useEffect} from "react";
 import {
     StyleSheet,
     View,
     TouchableOpacity,
     // Alert,
     Platform,
-} from 'react-native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Work from '../screens/home/Work';
+} from "react-native";
+import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import Work from "../screens/home/Work";
 // import AutomaticTracing from '../screens/onboarding/AutomaticTracing';
-import History from '../screens/home/History';
-import Profile from '../screens/user/Profile';
-import Main from '../screens/home/Main';
-import Document from '../screens/home/Document';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import History from "../screens/home/History";
+import Profile from "../screens/user/Profile";
+import Main from "../screens/home/Main";
+import Document from "../screens/home/Document";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 // import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import SCREEN_INFO from '../config/SCREEN_CONFIG/screenInfo';
-import Backdrop from '@/screens/subscreen/Loading/index2';
-import {useAuthStore} from '@/stores/authStore';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import useNotificationStore from '@/stores/notificationStore';
+import SCREEN_INFO from "../config/SCREEN_CONFIG/screenInfo";
+import Backdrop from "@/screens/subscreen/Loading/index2";
+import {useAuthStore} from "@/stores/authStore";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
+import useNotificationStore from "@/stores/notificationStore";
 
 const BottomTabsNavigator = ({navigation}: any) => {
     const {
@@ -52,8 +52,8 @@ const BottomTabsNavigator = ({navigation}: any) => {
             });
         }
 
-        if (otherRedirect !== '') {
-            if (otherRedirect === 'harvest') {
+        if (otherRedirect !== "") {
+            if (otherRedirect === "harvest") {
                 navigation.navigate(SCREEN_INFO.BROWSE_HARVEST.key);
             }
         }
@@ -75,7 +75,7 @@ const BottomTabsNavigator = ({navigation}: any) => {
                 })
             }>
             {hasUnread && <View style={style.alertDot} />}
-            <FontAwesome name='bell' size={26} color={'rgba(76, 175, 80, 1)'} />
+            <FontAwesome name="bell" size={26} color={"rgba(76, 175, 80, 1)"} />
         </TouchableOpacity>
     );
 
@@ -84,41 +84,41 @@ const BottomTabsNavigator = ({navigation}: any) => {
     ) : (
         <Tab.Navigator
             initialRouteName={
-                redirectDataRequestSchedule ? 'Công việc' : 'Trang chủ'
+                redirectDataRequestSchedule ? "Công việc" : "Trang chủ"
             }
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: '#fff',
+                    backgroundColor: "#fff",
                 },
                 tabBarStyle: {
-                    borderColor: '#D3D3D3',
+                    borderColor: "#D3D3D3",
                     borderTopWidth: 1,
-                    boxShadow: '-1 2 0 #00000040',
-                    height: Platform.OS === 'android' ? 60 + insets.bottom : 60,
+                    boxShadow: "-1 2 0 #00000040",
+                    height: Platform.OS === "android" ? 60 + insets.bottom : 60,
                     paddingBottom:
-                        Platform.OS === 'android' ? insets.bottom : 0,
+                        Platform.OS === "android" ? insets.bottom : 0,
                 },
                 headerShown: false,
                 tabBarHideOnKeyboard: true,
-                animation: 'shift',
-                headerTitleAlign: 'center',
+                animation: "shift",
+                headerTitleAlign: "center",
                 headerShadowVisible: false,
-                tabBarActiveTintColor: 'rgba(76, 175, 80, 1)',
-                tabBarInactiveTintColor: 'gray',
+                tabBarActiveTintColor: "rgba(76, 175, 80, 1)",
+                tabBarInactiveTintColor: "gray",
                 tabBarLabelStyle: {
                     fontSize: 10,
                 },
             }}>
             <Tab.Screen
                 component={Main}
-                name='Trang chủ'
+                name="Trang chủ"
                 options={{
-                    headerTitle: 'CF15 OFFICE',
+                    headerTitle: "CF15 OFFICE",
                     headerTitleStyle: style.headerTitle,
                     headerShown: true,
                     tabBarIcon: ({color}) => (
                         <MaterialIcons
-                            name='dashboard'
+                            name="dashboard"
                             size={26}
                             color={color}
                         />
@@ -130,14 +130,14 @@ const BottomTabsNavigator = ({navigation}: any) => {
             {userInfo.userType.level === EOrganization.LEADER && (
                 <Tab.Screen
                     component={Work}
-                    name='Công việc'
+                    name="Công việc"
                     options={{
                         headerShown: true,
-                        headerTitle: 'CÔNG VIỆC KHU VƯỜN',
+                        headerTitle: "CÔNG VIỆC KHU VƯỜN",
                         headerTitleStyle: style.headerTitle,
                         tabBarIcon: ({color}) => (
                             <MaterialIcons
-                                name='work'
+                                name="work"
                                 size={26}
                                 color={color}
                             />
@@ -148,14 +148,14 @@ const BottomTabsNavigator = ({navigation}: any) => {
 
             <Tab.Screen
                 component={Document}
-                name='Văn bản'
+                name="Văn bản"
                 options={{
                     headerShown: true,
-                    headerTitle: 'TÀI LIỆU',
+                    headerTitle: "TÀI LIỆU",
                     headerTitleStyle: style.headerTitle,
                     tabBarIcon: ({color}) => (
                         <MaterialCommunityIcons
-                            name='file-document-outline'
+                            name="file-document-outline"
                             size={24}
                             color={color}
                         />
@@ -195,26 +195,26 @@ const BottomTabsNavigator = ({navigation}: any) => {
 
             <Tab.Screen
                 component={History}
-                name='Lịch sử'
+                name="Lịch sử"
                 options={{
                     headerShown: true,
-                    headerTitle: 'LỊCH SỬ HOẠT ĐỘNG',
+                    headerTitle: "LỊCH SỬ HOẠT ĐỘNG",
                     headerTitleStyle: style.headerTitle,
                     tabBarIcon: ({color}) => (
-                        <MaterialIcons name='history' size={26} color={color} />
+                        <MaterialIcons name="history" size={26} color={color} />
                     ),
                 }}
             />
 
             <Tab.Screen
                 component={Profile}
-                name='Hồ sơ'
+                name="Hồ sơ"
                 options={{
                     headerShown: true,
-                    headerTitle: 'HỒ SƠ',
+                    headerTitle: "HỒ SƠ",
                     headerTitleStyle: style.headerTitle,
                     tabBarIcon: ({color}) => (
-                        <FontAwesome name='user' size={26} color={color} />
+                        <FontAwesome name="user" size={26} color={color} />
                     ),
                     headerRight: () => <BellButton />,
                 }}
@@ -229,28 +229,28 @@ const style = StyleSheet.create({
     headerTitle: {
         fontSize: 16,
         fontWeight: 700,
-        color: 'rgba(0, 0, 0, 1)',
+        color: "rgba(0, 0, 0, 1)",
     },
     cameraBottomTab: {
-        borderRadius: '50%',
-        backgroundColor: 'rgba(76, 175, 80, 1)',
+        borderRadius: "50%",
+        backgroundColor: "rgba(76, 175, 80, 1)",
         width: 60,
         height: 60,
         top: -30,
-        margin: 'auto',
-        alignItems: 'center',
-        justifyContent: 'center',
+        margin: "auto",
+        alignItems: "center",
+        justifyContent: "center",
     },
     alertView: {
-        position: 'relative',
+        position: "relative",
         marginRight: 20,
     },
     alertDot: {
-        position: 'absolute',
+        position: "absolute",
         right: 1,
         height: 10,
         width: 10,
-        backgroundColor: 'red',
+        backgroundColor: "red",
         borderRadius: 25,
         zIndex: 10,
     },

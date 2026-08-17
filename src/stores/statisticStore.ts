@@ -1,13 +1,13 @@
-import ENV from '@/config/ENV';
+import ENV from "@/config/ENV";
 import {
     EType,
     IStatisticFormData,
-} from '@/shared-types/form-data/StatisticFormData/StatisticFormData';
-import {IWorkList} from '@/shared-types/Response/StatisticResponse/StatisticResponse';
-import axiosClient from '@/utils/axiosClient';
-import moment from 'moment';
-import Snackbar from 'react-native-snackbar';
-import {create} from 'zustand';
+} from "@/shared-types/form-data/StatisticFormData/StatisticFormData";
+import {IWorkList} from "@/shared-types/Response/StatisticResponse/StatisticResponse";
+import axiosClient from "@/utils/axiosClient";
+import moment from "moment";
+import Snackbar from "react-native-snackbar";
+import {create} from "zustand";
 
 interface IStatisticResponse {
     totalCost: number;
@@ -58,16 +58,16 @@ type IChartData = {
 };
 
 const COLOR_PALETTE = [
-    '#0EA5E9', // sky
-    '#22C55E', // green
-    '#F97316', // orange
-    '#A855F7', // purple
-    '#14B8A6', // teal
-    '#EAB308', // yellow
-    '#EF4444', // red
-    '#6366F1', // indigo
-    '#EC4899', // pink
-    '#84CC16', // lime
+    "#0EA5E9", // sky
+    "#22C55E", // green
+    "#F97316", // orange
+    "#A855F7", // purple
+    "#14B8A6", // teal
+    "#EAB308", // yellow
+    "#EF4444", // red
+    "#6366F1", // indigo
+    "#EC4899", // pink
+    "#84CC16", // lime
 ];
 
 const convertToChartData = (data: any[]): IChartData[] => {
@@ -101,14 +101,14 @@ const convertToChartData = (data: any[]): IChartData[] => {
             });
         };
 
-        pushColumn(item.labourCost ?? 0, '#FF4C4C', item.label);
-        pushColumn(item.materialCost ?? 0, '#4CAF50');
-        pushColumn(item.machineCost ?? 0, '#2196F3');
+        pushColumn(item.labourCost ?? 0, "#FF4C4C", item.label);
+        pushColumn(item.materialCost ?? 0, "#4CAF50");
+        pushColumn(item.machineCost ?? 0, "#2196F3");
 
         result.push({
             value: 0,
             spacing: 70,
-            frontColor: 'transparent',
+            frontColor: "transparent",
             _realValue: 0,
         });
     });
@@ -179,7 +179,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -210,16 +210,16 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                         pieChart: [
                             {
                                 value: item.percentage,
-                                color: '#4CAF50',
+                                color: "#4CAF50",
                                 text: `${item.percentage}%`,
                             },
                             {
                                 value: notComplete,
-                                color: '#FF4E45',
+                                color: "#FF4E45",
                                 text:
                                     notComplete > 0
                                         ? `${notComplete.toFixed(1)}%`
-                                        : '',
+                                        : "",
                             },
                         ],
                     };
@@ -231,7 +231,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     totalGarden: 0,
                     totalGroup: 0,
                     totalMember: 0,
-                    totalWork: '0',
+                    totalWork: "0",
                     chart: [],
                     pieChart: chartData,
                 };
@@ -256,7 +256,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -281,7 +281,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
             const response = await axiosClient.get(
                 `${
                     ENV.BACKEND_URL
-                }/resources/statistics/statistic-harvest/?${targetType}=${targetTypeValue}&type=${type}&startDate=${'2025-01-01T00:00:00.000Z'}&endDate=${'2025-12-31T23:59:59.999Z'}`,
+                }/resources/statistics/statistic-harvest/?${targetType}=${targetTypeValue}&type=${type}&startDate=${"2025-01-01T00:00:00.000Z"}&endDate=${"2025-12-31T23:59:59.999Z"}`,
             );
 
             if (response.data.data) {
@@ -320,7 +320,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -332,11 +332,11 @@ export const useStatisticStore = create<StatisticStore>(set => ({
         set({isLoading: true});
         try {
             const response =
-                selection === 'WORK'
+                selection === "WORK"
                     ? await axiosClient.get(
                           `${ENV.BACKEND_URL}/resources/schedules/selection-schedule`,
                       )
-                    : selection === 'PRODUCT'
+                    : selection === "PRODUCT"
                     ? await axiosClient.get(
                           `${ENV.BACKEND_URL}/resources/products/selection`,
                       )
@@ -351,8 +351,8 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                 }));
 
                 const selectionAll = {
-                    _id: '',
-                    name: 'Tất cả',
+                    _id: "",
+                    name: "Tất cả",
                 };
 
                 selections.unshift(selectionAll);
@@ -374,7 +374,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -411,7 +411,7 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }

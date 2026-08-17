@@ -7,24 +7,24 @@ import {
     Linking,
     Image,
     ViewStyle,
-} from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
-import React, {useEffect, useState, useCallback} from 'react';
+} from "react-native";
+import {useFocusEffect} from "@react-navigation/native";
+import React, {useEffect, useState, useCallback} from "react";
 import {
     useCameraDevice,
     Camera,
     CameraPermissionRequestResult,
     useCodeScanner,
-} from 'react-native-vision-camera';
-import useGardenStore from '@/stores/gardenStore';
-import images from '../../../assets/images';
-import {useAuthStore} from '../../../stores/authStore';
+} from "react-native-vision-camera";
+import useGardenStore from "@/stores/gardenStore";
+import images from "../../../assets/images";
+import {useAuthStore} from "../../../stores/authStore";
 
 const GardenScan = ({navigation, route}: any) => {
     const {userInfo} = useAuthStore();
 
     const [notFound, setNotFound] = useState(false);
-    const [codeInput, setCodeInput] = useState('');
+    const [codeInput, setCodeInput] = useState("");
     const [hasScanned, setHasScanned] = useState(false);
 
     const {navigateNext} = route.params || {};
@@ -33,13 +33,15 @@ const GardenScan = ({navigation, route}: any) => {
     useFocusEffect(
         useCallback(() => {
             setNotFound(false);
-            setCodeInput('');
+            setCodeInput("");
             setHasScanned(false);
         }, []),
     );
 
     const handleSearch = async (code: string) => {
-        if (!code) return;
+        if (!code) {
+            return;
+        }
 
         await searchGardens(code, userInfo._id);
 
@@ -57,12 +59,16 @@ const GardenScan = ({navigation, route}: any) => {
     };
 
     const codeScanner = useCodeScanner({
-        codeTypes: ['qr'],
+        codeTypes: ["qr"],
         onCodeScanned: async codes => {
-            if (hasScanned) return;
+            if (hasScanned) {
+                return;
+            }
 
             const scannedCode = codes[0]?.value?.trim();
-            if (!scannedCode) return;
+            if (!scannedCode) {
+                return;
+            }
 
             setHasScanned(true);
             setCodeInput(scannedCode);
@@ -72,7 +78,9 @@ const GardenScan = ({navigation, route}: any) => {
 
     const handleConfirm = async () => {
         const code = codeInput.trim();
-        if (!code) return;
+        if (!code) {
+            return;
+        }
 
         setHasScanned(true);
         await handleSearch(code);
@@ -85,11 +93,11 @@ const GardenScan = ({navigation, route}: any) => {
         height: 0,
     });
 
-    const device = useCameraDevice('back');
+    const device = useCameraDevice("back");
 
     const getPermission = async () => {
         const permission = await Camera.requestCameraPermission();
-        if (permission === 'denied') {
+        if (permission === "denied") {
             await Linking.openSettings();
         }
         setPermissionState(permission);
@@ -103,7 +111,7 @@ const GardenScan = ({navigation, route}: any) => {
         <>
             {notFound ? (
                 <View style={CameraScannerStyles.notFoundContainer}>
-                    <View style={{alignItems: 'center'}}>
+                    <View style={{alignItems: "center"}}>
                         <Image
                             source={images.emptyGarden}
                             style={{
@@ -111,7 +119,7 @@ const GardenScan = ({navigation, route}: any) => {
                                 height: 400,
                                 marginVertical: 24,
                             }}
-                            resizeMode='contain'
+                            resizeMode="contain"
                         />
                         <Text style={CameraScannerStyles.notFoundText}>
                             Không tìm thấy khu vườn phù hợp!
@@ -125,7 +133,7 @@ const GardenScan = ({navigation, route}: any) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            ) : permissionState === 'granted' && device != null ? (
+            ) : permissionState === "granted" && device != null ? (
                 <View style={CameraScannerStyles.container}>
                     <Camera
                         codeScanner={codeScanner}
@@ -139,8 +147,8 @@ const GardenScan = ({navigation, route}: any) => {
 
                     <View style={CameraScannerStyles.inputView}>
                         <TextInput
-                            placeholder='Nhập mã khu vườn'
-                            placeholderTextColor={'#808080'}
+                            placeholder="Nhập mã khu vườn"
+                            placeholderTextColor={"#808080"}
                             style={CameraScannerStyles.inputManualSearch}
                             value={codeInput}
                             onChangeText={setCodeInput}
@@ -161,9 +169,9 @@ const GardenScan = ({navigation, route}: any) => {
             ) : (
                 <View style={CameraScannerStyles.requestPermissionContainer}>
                     <Text style={CameraScannerStyles.requestPermissionText}>
-                        {permissionState !== 'granted'
-                            ? 'Bạn cần cấp quyền truy cập camera để có thể sử dụng chức năng này'
-                            : 'Đang tải camera...'}
+                        {permissionState !== "granted"
+                            ? "Bạn cần cấp quyền truy cập camera để có thể sử dụng chức năng này"
+                            : "Đang tải camera..."}
                     </Text>
                 </View>
             )}
@@ -175,7 +183,7 @@ const CameraScannerStyles = StyleSheet.create({
     container: {
         padding: 20,
         flex: 1,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: "#F5F5F5",
     },
     camera: {
         flex: 1,
@@ -183,86 +191,86 @@ const CameraScannerStyles = StyleSheet.create({
     },
     inputView: {
         flex: 1,
-        alignItems: 'center',
+        alignItems: "center",
         gap: 14,
     },
     inputManualSearch: {
-        textAlignVertical: 'center',
-        textAlign: 'center',
-        width: '100%',
-        backgroundColor: '#FFFFFF',
-        borderColor: '#D3D3D3',
+        textAlignVertical: "center",
+        textAlign: "center",
+        width: "100%",
+        backgroundColor: "#FFFFFF",
+        borderColor: "#D3D3D3",
         borderWidth: 1,
         padding: 12,
         borderRadius: 8,
         marginTop: 22,
-        color: '#212121',
+        color: "#212121",
         fontWeight: 500,
         fontSize: 14,
     },
     confirmManualSearchBtn: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         borderRadius: 24,
-        borderColor: '#D3D3D3',
+        borderColor: "#D3D3D3",
         borderWidth: 1,
         paddingVertical: 12,
         paddingHorizontal: 24,
     },
     confirmManualSearchText: {
-        color: '#F5F5F5',
+        color: "#F5F5F5",
         fontWeight: 500,
         fontSize: 16,
     },
     viewRequestCameraPermission: {
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     notHavePermission: {
-        backgroundColor: 'black',
+        backgroundColor: "black",
     },
     requestPermissionContainer: {
         paddingHorizontal: 20,
-        backgroundColor: 'black',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "center",
         flex: 1,
     },
     requestPermissionText: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 16,
-        textAlign: 'center',
+        textAlign: "center",
     },
 
     notFoundContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff",
         paddingHorizontal: 20,
     },
     notFoundText: {
         fontSize: 16,
-        color: '#333',
-        textAlign: 'center',
+        color: "#333",
+        textAlign: "center",
         marginBottom: 16,
     },
     goBackButton: {
-        borderColor: '#4CAF50',
+        borderColor: "#4CAF50",
         borderWidth: 1,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 20,
     },
     goBackText: {
-        color: '#4CAF50',
+        color: "#4CAF50",
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: "500",
     },
     headerText: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: "bold",
         marginBottom: 12,
     },
 });

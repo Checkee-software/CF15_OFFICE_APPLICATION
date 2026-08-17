@@ -1,25 +1,30 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import {Platform} from 'react-native';
-import ReactNativeBlobUtil from 'react-native-blob-util';
-import {IDocument} from '../shared-types/Response/DocumentResponse/DocumentResponse';
-import {EDocumentStatus} from '@/shared-types/common/Document/document';
-import ENV from '@/config/ENV';
-import RNFS from 'react-native-fs';
-import {encode} from 'base64-arraybuffer';
-import asyncStorageHelper from '@/utils/localStorageHelper';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import {Platform} from "react-native";
+import ReactNativeBlobUtil from "react-native-blob-util";
+import {IDocument} from "../shared-types/Response/DocumentResponse/DocumentResponse";
+import {EDocumentStatus} from "@/shared-types/common/Document/document";
+import ENV from "@/config/ENV";
+import RNFS from "react-native-fs";
+import {encode} from "base64-arraybuffer";
+import asyncStorageHelper from "@/utils/localStorageHelper";
 
 type DocumentListParams = {type?: string; page?: number; rows?: number};
 type DocumentListWithTotal = {data: IDocument[]; total: number};
-type DocumentDetailPayload = IDocument | {document?: IDocument | null; stepsInfo?: any[]};
-const DOWNLOAD_ENDPOINT_FOLDERS = ['files', 'signedFiles', 'attachedFiles', 'mainFiles'];
+type DocumentDetailPayload =
+    | IDocument
+    | {document?: IDocument | null; stepsInfo?: any[]};
+const DOWNLOAD_ENDPOINT_FOLDERS = ["files", "signedFiles", "attachedFiles", "mainFiles"];
 
-const normalizeFilePath = (value: string) => String(value || '').replace(/\\/g, '/').trim();
+const normalizeFilePath = (value: string) =>
+    String(value || "")
+        .replace(/\\/g, "/")
+        .trim();
 
 const getLastPathSegment = (value: string) => {
-    const clean = normalizeFilePath(value).split('?')[0].split('#')[0];
-    const segment = clean.split('/').filter(Boolean).pop() || '';
+    const clean = normalizeFilePath(value).split("?")[0].split("#")[0];
+    const segment = clean.split("/").filter(Boolean).pop() || "";
 
     try {
         return decodeURIComponent(segment);
@@ -29,8 +34,8 @@ const getLastPathSegment = (value: string) => {
 };
 
 const sanitizeFileName = (value: string) =>
-    String(value || '')
-        .replace(/[\\/:*?"<>|]/g, '_')
+    String(value || "")
+        .replace(/[\\/:*?"<>|]/g, "_")
         .trim();
 
 export const buildDownloadUrl = (fileSource: string) => {
@@ -41,13 +46,13 @@ export const buildDownloadUrl = (fileSource: string) => {
         return encodeURI(normalizedSource);
     }
 
-    if (normalizedSource.includes('/')) {
+    if (normalizedSource.includes("/")) {
         const sourceParts = normalizedSource
-            .split('?')[0]
-            .split('#')[0]
-            .split('/')
+            .split("?")[0]
+            .split("#")[0]
+            .split("/")
             .filter(Boolean);
-        const sourceFolder = sourceParts[sourceParts.length - 2] || '';
+        const sourceFolder = sourceParts[sourceParts.length - 2] || "";
 
         if (DOWNLOAD_ENDPOINT_FOLDERS.includes(sourceFolder)) {
             return `${ENV.BACKEND_URL}/resources/downloads/${encodeURIComponent(
@@ -55,7 +60,7 @@ export const buildDownloadUrl = (fileSource: string) => {
             )}`;
         }
 
-        const normalizedUrlPath = normalizedSource.startsWith('/')
+        const normalizedUrlPath = normalizedSource.startsWith("/")
             ? normalizedSource
             : `/${normalizedSource}`;
         return `${ENV.BACKEND_URL}${encodeURI(normalizedUrlPath)}`;
@@ -70,18 +75,20 @@ const requestDocumentList = async (
     params?: DocumentListParams,
 ): Promise<DocumentListWithTotal> => {
     try {
-        const type = params?.type || 'INCOMING';
+        const type = params?.type || "INCOMING";
         const queryParts = [`type=${encodeURIComponent(type)}`];
         const rows =
-            typeof params?.rows === 'number' && Number.isFinite(params.rows)
+            typeof params?.rows === "number" && Number.isFinite(params.rows)
                 ? params.rows
                 : 100;
         queryParts.push(`rows=${rows}`);
-        if (typeof params?.page === 'number') {
+        if (typeof params?.page === "number") {
             queryParts.push(`page=${params.page}`);
         }
         const response = await axiosClient.get(
-            `${ENV.BACKEND_URL}/resources/documents/list?${queryParts.join('&')}`,
+            `${ENV.BACKEND_URL}/resources/documents/list?${queryParts.join(
+                "&",
+            )}`,
         );
 
         const payload = response.data?.data ?? response.data ?? {};
@@ -102,11 +109,14 @@ const requestDocumentList = async (
     }
 };
 
-const extractDocumentFromDetailResponse = (responseData: any): IDocument | null => {
-    const payload = responseData?.data?.data ?? responseData?.data ?? responseData;
+const extractDocumentFromDetailResponse = (
+    responseData: any,
+): IDocument | null => {
+    const payload =
+        responseData?.data?.data ?? responseData?.data ?? responseData;
     const document = payload?.document ?? payload;
 
-    return document && typeof document === 'object'
+    return document && typeof document === "object"
         ? (document as IDocument)
         : null;
 };
@@ -114,7 +124,9 @@ const extractDocumentFromDetailResponse = (responseData: any): IDocument | null 
 interface DocumentStore {
     isLoading: boolean;
     listDocument: IDocument[];
-    fetchDocumentListWithTotal: (params?: DocumentListParams) => Promise<DocumentListWithTotal>;
+    fetchDocumentListWithTotal: (
+        params?: DocumentListParams,
+    ) => Promise<DocumentListWithTotal>;
     fetchDocuments: (params?: DocumentListParams) => Promise<IDocument[]>;
     getListDocument: (params?: DocumentListParams) => Promise<void>;
     downloadFile: (
@@ -123,12 +135,29 @@ interface DocumentStore {
     ) => Promise<string | undefined>;
     createOutgoingDocument: (formData: FormData) => Promise<boolean>;
     createIncomingDocument: (formData: FormData) => Promise<boolean>;
-    getDocumentDetail: (documentId: string) => Promise<DocumentDetailPayload | null>;
-    updateOutgoingDocument: (documentId: string, formData: FormData) => Promise<boolean>;
-    updateIncomingDraft: (documentId: string, formData: FormData) => Promise<boolean>;
-    registerIncomingDocument: (documentId: string, formData: FormData) => Promise<boolean>;
-    assignIncomingDocument: (documentId: string, formData: FormData) => Promise<boolean>;
-    updateIncomingDocument: (documentId: string, formData?: FormData) => Promise<boolean>;
+    getDocumentDetail: (
+        documentId: string,
+    ) => Promise<DocumentDetailPayload | null>;
+    updateOutgoingDocument: (
+        documentId: string,
+        formData: FormData,
+    ) => Promise<boolean>;
+    updateIncomingDraft: (
+        documentId: string,
+        formData: FormData,
+    ) => Promise<boolean>;
+    registerIncomingDocument: (
+        documentId: string,
+        formData: FormData,
+    ) => Promise<boolean>;
+    assignIncomingDocument: (
+        documentId: string,
+        formData: FormData,
+    ) => Promise<boolean>;
+    updateIncomingDocument: (
+        documentId: string,
+        formData?: FormData,
+    ) => Promise<boolean>;
     deleteDocument: (documentId: string) => Promise<boolean>;
 }
 
@@ -153,7 +182,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
 
         if (!normalizedFileName) {
             Snackbar.show({
-                text: 'File chưa có thông tin tải xuống',
+                text: "File chưa có thông tin tải xuống",
                 duration: Snackbar.LENGTH_SHORT,
             });
             return;
@@ -162,7 +191,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
         const downloadUrl = buildDownloadUrl(fileSource);
 
         try {
-            if (Platform.OS === 'android') {
+            if (Platform.OS === "android") {
                 const filePath = `${ReactNativeBlobUtil.fs.dirs.DownloadDir}/${normalizedFileName}`;
                 const headers: {[key: string]: string} | undefined =
                     asyncStorageHelper.token
@@ -175,46 +204,45 @@ export const useDocumentStore = create<DocumentStore>(set => ({
                         mediaScannable: true,
                         title: normalizedFileName,
                         path: filePath,
-                        description: 'Đang tải file',
+                        description: "Đang tải file",
                     },
-                }).fetch('GET', downloadUrl, headers);
+                }).fetch("GET", downloadUrl, headers);
                 const statusCode = result.info().status;
 
                 if (statusCode < 200 || statusCode >= 300) {
-                    throw new Error(`Download failed with status ${statusCode}`);
+                    throw new Error(
+                        `Download failed with status ${statusCode}`,
+                    );
                 }
 
                 Snackbar.show({
-                    text: 'Đã tải file thành công',
+                    text: "Đã tải file thành công",
                     duration: Snackbar.LENGTH_LONG,
                 });
 
                 return filePath;
             }
 
-            const response = await axiosClient.get(
-                downloadUrl,
-                {
-                    responseType: 'arraybuffer',
-                },
-            );
+            const response = await axiosClient.get(downloadUrl, {
+                responseType: "arraybuffer",
+            });
             const base64Data = encode(response.data);
 
             const downloadDirectory =
                 RNFS.DownloadDirectoryPath || RNFS.DocumentDirectoryPath;
             const filePath = `${downloadDirectory}/${normalizedFileName}`;
-            await RNFS.writeFile(filePath, base64Data, 'base64');
+            await RNFS.writeFile(filePath, base64Data, "base64");
 
             Snackbar.show({
-                text: 'Đã tải file thành công',
+                text: "Đã tải file thành công",
                 duration: Snackbar.LENGTH_LONG,
             });
 
             return filePath;
         } catch (error) {
-            console.error('Download failed:', error);
+            console.error("Download failed:", error);
             Snackbar.show({
-                text: 'Tải file không thành công, vui lòng thử lại!',
+                text: "Tải file không thành công, vui lòng thử lại!",
                 duration: Snackbar.LENGTH_LONG,
             });
         }
@@ -234,7 +262,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             setTimeout(() => {
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -250,12 +278,12 @@ export const useDocumentStore = create<DocumentStore>(set => ({
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
+                        "Content-Type": "multipart/form-data",
                     },
                 },
             );
             Snackbar.show({
-                text: 'Tạo văn bản đi thành công!',
+                text: "Tạo văn bản đi thành công!",
                 duration: Snackbar.LENGTH_LONG,
             });
             set({isLoading: false});
@@ -265,7 +293,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             Snackbar.show({
                 text:
                     error?.response?.data?.message ||
-                    'Không thể tạo văn bản đi, vui lòng thử lại!',
+                    "Không thể tạo văn bản đi, vui lòng thử lại!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return false;
@@ -278,10 +306,10 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             await axiosClient.post(
                 `${ENV.BACKEND_URL}/resources/documents/incoming/create`,
                 formData,
-                {headers: {'Content-Type': 'multipart/form-data'}},
+                {headers: {"Content-Type": "multipart/form-data"}},
             );
             Snackbar.show({
-                text: 'Tạo văn bản đến thành công!',
+                text: "Tạo văn bản đến thành công!",
                 duration: Snackbar.LENGTH_LONG,
             });
             set({isLoading: false});
@@ -291,7 +319,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             Snackbar.show({
                 text:
                     error?.response?.data?.message ||
-                    'Không thể tạo văn bản đến, vui lòng thử lại!',
+                    "Không thể tạo văn bản đến, vui lòng thử lại!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return false;
@@ -309,7 +337,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             Snackbar.show({
                 text:
                     error?.response?.data?.message ||
-                    'Không thể tải chi tiết văn bản!',
+                    "Không thể tải chi tiết văn bản!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return null;
@@ -324,12 +352,12 @@ export const useDocumentStore = create<DocumentStore>(set => ({
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
+                        "Content-Type": "multipart/form-data",
                     },
                 },
             );
             Snackbar.show({
-                text: 'Cập nhật văn bản đi thành công!',
+                text: "Cập nhật văn bản đi thành công!",
                 duration: Snackbar.LENGTH_LONG,
             });
             set({isLoading: false});
@@ -339,7 +367,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             Snackbar.show({
                 text:
                     error?.response?.data?.message ||
-                    'Không thể cập nhật văn bản đi, vui lòng thử lại!',
+                    "Không thể cập nhật văn bản đi, vui lòng thử lại!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return false;
@@ -352,10 +380,10 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             await axiosClient.patch(
                 `${ENV.BACKEND_URL}/resources/documents/incoming-draft/update/${documentId}`,
                 formData,
-                {headers: {'Content-Type': 'multipart/form-data'}},
+                {headers: {"Content-Type": "multipart/form-data"}},
             );
             Snackbar.show({
-                text: 'Cập nhật bản nháp văn bản đến thành công!',
+                text: "Cập nhật bản nháp văn bản đến thành công!",
                 duration: Snackbar.LENGTH_LONG,
             });
             set({isLoading: false});
@@ -365,7 +393,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             Snackbar.show({
                 text:
                     error?.response?.data?.message ||
-                    'Không thể cập nhật bản nháp văn bản đến!',
+                    "Không thể cập nhật bản nháp văn bản đến!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return false;
@@ -378,10 +406,10 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             await axiosClient.patch(
                 `${ENV.BACKEND_URL}/resources/documents/incoming/register/${documentId}`,
                 formData,
-                {headers: {'Content-Type': 'multipart/form-data'}},
+                {headers: {"Content-Type": "multipart/form-data"}},
             );
             Snackbar.show({
-                text: 'Vào sổ văn bản đến thành công!',
+                text: "Vào sổ văn bản đến thành công!",
                 duration: Snackbar.LENGTH_LONG,
             });
             set({isLoading: false});
@@ -391,7 +419,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             Snackbar.show({
                 text:
                     error?.response?.data?.message ||
-                    'Không thể vào sổ văn bản đến!',
+                    "Không thể vào sổ văn bản đến!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return false;
@@ -404,10 +432,10 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             await axiosClient.patch(
                 `${ENV.BACKEND_URL}/resources/documents/incoming/assign/${documentId}`,
                 formData,
-                {headers: {'Content-Type': 'multipart/form-data'}},
+                {headers: {"Content-Type": "multipart/form-data"}},
             );
             Snackbar.show({
-                text: 'Phân công văn bản đến thành công!',
+                text: "Phân công văn bản đến thành công!",
                 duration: Snackbar.LENGTH_LONG,
             });
             set({isLoading: false});
@@ -425,14 +453,13 @@ export const useDocumentStore = create<DocumentStore>(set => ({
                     set({isLoading: false});
                     return true;
                 }
-            } catch {
-            }
+            } catch {}
 
             set({isLoading: false});
             Snackbar.show({
                 text:
                     error?.response?.data?.message ||
-                    'Không thể phân công văn bản đến!',
+                    "Không thể phân công văn bản đến!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return false;
@@ -445,10 +472,12 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             await axiosClient.patch(
                 `${ENV.BACKEND_URL}/resources/documents/incoming/update/${documentId}`,
                 formData || {},
-                formData ? {headers: {'Content-Type': 'multipart/form-data'}} : undefined,
+                formData
+                    ? {headers: {"Content-Type": "multipart/form-data"}}
+                    : undefined,
             );
             Snackbar.show({
-                text: 'Cập nhật tiến trình văn bản đến thành công!',
+                text: "Cập nhật tiến trình văn bản đến thành công!",
                 duration: Snackbar.LENGTH_LONG,
             });
             set({isLoading: false});
@@ -458,7 +487,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             Snackbar.show({
                 text:
                     error?.response?.data?.message ||
-                    'Không thể cập nhật tiến trình văn bản đến!',
+                    "Không thể cập nhật tiến trình văn bản đến!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return false;
@@ -472,7 +501,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
                 `${ENV.BACKEND_URL}/resources/documents/${documentId}`,
             );
             Snackbar.show({
-                text: 'Xóa văn bản thành công!',
+                text: "Xóa văn bản thành công!",
                 duration: Snackbar.LENGTH_LONG,
             });
             set({isLoading: false});
@@ -482,7 +511,7 @@ export const useDocumentStore = create<DocumentStore>(set => ({
             Snackbar.show({
                 text:
                     error?.response?.data?.message ||
-                    'Không thể xóa văn bản, vui lòng thử lại!',
+                    "Không thể xóa văn bản, vui lòng thử lại!",
                 duration: Snackbar.LENGTH_LONG,
             });
             return false;

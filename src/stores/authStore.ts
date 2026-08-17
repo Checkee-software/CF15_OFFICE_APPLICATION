@@ -1,20 +1,20 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import asyncStorageHelper from '../utils/localStorageHelper/index';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import asyncStorageHelper from "../utils/localStorageHelper/index";
 import {
     ILogin,
     IUpdatePassword,
-} from '../shared-types/form-data/UserFormData/UserFormData';
-import {EScheduleStatus} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
-import UserType from '@/shared-types/common/UserType';
-import Address from '@/shared-types/common/Address';
-import {OneSignal} from 'react-native-onesignal';
+} from "../shared-types/form-data/UserFormData/UserFormData";
+import {EScheduleStatus} from "@/shared-types/Response/ScheduleResponse/ScheduleResponse";
+import UserType from "@/shared-types/common/UserType";
+import Address from "@/shared-types/common/Address";
+import {OneSignal} from "react-native-onesignal";
 import {
     EOrganization,
     IFunction,
-} from '@/shared-types/common/Permissions/Permissions';
-import ENV from '@/config/ENV';
+} from "@/shared-types/common/Permissions/Permissions";
+import ENV from "@/config/ENV";
 
 type tasks = {
     compeleted: string;
@@ -57,6 +57,7 @@ type AuthStore = {
     redirectDataRequestSchedule: string | null;
     otherRedirect: string | null;
     login: (userAccount: ILogin) => Promise<void>;
+    setTasksData: (payload: tasks) => void;
     autoLogin: () => Promise<void>;
     getScheduleCollection: () => Promise<tasks | undefined>;
     loadSupplementalUserInfo: (userData: IUser) => Promise<void>;
@@ -68,52 +69,52 @@ type AuthStore = {
 };
 
 const initialUserInfo: IUser = {
-    _id: '',
+    _id: "",
     status: false,
-    avatar: '',
-    username: '',
-    fullName: '',
-    nation: '',
+    avatar: "",
+    username: "",
+    fullName: "",
+    nation: "",
     dateOfBirth: undefined,
     recruimentDate: undefined,
-    contract: '',
-    phoneNumber: '',
-    ID: '',
-    departmentName: '',
+    contract: "",
+    phoneNumber: "",
+    ID: "",
+    departmentName: "",
     userType: {
-        level: '',
-        role: '',
-        department: '',
-        unit: '',
+        level: "",
+        role: "",
+        department: "",
+        unit: "",
     } as UserType.IUserType,
     address: {} as Address.IAddresses,
     managedGardens: [],
     functions: [],
     tasks: {
-        compeleted: '0',
-        expired: '0',
-        processing: '0',
-        total: '0',
+        compeleted: "0",
+        expired: "0",
+        processing: "0",
+        total: "0",
     },
-    groupId: '',
-    groupName: '',
+    groupId: "",
+    groupName: "",
     canViewSensitiveInfo: false,
-    roleName: '',
+    roleName: "",
 };
 
 const fixAvatarPath = (path: string) => {
-    if (!path || typeof path !== 'string') {
-        return '';
+    if (!path || typeof path !== "string") {
+        return "";
     }
 
-    const updatedPath = path.replace(/\\/g, '/').trim();
+    const updatedPath = path.replace(/\\/g, "/").trim();
 
     if (/^https?:\/\//i.test(updatedPath)) {
         return updatedPath;
     }
 
-    const baseUrl = ENV.BACKEND_URL.replace(/\/+$/, '');
-    const normalizedPath = updatedPath.startsWith('/')
+    const baseUrl = ENV.BACKEND_URL.replace(/\/+$/, "");
+    const normalizedPath = updatedPath.startsWith("/")
         ? updatedPath
         : `/${updatedPath}`;
 
@@ -122,43 +123,43 @@ const fixAvatarPath = (path: string) => {
 
 const resolveAvatarUrl = (avatar: any): string => {
     if (!avatar) {
-        return '';
+        return "";
     }
 
-    if (typeof avatar === 'string') {
+    if (typeof avatar === "string") {
         return fixAvatarPath(avatar);
     }
 
-    if (typeof avatar === 'object') {
-        if (typeof avatar.path === 'string' && avatar.path) {
+    if (typeof avatar === "object") {
+        if (typeof avatar.path === "string" && avatar.path) {
             return fixAvatarPath(avatar.path);
         }
 
-        if (typeof avatar.url === 'string' && avatar.url) {
+        if (typeof avatar.url === "string" && avatar.url) {
             return fixAvatarPath(avatar.url);
         }
 
         if (
-            typeof avatar.destination === 'string' &&
-            typeof avatar.filename === 'string' &&
+            typeof avatar.destination === "string" &&
+            typeof avatar.filename === "string" &&
             avatar.filename
         ) {
-            const destination = avatar.destination.replace(/\/+$/, '');
+            const destination = avatar.destination.replace(/\/+$/, "");
             return fixAvatarPath(`${destination}/${avatar.filename}`);
         }
     }
 
-    return '';
+    return "";
 };
 
 const AUTH_REQUEST_TIMEOUT_MS = 15000;
 const SUPPLEMENTAL_REQUEST_TIMEOUT_MS = 8000;
 
 const getDefaultTasks = (): tasks => ({
-    compeleted: '0',
-    expired: '0',
-    processing: '0',
-    total: '0',
+    compeleted: "0",
+    expired: "0",
+    processing: "0",
+    total: "0",
 });
 
 const shouldLoadTasks = (level?: string) =>
@@ -193,11 +194,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     ...response.data.data,
                 };
 
-                OneSignal.User.addAlias('userId', userData._id);
+                OneSignal.User.addAlias("userId", userData._id);
 
                 userData.avatar = resolveAvatarUrl(response.data.data.avatar);
                 userData.tasks = userData.tasks || getDefaultTasks();
-                userData.groupName = userData.groupName || '';
+                userData.groupName = userData.groupName || "";
 
                 if (
                     response.data.data.userType.level ===
@@ -213,7 +214,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     .loadSupplementalUserInfo(userData)
                     .catch(error =>
                         console.log(
-                            '[authStore] Background supplemental load failed',
+                            "[authStore] Background supplemental load failed",
                             error,
                         ),
                     );
@@ -233,7 +234,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -260,7 +261,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             setTimeout(() => {
                 if (_error.response.status === 404) {
                     Snackbar.show({
-                        text: 'Mật khẩu hiện tại không đúng! Hãy kiểm tra lại.',
+                        text: "Mật khẩu hiện tại không đúng! Hãy kiểm tra lại.",
                         //dòng dưới dùng khi api sửa lại đúng lỗi (hiện tại là Không tìm thấy người dùng!)
                         //text: _error.response.data,
                         duration: Snackbar.LENGTH_LONG,
@@ -269,7 +270,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                 if (_error.response.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -292,14 +293,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
                 userData.avatar = resolveAvatarUrl(response.data.data.avatar);
                 userData.tasks = userData.tasks || getDefaultTasks();
-                userData.groupName = userData.groupName || '';
+                userData.groupName = userData.groupName || "";
 
                 set({userInfo: userData, isLogin: true});
                 get()
                     .loadSupplementalUserInfo(userData)
                     .catch(error =>
                         console.log(
-                            '[authStore] Background supplemental load failed',
+                            "[authStore] Background supplemental load failed",
                             error,
                         ),
                     );
@@ -315,7 +316,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -352,23 +353,23 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
         const updates: Partial<IUser> = {};
 
-        if (tasksResult.status === 'fulfilled' && tasksResult.value) {
+        if (tasksResult.status === "fulfilled" && tasksResult.value) {
             updates.tasks = tasksResult.value;
-        } else if (tasksResult.status === 'rejected') {
+        } else if (tasksResult.status === "rejected") {
             console.log(
-                '[authStore] Background load tasks failed',
+                "[authStore] Background load tasks failed",
                 tasksResult.reason,
             );
         }
 
         if (
-            groupNameResult.status === 'fulfilled' &&
-            typeof groupNameResult.value === 'string'
+            groupNameResult.status === "fulfilled" &&
+            typeof groupNameResult.value === "string"
         ) {
             updates.groupName = groupNameResult.value;
-        } else if (groupNameResult.status === 'rejected') {
+        } else if (groupNameResult.status === "rejected") {
             console.log(
-                '[authStore] Background load group name failed',
+                "[authStore] Background load group name failed",
                 groupNameResult.reason,
             );
         }
@@ -425,12 +426,24 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     setRedirectData: (type: string, data: string) =>
         set(
-            type === 'schdule'
+            type === "schdule"
                 ? {redirectData: data}
-                : type === 'request'
+                : type === "request"
                 ? {redirectDataRequestSchedule: data}
                 : {otherRedirect: type},
         ),
+    setTasksData: (payload: tasks) =>
+        set(state => ({
+            userInfo: {
+                ...state.userInfo,
+                tasks: {
+                    total: payload.total,
+                    compeleted: payload.compeleted ?? "0",
+                    processing: payload.processing,
+                    expired: payload.expired,
+                },
+            },
+        })),
     clearRedirectData: () =>
         set({
             redirectData: null,
@@ -451,7 +464,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 OneSignal.logout();
             }
         } catch (error) {
-            console.log('[authStore] OneSignal logout failed', error);
+            console.log("[authStore] OneSignal logout failed", error);
         } finally {
             set({userInfo: initialUserInfo, isLogin: false});
         }
@@ -460,10 +473,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     updateAvatar: async (userId: string, uri: string) => {
         try {
             const formData = new FormData();
-            formData.append('avatar', {
+            formData.append("avatar", {
                 uri,
-                name: 'avatar.jpg',
-                type: 'image/jpeg',
+                name: "avatar.jpg",
+                type: "image/jpeg",
             } as any);
 
             const res = await axiosClient.post(
@@ -471,7 +484,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
+                        "Content-Type": "multipart/form-data",
                     },
                 },
             );
@@ -487,14 +500,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 }));
 
                 Snackbar.show({
-                    text: 'Cập nhật ảnh đại diện thành công!',
+                    text: "Cập nhật ảnh đại diện thành công!",
                     duration: Snackbar.LENGTH_SHORT,
                 });
             }
         } catch (error: any) {
             console.log(error);
             Snackbar.show({
-                text: 'Không thể cập nhật ảnh đại diện!',
+                text: "Không thể cập nhật ảnh đại diện!",
                 duration: Snackbar.LENGTH_LONG,
             });
         }

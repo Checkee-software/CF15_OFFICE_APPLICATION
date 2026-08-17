@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react";
 import {
     View,
     Text,
     TextInput,
     StyleSheet,
     TouchableOpacity,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Dropdown } from 'react-native-element-dropdown';
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import {Dropdown} from "react-native-element-dropdown";
 
 type AdditionalSupply = {
     name: string;
@@ -29,17 +29,17 @@ type Props = {
 };
 
 const unitOptions = [
-    { label: 'kg', value: 'kg' },
-    { label: 'g', value: 'g' },
-    { label: 'lít', value: 'lít' },
-    { label: 'ml', value: 'ml' },
-    { label: 'tấn', value: 'tấn' },
-    { label: 'tạ', value: 'tạ' },
-    { label: 'yến', value: 'yến' },
+    {label: "kg", value: "kg"},
+    {label: "g", value: "g"},
+    {label: "lít", value: "lít"},
+    {label: "ml", value: "ml"},
+    {label: "tấn", value: "tấn"},
+    {label: "tạ", value: "tạ"},
+    {label: "yến", value: "yến"},
 ];
 const formatMoney = (value: string | undefined | null) => {
-    const numeric = (value || '').replace(/\D/g, '');
-    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const numeric = (value || "").replace(/\D/g, "");
+    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 };
 
 const AdditionalSupplySection = ({
@@ -54,38 +54,38 @@ const AdditionalSupplySection = ({
     );
 
     return (
-        gardenId !== '' && (
-            <View style={{ marginTop: 16 }}>
+        gardenId !== "" && (
+            <View style={{marginTop: 16}}>
                 <View style={styles.header}>
                     <Text style={styles.title}>Đầu tư tăng thêm</Text>
                     <TouchableOpacity onPress={onAdd}>
-                        <Icon name='add' size={20} color='blue' />
+                        <Icon name="add" size={20} color="blue" />
                     </TouchableOpacity>
                 </View>
 
                 {supplies.map((item: any, index: number) => (
-                    <View key={index} style={{ marginBottom: 28 }}>
+                    <View key={index} style={{marginBottom: 28}}>
                         <TextInput
                             style={styles.input}
-                            placeholder='Tên vật tư'
-                            placeholderTextColor={'gray'}
+                            placeholder="Tên vật tư"
+                            placeholderTextColor={"gray"}
                             value={item.name}
-                            onChangeText={text => onChange(index, 'name', text)}
+                            onChangeText={text => onChange(index, "name", text)}
                         />
 
                         <Dropdown
-                            mode='modal'
+                            mode="modal"
                             style={styles.dropdown}
                             data={unitOptions}
-                            labelField='label'
-                            valueField='value'
-                            placeholder='Đơn vị tính'
-                            placeholderStyle={{ color: 'gray' }}
+                            labelField="label"
+                            valueField="value"
+                            placeholder="Đơn vị tính"
+                            placeholderStyle={{color: "gray"}}
                             search
-                            searchPlaceholder='Tìm kiếm'
+                            searchPlaceholder="Tìm kiếm"
                             value={item.unit}
                             onChange={value =>
-                                onChange(index, 'unit', value.value)
+                                onChange(index, "unit", value.value)
                             }
                         />
 
@@ -94,34 +94,42 @@ const AdditionalSupplySection = ({
                             placeholder="Khối lượng"
                             placeholderTextColor="gray"
                             keyboardType="numeric"
-                            value={item.value?.toString() ?? ''}
+                            value={item.value?.toString() ?? ""}
                             onChangeText={text => {
-                                let normalizedText = text.replace(',', '.');
-                                normalizedText = normalizedText.replace(/[^0-9.]/g, '');
-                                const parts = normalizedText.split('.');
+                                let normalizedText = text.replace(",", ".");
+                                normalizedText = normalizedText.replace(
+                                    /[^0-9.]/g,
+                                    "",
+                                );
+                                const parts = normalizedText.split(".");
                                 if (parts.length > 2) {
-                                    normalizedText = parts[0] + '.' + parts.slice(1).join('');
+                                    normalizedText =
+                                        parts[0] +
+                                        "." +
+                                        parts.slice(1).join("");
                                 }
-                                if (normalizedText.startsWith('.')) {
-                                    normalizedText = '0' + normalizedText;
+                                if (normalizedText.startsWith(".")) {
+                                    normalizedText = "0" + normalizedText;
                                 }
-                                const [intPart, decimalPart] = normalizedText.split('.');
+                                const [intPart, decimalPart] =
+                                    normalizedText.split(".");
                                 if (decimalPart !== undefined) {
-                                    normalizedText = intPart + '.' + decimalPart.slice(0, 2);
+                                    normalizedText =
+                                        intPart + "." + decimalPart.slice(0, 2);
                                 }
-                                onChange(index, 'value', normalizedText);
+                                onChange(index, "value", normalizedText);
                             }}
                         />
 
                         <TextInput
                             style={styles.input}
-                            placeholder='Thành tiền (VNĐ)'
-                            placeholderTextColor='gray'
-                            keyboardType='numeric'
+                            placeholder="Thành tiền (VNĐ)"
+                            placeholderTextColor="gray"
+                            keyboardType="numeric"
                             value={formatMoney(item.price?.toString())}
                             onChangeText={text => {
-                                const raw = text.replace(/\s/g, '');
-                                onChange(index, 'price', raw);
+                                const raw = text.replace(/\s/g, "");
+                                onChange(index, "price", raw);
                             }}
                         />
                     </View>
@@ -130,7 +138,7 @@ const AdditionalSupplySection = ({
                 <TouchableOpacity
                     style={[
                         styles.saveButton,
-                        !allValid && { backgroundColor: '#ccc' },
+                        !allValid && {backgroundColor: "#ccc"},
                     ]}
                     disabled={!allValid}
                     onPress={onSubmit}>
@@ -143,44 +151,44 @@ const AdditionalSupplySection = ({
 
 const styles = StyleSheet.create({
     header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         marginBottom: 12,
     },
     title: {
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: "600",
         marginBottom: 12,
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: "#ccc",
         borderRadius: 6,
         padding: 8,
         marginBottom: 8,
         height: 55,
-        color: 'black',
+        color: "black",
     },
     dropdown: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: "#ccc",
         borderRadius: 6,
         paddingHorizontal: 8,
         marginBottom: 8,
         height: 55,
-        justifyContent: 'center',
+        justifyContent: "center",
     },
     saveButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         borderRadius: 24,
         paddingVertical: 12,
-        alignItems: 'center',
+        alignItems: "center",
         marginTop: 10,
     },
     saveButtonText: {
-        color: 'white',
-        fontWeight: '600',
+        color: "white",
+        fontWeight: "600",
         fontSize: 16,
     },
 });

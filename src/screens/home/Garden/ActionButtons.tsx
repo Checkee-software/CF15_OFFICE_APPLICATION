@@ -1,6 +1,6 @@
-import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React from "react";
+import {View, Text, TouchableOpacity, StyleSheet} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const ActionButtons = ({
     visible,
@@ -25,7 +25,9 @@ const ActionButtons = ({
     onCancelReport?: () => void;
     onlyShowReportButton?: boolean;
 }) => {
-    if (!visible) return null;
+    if (!visible) {
+        return null;
+    }
 
     return (
         <>
@@ -59,16 +61,16 @@ const ActionButtons = ({
                 {/* Alert message */}
                 {showAlert && !showReportConfirmation && (
                     <View style={styles.alertInSnackbar}>
-                        <Icon name='warning' size={20} color='#F59E0B' />
+                        <Icon name="warning" size={20} color="#F59E0B" />
                         <Text style={styles.alertText}>
                             {alertMessage ||
-                                'Vui lòng nhập thông tin đầy đủ các công việc hoặc thoát.'}
+                                "Vui lòng nhập thông tin đầy đủ các công việc hoặc thoát."}
                         </Text>
                         {onCloseAlert && (
                             <TouchableOpacity
                                 onPress={onCloseAlert}
                                 style={styles.closeButton}>
-                                <Icon name='close' size={18} color='#92400E' />
+                                <Icon name="close" size={18} color="#92400E" />
                             </TouchableOpacity>
                         )}
                     </View>
@@ -85,19 +87,19 @@ const ActionButtons = ({
                             onPress={onExit}>
                             <View
                                 style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
+                                    flexDirection: "row",
+                                    alignItems: "center",
                                 }}>
                                 <Icon
-                                    name='arrow-circle-left'
+                                    name="arrow-circle-left"
                                     size={24}
-                                    color='#fff'
+                                    color="#fff"
                                 />
                                 <Text
                                     style={{
-                                        color: '#fff',
+                                        color: "#fff",
                                         marginLeft: 6,
-                                        fontWeight: '600',
+                                        fontWeight: "600",
                                     }}>
                                     Thoát ra
                                 </Text>
@@ -126,17 +128,17 @@ export default ActionButtons;
 
 const styles = StyleSheet.create({
     reportButtonOnly: {
-        width: '80%',
-        alignSelf: 'center',
+        width: "80%",
+        alignSelf: "center",
     },
     snackbarContainer: {
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         padding: 10,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         shadowRadius: 3,
@@ -147,8 +149,8 @@ const styles = StyleSheet.create({
     },
 
     buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         paddingHorizontal: 10,
         paddingVertical: 5,
     },
@@ -157,37 +159,37 @@ const styles = StyleSheet.create({
         marginHorizontal: 8,
         paddingVertical: 10,
         borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     reportButton: {
-        borderColor: 'green',
+        borderColor: "green",
         borderWidth: 1,
     },
     snackbarText1: {
-        color: 'green',
-        fontWeight: 'bold',
+        color: "green",
+        fontWeight: "bold",
     },
     exitActionButton: {
-        backgroundColor: 'red',
+        backgroundColor: "red",
         borderWidth: 0,
         paddingHorizontal: 12,
         paddingVertical: 10,
         borderRadius: 20,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
     },
     alertText: {
-        color: '#92400E',
+        color: "#92400E",
         marginLeft: 8,
         flex: 1,
     },
     alertInSnackbar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FEF3C7',
-        borderColor: '#F59E0B',
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#FEF3C7",
+        borderColor: "#F59E0B",
         borderWidth: 1,
         borderRadius: 6,
         padding: 10,
@@ -196,19 +198,19 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         padding: 5,
-        marginLeft: 'auto',
+        marginLeft: "auto",
     },
     confirmationContainerOverlay: {
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         zIndex: 20,
         padding: 15,
         borderBottomLeftRadius: 15,
         borderBottomRightRadius: 15,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.2,
         shadowRadius: 3,
@@ -217,14 +219,14 @@ const styles = StyleSheet.create({
 
     confirmationText: {
         fontSize: 16,
-        textAlign: 'center',
+        textAlign: "center",
         marginBottom: 20,
-        color: '#333',
+        color: "#333",
     },
     confirmationButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "100%",
         marginBottom: 10,
     },
     cancelButton: {
@@ -232,29 +234,29 @@ const styles = StyleSheet.create({
         padding: 12,
         borderRadius: 20,
         marginRight: 10,
-        alignItems: 'center',
-        backgroundColor: '#E5E7EB',
+        alignItems: "center",
+        backgroundColor: "#E5E7EB",
     },
     confirmButton: {
         flex: 1,
         padding: 12,
         borderRadius: 20,
         marginLeft: 10,
-        alignItems: 'center',
-        backgroundColor: '#4CAF50',
+        alignItems: "center",
+        backgroundColor: "#4CAF50",
     },
     cancelButtonText: {
-        color: '#6B7280',
-        fontWeight: 'bold',
+        color: "#6B7280",
+        fontWeight: "bold",
     },
     confirmButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
+        color: "white",
+        fontWeight: "bold",
     },
     confirmationDivider: {
         height: 1,
-        backgroundColor: '#E5E7EB',
-        width: '100%',
+        backgroundColor: "#E5E7EB",
+        width: "100%",
         marginTop: 10,
     },
 });

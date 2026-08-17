@@ -42,11 +42,11 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>$(PMG_MANAGER_APPLICATION) needs your permission to use the camera for scan QR.</string>
+	<string>CF15 Office needs your permission to use the camera for scan QR.</string>
 	<!-- <key>NSLocationWhenInUseUsageDescription</key>
 	<string></string> -->
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Photo access needed</string>
+	<string>CF15 Office needs your permission Photo to change avatar.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

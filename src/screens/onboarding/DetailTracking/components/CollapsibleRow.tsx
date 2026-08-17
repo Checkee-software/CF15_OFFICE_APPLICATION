@@ -1,6 +1,6 @@
 import colors from "@/assets/colors";
 import React from "react";
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
+import {Text, View, TouchableOpacity, StyleSheet} from "react-native";
 import FeatherIcon from "react-native-vector-icons/Feather";
 
 interface ICollapsibleRowProps {
@@ -8,10 +8,16 @@ interface ICollapsibleRowProps {
     value: string;
     expanded: boolean;
     onToggle: () => void;
-    children: React.ReactNode
+    children: React.ReactNode;
 }
 
-const CollapsibleRow = ({ label, value, expanded, onToggle, children }: ICollapsibleRowProps) => (
+const CollapsibleRow = ({
+    label,
+    value,
+    expanded,
+    onToggle,
+    children,
+}: ICollapsibleRowProps) => (
     <>
         <TouchableOpacity onPress={onToggle} style={styles.container}>
             <Text style={styles.label}>{label}</Text>
@@ -20,7 +26,7 @@ const CollapsibleRow = ({ label, value, expanded, onToggle, children }: ICollaps
                 <FeatherIcon
                     size={20}
                     color={colors.primary}
-                    name={ expanded ? "chevron-up" : "chevron-down" }
+                    name={expanded ? "chevron-up" : "chevron-down"}
                 />
             </View>
         </TouchableOpacity>
@@ -33,10 +39,10 @@ const styles = StyleSheet.create({
         gap: 8,
         alignItems: "center",
         flexDirection: "row",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
     },
     label: {
-        color: colors.black
+        color: colors.black,
     },
     value_with_icon: {
         gap: 4,

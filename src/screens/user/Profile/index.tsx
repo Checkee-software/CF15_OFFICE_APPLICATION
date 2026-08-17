@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState} from "react";
 import {
     View,
     Text,
@@ -8,27 +8,27 @@ import {
     ScrollView,
     Modal,
     ActivityIndicator,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import {useAuthStore} from '../../../stores/authStore';
-import {useWorkerStore} from '@/stores/workerStore';
-import moment from 'moment';
-import images from '../../../assets/images';
+} from "react-native";
+import Icon from "react-native-vector-icons/Feather";
+import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
+import {useAuthStore} from "../../../stores/authStore";
+import {useWorkerStore} from "@/stores/workerStore";
+import moment from "moment";
+import images from "../../../assets/images";
 import {
     EOrganization,
     organizations,
-} from '@/shared-types/common/Permissions/Permissions';
-import {launchImageLibrary} from 'react-native-image-picker';
+} from "@/shared-types/common/Permissions/Permissions";
+import {launchImageLibrary} from "react-native-image-picker";
 
 export default function Profile({navigation}: any) {
     const {userInfo, logout, updateAvatar} = useAuthStore();
     const userLevel = userInfo?.userType?.level;
     const userTasks = userInfo?.tasks || {
-        total: '0',
-        compeleted: '0',
-        processing: '0',
-        expired: '0',
+        total: "0",
+        compeleted: "0",
+        processing: "0",
+        expired: "0",
     };
     const {resetStateWhenLogout} = useWorkerStore();
 
@@ -50,11 +50,13 @@ export default function Profile({navigation}: any) {
 
     const handleSelectAvatar = async () => {
         const result = await launchImageLibrary({
-            mediaType: 'photo',
+            mediaType: "photo",
             quality: 0.8,
         });
 
-        if (result.didCancel) return;
+        if (result.didCancel) {
+            return;
+        }
 
         const uri = result.assets?.[0]?.uri;
         if (uri && userInfo._id) {
@@ -65,7 +67,7 @@ export default function Profile({navigation}: any) {
     };
 
     const renderProtectedInfo = (info: string) => {
-        const stars = '*'.repeat(info.length);
+        const stars = "*".repeat(info.length);
         return userInfo?.canViewSensitiveInfo ||
             userInfo?.userType?.level === EOrganization.ADMIN
             ? info
@@ -86,7 +88,7 @@ export default function Profile({navigation}: any) {
                                 onError={() => setAvatarLoadFailed(true)}
                             />
                             <View style={styles.cameraIcon}>
-                                <Icon name='camera' size={18} color='#4CAF50' />
+                                <Icon name="camera" size={18} color="#4CAF50" />
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -97,13 +99,12 @@ export default function Profile({navigation}: any) {
                     <View style={styles.card}>
                         <Text style={styles.dateValue}>
                             {moment().format(
-                                'ddd, [ngày] D [tháng] M [năm] YYYY',
+                                "ddd, [ngày] D [tháng] M [năm] YYYY",
                             )}
                         </Text>
 
                         {userLevel !== EOrganization.ADMIN &&
-                            userLevel !==
-                                EOrganization.MANAGEMENT && (
+                            userLevel !== EOrganization.MANAGEMENT && (
                                 <>
                                     <View style={styles.divider} />
 
@@ -112,20 +113,17 @@ export default function Profile({navigation}: any) {
                                     </Text>
 
                                     <View style={styles.jobStats}>
+                                        {renderStat("Tổng", userTasks.total)}
                                         {renderStat(
-                                            'Tổng',
-                                            userTasks.total,
-                                        )}
-                                        {renderStat(
-                                            'Hoàn thành',
+                                            "Hoàn thành",
                                             userTasks.compeleted,
                                         )}
                                         {renderStat(
-                                            'Đang làm',
+                                            "Đang làm",
                                             userTasks.processing,
                                         )}
                                         {renderStat(
-                                            'Thất bại',
+                                            "Thất bại",
                                             userTasks.expired,
                                         )}
                                     </View>
@@ -149,112 +147,108 @@ export default function Profile({navigation}: any) {
                                 <Icon
                                     name={
                                         showAccountInfo
-                                            ? 'chevron-down'
-                                            : 'chevron-right'
+                                            ? "chevron-down"
+                                            : "chevron-right"
                                     }
                                     size={18}
-                                    color='#fff'
+                                    color="#fff"
                                 />
                             </TouchableOpacity>
 
                             {showAccountInfo && (
                                 <View style={styles.accountInfoCard}>
                                     {renderInfoRow(
-                                        'Dân tộc',
+                                        "Dân tộc",
                                         `${userInfo.nation}`,
                                     )}
-                                    {userLevel !==
-                                    EOrganization.WORKER
+                                    {userLevel !== EOrganization.WORKER
                                         ? renderInfoRow(
-                                              'Cấp đơn vị',
+                                              "Cấp đơn vị",
                                               `${
                                                   organizations.find(
                                                       (item: any) =>
                                                           item.code ===
                                                           userLevel,
-                                                  )?.label || 'Chưa cập nhật'
+                                                  )?.label || "Chưa cập nhật"
                                               }`,
                                           )
                                         : null}
 
-                                    {userLevel ===
-                                        EOrganization.LEADER ||
-                                    userLevel ===
-                                        EOrganization.WORKER
+                                    {userLevel === EOrganization.LEADER ||
+                                    userLevel === EOrganization.WORKER
                                         ? renderInfoRow(
-                                              'Đội sản xuất',
+                                              "Đội sản xuất",
                                               //{userInfo?.userType?.unit}
                                               `${
-                                                  userInfo.groupName === ''
-                                                      ? 'Chưa cập nhật'
+                                                  userInfo.groupName === ""
+                                                      ? "Chưa cập nhật"
                                                       : userInfo.groupName
                                               }`,
                                           )
                                         : null}
 
-                                    {userLevel ===
-                                        EOrganization.LEADER ||
-                                    userLevel ===
-                                        EOrganization.WORKER
+                                    {userLevel === EOrganization.LEADER ||
+                                    userLevel === EOrganization.WORKER
                                         ? renderInfoRow(
-                                              'Tổ',
+                                              "Tổ",
                                               //{userInfo?.userType?.unit}
                                               `${
-                                                  userInfo?.userType?.unit === ''
-                                                      ? 'Chưa cập nhật'
+                                                  userInfo?.userType?.unit ===
+                                                  ""
+                                                      ? "Chưa cập nhật"
                                                       : userInfo?.userType?.unit
                                               }`,
                                           )
                                         : null}
 
                                     {renderInfoRow(
-                                        'Ngày sinh',
+                                        "Ngày sinh",
                                         `${renderProtectedInfo(
                                             moment(userInfo.dateOfBirth).format(
-                                                'L',
+                                                "L",
                                             ),
                                         )}`,
                                     )}
                                     {renderInfoRow(
-                                        'Số điện thoại',
+                                        "Số điện thoại",
                                         `${renderProtectedInfo(
                                             userInfo.phoneNumber,
                                         )}`,
                                     )}
                                     {renderInfoRow(
-                                        'CCCD',
+                                        "CCCD",
                                         `${renderProtectedInfo(userInfo.ID)}`,
                                     )}
                                     {renderInfoRow(
-                                        'Ngày tuyển dụng',
+                                        "Ngày tuyển dụng",
                                         `${moment(
                                             userInfo.recruimentDate,
-                                        ).format('L')}`,
+                                        ).format("L")}`,
                                     )}
                                     {renderInfoRow(
-                                        'Loại hợp đồng',
+                                        "Loại hợp đồng",
                                         `${userInfo.contract}`,
                                     )}
                                 </View>
                             )}
                         </View>
 
-                        {renderOption('Đổi mật khẩu', false, () =>
+                        {renderOption("Đổi mật khẩu", false, () =>
                             navigation.navigate(
                                 SCREEN_INFO.UPDATE_PASSWORD.key,
                             ),
                         )}
-                        {renderOption('Quản lý thông báo', false, () =>
+                        {renderOption("Quản lý thông báo", false, () =>
                             navigation.navigate(SCREEN_INFO.NOTIFICATION.key),
                         )}
-                        {renderOption('Đăng xuất tài khoản', true, () =>
+                        {renderOption("Đăng xuất tài khoản", true, () =>
                             setShowLogoutModal(true),
                         )}
                     </View>
                 </View>
             </ScrollView>
             <Modal
-                animationType='fade'
+                animationType="fade"
                 transparent={true}
                 visible={showLogoutModal}
                 onRequestClose={() => setShowLogoutModal(false)}>
@@ -292,7 +286,7 @@ export default function Profile({navigation}: any) {
             </Modal>
             {isUploading && (
                 <View style={styles.loadingOverlay}>
-                    <ActivityIndicator size='large' color='#fff' />
+                    <ActivityIndicator size="large" color="#fff" />
                     <Text style={styles.loadingText}>
                         Đang cập nhật ảnh đại diện...
                     </Text>
@@ -317,9 +311,9 @@ const renderOption = (
     <TouchableOpacity style={styles.option} onPress={onPress}>
         <Text style={styles.optionText}>{label}</Text>
         <Icon
-            name={isLogout ? 'log-out' : 'chevron-right'}
+            name={isLogout ? "log-out" : "chevron-right"}
             size={18}
-            color='#fff'
+            color="#fff"
         />
     </TouchableOpacity>
 );
@@ -334,10 +328,10 @@ const renderInfoRow = (label: string, value: string) => (
 
 const styles = StyleSheet.create({
     infoValueContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '90%',
-        justifyContent: 'flex-start',
+        flexDirection: "row",
+        alignItems: "center",
+        width: "90%",
+        justifyContent: "flex-start",
     },
 
     optionExpanded: {
@@ -347,19 +341,19 @@ const styles = StyleSheet.create({
 
     wrapper: {
         flex: 1,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "#fff",
+        justifyContent: "center",
+        alignItems: "center",
     },
     scrollViewStyle: {
-        alignItems: 'center',
+        alignItems: "center",
         paddingBottom: 50,
     },
     container: {
         width: 372,
         //height: 653,
-        backgroundColor: '#4CAF50',
-        alignItems: 'center',
+        backgroundColor: "#4CAF50",
+        alignItems: "center",
         marginTop: 112,
         paddingTop: 56,
         paddingHorizontal: 20,
@@ -368,13 +362,13 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 16,
     },
     avatarWrapper: {
-        position: 'absolute',
+        position: "absolute",
         top: -60,
         zIndex: 2,
         borderWidth: 6,
-        borderColor: '#4CAF50',
+        borderColor: "#4CAF50",
         borderRadius: 60,
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         padding: 3,
     },
     avatar: {
@@ -383,100 +377,100 @@ const styles = StyleSheet.create({
         borderRadius: 100,
     },
     name: {
-        fontWeight: 'bold',
-        color: '#fff',
+        fontWeight: "bold",
+        color: "#fff",
         fontSize: 16,
         marginTop: 10,
     },
     email: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 13,
         marginBottom: 15,
     },
 
     card: {
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         borderRadius: 8,
         padding: 12,
         width: 324,
-        alignItems: 'center',
+        alignItems: "center",
         elevation: 3,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOpacity: 0.1,
         shadowOffset: {width: 0, height: 1},
         shadowRadius: 4,
     },
     dateLabel: {
-        color: '#888',
+        color: "#888",
         fontSize: 13,
     },
     dateValue: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "bold",
         marginTop: 4,
     },
     divider: {
-        width: '100%',
+        width: "100%",
         height: 1,
-        backgroundColor: '#ddd',
+        backgroundColor: "#ddd",
         marginVertical: 12,
     },
     sectionLabel: {
         fontSize: 13,
-        color: '#666',
+        color: "#666",
         marginBottom: 12,
     },
     jobStats: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "100%",
     },
     statItem: {
-        alignItems: 'center',
+        alignItems: "center",
         flex: 1,
     },
     statValue: {
         fontSize: 15,
-        fontWeight: 'bold',
-        color: '#000',
-        backgroundColor: '#F1F1F1',
+        fontWeight: "bold",
+        color: "#000",
+        backgroundColor: "#F1F1F1",
         paddingVertical: 10,
         paddingHorizontal: 0,
         borderRadius: 50,
         width: 40,
         height: 40,
-        textAlign: 'center',
-        textAlignVertical: 'center',
+        textAlign: "center",
+        textAlignVertical: "center",
         marginBottom: 5,
     },
     statLabel: {
         fontSize: 12,
-        color: '#666',
-        textAlign: 'center',
+        color: "#666",
+        textAlign: "center",
     },
 
     buttonGroup: {
         marginTop: 20,
-        width: '100%',
+        width: "100%",
         gap: 15,
     },
     option: {
-        backgroundColor: 'rgba(245, 245, 245, 0.15)',
+        backgroundColor: "rgba(245, 245, 245, 0.15)",
         padding: 12,
         width: 332,
         borderRadius: 8,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
 
     optionText: {
         fontSize: 16,
-        color: 'white',
+        color: "white",
     },
 
     accountInfoCard: {
-        backgroundColor: 'rgba(245, 245, 245, 0.15)',
+        backgroundColor: "rgba(245, 245, 245, 0.15)",
         padding: 12,
         width: 332,
         borderBottomLeftRadius: 8,
@@ -484,35 +478,35 @@ const styles = StyleSheet.create({
     },
 
     infoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         marginBottom: 15,
     },
 
     infoLabel: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 14,
-        width: '40%',
+        width: "40%",
     },
 
     infoValue: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 14,
-        width: '60%',
-        textAlign: 'left',
+        width: "60%",
+        textAlign: "left",
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.34)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "rgba(0, 0, 0, 0.34)",
+        justifyContent: "center",
+        alignItems: "center",
     },
     modalContainer: {
-        backgroundColor: '#F4F0F8',
+        backgroundColor: "#F4F0F8",
         borderRadius: 14,
-        width: '82%',
+        width: "82%",
         maxWidth: 310,
-        overflow: 'hidden',
+        overflow: "hidden",
     },
     modalBody: {
         paddingHorizontal: 20,
@@ -520,66 +514,66 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
     },
     modalDivider: {
-        width: '100%',
+        width: "100%",
         height: 1,
-        backgroundColor: '#D7D0DE',
+        backgroundColor: "#D7D0DE",
     },
     modalTitle: {
         fontSize: 22,
         lineHeight: 28,
         marginBottom: 10,
-        fontWeight: '600',
-        textAlign: 'left',
-        color: '#2D2A31',
+        fontWeight: "600",
+        textAlign: "left",
+        color: "#2D2A31",
     },
     modalMessage: {
         fontSize: 15,
         lineHeight: 21,
-        color: '#67606F',
-        textAlign: 'left',
+        color: "#67606F",
+        textAlign: "left",
     },
     modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        width: "100%",
     },
     modalButton: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
         paddingVertical: 18,
     },
     cancelButton: {
         fontSize: 18,
-        color: '#8E8A94',
-        fontWeight: '500',
+        color: "#8E8A94",
+        fontWeight: "500",
     },
     confirmButton: {
         fontSize: 18,
-        color: '#FF3B30',
-        fontWeight: '600',
+        color: "#FF3B30",
+        fontWeight: "600",
     },
     cameraIcon: {
-        position: 'absolute',
+        position: "absolute",
         bottom: 0,
         right: 0,
-        backgroundColor: 'white',
+        backgroundColor: "white",
         borderRadius: 15,
         padding: 6,
     },
     loadingOverlay: {
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "rgba(0,0,0,0.5)",
+        justifyContent: "center",
+        alignItems: "center",
         zIndex: 99,
     },
     loadingText: {
-        color: '#fff',
+        color: "#fff",
         marginTop: 10,
         fontSize: 16,
     },

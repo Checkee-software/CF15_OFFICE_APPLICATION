@@ -1,12 +1,12 @@
-import {View, Text, StyleSheet, Image, ScrollView} from 'react-native';
-import React from 'react';
-import moment from 'moment';
-import {useAuthStore} from '@/stores/authStore';
-import images from '@/assets/images';
+import {View, Text, StyleSheet, Image, ScrollView} from "react-native";
+import React from "react";
+import moment from "moment";
+import {useAuthStore} from "@/stores/authStore";
+import images from "@/assets/images";
 import {
     EOrganization,
     organizations,
-} from '@/shared-types/common/Permissions/Permissions';
+} from "@/shared-types/common/Permissions/Permissions";
 
 const WorkerInfo = ({route}: any) => {
     const {itemListWorker, itemWorkerBySearch} = route.params;
@@ -70,7 +70,7 @@ const WorkerInfo = ({route}: any) => {
                             {userInfo?.canViewSensitiveInfo ||
                             userInfo?.userType?.level === EOrganization.ADMIN
                                 ? item?.phoneNumber
-                                : '*'.repeat(item?.phoneNumber?.length ?? 0)}
+                                : "*".repeat(item?.phoneNumber?.length ?? 0)}
                         </Text>
                     </View>
 
@@ -80,7 +80,7 @@ const WorkerInfo = ({route}: any) => {
                             {userInfo?.canViewSensitiveInfo ||
                             userInfo?.userType?.level === EOrganization.ADMIN
                                 ? item?.ID
-                                : '*'.repeat(item?.ID?.length ?? 0)}
+                                : "*".repeat(item?.ID?.length ?? 0)}
                         </Text>
                     </View>
 
@@ -91,9 +91,9 @@ const WorkerInfo = ({route}: any) => {
                         <Text style={WorkerInfoStyles.valueText}>
                             {userInfo?.canViewSensitiveInfo ||
                             userInfo?.userType?.level === EOrganization.ADMIN
-                                ? moment(item.dateOfBirth).format('l')
-                                : '*'.repeat(
-                                      moment(item?.dateOfBirth).format('l')
+                                ? moment(item.dateOfBirth).format("l")
+                                : "*".repeat(
+                                      moment(item?.dateOfBirth).format("l")
                                           ?.length ?? 0,
                                   )}
                         </Text>
@@ -139,7 +139,7 @@ const WorkerInfo = ({route}: any) => {
                             Ngày tuyển dụng
                         </Text>
                         <Text style={WorkerInfoStyles.valueText}>
-                            {moment(item.recruimentDate).format('l')}
+                            {moment(item.recruimentDate).format("l")}
                         </Text>
                     </View>
 
@@ -180,46 +180,46 @@ const WorkerInfoStyles = StyleSheet.create({
         flex: 1,
         paddingVertical: 10,
         paddingHorizontal: 20,
-        alignItems: 'center',
-        backgroundColor: '#fff',
+        alignItems: "center",
+        backgroundColor: "#fff",
     },
     workerNameSection: {
-        width: '100%',
+        width: "100%",
         marginBottom: 35,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         gap: 12,
     },
     workerAvatar: {
-        borderRadius: '50%',
+        borderRadius: "50%",
         width: 72,
         height: 72,
-        backgroundColor: 'rgba(76, 175, 80, 1)',
+        backgroundColor: "rgba(76, 175, 80, 1)",
     },
     workerAvatar2: {
-        borderRadius: '50%',
+        borderRadius: "50%",
         width: 72,
         height: 72,
-        backgroundColor: '#D3D3D3',
+        backgroundColor: "#D3D3D3",
     },
     avatar: {
         borderRadius: 150,
         width: 66,
         height: 66,
-        margin: 'auto',
+        margin: "auto",
     },
     warpWorkerNameAndRole: {
         gap: 8,
-        width: '68%',
+        width: "68%",
     },
     workerName: {
-        color: 'rgba(76, 175, 80, 1)',
-        textTransform: 'uppercase',
+        color: "rgba(76, 175, 80, 1)",
+        textTransform: "uppercase",
         fontWeight: 600,
         fontSize: 16,
     },
     workerRole: {
-        color: 'rgba(33, 33, 33, 1)',
+        color: "rgba(33, 33, 33, 1)",
         fontSize: 13,
         fontWeight: 500,
     },
@@ -230,28 +230,28 @@ const WorkerInfoStyles = StyleSheet.create({
     warpLabelAndValueText: {
         gap: 8,
         marginBottom: 6,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
     },
     labelText: {
         fontSize: 14,
         fontWeight: 400,
-        color: 'rgba(33, 33, 33, 1)',
-        width: '40%',
+        color: "rgba(33, 33, 33, 1)",
+        width: "40%",
     },
     valueText: {
-        textAlign: 'right',
+        textAlign: "right",
         fontWeight: 500,
-        color: 'rgba(33, 33, 33, 1)',
-        width: '60%',
+        color: "rgba(33, 33, 33, 1)",
+        width: "60%",
         fontSize: 13,
     },
     workerOtherInfoSection: {
         gap: 20,
     },
     otherInfoText: {
-        color: 'rgba(76, 175, 80, 1)',
+        color: "rgba(76, 175, 80, 1)",
         fontWeight: 500,
         fontSize: 13,
     },
@@ -260,8 +260,8 @@ const WorkerInfoStyles = StyleSheet.create({
         gap: 20,
     },
     warpLabelAndValue: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
     },
 });
 

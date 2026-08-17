@@ -19,11 +19,11 @@ const ModalPdfView = (props: {
     const {visible, pdfFilePath, onClose} = props;
     const insets = useSafeAreaInsets();
     return (
-        <Modal visible={visible} animationType={'fade'}>
+        <Modal visible={visible} animationType={"fade"}>
             <View
                 style={[
                     styles.modalContent,
-                    Platform.OS === 'ios' && {marginTop: insets.top},
+                    Platform.OS === "ios" && {marginTop: insets.top},
                 ]}>
                 <TouchableOpacity
                     style={styles.button2}
@@ -41,7 +41,7 @@ const ModalPdfView = (props: {
                     }}
                     style={styles.modalContent}
                     onError={error => {
-                        console.log('PDF error:', error);
+                        console.log("PDF error:", error);
                     }}
                 />
             </View>
@@ -56,13 +56,13 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     button2: {
-        alignSelf: 'flex-end',
+        alignSelf: "flex-end",
         marginRight: 10,
         paddingVertical: 8,
     },
     buttonText2: {
-        color: 'red',
+        color: "red",
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
 });

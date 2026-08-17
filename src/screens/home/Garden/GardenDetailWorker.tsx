@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect} from 'react';
+
+import React, {useEffect} from "react";
 import {
     View,
     Text,
@@ -38,14 +38,14 @@ const CollapsibleRow = ({
     <>
         <TouchableOpacity onPress={onToggle} style={styles.row}>
             <Text style={styles.label}>{label}</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
                 <Text style={styles.value}>{value}</Text>
                 <Icon
                     name={
-                        expanded ? 'keyboard-arrow-up' : 'keyboard-arrow-right'
+                        expanded ? "keyboard-arrow-up" : "keyboard-arrow-right"
                     }
                     size={20}
-                    color='green'
+                    color="green"
                 />
             </View>
         </TouchableOpacity>
@@ -95,8 +95,8 @@ const GardenWorker = () => {
         <View style={styles.cardDocument}>
             <View style={styles.leftCardDocument}>
                 <MaterialCommunityIcons
-                    name='text-box'
-                    color={'rgba(255, 78, 69, 1)'}
+                    name="text-box"
+                    color={"rgba(255, 78, 69, 1)"}
                     size={28}
                 />
                 <View style={styles.infoDocument}>
@@ -112,8 +112,8 @@ const GardenWorker = () => {
             <View style={styles.rightCardDocument}>
                 <TouchableOpacity onPress={() => setShowModalPdf(true)}>
                     <FontAwesome
-                        name='eye'
-                        color={'rgba(33, 150, 243, 1)'}
+                        name="eye"
+                        color={"rgba(33, 150, 243, 1)"}
                         size={22}
                     />
                 </TouchableOpacity>
@@ -123,8 +123,8 @@ const GardenWorker = () => {
                         handleDownloadFile(itemAttachedFiles.filename)
                     }>
                     <Feather
-                        name='download'
-                        color={'rgba(33, 150, 243, 1)'}
+                        name="download"
+                        color={"rgba(33, 150, 243, 1)"}
                         size={22}
                     />
                 </TouchableOpacity>
@@ -139,7 +139,9 @@ const GardenWorker = () => {
     }, [code]);
 
     useEffect(() => {
-        if (!gardenDetail) return;
+        if (!gardenDetail) {
+            return;
+        }
 
         if (gardenDetail.code && !harvestHistory) {
             useGardenStore.getState().fetchHarvestCollection(gardenDetail._id);
@@ -157,22 +159,22 @@ const GardenWorker = () => {
     return (
         <>
             <ScrollView contentContainerStyle={styles.container}>
-                <Section title='Thông tin khu vườn'>
+                <Section title="Thông tin khu vườn">
                     <View
                         style={{
-                            flexDirection: 'row',
-                            width: '100%',
-                            justifyContent: 'space-between',
+                            flexDirection: "row",
+                            width: "100%",
+                            justifyContent: "space-between",
                         }}>
-                        <Text style={(styles.label, {width: '45%'})}>
+                        <Text style={(styles.label, {width: "45%"})}>
                             Tên khu vườn
                         </Text>
                         <Text
                             style={
                                 (styles.value,
                                 {
-                                    width: '52%',
-                                    textAlign: 'right',
+                                    width: "52%",
+                                    textAlign: "right",
                                 })
                             }>
                             {!gardenDetail.gardenNickname
@@ -182,21 +184,21 @@ const GardenWorker = () => {
                     </View>
                     <View style={styles.row}>
                         <Text style={styles.label}>Mã khu vườn</Text>
-                        <Text style={[styles.value, {color: 'green'}]}>
+                        <Text style={[styles.value, {color: "green"}]}>
                             {gardenDetail.code}
                         </Text>
                     </View>
 
                     <CollapsibleRow
-                        label='Vị trí khu vườn'
+                        label="Vị trí khu vườn"
                         expanded={showLocationInfo}
                         onToggle={() => setShowLocationInfo(!showLocationInfo)}>
                         <Row
-                            label='Kinh độ'
+                            label="Kinh độ"
                             value={gardenDetail.location?.latitude}
                         />
                         <Row
-                            label='Vĩ độ'
+                            label="Vĩ độ"
                             value={gardenDetail.location?.longitude}
                         />
                     </CollapsibleRow>
@@ -211,7 +213,7 @@ const GardenWorker = () => {
                     <View style={styles.row}>
                         <Text style={styles.label}>Đơn vị</Text>
                         <Text style={[styles.value]}>
-                            {(gardenDetail as any).unit || 'Không xác định'}
+                            {(gardenDetail as any).unit || "Không xác định"}
                         </Text>
                     </View>
 
@@ -255,7 +257,7 @@ const GardenWorker = () => {
                     </CollapsibleRow> */}
                 </Section>
 
-                <Section title='Thông tin cây trồng'>
+                <Section title="Thông tin cây trồng">
                     <View style={styles.infoRow}>
                         <Text style={styles.infoLabel}>Tên giống</Text>
                         <Text style={styles.infoValue}>
@@ -289,15 +291,15 @@ const GardenWorker = () => {
                                 <Text style={styles.qualityText}>{`A: ${
                                     item.qualities?.[0] ?? 0
                                 }`}</Text>
-                                <Text style={styles.separator}></Text>
+                                <Text style={styles.separator} />
                                 <Text style={styles.qualityText}>{`B: ${
                                     item.qualities?.[1] ?? 0
                                 }`}</Text>
-                                <Text style={styles.separator}></Text>
+                                <Text style={styles.separator} />
                                 <Text style={styles.qualityText}>{`C: ${
                                     item.qualities?.[2] ?? 0
                                 }`}</Text>
-                                <Text style={styles.separator}></Text>
+                                <Text style={styles.separator} />
                                 <Text style={styles.qualityText}>{`D: ${
                                     item.qualities?.[3] ?? 0
                                 }`}</Text>
@@ -311,7 +313,7 @@ const GardenWorker = () => {
                                 <Text
                                     style={[
                                         styles.labelTree,
-                                        {textAlign: 'right'},
+                                        {textAlign: "right"},
                                     ]}>{`Cây chết: ${
                                     item.deadTree || 0
                                 }`}</Text>
@@ -321,9 +323,9 @@ const GardenWorker = () => {
                 </Section>
 
                 {gardenDetail.sidePlants?.length > 0 && (
-                    <Section title='Thông tin cây trồng xen'>
+                    <Section title="Thông tin cây trồng xen">
                         <Row
-                            label='Số loại cây trồng xen'
+                            label="Số loại cây trồng xen"
                             value={gardenDetail?.sidePlants?.length}
                         />
                         {gardenDetail?.sidePlants?.map(plant => (
@@ -337,7 +339,7 @@ const GardenWorker = () => {
                 )}
 
                 {gardenDetail.management?.files.length !== 0 ? (
-                    <Section title='Tệp đính kèm'>
+                    <Section title="Tệp đính kèm">
                         <FlatList
                             scrollEnabled={false}
                             data={gardenDetail.management?.files}
@@ -386,11 +388,11 @@ export default GardenWorker;
 const styles = StyleSheet.create({
     container: {
         padding: 16,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
 
     qrContainer: {
-        alignItems: 'center',
+        alignItems: "center",
         marginBottom: 20,
     },
     section: {
@@ -398,94 +400,94 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 16,
-        color: 'green',
+        color: "green",
         marginBottom: 10,
     },
     row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         paddingVertical: 6,
     },
     label: {
         fontSize: 14,
-        color: '#444',
+        color: "#444",
     },
     value: {
         fontSize: 14,
-        fontWeight: '400',
-        color: '#000',
+        fontWeight: "400",
+        color: "#000",
     },
     indentedContent: {
         paddingLeft: 20,
     },
 
     typeRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         paddingHorizontal: 10,
         marginTop: 4,
     },
     typeText: {
         fontSize: 14,
-        color: '#000',
-        fontWeight: '500',
+        color: "#000",
+        fontWeight: "500",
     },
     infoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         paddingVertical: 6,
     },
     infoLabel: {
         fontSize: 14,
-        color: '#444',
+        color: "#444",
     },
     infoValue: {
         fontSize: 14,
-        color: '#000',
+        color: "#000",
     },
     yearBox: {
         borderBottomWidth: 2,
-        borderBottomColor: '#ddd',
+        borderBottomColor: "#ddd",
         borderRadius: 4,
         marginTop: 10,
         padding: 0,
-        overflow: 'hidden',
+        overflow: "hidden",
     },
     yearTitleRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         paddingHorizontal: 10,
         paddingVertical: 8,
     },
     yearTitle: {
         fontSize: 14,
-        fontWeight: 'bold',
-        color: '#000',
+        fontWeight: "bold",
+        color: "#000",
         paddingLeft: 34,
     },
     plantedText: {
-        fontWeight: 'bold',
+        fontWeight: "bold",
         fontSize: 14,
-        color: '#000',
+        color: "#000",
         paddingRight: 34,
     },
     qualityRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
+        flexDirection: "row",
+        justifyContent: "space-around",
         paddingVertical: 8,
         paddingHorizontal: 5,
     },
     qualityText: {
         fontSize: 14,
-        color: '#000',
+        color: "#000",
     },
     separator: {
         fontSize: 14,
-        color: '#ddd',
+        color: "#ddd",
     },
     warpNewTreeDead: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         marginBottom: 8,
     },
     labelTree: {
@@ -497,54 +499,54 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 10,
         flex: 1,
-        backgroundColor: 'rgba(128, 128, 128, 0.15)',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        backgroundColor: "rgba(128, 128, 128, 0.15)",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         marginBottom: 10,
     },
     leftCardDocument: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         flex: 0.96,
         gap: 10,
     },
     rightCardDocument: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         gap: 10,
     },
     infoDocument: {
-        width: '85%',
+        width: "85%",
     },
     infoDocumentText: {
         fontSize: 11,
     },
     infoDocumentSizeText: {
         fontSize: 11,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
     },
     modalContent: {
         flex: 1,
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height,
+        width: Dimensions.get("window").width,
+        height: Dimensions.get("window").height,
     },
     loadingPdf: {
         flex: 1,
-        alignItems: 'center',
+        alignItems: "center",
     },
     loadingPdfText: {
         marginTop: 10,
-        textAlign: 'center',
+        textAlign: "center",
     },
     button2: {
-        alignSelf: 'flex-end',
+        alignSelf: "flex-end",
         marginRight: 10,
         paddingVertical: 8,
     },
     buttonText2: {
-        color: 'red',
+        color: "red",
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
 });

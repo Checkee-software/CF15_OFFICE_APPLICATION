@@ -1,5 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useEffect, useState} from "react";
 import {
     View,
     Text,
@@ -7,23 +7,21 @@ import {
     TouchableOpacity,
     Image,
     TextInput,
-    Modal,
-    Pressable,
-} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import useGardenStore from '../../../stores/gardenStore';
-import Loading from '../../subscreen/Loading';
-import {IGarden} from '../../../stores/gardenStore';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useAuthStore} from '../../../stores/authStore';
-import asyncStorageHelper from '../../../utils/localStorageHelper/index';
-import Backdrop from '@/screens/subscreen/Loading/index2';
-import {KeyboardAwareFlatList} from 'react-native-keyboard-aware-scroll-view';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import {useStatisticStore} from '@/stores/statisticStore';
-import {useWorkScheduleStore} from '@/stores/workScheduleStore';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+} from "react-native";
+import {useNavigation, useRoute} from "@react-navigation/native";
+import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
+import useGardenStore from "../../../stores/gardenStore";
+import Loading from "../../subscreen/Loading";
+import {IGarden} from "../../../stores/gardenStore";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import {useAuthStore} from "../../../stores/authStore";
+import asyncStorageHelper from "../../../utils/localStorageHelper/index";
+import Backdrop from "@/screens/subscreen/Loading/index2";
+import {KeyboardAwareFlatList} from "react-native-keyboard-aware-scroll-view";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import {useStatisticStore} from "@/stores/statisticStore";
+import {useWorkScheduleStore} from "@/stores/workScheduleStore";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const GardenInfoWorker = () => {
     const [expandedParentId, setExpandedParentId] = useState<string | null>(
@@ -44,59 +42,57 @@ const GardenInfoWorker = () => {
         setGardenData,
         isLoading2,
         filterGarden,
-        plantsGarden,
-        getPlantGarden,
     } = useGardenStore();
     const {userInfo} = useAuthStore();
-    const isDepartment = userInfo?.userType?.level === 'DEPARTMENT';
+    const isDepartment = userInfo?.userType?.level === "DEPARTMENT";
 
-    const [gardenNameInput, setGardenNameInput] = useState({_id: '', name: ''});
+    const [gardenNameInput, setGardenNameInput] = useState({_id: "", name: ""});
     const [showInputGardenName, setShowInputGardenName] = useState({
-        _id: '',
+        _id: "",
         check: false,
     });
-    const [searchText, setSearchText] = useState('');
+    const [searchText, setSearchText] = useState("");
     const route = useRoute<any>();
     const navigateNext =
         route.params?.navigateNext ?? SCREEN_INFO.GARDENWORKER.key;
-    const [filters, setFilters] = useState({
+    const [filters] = useState({
         teamId: undefined,
         productTypeId: undefined,
         productId: undefined,
     });
 
     const teams = [
-        {label: 'Tất cả Đội sản xuất', value: 'all'},
+        {label: "Tất cả Đội sản xuất", value: "all"},
         ...(listSelection
-            ?.filter((item: any) => item._id !== '')
+            ?.filter((item: any) => item._id !== "")
             .map((item: any) => ({
-                label: item?.name ?? 'Không tên',
+                label: item?.name ?? "Không tên",
                 value: item?._id,
             })) || []),
     ];
 
     const plants = [
-        {label: 'Tất cả Cây trồng', value: 'all'},
+        {label: "Tất cả Cây trồng", value: "all"},
         ...(listProductType?.map((item: any) => ({
-            label: item?.name ?? 'Không tên',
+            label: item?.name ?? "Không tên",
             value: item?._id,
         })) || []),
     ];
 
-    const gardensFilter = [
-        {label: 'Tất cả Khu vườn', value: 'all'},
-        ...(plantsGarden?.map((item: any) => ({
-            label: item?.name ?? 'Không tên',
-            value: item?._id,
-        })) || []),
-    ];
+    // const gardensFilter = [
+    //     {label: "Tất cả Khu vườn", value: "all"},
+    //     ...(plantsGarden?.map((item: any) => ({
+    //         label: item?.name ?? "Không tên",
+    //         value: item?._id,
+    //     })) || []),
+    // ];
 
     const handleNavigate = (code: string) => {
         setGardenNameInput({
-            _id: '',
-            name: '',
+            _id: "",
+            name: "",
         });
-        setShowInputGardenName({_id: '', check: false});
+        setShowInputGardenName({_id: "", check: false});
 
         navigation.navigate(navigateNext, {
             code: code,
@@ -108,7 +104,7 @@ const GardenInfoWorker = () => {
         const userGardenNickname = asyncStorageHelper.userGardenNickname;
         const user = userGardenNickname.find(u => u.userId === userInfo._id);
         return newGardens?.map((item: any) => {
-            let gardenNickname = '';
+            let gardenNickname = "";
             if (user) {
                 const matchedGarden = user.garden.find(
                     g => g.gardenId === item._id,
@@ -122,7 +118,7 @@ const GardenInfoWorker = () => {
     };
 
     const saveGardenName = () => {
-        if (gardenNameInput.name !== '') {
+        if (gardenNameInput.name !== "") {
             asyncStorageHelper.setStorageUserGardens(
                 userInfo._id,
                 gardenNameInput._id,
@@ -131,8 +127,8 @@ const GardenInfoWorker = () => {
             const newGardenNickname = getStorageUserGardens();
             setGardenData(newGardenNickname);
         }
-        setGardenNameInput({_id: '', name: ''});
-        setShowInputGardenName({_id: '', check: false});
+        setGardenNameInput({_id: "", name: ""});
+        setShowInputGardenName({_id: "", check: false});
     };
 
     // useEffect(() => {
@@ -142,7 +138,7 @@ const GardenInfoWorker = () => {
     // }, []);
 
     useEffect(() => {
-        getListSelection('UNIT');
+        getListSelection("UNIT");
         getProductType();
     }, []);
 
@@ -166,8 +162,12 @@ const GardenInfoWorker = () => {
                 const key = isDepartment
                     ? garden.groupId
                     : garden.productTypeId;
-                if (!key) return;
-                if (!grouped[key]) grouped[key] = [];
+                if (!key) {
+                    return;
+                }
+                if (!grouped[key]) {
+                    grouped[key] = [];
+                }
                 grouped[key].push(garden);
             });
             setGroupedGardens(grouped);
@@ -179,18 +179,18 @@ const GardenInfoWorker = () => {
             style={styles.card}
             onPress={() => handleNavigate(item.code)}>
             <Image
-                source={require('../../../assets/images/garden.png')}
+                source={require("../../../assets/images/garden.png")}
                 style={styles.image}
-                resizeMode='contain'
+                resizeMode="contain"
             />
             <View style={styles.cardContent}>
                 <View>
                     <Text style={styles.cardTitle}>{item.name}</Text>
                     {showInputGardenName._id === item._id ? (
                         <TextInput
-                            style={{width: '90%', padding: 0, margin: 0}}
-                            placeholder='Hãy đặt tên khu vườn'
-                            placeholderTextColor={'black'}
+                            style={{width: "90%", padding: 0, margin: 0}}
+                            placeholder="Hãy đặt tên khu vườn"
+                            placeholderTextColor={"black"}
                             autoFocus={gardenNameInput._id === item._id}
                             onChangeText={value =>
                                 setGardenNameInput({
@@ -201,7 +201,7 @@ const GardenInfoWorker = () => {
                             value={gardenNameInput.name}
                         />
                     ) : (
-                        item.gardenNickname !== '' && (
+                        item.gardenNickname !== "" && (
                             <Text style={styles.cardTitle}>
                                 {item.gardenNickname}
                             </Text>
@@ -213,7 +213,7 @@ const GardenInfoWorker = () => {
 
             {showInputGardenName._id === item._id ? (
                 <TouchableOpacity onPress={saveGardenName}>
-                    <FontAwesome name='check' size={24} color={'#2196F3'} />
+                    <FontAwesome name="check" size={24} color={"#2196F3"} />
                 </TouchableOpacity>
             ) : (
                 <TouchableOpacity
@@ -224,17 +224,17 @@ const GardenInfoWorker = () => {
                             _id: item._id,
                             name: item.gardenNickname
                                 ? item.gardenNickname
-                                : '',
+                                : "",
                         });
                     }}>
                     {item.isHarvest && (
                         <MaterialCommunityIcons
-                            name='cart-outline'
+                            name="cart-outline"
                             size={24}
                             style={styles.harvestIcon}
                         />
                     )}
-                    <FontAwesome name='pencil' size={24} color={'#FF4E45'} />
+                    <FontAwesome name="pencil" size={24} color={"#FF4E45"} />
                 </TouchableOpacity>
             )}
         </TouchableOpacity>
@@ -251,19 +251,19 @@ const GardenInfoWorker = () => {
                     onPress={() => {
                         setExpandedParentId(isExpanded ? null : item.value);
                     }}>
-                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <View style={{flexDirection: "row", alignItems: "center"}}>
                         <Icon
-                            name={isDepartment ? 'groups' : 'eco'}
+                            name={isDepartment ? "groups" : "eco"}
                             size={26}
-                            color='#4CAF50'
+                            color="#4CAF50"
                             style={{marginRight: 10}}
                         />
                         <Text style={styles.teamName}>{item.label}</Text>
                     </View>
                     <Icon
-                        name={isExpanded ? 'expand-less' : 'expand-more'}
+                        name={isExpanded ? "expand-less" : "expand-more"}
                         size={28}
-                        color='#999'
+                        color="#999"
                     />
                 </TouchableOpacity>
 
@@ -276,13 +276,13 @@ const GardenInfoWorker = () => {
                         ) : (
                             <Text
                                 style={{
-                                    textAlign: 'center',
-                                    fontStyle: 'italic',
-                                    color: '#888',
+                                    textAlign: "center",
+                                    fontStyle: "italic",
+                                    color: "#888",
                                     marginVertical: 6,
                                 }}>
-                                Không có khu vườn thuộc{' '}
-                                {isDepartment ? 'đội này' : 'cây trồng này'}
+                                Không có khu vườn thuộc{" "}
+                                {isDepartment ? "đội này" : "cây trồng này"}
                             </Text>
                         )}
                     </View>
@@ -291,35 +291,37 @@ const GardenInfoWorker = () => {
         );
     };
 
-    if (isLoading) return <Loading />;
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <View style={styles.container}>
             <View style={styles.searchContainer}>
                 <View style={styles.searchBox}>
                     <Icon
-                        name='search'
+                        name="search"
                         size={20}
-                        color='#888'
+                        color="#888"
                         style={styles.searchIcon}
                     />
                     <TextInput
                         style={styles.searchInput}
-                        placeholder='Tìm kiếm khu vườn'
+                        placeholder="Tìm kiếm khu vườn"
                         value={searchText}
                         onChangeText={setSearchText}
-                        placeholderTextColor='#888'
+                        placeholderTextColor="#888"
                     />
                     {searchText.length > 0 && (
                         <TouchableOpacity
                             onPress={() => {
-                                setSearchText('');
+                                setSearchText("");
                                 filterGarden({});
                             }}>
                             <Icon
-                                name='close'
+                                name="close"
                                 size={20}
-                                color='#888'
+                                color="#888"
                                 style={styles.clearIcon}
                             />
                         </TouchableOpacity>
@@ -334,15 +336,15 @@ const GardenInfoWorker = () => {
                     }>
                     <View style={styles.qrButton}>
                         <Icon
-                            name='qr-code-scanner'
+                            name="qr-code-scanner"
                             size={24}
-                            color='#2E7D32'
+                            color="#2E7D32"
                         />
                     </View>
                 </TouchableOpacity>
             </View>
 
-            {searchText.trim() !== '' ||
+            {searchText.trim() !== "" ||
             filters.teamId ||
             filters.productTypeId ||
             filters.productId ? (
@@ -363,8 +365,8 @@ const GardenInfoWorker = () => {
                 <KeyboardAwareFlatList
                     data={
                         isDepartment
-                            ? teams.filter(item => item.value !== 'all')
-                            : plants.filter(item => item.value !== 'all')
+                            ? teams.filter(item => item.value !== "all")
+                            : plants.filter(item => item.value !== "all")
                     }
                     keyExtractor={item => item.value}
                     renderItem={renderParentItem}
@@ -372,8 +374,8 @@ const GardenInfoWorker = () => {
                         <View style={styles.emptyContainer}>
                             <Text style={styles.emptyText}>
                                 {isDepartment
-                                    ? 'Không có đội sản xuất'
-                                    : 'Không có cây trồng'}
+                                    ? "Không có đội sản xuất"
+                                    : "Không có cây trồng"}
                             </Text>
                         </View>
                     }
@@ -388,17 +390,17 @@ const GardenInfoWorker = () => {
 export default GardenInfoWorker;
 
 const styles = StyleSheet.create({
-    container: {flex: 1, backgroundColor: '#fff', paddingTop: 16},
+    container: {flex: 1, backgroundColor: "#fff", paddingTop: 16},
     searchContainer: {
         paddingHorizontal: 16,
         marginBottom: 12,
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 10,
     },
     searchBox: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F0F0F0',
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F0F0F0",
         borderRadius: 8,
         paddingHorizontal: 8,
         height: 40,
@@ -406,34 +408,34 @@ const styles = StyleSheet.create({
     },
     searchIcon: {marginRight: 8},
     filterIcon: {flex: 1.5},
-    searchInput: {flex: 1, fontSize: 14, color: '#000'},
+    searchInput: {flex: 1, fontSize: 14, color: "#000"},
     clearIcon: {marginLeft: 8},
     teamCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#F8F8F8',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: "#F8F8F8",
         borderRadius: 12,
         paddingVertical: 14,
         paddingHorizontal: 16,
         marginHorizontal: 16,
         marginBottom: 8,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
     },
-    teamName: {fontSize: 15, fontWeight: '600', color: '#000'},
+    teamName: {fontSize: 15, fontWeight: "600", color: "#000"},
     card: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FAFAFA',
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#FAFAFA",
         borderRadius: 10,
         paddingVertical: 10,
         paddingHorizontal: 16,
         marginVertical: 6,
         marginRight: 16,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOpacity: 0.05,
         shadowRadius: 2,
         elevation: 1,
@@ -441,94 +443,94 @@ const styles = StyleSheet.create({
     image: {width: 36, height: 36, marginRight: 12},
     cardContent: {
         flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         marginRight: 10,
     },
-    cardTitle: {fontSize: 14, fontWeight: '600', color: '#000'},
-    cardSubtitle: {fontSize: 12, color: '#888'},
+    cardTitle: {fontSize: 14, fontWeight: "600", color: "#000"},
+    cardSubtitle: {fontSize: 12, color: "#888"},
     emptyContainer: {
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         paddingTop: 100,
     },
     warpIcon: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         gap: 6,
     },
-    emptyText: {fontSize: 16, color: 'gray', fontStyle: 'italic'},
+    emptyText: {fontSize: 16, color: "gray", fontStyle: "italic"},
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "rgba(0,0,0,0.3)",
+        justifyContent: "center",
+        alignItems: "center",
     },
     modalContainer: {
-        width: '85%',
-        backgroundColor: '#fff',
+        width: "85%",
+        backgroundColor: "#fff",
         borderRadius: 12,
         padding: 16,
     },
     modalTitle: {
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: "700",
         marginBottom: 16,
-        color: '#000',
+        color: "#000",
     },
     dropdownBlock: {
         marginBottom: 12,
     },
     dropdownLabel: {
         fontSize: 16,
-        color: '#333',
+        color: "#333",
         marginBottom: 4,
     },
     dropdown: {
         height: 42,
-        borderColor: '#ddd',
+        borderColor: "#ddd",
         borderWidth: 1,
         borderRadius: 8,
         paddingHorizontal: 8,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     resetButton: {
         marginTop: 12,
         borderWidth: 1,
-        borderColor: '#ff4e45',
-        backgroundColor: '#fff1f1',
+        borderColor: "#ff4e45",
+        backgroundColor: "#fff1f1",
         borderRadius: 8,
         paddingVertical: 10,
-        alignItems: 'center',
+        alignItems: "center",
     },
     resetText: {
-        color: '#ff4e45',
-        fontWeight: '600',
+        color: "#ff4e45",
+        fontWeight: "600",
     },
     closeArea: {
         marginTop: 12,
-        alignItems: 'center',
+        alignItems: "center",
     },
     closeText: {
-        color: '#2196F3',
-        fontWeight: '600',
+        color: "#2196F3",
+        fontWeight: "600",
         fontSize: 14,
     },
     qrButtonWrapper: {
         flex: 2,
-        alignItems: 'flex-end',
-        justifyContent: 'center',
+        alignItems: "flex-end",
+        justifyContent: "center",
     },
 
     qrButton: {
-        backgroundColor: '#E6F4EA',
+        backgroundColor: "#E6F4EA",
         padding: 8,
         borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     harvestIcon: {
-        color: '#2E7D32',
+        color: "#2E7D32",
     },
 });

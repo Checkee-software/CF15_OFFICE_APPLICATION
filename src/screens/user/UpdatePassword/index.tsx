@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import * as React from 'react';
+import * as React from "react";
 import {
     View,
     Text,
@@ -9,16 +9,16 @@ import {
     TouchableOpacity,
     ScrollView,
     Animated,
-} from 'react-native';
-import Backdrop from '../../subscreen/Loading/index2';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import {useAuthStore} from '../../../stores/authStore';
-import Snackbar from 'react-native-snackbar';
+} from "react-native";
+import Backdrop from "../../subscreen/Loading/index2";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import {useAuthStore} from "../../../stores/authStore";
+import Snackbar from "react-native-snackbar";
 
 export default function UpdatePassword() {
-    const [currentPassword, setCurrentPassword] = React.useState('');
-    const [newPassword, setNewPassword] = React.useState('');
-    const [confirmPassword, setConfirmPassword] = React.useState('');
+    const [currentPassword, setCurrentPassword] = React.useState("");
+    const [newPassword, setNewPassword] = React.useState("");
+    const [confirmPassword, setConfirmPassword] = React.useState("");
     const [showSuccess, setShowSuccess] = React.useState(false);
     const [showCurrentPassword, setShowCurrentPassword] = React.useState(false);
     const [showNewPassword, setShowNewPassword] = React.useState(false);
@@ -52,18 +52,18 @@ export default function UpdatePassword() {
         const resultUpdatePassword = await updatePassword(updateUserAccount);
 
         if (resultUpdatePassword) {
-            setCurrentPassword('');
-            setNewPassword('');
-            setConfirmPassword('');
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
             setShowCurrentPassword(false);
             setShowNewPassword(false);
             setShowConfirmPassword(false);
 
             Snackbar.show({
-                text: 'Đổi mật khẩu thành công!',
+                text: "Đổi mật khẩu thành công!",
                 duration: Snackbar.LENGTH_SHORT,
-                backgroundColor: '#4CAF50',
-                textColor: '#fff',
+                backgroundColor: "#4CAF50",
+                textColor: "#fff",
             });
 
             setTimeout(() => {
@@ -122,9 +122,9 @@ export default function UpdatePassword() {
                                 style={styles.eyeIcon}
                                 onPress={toggleCurrentPasswordVisibility}>
                                 <AntDesign
-                                    name={showCurrentPassword ? 'eye' : 'eyeo'}
+                                    name={showCurrentPassword ? "eye" : "eyeo"}
                                     size={20}
-                                    color='#666'
+                                    color="#666"
                                 />
                             </TouchableOpacity>
                         )}
@@ -136,7 +136,7 @@ export default function UpdatePassword() {
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.inputWithIcon}
-                            placeholder='Nhập mật khẩu mới'
+                            placeholder="Nhập mật khẩu mới"
                             secureTextEntry={!showNewPassword}
                             value={newPassword}
                             onChangeText={setNewPassword}
@@ -146,9 +146,9 @@ export default function UpdatePassword() {
                                 style={styles.eyeIcon}
                                 onPress={toggleNewPasswordVisibility}>
                                 <AntDesign
-                                    name={showNewPassword ? 'eye' : 'eyeo'}
+                                    name={showNewPassword ? "eye" : "eyeo"}
                                     size={20}
-                                    color='#666'
+                                    color="#666"
                                 />
                             </TouchableOpacity>
                         )}
@@ -187,13 +187,13 @@ export default function UpdatePassword() {
 
                 <View style={styles.section}>
                     <Text style={styles.label}>
-                        Xác nhận mật khẩu mới{' '}
+                        Xác nhận mật khẩu mới{" "}
                         <Text style={styles.required}>*</Text>
                     </Text>
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.inputWithIcon}
-                            placeholder='Xác nhận mật khẩu mới'
+                            placeholder="Xác nhận mật khẩu mới"
                             secureTextEntry={!showConfirmPassword}
                             value={confirmPassword}
                             onChangeText={setConfirmPassword}
@@ -203,9 +203,9 @@ export default function UpdatePassword() {
                                 style={styles.eyeIcon}
                                 onPress={toggleConfirmPasswordVisibility}>
                                 <AntDesign
-                                    name={showConfirmPassword ? 'eye' : 'eyeo'}
+                                    name={showConfirmPassword ? "eye" : "eyeo"}
                                     size={20}
-                                    color='#666'
+                                    color="#666"
                                 />
                             </TouchableOpacity>
                         )}
@@ -259,7 +259,7 @@ export default function UpdatePassword() {
                     <TouchableOpacity
                         onPress={dismissSuccess}
                         style={styles.closeButton}>
-                        <AntDesign name='close' size={20} color='#fff' />
+                        <AntDesign name="close" size={20} color="#fff" />
                     </TouchableOpacity>
                 </Animated.View>
             )}
@@ -272,57 +272,57 @@ export default function UpdatePassword() {
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     container: {
         flexGrow: 1,
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     section: {
         marginBottom: 25,
     },
     label: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "bold",
         marginBottom: 8,
-        color: '#000',
+        color: "#000",
     },
     required: {
-        color: 'red',
+        color: "red",
     },
     accountText: {
         fontSize: 16,
         padding: 12,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: "#f0f0f0",
         borderRadius: 5,
         borderWidth: 2,
-        borderColor: '#ccc',
-        color: '#555',
+        borderColor: "#ccc",
+        color: "#555",
     },
     inputContainerCurrentPassword: {
-        position: 'relative',
-        flexDirection: 'row',
-        alignItems: 'center',
+        position: "relative",
+        flexDirection: "row",
+        alignItems: "center",
         marginBottom: 12,
     },
     inputContainer: {
-        position: 'relative',
-        flexDirection: 'row',
-        alignItems: 'center',
+        position: "relative",
+        flexDirection: "row",
+        alignItems: "center",
     },
     inputWithIcon: {
         flex: 1,
         fontSize: 16,
         padding: 12,
         borderWidth: 2,
-        borderColor: '#ccc',
+        borderColor: "#ccc",
         borderRadius: 5,
-        backgroundColor: '#fff',
-        color: '#000',
+        backgroundColor: "#fff",
+        color: "#000",
     },
     eyeIcon: {
-        position: 'absolute',
+        position: "absolute",
         right: 12,
         padding: 5,
     },
@@ -330,10 +330,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         padding: 12,
         borderWidth: 2,
-        borderColor: '#ccc',
+        borderColor: "#ccc",
         borderRadius: 5,
-        backgroundColor: '#fff',
-        color: '#000',
+        backgroundColor: "#fff",
+        color: "#000",
     },
     passwordRules: {
         marginTop: 10,
@@ -341,47 +341,47 @@ const styles = StyleSheet.create({
     },
     ruleText: {
         fontSize: 14,
-        color: '#666',
+        color: "#666",
         marginBottom: 3,
     },
     ruleValid: {
-        color: '#4CAF50',
+        color: "#4CAF50",
     },
     confirmButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         // width: 372,
         height: 44,
-        justifyContent: 'center',
+        justifyContent: "center",
         borderRadius: 22,
-        alignItems: 'center',
+        alignItems: "center",
     },
     confirmButtonDisabled: {
-        backgroundColor: '#ccc',
+        backgroundColor: "#ccc",
     },
     confirmButtonText: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 18,
     },
     errorText: {
-        color: 'red',
+        color: "red",
         marginTop: 6,
         fontSize: 14,
     },
     successNotification: {
-        position: 'absolute',
+        position: "absolute",
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: '#4CAF50',
+        backgroundColor: "#4CAF50",
         padding: 15,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     successText: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
     closeButton: {
         padding: 5,

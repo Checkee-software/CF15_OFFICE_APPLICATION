@@ -1,6 +1,6 @@
-import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import CollapsibleTaskBlock from './CollapsibleTaskBlock';
+import React from "react";
+import {View, Text, StyleSheet} from "react-native";
+import CollapsibleTaskBlock from "./CollapsibleTaskBlock";
 
 interface MachineShift {
     _id: string;
@@ -53,30 +53,30 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     card: {
-        backgroundColor: '#EAF6FF',
+        backgroundColor: "#EAF6FF",
         borderRadius: 8,
         padding: 12,
         marginBottom: 12,
         gap: 10,
     },
     taskName: {
-        fontWeight: '600',
+        fontWeight: "600",
         marginBottom: 8,
         fontSize: 14,
-        color: '#333',
+        color: "#333",
     },
     row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         marginBottom: 4,
     },
     label: {
         fontSize: 14,
-        color: '#333',
+        color: "#333",
     },
     value: {
         fontSize: 14,
-        color: '#333',
+        color: "#333",
     },
 });
 

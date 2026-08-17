@@ -1,6 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from "react";
 import {
     View,
     Text,
@@ -40,14 +39,14 @@ const CollapsibleRow = ({
     <>
         <TouchableOpacity onPress={onToggle} style={styles.row}>
             <Text style={styles.label}>{label}</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
                 <Text style={styles.value}>{value}</Text>
                 <Icon
                     name={
-                        expanded ? 'keyboard-arrow-up' : 'keyboard-arrow-right'
+                        expanded ? "keyboard-arrow-up" : "keyboard-arrow-right"
                     }
                     size={20}
-                    color='green'
+                    color="green"
                 />
             </View>
         </TouchableOpacity>
@@ -56,7 +55,8 @@ const CollapsibleRow = ({
 );
 
 const GardenDetailScreen = () => {
-    const [isHarvesting, setIsHarvesting] = useState(false);
+    // const [isHarvesting, setIsHarvesting] = useState(false);
+
     const route = useRoute<any>();
     const id = route.params?.id;
     const [showLocationInfo, setShowLocationInfo] = React.useState(false);
@@ -97,8 +97,8 @@ const GardenDetailScreen = () => {
         <View style={styles.cardDocument}>
             <View style={styles.leftCardDocument}>
                 <MaterialCommunityIcons
-                    name='text-box'
-                    color={'rgba(255, 78, 69, 1)'}
+                    name="text-box"
+                    color={"rgba(255, 78, 69, 1)"}
                     size={28}
                 />
                 <View style={styles.infoDocument}>
@@ -114,8 +114,8 @@ const GardenDetailScreen = () => {
             <View style={styles.rightCardDocument}>
                 <TouchableOpacity onPress={() => setShowModalPdf(true)}>
                     <FontAwesome
-                        name='eye'
-                        color={'rgba(33, 150, 243, 1)'}
+                        name="eye"
+                        color={"rgba(33, 150, 243, 1)"}
                         size={22}
                     />
                 </TouchableOpacity>
@@ -125,8 +125,8 @@ const GardenDetailScreen = () => {
                         handleDownloadFile(itemAttachedFiles.filename)
                     }>
                     <Feather
-                        name='download'
-                        color={'rgba(33, 150, 243, 1)'}
+                        name="download"
+                        color={"rgba(33, 150, 243, 1)"}
                         size={22}
                     />
                 </TouchableOpacity>
@@ -140,9 +140,9 @@ const GardenDetailScreen = () => {
         }
     }, [id]);
 
-    useEffect(() => {
-        setIsHarvesting(!!selectedGarden?.isHarvest);
-    }, [selectedGarden]);
+    // useEffect(() => {
+    //     setIsHarvesting(!!selectedGarden?.isHarvest);
+    // }, [selectedGarden]);
     useEffect(() => {
         if (selectedGarden?._id) {
             useGardenStore
@@ -151,7 +151,9 @@ const GardenDetailScreen = () => {
         }
     }, [selectedGarden]);
 
-    if (isLoading || !selectedGarden) return <Loading />;
+    if (isLoading || !selectedGarden) {
+        return <Loading />;
+    }
 
     console.log(selectedGarden);
     console.log(pdfFilePath);
@@ -161,72 +163,72 @@ const GardenDetailScreen = () => {
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.qrContainer}>
                     <QRCode
-                        value={selectedGarden.code || 'No Code'}
+                        value={selectedGarden.code || "No Code"}
                         size={372}
                     />
                 </View>
 
-                <Section title='Thông tin khu vườn'>
-                    <Row label='Tên khu vườn' value={selectedGarden.name} />
+                <Section title="Thông tin khu vườn">
+                    <Row label="Tên khu vườn" value={selectedGarden.name} />
                     <View style={styles.row}>
                         <Text style={styles.label}>Mã khu vườn</Text>
-                        <Text style={[styles.value, {color: 'green'}]}>
+                        <Text style={[styles.value, {color: "green"}]}>
                             {selectedGarden.code}
                         </Text>
                     </View>
 
                     <View
                         style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
+                            flexDirection: "row",
+                            justifyContent: "space-between",
                         }}>
-                        <Text style={{width: '65%'}}>Diện tích (ha)</Text>
+                        <Text style={{width: "65%"}}>Diện tích (ha)</Text>
                         <Text
                             style={{
-                                width: '30%',
-                                textAlign: 'right',
+                                width: "30%",
+                                textAlign: "right",
                             }}>
                             {selectedGarden.management?.area?.totalSquare}
                         </Text>
                     </View>
 
                     <CollapsibleRow
-                        label='Vị trí khu vườn'
+                        label="Vị trí khu vườn"
                         expanded={showLocationInfo}
                         onToggle={() => setShowLocationInfo(!showLocationInfo)}>
                         <Row
-                            label='Kinh độ'
+                            label="Kinh độ"
                             value={selectedGarden.location?.latitude}
                         />
                         <Row
-                            label='Vĩ độ'
+                            label="Vĩ độ"
                             value={selectedGarden.location?.longitude}
                         />
                     </CollapsibleRow>
 
                     <CollapsibleRow
-                        label='Người quản lý'
+                        label="Người quản lý"
                         value={(selectedGarden as any).manager}
                         expanded={showInfo}
                         onToggle={() => setShowInfo(!showInfo)}>
                         <Row
-                            label='Đơn vị'
+                            label="Đơn vị"
                             value={
-                                (selectedGarden as any).unit || 'Không xác định'
+                                (selectedGarden as any).unit || "Không xác định"
                             }
                         />
                         <View
                             style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
+                                flexDirection: "row",
+                                justifyContent: "space-between",
                             }}>
-                            <Text style={{width: '65%'}}>
+                            <Text style={{width: "65%"}}>
                                 Diện tích giao khoán (ha)
                             </Text>
                             <Text
                                 style={{
-                                    width: '30%',
-                                    textAlign: 'right',
+                                    width: "30%",
+                                    textAlign: "right",
                                 }}>
                                 {selectedGarden.management?.area?.totalSquare}
                             </Text>
@@ -234,7 +236,7 @@ const GardenDetailScreen = () => {
                     </CollapsibleRow>
                 </Section>
 
-                <Section title='Thông tin cây trồng'>
+                <Section title="Thông tin cây trồng">
                     <View style={styles.infoRow}>
                         <Text style={styles.infoLabel}>Tên giống</Text>
                         <Text style={styles.infoValue}>
@@ -292,7 +294,7 @@ const GardenDetailScreen = () => {
                                 <Text
                                     style={[
                                         styles.labelTree,
-                                        {textAlign: 'right'},
+                                        {textAlign: "right"},
                                     ]}>{`Cây chết: ${
                                     item.deadTree || 0
                                 }`}</Text>
@@ -302,9 +304,9 @@ const GardenDetailScreen = () => {
                 </Section>
 
                 {selectedGarden.sidePlants?.length > 0 && (
-                    <Section title='Thông tin cây trồng xen'>
+                    <Section title="Thông tin cây trồng xen">
                         <Row
-                            label='Số loại cây trồng xen'
+                            label="Số loại cây trồng xen"
                             value={selectedGarden.sidePlants.length}
                         />
                         {selectedGarden.sidePlants?.map(plant => (
@@ -318,7 +320,7 @@ const GardenDetailScreen = () => {
                 )}
 
                 {selectedGarden.management?.files.length !== 0 ? (
-                    <Section title='Tệp đính kèm'>
+                    <Section title="Tệp đính kèm">
                         <FlatList
                             scrollEnabled={false}
                             data={selectedGarden.management?.files}
@@ -370,16 +372,16 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         marginHorizontal: 4,
         borderRadius: 3,
-        alignItems: 'center',
+        alignItems: "center",
     },
 
     container: {
         padding: 16,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
 
     qrContainer: {
-        alignItems: 'center',
+        alignItems: "center",
         marginBottom: 20,
     },
     section: {
@@ -387,94 +389,94 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 16,
-        color: 'green',
+        color: "green",
         marginBottom: 10,
     },
     row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         paddingVertical: 6,
     },
     label: {
         fontSize: 14,
-        color: '#444',
+        color: "#444",
     },
     value: {
         fontSize: 14,
-        fontWeight: '400',
-        color: '#000',
+        fontWeight: "400",
+        color: "#000",
     },
     indentedContent: {
         paddingLeft: 20,
     },
 
     typeRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         paddingHorizontal: 10,
         marginTop: 4,
     },
     typeText: {
         fontSize: 14,
-        color: '#000',
-        fontWeight: '500',
+        color: "#000",
+        fontWeight: "500",
     },
     infoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         paddingVertical: 6,
     },
     infoLabel: {
         fontSize: 14,
-        color: '#444',
+        color: "#444",
     },
     infoValue: {
         fontSize: 14,
-        color: '#000',
+        color: "#000",
     },
     yearBox: {
         borderBottomWidth: 2,
-        borderBottomColor: '#ddd',
+        borderBottomColor: "#ddd",
         borderRadius: 4,
         marginTop: 10,
         padding: 0,
-        overflow: 'hidden',
+        overflow: "hidden",
     },
     yearTitleRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         paddingHorizontal: 10,
         paddingVertical: 8,
     },
     yearTitle: {
         fontSize: 14,
-        fontWeight: 'bold',
-        color: '#000',
+        fontWeight: "bold",
+        color: "#000",
         paddingLeft: 34,
     },
     plantedText: {
-        fontWeight: 'bold',
+        fontWeight: "bold",
         fontSize: 14,
-        color: '#000',
+        color: "#000",
         paddingRight: 34,
     },
     qualityRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
+        flexDirection: "row",
+        justifyContent: "space-around",
         paddingVertical: 8,
         paddingHorizontal: 5,
     },
     qualityText: {
         fontSize: 14,
-        color: '#000',
+        color: "#000",
     },
     separator: {
         fontSize: 14,
-        color: '#ddd',
+        color: "#ddd",
     },
     warpNewTreeDead: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        justifyContent: "space-between",
         marginBottom: 8,
     },
     labelTree: {
@@ -482,92 +484,92 @@ const styles = StyleSheet.create({
         flexShrink: 1,
     },
     harvestRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
+        flexDirection: "row",
+        justifyContent: "center",
         marginBottom: 20,
-        width: '100%',
+        width: "100%",
     },
     harvestButton: {
         paddingVertical: 12,
         paddingHorizontal: 14,
         borderRadius: 3,
-        alignItems: 'center',
+        alignItems: "center",
         width: 200,
         marginHorizontal: 5,
     },
     startButton: {
-        backgroundColor: '#FFA500',
-        width: '90%',
+        backgroundColor: "#FFA500",
+        width: "90%",
     },
     harvestingButton: {
-        backgroundColor: '#4CAF5026',
-        color: 'green',
+        backgroundColor: "#4CAF5026",
+        color: "green",
     },
     endButton: {
-        backgroundColor: '#FF0000',
+        backgroundColor: "#FF0000",
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 3,
-        alignItems: 'center',
+        alignItems: "center",
         minWidth: 100,
     },
     button2: {
-        alignSelf: 'flex-end',
+        alignSelf: "flex-end",
         marginRight: 10,
         paddingVertical: 8,
     },
     buttonText: {
-        color: '#fff',
+        color: "#fff",
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
     buttonText2: {
-        color: 'red',
+        color: "red",
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
     cardDocument: {
         borderRadius: 8,
         padding: 10,
         flex: 1,
-        backgroundColor: 'rgba(128, 128, 128, 0.15)',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        backgroundColor: "rgba(128, 128, 128, 0.15)",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         marginBottom: 10,
     },
     leftCardDocument: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         flex: 0.96,
         gap: 10,
     },
     rightCardDocument: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         gap: 10,
     },
     infoDocument: {
-        width: '85%',
+        width: "85%",
     },
     infoDocumentText: {
         fontSize: 11,
     },
     infoDocumentSizeText: {
         fontSize: 11,
-        color: 'rgba(128, 128, 128, 1)',
+        color: "rgba(128, 128, 128, 1)",
     },
     modalContent: {
         flex: 1,
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height,
+        width: Dimensions.get("window").width,
+        height: Dimensions.get("window").height,
     },
     loadingPdf: {
         flex: 1,
-        alignItems: 'center',
+        alignItems: "center",
     },
     loadingPdfText: {
         marginTop: 10,
-        textAlign: 'center',
+        textAlign: "center",
     },
 });

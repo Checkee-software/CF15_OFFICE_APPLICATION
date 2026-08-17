@@ -1,26 +1,30 @@
-/* eslint-disable react-native/no-inline-styles */
-import {useStatisticStore} from '@/stores/statisticStore';
-import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import {BarChart, PieChart} from 'react-native-gifted-charts';
+import {useStatisticStore} from "@/stores/statisticStore";
+import React from "react";
+import {View, Text, StyleSheet, ScrollView} from "react-native";
+import {BarChart, PieChart} from "react-native-gifted-charts";
 
 const StatisticResult = (props: any) => {
     const {statisticData, isLoading} = useStatisticStore();
 
     const formatVND = (value: number) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
+        return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND",
             maximumFractionDigits: 0, // không hiển thị số lẻ
         }).format(value);
     };
 
     // Hàm format đơn vị tiền
     const formatCurrency = (value: number) => {
-        if (value >= 1_000_000_000)
+        if (value >= 1_000_000_000) {
             return `${Math.round(value / 1_000_000_000)} tỷ`;
-        if (value >= 1_000_000) return `${Math.round(value / 1_000_000)}tr`;
-        if (value >= 1_000) return `${Math.round(value / 1_000)}k`;
+        }
+        if (value >= 1_000_000) {
+            return `${Math.round(value / 1_000_000)}tr`;
+        }
+        if (value >= 1_000) {
+            return `${Math.round(value / 1_000)}k`;
+        }
         return `${value}`;
     };
 
@@ -41,21 +45,21 @@ const StatisticResult = (props: any) => {
     return (
         !isLoading && (
             <View style={styles.container}>
-                {props.selectedType === 'DISPLAY' ? (
+                {props.selectedType === "DISPLAY" ? (
                     statisticData?.pieChart.length !== 0 ? (
                         <View style={{marginVertical: 20, gap: 30}}>
-                            <View style={{flexDirection: 'row', gap: 15}}>
+                            <View style={{flexDirection: "row", gap: 15}}>
                                 <View
                                     style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
+                                        flexDirection: "row",
+                                        alignItems: "center",
                                         gap: 5,
                                     }}>
                                     <View
                                         style={{
                                             width: 12,
                                             height: 12,
-                                            backgroundColor: '#FF4E45',
+                                            backgroundColor: "#FF4E45",
                                             borderRadius: 6,
                                         }}
                                     />
@@ -65,15 +69,15 @@ const StatisticResult = (props: any) => {
 
                                 <View
                                     style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
+                                        flexDirection: "row",
+                                        alignItems: "center",
                                         gap: 5,
                                     }}>
                                     <View
                                         style={{
                                             width: 12,
                                             height: 12,
-                                            backgroundColor: '#4CAF50',
+                                            backgroundColor: "#4CAF50",
                                             borderRadius: 6,
                                         }}
                                     />
@@ -86,8 +90,8 @@ const StatisticResult = (props: any) => {
                                 (item: any, index: number) => {
                                     const labelsPosition =
                                         item.percentage === 100
-                                            ? 'inward'
-                                            : 'mid';
+                                            ? "inward"
+                                            : "mid";
 
                                     return (
                                         <View
@@ -95,8 +99,8 @@ const StatisticResult = (props: any) => {
                                             key={index}>
                                             <PieChart
                                                 showText
-                                                textColor='white'
-                                                fontWeight='500'
+                                                textColor="white"
+                                                fontWeight="500"
                                                 radius={80}
                                                 innerRadius={30}
                                                 labelsPosition={labelsPosition}
@@ -104,7 +108,7 @@ const StatisticResult = (props: any) => {
                                                 // textBackgroundRadius={26}
                                                 data={item?.pieChart}
                                             />
-                                            <Text style={{textAlign: 'center'}}>
+                                            <Text style={{textAlign: "center"}}>
                                                 {`${item.taskName} ${item.totalProcessingRate}/${item.totalSquare} (ha)`}
                                             </Text>
                                         </View>
@@ -163,7 +167,7 @@ const StatisticResult = (props: any) => {
                             <>
                                 {/* <Text style={styles.chartLabel}>Biểu đồ quy trình sử dụng</Text>
                                     <Text style={styles.chartValue}>57.588.045</Text>
-                                    <Text style={styles.currency}>vnđ</Text> 
+                                    <Text style={styles.currency}>vnđ</Text>
                                 */}
 
                                 <View style={styles.chart}>
@@ -183,7 +187,7 @@ const StatisticResult = (props: any) => {
                                             yAxisThickness={1}
                                             xAxisLabelTextStyle={{
                                                 fontSize: 11,
-                                                textAlign: 'left',
+                                                textAlign: "left",
                                             }}
                                             width={
                                                 (statisticData?.chart?.length ??
@@ -215,7 +219,7 @@ const StatisticResult = (props: any) => {
                                                     styles.legendDot,
                                                     {
                                                         backgroundColor:
-                                                            '#FF4C4C',
+                                                            "#FF4C4C",
                                                     },
                                                 ]}
                                             />
@@ -229,7 +233,7 @@ const StatisticResult = (props: any) => {
                                                     styles.legendDot,
                                                     {
                                                         backgroundColor:
-                                                            '#4CAF50',
+                                                            "#4CAF50",
                                                     },
                                                 ]}
                                             />
@@ -243,7 +247,7 @@ const StatisticResult = (props: any) => {
                                                     styles.legendDot,
                                                     {
                                                         backgroundColor:
-                                                            '#2196F3',
+                                                            "#2196F3",
                                                     },
                                                 ]}
                                             />
@@ -268,25 +272,25 @@ const StatisticResult = (props: any) => {
 
                                     <View style={styles.taskCosts}>
                                         <Text style={styles.costText}>
-                                            Chi phí nhân công: {''}
+                                            Chi phí nhân công: {""}
                                             <Text style={styles.costValue}>
                                                 {new Intl.NumberFormat(
-                                                    'vi-VN',
+                                                    "vi-VN",
                                                     {
-                                                        style: 'currency',
-                                                        currency: 'VND',
+                                                        style: "currency",
+                                                        currency: "VND",
                                                     },
                                                 ).format(task?.labourCost ?? 0)}
                                             </Text>
                                         </Text>
                                         <Text style={styles.costText}>
-                                            Chi phí vật tư: {''}
+                                            Chi phí vật tư: {""}
                                             <Text style={styles.costValue}>
                                                 {new Intl.NumberFormat(
-                                                    'vi-VN',
+                                                    "vi-VN",
                                                     {
-                                                        style: 'currency',
-                                                        currency: 'VND',
+                                                        style: "currency",
+                                                        currency: "VND",
                                                     },
                                                 ).format(
                                                     task?.materialCost ?? 0,
@@ -294,13 +298,13 @@ const StatisticResult = (props: any) => {
                                             </Text>
                                         </Text>
                                         <Text style={styles.costText}>
-                                            Chi phí ca máy: {''}
+                                            Chi phí ca máy: {""}
                                             <Text style={styles.costValue}>
                                                 {new Intl.NumberFormat(
-                                                    'vi-VN',
+                                                    "vi-VN",
                                                     {
-                                                        style: 'currency',
-                                                        currency: 'VND',
+                                                        style: "currency",
+                                                        currency: "VND",
                                                     },
                                                 ).format(
                                                     task?.machineCost ?? 0,
@@ -329,41 +333,41 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     card: {
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     statBoxContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
         rowGap: 12,
         columnGap: 12,
     },
     statBox: {
-        width: '48%',
+        width: "48%",
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: "#ddd",
         borderRadius: 8,
         paddingVertical: 12,
         paddingHorizontal: 8,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         elevation: 3,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
         shadowRadius: 3,
-        alignItems: 'center',
+        alignItems: "center",
     },
     statBoxLabel: {
         fontSize: 12,
-        color: '#333',
+        color: "#333",
         marginBottom: 4,
-        textAlign: 'center',
+        textAlign: "center",
     },
     statBoxValue: {
         fontSize: 16,
-        fontWeight: '600',
-        color: '#4CAF50',
-        textAlign: 'center',
+        fontWeight: "600",
+        color: "#4CAF50",
+        textAlign: "center",
     },
     chartSection: {
         marginVertical: 10,
@@ -377,7 +381,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
     },
     currency: {
-        color: '#4F4F4F',
+        color: "#4F4F4F",
         fontSize: 12,
         fontWeight: 400,
     },
@@ -387,21 +391,21 @@ const styles = StyleSheet.create({
     },
     chartTooltip: {
         padding: 6,
-        backgroundColor: '#5A5A5B',
+        backgroundColor: "#5A5A5B",
         borderRadius: 8,
     },
     tooltipText: {
-        color: '#fff',
+        color: "#fff",
         fontWeight: 500,
         fontSize: 13,
     },
     legendRow: {
-        flexDirection: 'row',
-        justifyContent: 'center',
+        flexDirection: "row",
+        justifyContent: "center",
     },
     legendItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         marginHorizontal: 8,
     },
     legendDot: {
@@ -412,33 +416,33 @@ const styles = StyleSheet.create({
     },
     legendText: {
         fontSize: 12,
-        color: '#333',
+        color: "#333",
     },
     taskListContainer: {
         marginVertical: 10,
         gap: 5,
     },
     taskItem: {
-        backgroundColor: '#F5F5F5',
+        backgroundColor: "#F5F5F5",
         borderRadius: 8,
         padding: 16,
         marginBottom: 12,
         elevation: 2,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.1,
         shadowRadius: 2,
     },
     taskTitle: {
         fontSize: 16,
-        fontWeight: 'bold',
-        color: '#000',
+        fontWeight: "bold",
+        color: "#000",
         marginBottom: 4,
     },
     taskLocation: {
         fontSize: 14,
-        color: 'green',
-        fontStyle: 'italic',
+        color: "green",
+        fontStyle: "italic",
     },
     taskCosts: {
         marginVertical: 5,
@@ -446,18 +450,18 @@ const styles = StyleSheet.create({
     costText: {
         fontSize: 13,
         fontWeight: 500,
-        color: '#808080',
+        color: "#808080",
     },
     costValue: {
-        color: 'black',
+        color: "black",
     },
     pieChartView: {
         gap: 8,
-        alignItems: 'center',
+        alignItems: "center",
     },
     emptyDataText: {
-        margin: 'auto',
-        textAlign: 'center',
+        margin: "auto",
+        textAlign: "center",
         fontWeight: 500,
         padding: 12,
     },

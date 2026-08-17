@@ -1,42 +1,141 @@
-﻿import {ScreenInformation} from './types';
+import {ScreenInformation} from "./types";
 
 const HOME_SCREENS = {
-  MAIN: {key: 'MAIN', headerTitle: 'CF15 OFFICE', isOpenQRCamera: false} as ScreenInformation,
-  PRODUCTION_PORTAL: {key: 'PRODUCTION_PORTAL', headerTitle: 'QUẢN TRỊ SẢN XUẤT', isOpenQRCamera: false} as ScreenInformation,
-  OFFICE_PORTAL: {key: 'OFFICE_PORTAL', headerTitle: 'VĂN PHÒNG ĐIỆN TỬ', isOpenQRCamera: false} as ScreenInformation,
-  BROWSEADDMATERIALS: {key: 'BROWSEADDMATERIALS', headerTitle: 'ĐẦU TƯ TĂNG THÊM', isOpenQRCamera: false} as ScreenInformation,
-  BROWSE_HARVEST: {key: 'BROWSE_HARVEST', headerTitle: 'DUYỆT THU HOẠCH', isOpenQRCamera: false} as ScreenInformation,
-  HARVEST_SCHEDULE_DETAIL: {key: 'HARVEST_SCHEDULE_DETAIL', headerTitle: 'CHI TIẾT QUY TRÌNH THU HOẠCH', isOpenQRCamera: false} as ScreenInformation,
-  HARVEST_SCHEDULE: {key: 'HARVEST_SCHEDULE', headerTitle: 'QUY TRÌNH THU HOẠCH', isOpenQRCamera: false} as ScreenInformation,
-  HARVEST: {key: 'HARVEST', headerTitle: 'DANH SÁCH KHU VƯỜN THU HOẠCH', isOpenQRCamera: false} as ScreenInformation,
-  HARVEST_DETAIL: {key: 'HARVEST_DETAIL', headerTitle: 'CHI TIẾT THU HOẠCH', isOpenQRCamera: false} as ScreenInformation,
-  HARVEST_HISTORY: {key: 'HARVEST_HISTORY', headerTitle: 'LỊCH SỬ THU HOẠCH', isOpenQRCamera: false} as ScreenInformation,
-  NOTIFICATION: {key: 'NOTIFICATION', headerTitle: 'THÔNG BÁO', isOpenQRCamera: false} as ScreenInformation,
-  LISTNOTIFICATION: {key: 'LISTNOTIFICATION', headerTitle: 'THÔNG BÁO', isOpenQRCamera: false} as ScreenInformation,
-  DOCUMENT: {key: 'DOCUMENT', headerTitle: 'TÀI LIỆU 1', isOpenQRCamera: false} as ScreenInformation,
-  DETAILDOCUMENTS: {key: 'DETAILDOCUMENTS', headerTitle: 'NỘI DUNG VĂN BẢN', isOpenQRCamera: false} as ScreenInformation,
-  DOCUMENT_APPROVAL_HISTORY: {key: 'DOCUMENT_APPROVAL_HISTORY', headerTitle: 'LỊCH SỬ KÝ DUYỆT', isOpenQRCamera: false} as ScreenInformation,
-  DOCUMENT_EXECUTION_STEPS: {key: 'DOCUMENT_EXECUTION_STEPS', headerTitle: 'BƯỚC THỰC HIỆN', isOpenQRCamera: false} as ScreenInformation,
-  DOCUMENT_COMMUNICATION: {key: 'DOCUMENT_COMMUNICATION', headerTitle: 'NỘI DUNG TRAO ĐỔI', isOpenQRCamera: false} as ScreenInformation,
-  INCOMING: {key: 'INCOMING', headerTitle: 'VĂN BẢN ĐẾN', isOpenQRCamera: false} as ScreenInformation,
-  OUTGOING: {key: 'OUTGOING', headerTitle: 'VĂN BẢN ĐI', isOpenQRCamera: false} as ScreenInformation,
-  DOCUMENTCATEGORYMANAGER: {key: 'DOCUMENTCATEGORYMANAGER', headerTitle: 'QUẢN LÝ HỒ SƠ', isOpenQRCamera: false} as ScreenInformation,
-  GARDENINFO: {key: 'GARDENINFO', headerTitle: 'DANH SÁCH KHU VƯỜN', isOpenQRCamera: false} as ScreenInformation,
-  GARDENWORKER: {key: 'GARDENWORKER', headerTitle: 'THÔNG TIN KHU VƯỜN', isOpenQRCamera: false} as ScreenInformation,
-  GARDENINFOWORKER: {key: 'GARDENINFOWORKER', headerTitle: 'DANH SÁCH KHU VƯỜN', isOpenQRCamera: false} as ScreenInformation,
-  GARDENINFOWORKER1: {key: 'GARDENINFOWORKER1', headerTitle: 'BÁO CÁO QUY TRÌNH', isOpenQRCamera: false} as ScreenInformation,
-  GARDENDECLAREWORKER: {key: 'GARDENDECLAREWORKER', headerTitle: 'CHI TIẾT BÁO CÁO QUY TRÌNH', isOpenQRCamera: false} as ScreenInformation,
-  GARDENCAMERASCAN: {key: 'GARDENCAMERASCAN', headerTitle: 'QUÉT MÃ KHU VƯỜN', isOpenQRCamera: false} as ScreenInformation,
-  GARDENINFO1: {key: 'GARDENINFO1', headerTitle: 'CHI TIẾT KHU VƯỜN', isOpenQRCamera: false} as ScreenInformation,
-  ACTIVEMACHINE: {key: 'ACTIVEMACHINE', headerTitle: 'CA MÁY ĐANG HOẠT ĐỘNG', isOpenQRCamera: false} as ScreenInformation,
-  WORKER: {key: 'WORKER', headerTitle: 'DANH SÁCH NHÂN SỰ', isOpenQRCamera: false} as ScreenInformation,
-  WORKERINFO: {key: 'WORKERINFO', headerTitle: 'THÔNG TIN NGƯỜI LAO ĐỘNG', isOpenQRCamera: false} as ScreenInformation,
-  WORKSCHEDULE: {key: 'WORKSCHEDULE', headerTitle: 'LỊCH SỬ QUY TRÌNH', isOpenQRCamera: false} as ScreenInformation,
-  SCHEDULEDETAIL: {key: 'SCHEDULEDETAIL', headerTitle: 'CHI TIẾT LỊCH SỬ QUY TRÌNH', isOpenQRCamera: false} as ScreenInformation,
-  UNIT: {key: 'UNIT', headerTitle: 'NGƯỜI LAO ĐỘNG', isOpenQRCamera: false} as ScreenInformation,
-  STATISTIC: {key: 'STATISTIC', headerTitle: 'BÁO CÁO THỐNG KÊ', isOpenQRCamera: false} as ScreenInformation,
-  STATISTIC_HARVEST: {key: 'STATISTIC_HARVEST', headerTitle: 'BÁO CÁO THỐNG KÊ THU HOẠCH', isOpenQRCamera: false} as ScreenInformation,
+    MAIN: {
+        key: "MAIN",
+        headerTitle: "CF15 OFFICE",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    BROWSEADDMATERIALS: {
+        key: "BROWSEADDMATERIALS",
+        headerTitle: "ĐẦU TƯ TĂNG THÊM",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    BROWSE_HARVEST: {
+        key: "BROWSE_HARVEST",
+        headerTitle: "DUYỆT THU HOẠCH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    HARVEST_SCHEDULE_DETAIL: {
+        key: "HARVEST_SCHEDULE_DETAIL",
+        headerTitle: "CHI TIẾT QUY TRÌNH THU HOẠCH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    HARVEST_SCHEDULE: {
+        key: "HARVEST_SCHEDULE",
+        headerTitle: "QUY TRÌNH THU HOẠCH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    HARVEST: {
+        key: "HARVEST",
+        headerTitle: "DANH SÁCH KHU VƯỜN THU HOẠCH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    HARVEST_DETAIL: {
+        key: "HARVEST_DETAIL",
+        headerTitle: "CHI TIẾT THU HOẠCH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    HARVEST_HISTORY: {
+        key: "HARVEST_HISTORY",
+        headerTitle: "LỊCH SỬ THU HOẠCH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    NOTIFICATION: {
+        key: "NOTIFICATION",
+        headerTitle: "THÔNG BÁO",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    LISTNOTIFICATION: {
+        key: "LISTNOTIFICATION",
+        headerTitle: "THÔNG BÁO",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    DOCUMENT: {
+        key: "DOCUMENT",
+        headerTitle: "TÀI LIỆU",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    DETAILDOCUMENTS: {
+        key: "DETAILDOCUMENTS",
+        headerTitle: "CHI TIẾT TÀI LIỆU",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENINFO: {
+        key: "GARDENINFO",
+        headerTitle: "DANH SÁCH KHU VƯỜN",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENWORKER: {
+        key: "GARDENWORKER",
+        headerTitle: "THÔNG TIN KHU VƯỜN",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENINFOWORKER: {
+        key: "GARDENINFOWORKER",
+        headerTitle: "DANH SÁCH KHU VƯỜN",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENINFOWORKER1: {
+        key: "GARDENINFOWORKER1",
+        headerTitle: "BÁO CÁO QUY TRÌNH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENDECLAREWORKER: {
+        key: "GARDENDECLAREWORKER",
+        headerTitle: "CHI TIẾT BÁO CÁO QUY TRÌNH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENCAMERASCAN: {
+        key: "GARDENCAMERASCAN",
+        headerTitle: "QUÉT MÃ KHU VƯỜN",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    GARDENINFO1: {
+        key: "GARDENINFO1",
+        headerTitle: "CHI TIẾT KHU VƯỜN",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    ACTIVEMACHINE: {
+        key: "ACTIVEMACHINE",
+        headerTitle: "CA MÁY ĐANG HOẠT ĐỘNG",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    WORKER: {
+        key: "WORKER",
+        headerTitle: "DANH SÁCH NHÂN SỰ",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    WORKERINFO: {
+        key: "WORKERINFO",
+        headerTitle: "THÔNG TIN NGƯỜI LAO ĐỘNG",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    WORKSCHEDULE: {
+        key: "WORKSCHEDULE",
+        headerTitle: "LỊCH SỬ QUY TRÌNH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    SCHEDULEDETAIL: {
+        key: "SCHEDULEDETAIL",
+        headerTitle: "CHI TIẾT LỊCH SỬ QUY TRÌNH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    UNIT: {
+        key: "UNIT",
+        headerTitle: "NGƯỜI LAO ĐỘNG",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    STATISTIC: {
+        key: "STATISTIC",
+        headerTitle: "BÁO CÁO THỐNG KÊ",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    STATISTIC_HARVEST: {
+        key: "STATISTIC_HARVEST",
+        headerTitle: "BÁO CÁO THỐNG KÊ THU HOẠCH",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
 };
 
 export default HOME_SCREENS;
-

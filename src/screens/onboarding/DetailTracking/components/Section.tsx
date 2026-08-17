@@ -4,10 +4,10 @@ import {View, Text, StyleSheet} from "react-native";
 
 interface ISectionProps {
     title: string;
-    children: React.ReactNode
+    children: React.ReactNode;
 }
 
-const Section = ({ title, children }: ISectionProps) => (
+const Section = ({title, children}: ISectionProps) => (
     <View style={styles.container}>
         <Text style={styles.title}>{title}</Text>
         {children}
@@ -17,13 +17,13 @@ const Section = ({ title, children }: ISectionProps) => (
 const styles = StyleSheet.create({
     container: {
         gap: 20,
-        // flex: 1, 
+        // flex: 1,
         flexDirection: "column",
     },
     title: {
         fontSize: 16,
         fontWeight: 500,
-        color: colors.primary
+        color: colors.primary,
     },
 });
 

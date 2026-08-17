@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import {IUser} from '../shared-types/Response/UserResponse/UserResponse';
-import ENV from '@/config/ENV';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import {IUser} from "../shared-types/Response/UserResponse/UserResponse";
+import ENV from "@/config/ENV";
+import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
 
 interface listWorkerFilterByRole {
     title: string;
@@ -49,7 +48,7 @@ interface DocumentStore {
 }
 
 const fixAvatarPath = (path: string) => {
-    const updatedPath = path.replace(/\\/g, '/');
+    const updatedPath = path.replace(/\\/g, "/");
     return `${ENV.BACKEND_URL}${updatedPath}`;
 };
 
@@ -143,15 +142,15 @@ export const useWorkerStore = create<DocumentStore>(set => ({
 
                 const newListWorker = [
                     {
-                        title: 'Phòng ban',
+                        title: "Phòng ban",
                         data: filterDepartment,
                     },
                     {
-                        title: 'Cán bộ quản lý',
+                        title: "Cán bộ quản lý",
                         data: filterLeaders,
                     },
                     {
-                        title: 'Người lao động',
+                        title: "Người lao động",
                         data: filterUnit,
                     },
                 ];
@@ -171,7 +170,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
                             : [
                                   ...newListWorker,
                                   {
-                                      title: 'Ban lãnh đạo',
+                                      title: "Ban lãnh đạo",
                                       data: filterManagements,
                                   },
                               ],
@@ -189,7 +188,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
             setTimeout(() => {
                 if (_error.response?.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -279,7 +278,7 @@ export const useWorkerStore = create<DocumentStore>(set => ({
             setTimeout(() => {
                 if (_error.response?.status === 500) {
                     Snackbar.show({
-                        text: 'Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!',
+                        text: "Máy chủ đã xảy ra lỗi, vui lòng thử lại sau!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }

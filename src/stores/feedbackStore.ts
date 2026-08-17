@@ -1,9 +1,9 @@
-import { create } from "zustand";
+import {create} from "zustand";
 import axiosClient from "../utils/axiosClient";
 import Snackbar from "react-native-snackbar";
 //import {useAuthStore} from './authStore';
-import { ICreate as ICreateFormData } from "../shared-types/form-data/FeedbackFormData/FeedbackFormData";
-import { IFeedback } from "../shared-types/Response/FeedbackResponse/FeedbackResponse";
+import {ICreate as ICreateFormData} from "../shared-types/form-data/FeedbackFormData/FeedbackFormData";
+import {IFeedback} from "../shared-types/Response/FeedbackResponse/FeedbackResponse";
 import ENV from "@/config/ENV";
 
 interface FeedbackStore {
@@ -16,7 +16,7 @@ interface FeedbackStore {
     fetchFeedbacks: () => Promise<void>;
 }
 
-const useFeedbackStore = create<FeedbackStore>((set) => ({
+const useFeedbackStore = create<FeedbackStore>(set => ({
     feedbacks: [],
     isLoading: false,
 
@@ -37,7 +37,7 @@ const useFeedbackStore = create<FeedbackStore>((set) => ({
     ) => {
         //const {userInfo} = useAuthStore.getState();
 
-        set({ isLoading: true });
+        set({isLoading: true});
 
         const formData: ICreateFormData = {
             ...data,
@@ -55,7 +55,7 @@ const useFeedbackStore = create<FeedbackStore>((set) => ({
                     duration: Snackbar.LENGTH_SHORT,
                 });
 
-                set((state) => ({
+                set(state => ({
                     feedbacks: [response.data.data, ...state.feedbacks],
                 }));
             }
@@ -77,18 +77,18 @@ const useFeedbackStore = create<FeedbackStore>((set) => ({
                 });
             }
         } finally {
-            set({ isLoading: false });
+            set({isLoading: false});
         }
     },
 
     fetchFeedbacks: async () => {
-        set({ isLoading: true });
+        set({isLoading: true});
         try {
             const res = await axiosClient.get(
                 `${ENV.BACKEND_URL}/resources/feedbacks/collection?code=&createdAt=-1&from=1748710800000&to=4115817600000`,
             );
             //console.log('FETCH_FEEDBACKS_RESPONSE:', res.data);
-            set({ feedbacks: res.data?.data || [] });
+            set({feedbacks: res.data?.data || []});
         } catch (error: unknown) {
             const err = error as any;
             console.log(
@@ -100,7 +100,7 @@ const useFeedbackStore = create<FeedbackStore>((set) => ({
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
-            set({ isLoading: false });
+            set({isLoading: false});
         }
     },
 }));

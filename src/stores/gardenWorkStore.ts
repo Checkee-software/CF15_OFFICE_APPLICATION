@@ -1,12 +1,12 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import {IRateReportHarvest} from '@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData';
-import {EStatus} from '@/shared-types/Response/ScheduleRequestResponse/ScheduleRequestResponse';
-import ENV from '@/config/ENV';
-import {IMaterialsByStaff} from '@/shared-types/Response/ScheduleResponse/ScheduleResponse';
-import {EStatusData} from '@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse';
-import {EGardenData} from '@/shared-types/Response/GardenResponse/GardenResponse';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import {IRateReportHarvest} from "@/shared-types/form-data/HarvestHistoryFormData/HarvestHistoryFormData";
+import {EStatus} from "@/shared-types/Response/ScheduleRequestResponse/ScheduleRequestResponse";
+import ENV from "@/config/ENV";
+import {IMaterialsByStaff} from "@/shared-types/Response/ScheduleResponse/ScheduleResponse";
+import {EStatusData} from "@/shared-types/Response/HarvestHistoryResponse/HarvestHistoryResponse";
+import {EGardenData} from "@/shared-types/Response/GardenResponse/GardenResponse";
 
 type IGardenData = {
     _id: string;
@@ -107,7 +107,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                 for (let i = response.data.data.length - 1; i >= 0; i--) {
                     const item = response.data.data[i];
 
-                    if (item.status === 'CONFIRMED') {
+                    if (item.status === "CONFIRMED") {
                         const key = `${item.createdBy}-${item.childTaskId}`;
 
                         if (!map.has(key)) {
@@ -148,7 +148,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -189,7 +189,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -227,7 +227,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -288,7 +288,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -330,7 +330,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                     });
                 } else {
                     Snackbar.show({
-                        text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                        text: "Đã xảy ra lỗi, vui lòng thử lại!",
                         duration: Snackbar.LENGTH_LONG,
                     });
                 }
@@ -367,7 +367,7 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
                 });
             } else {
                 Snackbar.show({
-                    text: 'Đã xảy ra lỗi, vui lòng thử lại!',
+                    text: "Đã xảy ra lỗi, vui lòng thử lại!",
                     duration: Snackbar.LENGTH_LONG,
                 });
             }
@@ -388,7 +388,9 @@ export const useGardenWorkStore = create<gardenWorkStore>((set, get) => ({
 
             dataFiltered.forEach((item, index) => {
                 const key = `${item.childTaskId}-${item.requesterId}`;
-                if (!groupMap.has(key)) groupMap.set(key, []);
+                if (!groupMap.has(key)) {
+                    groupMap.set(key, []);
+                }
                 groupMap.get(key).push(index);
             });
 

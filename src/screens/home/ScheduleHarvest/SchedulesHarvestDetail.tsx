@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable react-native/no-inline-styles */
+
 /* eslint-disable react-hooks/exhaustive-deps */
-import {View, Text, ScrollView, FlatList, Image} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {View, Text, ScrollView, FlatList, Image} from "react-native";
+import React, {useEffect, useState} from "react";
 import {
     TypeDetailScheduleHarvest,
     TypeGroupProgress,
     useHarvestStore,
     fixAvatarPath,
-} from '@/stores/harvestStore';
-import {useAuthStore} from '@/stores/authStore';
-import styles from './ScheduleHarvestStyle';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import {EHarvestStatus} from '@/shared-types/Response/HarvestResponse/HarvestResponse';
-import moment from 'moment';
-import {List} from 'react-native-paper';
-import images from '@/assets/images';
-import Loading from '@/screens/subscreen/Loading';
+} from "@/stores/harvestStore";
+import {useAuthStore} from "@/stores/authStore";
+import styles from "./ScheduleHarvestStyle";
+import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
+import {EHarvestStatus} from "@/shared-types/Response/HarvestResponse/HarvestResponse";
+import moment from "moment";
+import {List} from "react-native-paper";
+import images from "@/assets/images";
+import Loading from "@/screens/subscreen/Loading";
 
 const SchedulesHarvestDetail = ({route}: any) => {
     const {userInfo} = useAuthStore();
@@ -27,19 +27,19 @@ const SchedulesHarvestDetail = ({route}: any) => {
 
     const renderScheduleRemain = (finishedDate: string) => {
         if (schedulesHarvestDetail?.status === EHarvestStatus.COMPLETED) {
-            return 'Hoàn thành';
+            return "Hoàn thành";
         }
 
         const now = moment();
 
-        const deadline = moment(finishedDate, 'DD/MM/YYYY'); // Chuyển string thành moment object với đúng định dạng
+        const deadline = moment(finishedDate, "DD/MM/YYYY"); // Chuyển string thành moment object với đúng định dạng
 
         // Tính khoảng cách
         const duration = moment.duration(deadline.diff(now));
 
         // Nếu thời gian đã trễ
         if (duration.asMilliseconds() < 0) {
-            return 'Trễ hạn';
+            return "Trễ hạn";
         }
 
         // Tính số ngày, giờ, phút
@@ -51,7 +51,7 @@ const SchedulesHarvestDetail = ({route}: any) => {
     };
 
     const renderStaff = (
-        itemStaff: TypeDetailScheduleHarvest['followerIds'][number],
+        itemStaff: TypeDetailScheduleHarvest["followerIds"][number],
         index: number,
     ) => (
         <View style={styles.listWorkerMargin}>
@@ -90,7 +90,7 @@ const SchedulesHarvestDetail = ({route}: any) => {
     );
 
     const renderHarvestProgressForLeader = (
-        itemProgress: TypeGroupProgress['users'][number],
+        itemProgress: TypeGroupProgress["users"][number],
     ) => {
         return (
             <View style={styles.listWorkerMargin2}>
@@ -110,9 +110,9 @@ const SchedulesHarvestDetail = ({route}: any) => {
                             g =>
                                 `${
                                     g.gardenId.code
-                                }: ${g.quantity.toLocaleString('vi-VN')} (KG)`,
+                                }: ${g.quantity.toLocaleString("vi-VN")} (KG)`,
                         )
-                        .join(', ')}
+                        .join(", ")}
                 </Text>
             </View>
         );
@@ -155,7 +155,7 @@ const SchedulesHarvestDetail = ({route}: any) => {
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 bounces={false}
-                overScrollMode='never'
+                overScrollMode="never"
                 contentContainerStyle={styles.scrollViewStyle}>
                 <Text style={styles.mainWorkTitle}>
                     {schedulesHarvestDetail?.title}
@@ -187,7 +187,7 @@ const SchedulesHarvestDetail = ({route}: any) => {
                     ]}>
                     {renderScheduleRemain(
                         moment(schedulesHarvestDetail?.finishedDate).format(
-                            'L',
+                            "L",
                         ),
                     )}
                 </Text>
@@ -220,7 +220,7 @@ const SchedulesHarvestDetail = ({route}: any) => {
                             <Text style={styles.infoValue}>
                                 {moment(
                                     schedulesHarvestDetail?.startedDate,
-                                ).format('L')}
+                                ).format("L")}
                             </Text>
                         </View>
 
@@ -230,7 +230,7 @@ const SchedulesHarvestDetail = ({route}: any) => {
                             <Text style={styles.infoValue}>
                                 {moment(
                                     schedulesHarvestDetail?.finishedDate,
-                                ).format('L')}
+                                ).format("L")}
                             </Text>
                         </View>
 
@@ -257,7 +257,7 @@ const SchedulesHarvestDetail = ({route}: any) => {
                                 titleStyle={styles.titleAccordion1}
                                 title={`Cán bộ quản lý (${schedulesHarvestDetail?.followerIds?.length})`}
                                 style={styles.boxAccordion}
-                                id='1'>
+                                id="1">
                                 <FlatList
                                     scrollEnabled={false}
                                     data={schedulesHarvestDetail?.followerIds}
@@ -272,9 +272,9 @@ const SchedulesHarvestDetail = ({route}: any) => {
                                 EOrganization.LEADER && (
                                 <List.Accordion
                                     titleStyle={styles.titleAccordion1}
-                                    title='Tiến trình thu hoạch'
+                                    title="Tiến trình thu hoạch"
                                     style={styles.boxAccordion}
-                                    id='2'>
+                                    id="2">
                                     <View style={styles.listChildTasks}>
                                         <FlatList
                                             scrollEnabled={false}
@@ -320,10 +320,10 @@ const SchedulesHarvestDetail = ({route}: any) => {
                                                             0,
                                                         )
                                                         .toLocaleString(
-                                                            'vi-VN',
+                                                            "vi-VN",
                                                         )} (KG)`}
                                                     style={styles.boxAccordion}
-                                                    id='3'>
+                                                    id="3">
                                                     <FlatList
                                                         scrollEnabled={false}
                                                         data={item.users}
@@ -344,7 +344,7 @@ const SchedulesHarvestDetail = ({route}: any) => {
                                             titleStyle={styles.titleAccordion1}
                                             title={`Người lao động (${schedulesHarvestDetail?.employeeIds?.length})`}
                                             style={styles.boxAccordion}
-                                            id='4'>
+                                            id="4">
                                             <FlatList
                                                 scrollEnabled={false}
                                                 data={

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState, useCallback} from "react";
 import {
     View,
     Text,
@@ -8,22 +8,22 @@ import {
     Image,
     TouchableOpacity,
     TextInput,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import SCREEN_INFO from '../../../config/SCREEN_CONFIG/screenInfo';
-import Loading from '../../subscreen/Loading';
-import useNewsStore from '../../../stores/newsStore';
-import {INews} from '../../../shared-types/Response/NewsResponse/NewsResponse';
-import images from '../../../assets/images';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
+import Loading from "../../subscreen/Loading";
+import useNewsStore from "../../../stores/newsStore";
+import {INews} from "../../../shared-types/Response/NewsResponse/NewsResponse";
+import images from "../../../assets/images";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useFocusEffect} from "@react-navigation/native";
 
 export default function News({navigation}: {navigation: any}) {
     const {news, fetchNews, isLoading, getFullAvatarUrl} = useNewsStore();
     const [bookmarkedItems, setBookmarkedItems] = useState<{
         [key: string]: boolean;
     }>({});
-    const [searchText, setSearchText] = useState('');
+    const [searchText, setSearchText] = useState("");
     const [showBookmarksOnly, setShowBookmarksOnly] = useState(false);
 
     useEffect(() => {
@@ -39,13 +39,13 @@ export default function News({navigation}: {navigation: any}) {
     const loadBookmarks = async () => {
         try {
             const storedBookmarks = await AsyncStorage.getItem(
-                'bookmarkedItems',
+                "bookmarkedItems",
             );
             if (storedBookmarks) {
                 setBookmarkedItems(JSON.parse(storedBookmarks));
             }
         } catch (error) {
-            console.error('Error loading bookmarks from AsyncStorage', error);
+            console.error("Error loading bookmarks from AsyncStorage", error);
         }
     };
 
@@ -54,11 +54,11 @@ export default function News({navigation}: {navigation: any}) {
     }) => {
         try {
             await AsyncStorage.setItem(
-                'bookmarkedItems',
+                "bookmarkedItems",
                 JSON.stringify(updatedBookmarks),
             );
         } catch (error) {
-            console.error('Error saving bookmarks to AsyncStorage', error);
+            console.error("Error saving bookmarks to AsyncStorage", error);
         }
     };
 
@@ -73,10 +73,10 @@ export default function News({navigation}: {navigation: any}) {
 
     const normalizeText = (text: string) => {
         return text
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/đ/g, 'd')
-            .replace(/Đ/g, 'D')
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d")
+            .replace(/Đ/g, "D")
             .toLowerCase();
     };
 
@@ -85,7 +85,7 @@ export default function News({navigation}: {navigation: any}) {
         const normalizedTitle = normalizeText(item.title);
         const normalizedContent = item.content
             ? normalizeText(item.content)
-            : '';
+            : "";
 
         const matchesSearch =
             normalizedTitle.includes(normalizedSearch) ||
@@ -119,9 +119,9 @@ export default function News({navigation}: {navigation: any}) {
                     {item.content?.slice(0, 25)}...
                 </Text>
                 <Text style={styles.author}>
-                    Tác giả:{' '}
-                    <Text style={{color: '#339CFF'}}>
-                        {item.author || 'CF15 Office'}
+                    Tác giả:{" "}
+                    <Text style={{color: "#339CFF"}}>
+                        {item.author || "CF15 Office"}
                     </Text>
                 </Text>
             </View>
@@ -134,11 +134,11 @@ export default function News({navigation}: {navigation: any}) {
                 <Icon
                     name={
                         bookmarkedItems[item._id]
-                            ? 'bookmark'
-                            : 'bookmark-outline'
+                            ? "bookmark"
+                            : "bookmark-outline"
                     }
                     size={20}
-                    color={bookmarkedItems[item._id] ? '#FFA500' : 'gray'}
+                    color={bookmarkedItems[item._id] ? "#FFA500" : "gray"}
                 />
             </TouchableOpacity>
         </TouchableOpacity>
@@ -153,17 +153,17 @@ export default function News({navigation}: {navigation: any}) {
             <View style={styles.searchWrapper}>
                 <View style={styles.searchContainer}>
                     <Icon
-                        name='search'
+                        name={"search"}
                         size={20}
-                        color='#666'
+                        color={"#666"}
                         style={styles.searchIcon}
                     />
                     <TextInput
                         style={styles.searchInput}
-                        placeholder='Tìm kiếm tin tức...'
+                        placeholder={"Tìm kiếm tin tức..."}
                         value={searchText}
                         onChangeText={setSearchText}
-                        placeholderTextColor='#666'
+                        placeholderTextColor={"#666"}
                     />
                 </View>
                 <TouchableOpacity
@@ -172,14 +172,14 @@ export default function News({navigation}: {navigation: any}) {
                         styles.bookmarkIconWrapper,
                         {
                             backgroundColor: showBookmarksOnly
-                                ? '#FF98004D'
-                                : '#EDEDED',
+                                ? "#FF98004D"
+                                : "#EDEDED",
                         },
                     ]}>
                     <Icon
-                        name='bookmark'
+                        name="bookmark"
                         size={20}
-                        color={showBookmarksOnly ? 'orange' : '#C4C4C4'}
+                        color={showBookmarksOnly ? "orange" : "#C4C4C4"}
                     />
                 </TouchableOpacity>
             </View>
@@ -194,10 +194,10 @@ export default function News({navigation}: {navigation: any}) {
                         <Image
                             source={images.emptyScheduleList}
                             style={styles.emptyImage}
-                            resizeMode='contain'
+                            resizeMode="contain"
                         />
                         {searchText.trim() ? (
-                            <View style={{alignItems: 'center'}}>
+                            <View style={{alignItems: "center"}}>
                                 <Text style={styles.emptyText}>
                                     Không tìm thấy tin tức nào phù hợp với
                                 </Text>
@@ -220,20 +220,20 @@ export default function News({navigation}: {navigation: any}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     searchWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         paddingHorizontal: 10,
         marginTop: 10,
     },
     searchContainer: {
         flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#f5f5f5",
         borderRadius: 20,
         paddingHorizontal: 10,
         height: 50,
@@ -245,23 +245,23 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         fontSize: 14,
-        color: '#000',
+        color: "#000",
     },
     bookmarkIconWrapper: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#EDEDED',
-        alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: "#EDEDED",
+        alignItems: "center",
+        justifyContent: "center",
     },
     itemContainer: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
+        flexDirection: "row",
+        alignItems: "flex-start",
         paddingVertical: 10,
         gap: 10,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        borderBottomColor: "#eee",
     },
     image: {
         width: 100,
@@ -272,30 +272,30 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     category: {
-        fontWeight: 'bold',
+        fontWeight: "bold",
         fontSize: 12,
-        color: '#666',
+        color: "#666",
         marginBottom: 4,
     },
     title: {
-        fontWeight: 'bold',
+        fontWeight: "bold",
         fontSize: 14,
-        color: '#000',
+        color: "#000",
         marginBottom: 4,
     },
     description: {
         fontSize: 12,
-        color: '#666',
+        color: "#666",
         marginBottom: 4,
     },
     author: {
         fontSize: 12,
-        color: '#666',
+        color: "#666",
     },
     emptyContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
     },
     emptyImage: {
         width: 250,
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 18,
-        color: 'gray',
+        color: "gray",
     },
     bookmarkButton: {
         padding: 5,

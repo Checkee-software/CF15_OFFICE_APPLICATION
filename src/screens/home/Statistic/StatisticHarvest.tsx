@@ -1,6 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect} from "react";
 import {
     Modal,
     Text,
@@ -8,24 +7,23 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
-} from 'react-native';
-import {useStatisticStore} from '../../../stores/statisticStore';
-import Backdrop from '@/screens/subscreen/Loading/index2';
-import moment from 'moment';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {Dropdown} from 'react-native-element-dropdown';
-import {EType} from '@/shared-types/form-data/StatisticFormData/StatisticFormData';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import {useAuthStore} from '@/stores/authStore';
-import {EOrganization} from '@/shared-types/common/Permissions/Permissions';
-import Loading from '@/screens/subscreen/Loading';
-import ProgressBlock from './Components/ProgressBlock';
+} from "react-native";
+import {useStatisticStore} from "../../../stores/statisticStore";
+import Backdrop from "@/screens/subscreen/Loading/index2";
+import moment from "moment";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import {Dropdown} from "react-native-element-dropdown";
+import {EType} from "@/shared-types/form-data/StatisticFormData/StatisticFormData";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import {useAuthStore} from "@/stores/authStore";
+import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
+import ProgressBlock from "./Components/ProgressBlock";
 
 const StatisticHarvest = () => {
     const listStatisticTypeDefault = [
-        {_id: 'WORK', name: 'Quy trình'},
-        {_id: 'PRODUCT', name: 'Cây trồng'},
-        {_id: 'GROUP', name: 'Đội sản xuất'},
+        {_id: "WORK", name: "Quy trình"},
+        {_id: "PRODUCT", name: "Cây trồng"},
+        {_id: "GROUP", name: "Đội sản xuất"},
     ];
 
     const {
@@ -48,11 +46,11 @@ const StatisticHarvest = () => {
     >([]);
 
     const [showForm, setShowForm] = useState(false);
-    const [selectedType, setSelectedType] = useState<EType | ''>('');
+    const [selectedType, setSelectedType] = useState<EType | "">("");
 
     const [selectedTarget, setSelectedTarget] = useState({
-        id: '',
-        name: '',
+        id: "",
+        name: "",
     });
 
     const [selectedTimeOption, setSelectedTimeOption] = useState<string | null>(
@@ -64,33 +62,33 @@ const StatisticHarvest = () => {
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
     const renderTimeStatistic = () => {
-        if (selectedTimeOption === 'month') {
-            return 'Tháng này';
-        } else if (selectedTimeOption === 'quarter') {
-            return 'Theo quý';
-        } else if (selectedTimeOption === 'year') {
-            return 'Theo năm';
+        if (selectedTimeOption === "month") {
+            return "Tháng này";
+        } else if (selectedTimeOption === "quarter") {
+            return "Theo quý";
+        } else if (selectedTimeOption === "year") {
+            return "Theo năm";
         } else {
-            return `${moment(startDate).format('DD/MM/YYYY')} - ${moment
+            return `${moment(startDate).format("DD/MM/YYYY")} - ${moment
                 .utc(endDate)
-                .format('DD/MM/YYYY')}`;
+                .format("DD/MM/YYYY")}`;
         }
     };
 
-    const formatVND = (value: number) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            maximumFractionDigits: 0, // không hiển thị số lẻ
-        }).format(value);
-    };
+    // const formatVND = (value: number) => {
+    //     return new Intl.NumberFormat("vi-VN", {
+    //         style: "currency",
+    //         currency: "VND",
+    //         maximumFractionDigits: 0, // không hiển thị số lẻ
+    //     }).format(value);
+    // };
 
     const onChangeSelectedType = async (value: EType) => {
         if (
-            value === 'GROUP' &&
+            value === "GROUP" &&
             userInfo.userType.level === EOrganization.LEADER
         ) {
-            setSelectedType('GROUP' as EType);
+            setSelectedType("GROUP" as EType);
             await getGroupName(userInfo.groupId);
             setSelectedTarget({
                 id: userInfo.groupId,
@@ -100,8 +98,8 @@ const StatisticHarvest = () => {
             setSelectedType(value);
             await getListSelection(value);
             setSelectedTarget({
-                id: '',
-                name: '',
+                id: "",
+                name: "",
             });
         }
     };
@@ -119,7 +117,7 @@ const StatisticHarvest = () => {
                     second: 0,
                     millisecond: 0,
                 })
-                .add(7, 'hours')
+                .add(7, "hours")
                 .toISOString();
             selectedEndDate = moment()
                 .endOf(value)
@@ -129,7 +127,7 @@ const StatisticHarvest = () => {
                     second: 59,
                     millisecond: 999,
                 })
-                .add(7, 'hours')
+                .add(7, "hours")
                 .toISOString();
         } else {
             selectedStartDate = moment()
@@ -139,7 +137,7 @@ const StatisticHarvest = () => {
                     second: 0,
                     millisecond: 0,
                 })
-                .add(7, 'hours')
+                .add(7, "hours")
                 .toISOString();
             selectedEndDate = moment()
                 .set({
@@ -148,17 +146,17 @@ const StatisticHarvest = () => {
                     second: 59,
                     millisecond: 999,
                 })
-                .add(7, 'hours')
+                .add(7, "hours")
                 .toISOString();
         }
 
-        setSelectedTimeOption(value !== null ? value : 'manual');
+        setSelectedTimeOption(value !== null ? value : "manual");
         setStartDate(selectedStartDate);
         setEndDate(selectedEndDate);
     };
 
     const onChangeSelectedDatePicker = (type: string, date: Date) => {
-        if (type === 'startDate') {
+        if (type === "startDate") {
             const formatStartDate = moment(date)
                 .set({
                     hour: 0,
@@ -166,7 +164,7 @@ const StatisticHarvest = () => {
                     second: 0,
                     millisecond: 0,
                 })
-                .add(7, 'hours')
+                .add(7, "hours")
                 .toISOString();
             setStartDate(formatStartDate);
             setShowStartDatePicker(!showStartDatePicker);
@@ -178,7 +176,7 @@ const StatisticHarvest = () => {
                     second: 59,
                     millisecond: 999,
                 })
-                .add(7, 'hours')
+                .add(7, "hours")
                 .toISOString();
 
             setEndDate(formatEndDate);
@@ -192,11 +190,11 @@ const StatisticHarvest = () => {
             startDate: new Date(startDate as string),
             endDate: new Date(endDate as string),
             targetType:
-                selectedType === 'WORK'
-                    ? 'harvestId'
-                    : selectedType === 'PRODUCT'
-                    ? 'productId'
-                    : 'groupId',
+                selectedType === "WORK"
+                    ? "harvestId"
+                    : selectedType === "PRODUCT"
+                    ? "productId"
+                    : "groupId",
             targetTypeValue: selectedTarget.id,
         });
         setShowForm(!showForm);
@@ -210,85 +208,85 @@ const StatisticHarvest = () => {
             if (userInfo.userType.level === EOrganization.LEADER) {
                 setListStatisticType(
                     listStatisticTypeDefault.filter(
-                        (item: any) => item._id !== 'PRODUCT',
+                        (item: any) => item._id !== "PRODUCT",
                     ),
                 );
 
-                setSelectedType('GROUP' as EType);
+                setSelectedType("GROUP" as EType);
                 setSelectedTarget({
-                    id: 'all',
-                    name: 'Tất cả',
+                    id: "all",
+                    name: "Tất cả",
                 });
 
-                await getListSelection('WORK');
+                await getListSelection("WORK");
 
                 const selectedStartDate = moment()
-                    .startOf('month')
+                    .startOf("month")
                     .set({
                         hour: 0,
                         minute: 0,
                         second: 0,
                         millisecond: 0,
                     })
-                    .add(7, 'hours')
+                    .add(7, "hours")
                     .toISOString();
                 const selectedEndDate = moment()
-                    .endOf('month')
+                    .endOf("month")
                     .set({
                         hour: 23,
                         minute: 59,
                         second: 59,
                         millisecond: 999,
                     })
-                    .add(7, 'hours')
+                    .add(7, "hours")
                     .toISOString();
 
-                setSelectedTimeOption('month');
+                setSelectedTimeOption("month");
 
                 setStartDate(selectedStartDate);
 
                 setEndDate(selectedEndDate);
 
                 await getStatisticHarvest({
-                    type: 'GROUP' as EType,
+                    type: "GROUP" as EType,
                     startDate: new Date(selectedStartDate),
                     endDate: new Date(selectedEndDate),
-                    targetType: 'groupId',
-                    targetTypeValue: 'all',
+                    targetType: "groupId",
+                    targetTypeValue: "all",
                 });
             } else if (userInfo.userType.level === EOrganization.WORKER) {
                 setListStatisticType(
                     listStatisticTypeDefault.filter(
                         (item: any) =>
-                            item._id === 'WORK' || item._id === 'DISPLAY',
+                            item._id === "WORK" || item._id === "DISPLAY",
                     ),
                 );
-                setSelectedType('DISPLAY' as EType);
+                setSelectedType("DISPLAY" as EType);
 
-                await getListSelection('WORK');
+                await getListSelection("WORK");
 
                 const selectedStartDate = moment()
-                    .startOf('month')
+                    .startOf("month")
                     .set({
                         hour: 0,
                         minute: 0,
                         second: 0,
                         millisecond: 0,
                     })
-                    .add(7, 'hours')
+                    .add(7, "hours")
                     .toISOString();
                 const selectedEndDate = moment()
-                    .endOf('month')
+                    .endOf("month")
                     .set({
                         hour: 23,
                         minute: 59,
                         second: 59,
                         millisecond: 999,
                     })
-                    .add(7, 'hours')
+                    .add(7, "hours")
                     .toISOString();
 
-                setSelectedTimeOption('month');
+                setSelectedTimeOption("month");
 
                 setStartDate(selectedStartDate);
 
@@ -303,47 +301,47 @@ const StatisticHarvest = () => {
             } else {
                 setListStatisticType(listStatisticTypeDefault);
 
-                setSelectedType('WORK' as EType);
+                setSelectedType("WORK" as EType);
                 setSelectedTarget({
-                    id: 'all',
-                    name: 'Tất cả',
+                    id: "all",
+                    name: "Tất cả",
                 });
 
-                await getListSelection('WORK');
+                await getListSelection("WORK");
 
                 const selectedStartDate = moment()
-                    .startOf('month')
+                    .startOf("month")
                     .set({
                         hour: 0,
                         minute: 0,
                         second: 0,
                         millisecond: 0,
                     })
-                    .add(7, 'hours')
+                    .add(7, "hours")
                     .toISOString();
                 const selectedEndDate = moment()
-                    .endOf('month')
+                    .endOf("month")
                     .set({
                         hour: 23,
                         minute: 59,
                         second: 59,
                         millisecond: 999,
                     })
-                    .add(7, 'hours')
+                    .add(7, "hours")
                     .toISOString();
 
-                setSelectedTimeOption('month');
+                setSelectedTimeOption("month");
 
                 setStartDate(selectedStartDate);
 
                 setEndDate(selectedEndDate);
 
                 await getStatisticHarvest({
-                    type: 'WORK' as EType,
+                    type: "WORK" as EType,
                     startDate: new Date(selectedStartDate),
                     endDate: new Date(selectedEndDate),
-                    targetType: 'harvestId',
-                    targetTypeValue: 'all',
+                    targetType: "harvestId",
+                    targetTypeValue: "all",
                 });
             }
 
@@ -365,22 +363,22 @@ const StatisticHarvest = () => {
                         style={styles.btnCurrentStatistic}
                         onPress={() => setShowForm(!showForm)}>
                         <Text style={styles.statisticTypeText}>
-                            {selectedType === 'WORK'
-                                ? 'Quy trình'
-                                : selectedType === 'PRODUCT'
-                                ? 'Cây trồng'
-                                : 'Đội sản xuất'}
+                            {selectedType === "WORK"
+                                ? "Quy trình"
+                                : selectedType === "PRODUCT"
+                                ? "Cây trồng"
+                                : "Đội sản xuất"}
                         </Text>
                         <View style={styles.warpIconTextStatistic}>
-                            <View style={{flexDirection: 'row', gap: 10}}>
+                            <View style={{flexDirection: "row", gap: 10}}>
                                 <MaterialIcons
-                                    name='search'
+                                    name="search"
                                     size={20}
-                                    color={'#808080'}
+                                    color={"#808080"}
                                 />
                                 <Text style={styles.statisticTargetText}>
-                                    {selectedTarget.name === ''
-                                        ? 'Tất cả'
+                                    {selectedTarget.name === ""
+                                        ? "Tất cả"
                                         : selectedTarget.name}
                                 </Text>
                             </View>
@@ -388,12 +386,12 @@ const StatisticHarvest = () => {
                             <View
                                 style={[
                                     styles.btnFilter,
-                                    {backgroundColor: '#4CAF50'},
+                                    {backgroundColor: "#4CAF50"},
                                 ]}>
                                 <MaterialIcons
-                                    name='manage-search'
+                                    name="manage-search"
                                     size={22}
-                                    color={'#F5F5F5'}
+                                    color={"#F5F5F5"}
                                 />
                             </View>
                         </View>
@@ -415,7 +413,7 @@ const StatisticHarvest = () => {
 
             <Modal
                 visible={showForm}
-                animationType='fade'
+                animationType="fade"
                 transparent={true}
                 onRequestClose={() => setShowForm(!showForm)}>
                 <View style={styles.modalBackdrop}>
@@ -428,9 +426,9 @@ const StatisticHarvest = () => {
                             iconStyle={styles.iconStyle}
                             data={listStatisticType}
                             maxHeight={300}
-                            labelField='name'
-                            valueField='_id'
-                            placeholder='Chọn loại thống kê'
+                            labelField="name"
+                            valueField="_id"
+                            placeholder="Chọn loại thống kê"
                             value={selectedType}
                             onChange={itemValue =>
                                 onChangeSelectedType(itemValue._id as EType)
@@ -441,28 +439,28 @@ const StatisticHarvest = () => {
                             disable={
                                 userInfo.userType.level ===
                                     EOrganization.LEADER &&
-                                selectedType === 'GROUP'
+                                selectedType === "GROUP"
                                     ? true
                                     : false
                             }
                             style={[
                                 styles.dropdown,
                                 listSelection.length !== 0
-                                    ? {backgroundColor: '#f5f5f5'}
-                                    : {backgroundColor: '#D3D3D3'},
+                                    ? {backgroundColor: "#f5f5f5"}
+                                    : {backgroundColor: "#D3D3D3"},
                             ]}
                             placeholderStyle={styles.placeholderStyle}
                             selectedTextStyle={styles.selectedTextStyle}
                             iconStyle={styles.iconStyle}
                             data={listSelection}
                             maxHeight={300}
-                            labelField='name'
-                            valueField='_id'
-                            placeholder='Chọn'
+                            labelField="name"
+                            valueField="_id"
+                            placeholder="Chọn"
                             value={
-                                selectedTarget.id !== 'all'
+                                selectedTarget.id !== "all"
                                     ? selectedTarget.id
-                                    : ''
+                                    : ""
                             }
                             onChange={itemValue => {
                                 setSelectedTarget({
@@ -477,22 +475,22 @@ const StatisticHarvest = () => {
                             <TouchableOpacity
                                 style={[
                                     styles.selectDateBtnModal,
-                                    selectedTimeOption === 'month'
+                                    selectedTimeOption === "month"
                                         ? styles.selectedDateBtnModal
                                         : null,
                                 ]}
-                                onPress={() => onChangeSelectedTime('month')}>
+                                onPress={() => onChangeSelectedTime("month")}>
                                 <MaterialIcons
                                     name={
-                                        selectedTimeOption === 'month'
-                                            ? 'radio-button-checked'
-                                            : 'radio-button-unchecked'
+                                        selectedTimeOption === "month"
+                                            ? "radio-button-checked"
+                                            : "radio-button-unchecked"
                                     }
                                     size={22}
                                     color={
-                                        selectedTimeOption === 'month'
-                                            ? '#4CAF50'
-                                            : '#49454F'
+                                        selectedTimeOption === "month"
+                                            ? "#4CAF50"
+                                            : "#49454F"
                                     }
                                 />
                                 <Text style={styles.selectDateBtnModalText}>
@@ -503,22 +501,22 @@ const StatisticHarvest = () => {
                             <TouchableOpacity
                                 style={[
                                     styles.selectDateBtnModal,
-                                    selectedTimeOption === 'quarter'
+                                    selectedTimeOption === "quarter"
                                         ? styles.selectedDateBtnModal
                                         : null,
                                 ]}
-                                onPress={() => onChangeSelectedTime('quarter')}>
+                                onPress={() => onChangeSelectedTime("quarter")}>
                                 <MaterialIcons
                                     name={
-                                        selectedTimeOption === 'quarter'
-                                            ? 'radio-button-checked'
-                                            : 'radio-button-unchecked'
+                                        selectedTimeOption === "quarter"
+                                            ? "radio-button-checked"
+                                            : "radio-button-unchecked"
                                     }
                                     size={22}
                                     color={
-                                        selectedTimeOption === 'quarter'
-                                            ? '#4CAF50'
-                                            : '#49454F'
+                                        selectedTimeOption === "quarter"
+                                            ? "#4CAF50"
+                                            : "#49454F"
                                     }
                                 />
                                 <Text style={styles.selectDateBtnModalText}>
@@ -531,22 +529,22 @@ const StatisticHarvest = () => {
                             <TouchableOpacity
                                 style={[
                                     styles.selectDateBtnModal,
-                                    selectedTimeOption === 'year'
+                                    selectedTimeOption === "year"
                                         ? styles.selectedDateBtnModal
                                         : null,
                                 ]}
-                                onPress={() => onChangeSelectedTime('year')}>
+                                onPress={() => onChangeSelectedTime("year")}>
                                 <MaterialIcons
                                     name={
-                                        selectedTimeOption === 'year'
-                                            ? 'radio-button-checked'
-                                            : 'radio-button-unchecked'
+                                        selectedTimeOption === "year"
+                                            ? "radio-button-checked"
+                                            : "radio-button-unchecked"
                                     }
                                     size={22}
                                     color={
-                                        selectedTimeOption === 'year'
-                                            ? '#4CAF50'
-                                            : '#49454F'
+                                        selectedTimeOption === "year"
+                                            ? "#4CAF50"
+                                            : "#49454F"
                                     }
                                 />
                                 <Text style={styles.selectDateBtnModalText}>
@@ -557,22 +555,22 @@ const StatisticHarvest = () => {
                             <TouchableOpacity
                                 style={[
                                     styles.selectDateBtnModal,
-                                    selectedTimeOption === 'manual'
+                                    selectedTimeOption === "manual"
                                         ? styles.selectedDateBtnModal
                                         : null,
                                 ]}
                                 onPress={() => onChangeSelectedTime(null)}>
                                 <MaterialIcons
                                     name={
-                                        selectedTimeOption === 'manual'
-                                            ? 'radio-button-checked'
-                                            : 'radio-button-unchecked'
+                                        selectedTimeOption === "manual"
+                                            ? "radio-button-checked"
+                                            : "radio-button-unchecked"
                                     }
                                     size={22}
                                     color={
-                                        selectedTimeOption === 'manual'
-                                            ? '#4CAF50'
-                                            : '#49454F'
+                                        selectedTimeOption === "manual"
+                                            ? "#4CAF50"
+                                            : "#49454F"
                                     }
                                 />
                                 <Text style={styles.selectDateBtnModalText}>
@@ -581,7 +579,7 @@ const StatisticHarvest = () => {
                             </TouchableOpacity>
                         </View>
 
-                        {selectedTimeOption === 'manual' ? (
+                        {selectedTimeOption === "manual" ? (
                             <View style={styles.warpButton}>
                                 <TouchableOpacity
                                     style={styles.optionBtnModal}
@@ -592,15 +590,15 @@ const StatisticHarvest = () => {
                                     }>
                                     <Text style={styles.optionBtnModalText}>
                                         {startDate === null
-                                            ? 'Bắt đầu'
+                                            ? "Bắt đầu"
                                             : moment(startDate).format(
-                                                  'DD/MM/YYYY',
+                                                  "DD/MM/YYYY",
                                               )}
                                     </Text>
                                     <MaterialIcons
-                                        name='calendar-month'
+                                        name="calendar-month"
                                         size={21}
-                                        color={'#888'}
+                                        color={"#888"}
                                     />
                                 </TouchableOpacity>
                                 <TouchableOpacity
@@ -610,15 +608,15 @@ const StatisticHarvest = () => {
                                     }>
                                     <Text style={styles.optionBtnModalText}>
                                         {endDate === null
-                                            ? 'Kết thúc'
+                                            ? "Kết thúc"
                                             : moment
                                                   .utc(endDate)
-                                                  .format('DD/MM/YYYY')}
+                                                  .format("DD/MM/YYYY")}
                                     </Text>
                                     <MaterialIcons
-                                        name='calendar-month'
+                                        name="calendar-month"
                                         size={21}
-                                        color={'#888'}
+                                        color={"#888"}
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -635,13 +633,13 @@ const StatisticHarvest = () => {
                             <TouchableOpacity
                                 style={[
                                     styles.btnModal,
-                                    {backgroundColor: '#4CAF50'},
+                                    {backgroundColor: "#4CAF50"},
                                 ]}
                                 onPress={handleGetStatistic}>
                                 <Text
                                     style={[
                                         styles.btnCloseModalText,
-                                        {color: '#fff'},
+                                        {color: "#fff"},
                                     ]}>
                                     Thống kê
                                 </Text>
@@ -654,10 +652,10 @@ const StatisticHarvest = () => {
             {showStartDatePicker && (
                 <DateTimePicker
                     value={startDate ? new Date(startDate) : new Date()}
-                    mode='date'
+                    mode="date"
                     onChange={(event, date) => {
                         if (date) {
-                            onChangeSelectedDatePicker('startDate', date);
+                            onChangeSelectedDatePicker("startDate", date);
                         }
                     }}
                 />
@@ -666,11 +664,11 @@ const StatisticHarvest = () => {
             {showEndDatePicker && (
                 <DateTimePicker
                     value={endDate ? new Date(endDate) : new Date()}
-                    mode='date'
+                    mode="date"
                     maximumDate={new Date()}
                     onChange={(event, date) => {
                         if (date) {
-                            onChangeSelectedDatePicker('endDate', date);
+                            onChangeSelectedDatePicker("endDate", date);
                         }
                     }}
                 />
@@ -686,49 +684,49 @@ export default StatisticHarvest;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     emptyStatisticData: {
         flex: 1,
         paddingHorizontal: 15,
     },
     btnQueryStatistic: {
-        alignItems: 'center',
+        alignItems: "center",
         paddingVertical: 10,
-        flexDirection: 'row',
-        backgroundColor: '#F5F5F5',
-        boxShadow: '0 1 2 0 #00000040',
+        flexDirection: "row",
+        backgroundColor: "#F5F5F5",
+        boxShadow: "0 1 2 0 #00000040",
         borderRadius: 12,
         paddingHorizontal: 10,
-        justifyContent: 'space-between',
+        justifyContent: "space-between",
     },
     warpIconText: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 10,
     },
     btnQueryStatisticText: {
         fontWeight: 500,
     },
     btnFilter: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: "#FFFFFF",
         width: 40,
         height: 40,
         borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center",
     },
     modalBackdrop: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        justifyContent: "center",
+        alignItems: "center",
     },
     modalContent: {
-        backgroundColor: '#f5f5f5',
+        backgroundColor: "#f5f5f5",
         paddingVertical: 20,
         paddingHorizontal: 15,
         borderRadius: 12,
-        width: '94%',
+        width: "94%",
         gap: 12,
     },
     text1: {
@@ -736,15 +734,15 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         height: 52,
-        minWidth: '100%',
-        borderColor: '#9A9A9A',
+        minWidth: "100%",
+        borderColor: "#9A9A9A",
         borderWidth: 1,
         paddingHorizontal: 8,
         borderRadius: 8,
     },
     placeholderStyle: {
         fontSize: 15,
-        color: '#666666',
+        color: "#666666",
         fontWeight: 400,
     },
     selectedTextStyle: {
@@ -756,23 +754,23 @@ const styles = StyleSheet.create({
         height: 20,
     },
     warpButton: {
-        flexDirection: 'row',
+        flexDirection: "row",
         gap: 12,
     },
     selectDateBtnModal: {
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: '#808080',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-around',
+        borderColor: "#808080",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-around",
         paddingHorizontal: 10,
         padding: 12,
         flex: 1,
     },
     selectedDateBtnModal: {
-        borderColor: '#4CAF50',
-        backgroundColor: '#c2e0c4',
+        borderColor: "#4CAF50",
+        backgroundColor: "#c2e0c4",
     },
     selectDateBtnModalText: {
         fontWeight: 600,
@@ -781,82 +779,82 @@ const styles = StyleSheet.create({
     optionBtnModal: {
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: '#9A9A9A',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        borderColor: "#9A9A9A",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         paddingHorizontal: 10,
         padding: 12,
         flex: 1,
     },
     optionBtnModalText: {
-        color: '#666666',
+        color: "#666666",
         fontWeight: 400,
         fontSize: 15,
     },
     btnModal: {
-        alignItems: 'center',
-        backgroundColor: '#D3D3D3',
+        alignItems: "center",
+        backgroundColor: "#D3D3D3",
         borderRadius: 10,
         padding: 12,
         flex: 1,
     },
     btnCloseModalText: {
-        color: '#212121',
+        color: "#212121",
         fontWeight: 600,
         fontSize: 15,
     },
     emptyStatisticDataText: {
-        color: '#808080',
+        color: "#808080",
         fontWeight: 500,
         fontSize: 15,
-        textAlign: 'center',
-        margin: 'auto',
+        textAlign: "center",
+        margin: "auto",
     },
     listStatistic: {
         paddingHorizontal: 15,
         flex: 1,
     },
     btnCurrentStatistic: {
-        backgroundColor: '#F5F5F5',
+        backgroundColor: "#F5F5F5",
         borderRadius: 12,
-        boxShadow: '0 1 2 0 #00000040',
+        boxShadow: "0 1 2 0 #00000040",
         paddingVertical: 12,
         paddingHorizontal: 15,
     },
     statisticTypeText: {
         fontSize: 13,
         fontWeight: 500,
-        color: '#808080',
+        color: "#808080",
     },
     statisticTargetText: {
-        width: '78%',
+        width: "78%",
         fontWeight: 600,
     },
     warpIconTextStatistic: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
     },
     statisticTimeText: {
-        fontStyle: 'italic',
-        color: '#4CAF50',
+        fontStyle: "italic",
+        color: "#4CAF50",
         fontWeight: 500,
         fontSize: 13,
     },
     statisticContent: {
         marginTop: 75,
-        justifyContent: 'center',
+        justifyContent: "center",
         flex: 1,
         gap: 120,
     },
     chartTooltip: {
         padding: 6,
-        backgroundColor: '#5A5A5B',
+        backgroundColor: "#5A5A5B",
         borderRadius: 8,
     },
     tooltipText: {
-        color: '#fff',
+        color: "#fff",
         fontWeight: 500,
         fontSize: 13,
     },

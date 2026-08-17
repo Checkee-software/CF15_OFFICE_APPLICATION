@@ -1,47 +1,47 @@
-﻿import SCREEN_INFO from './screenInfo';
-import {ScreenRegistry} from './types';
+import SCREEN_INFO from "./screenInfo";
+import {ScreenRegistry} from "./types";
 
 /* screens */
-import Main from '../../screens/home/Main';
-import FunctionPortal from '../../screens/home/Main/FunctionPortal';
-import Unit from '../../screens/home/unit';
-import Profile from '../../screens/user/Profile';
-import Document from '../../screens/home/Document';
-import DocumentCategoryManager from '../../screens/home/DocumentCategory/DocumentCategoryManager';
-import WorkSchedule from '../../screens/home/WorkSchedule';
-import DetailDocuments from '../../screens/home/Document/DetailDocuments';
-import DocumentApprovalHistory from '../../screens/home/Document/DocumentApprovalHistory';
-import DocumentExecutionSteps from '../../screens/home/Document/DocumentExecutionSteps';
-import DocumentCommunication from '../../screens/home/Document/DocumentCommunication';
-import Incoming from '../../screens/home/Incoming';
-import Outgoing from '../../screens/home/Outgoing';
-import Statistic from '../../screens/home/Statistic';
-import StatisticHarvest from '@/screens/home/Statistic/StatisticHarvest';
-import UpdatePassword from '../../screens/user/UpdatePassword';
-import Notification from '../../screens/user/Notification';
-import ListNotification from '../../screens/home/ListNotification';
-import Feedback from '../../screens/onboarding/Feedback';
-import Feedback1 from '../../screens/onboarding/Feedback/index2';
-import News from '../../screens/user/News';
-import News1 from '../../screens/user/News/index1';
-import GardenInfo from '../../screens/home/Garden/GardenInfo';
-import GardenScan from '@/screens/home/Garden/GardenScan';
-import GardenDeclareWorker from '../../screens/home/Garden/GardenDeclareWorker';
-import GardenWorker from '@/screens/home/Garden/GardenDetailWorker';
-import GardenInfo1 from '../../screens/home/Garden/GardenInfo1';
-import Worker from '../../screens/home/Worker';
-import WorkerInfo from '../../screens/home/Worker/WorkerInfo';
-import ScheduleDetail from '@/screens/home/WorkSchedule/ScheduleDetail';
-import GardenInfoWorker from '@/screens/home/Garden/GardenInfoWorker';
-import ActiveMachine from '@/screens/home/Garden/ActiveMachine';
-import GardenInfoWorker1 from '@/screens/home/Garden/GardenInfoWorker1';
-import BrowseAddMaterials from '@/screens/home/BrowseAddMaterials';
-import BrowseHarvest from '@/screens/home/BrowseHarvest';
-import SchedulesHarvest from '@/screens/home/ScheduleHarvest/SchedulesHarvest';
-import SchedulesHarvestDetail from '@/screens/home/ScheduleHarvest/SchedulesHarvestDetail';
-import HarvestList from '@/screens/home/Garden/Harvest/HarvestList';
-import HarvestDetail from '@/screens/home/Garden/Harvest/HarvestDetail';
-import HarvestHistory from '@/screens/home/Garden/Harvest/HarvestHistory';
+import Main from "../../screens/home/Main";
+import FunctionPortal from "../../screens/home/Main/FunctionPortal";
+import Unit from "../../screens/home/Unit";
+import Profile from "../../screens/user/Profile";
+import Document from "../../screens/home/Document";
+import DocumentCategoryManager from "../../screens/home/DocumentCategory/DocumentCategoryManager";
+import WorkSchedule from "../../screens/home/WorkSchedule";
+import DetailDocuments from "../../screens/home/Document/DetailDocuments";
+import DocumentApprovalHistory from "../../screens/home/Document/DocumentApprovalHistory";
+import DocumentExecutionSteps from "../../screens/home/Document/DocumentExecutionSteps";
+import DocumentCommunication from "../../screens/home/Document/DocumentCommunication";
+import Incoming from "../../screens/home/Incoming";
+import Outgoing from "../../screens/home/Outgoing";
+import Statistic from "../../screens/home/Statistic";
+import StatisticHarvest from "@/screens/home/Statistic/StatisticHarvest";
+import UpdatePassword from "../../screens/user/UpdatePassword";
+import Notification from "../../screens/user/Notification";
+import ListNotification from "../../screens/home/ListNotification";
+import Feedback from "../../screens/onboarding/Feedback";
+import Feedback1 from "../../screens/onboarding/Feedback/index2";
+import News from "../../screens/user/News";
+import News1 from "../../screens/user/News/index1";
+import GardenInfo from "../../screens/home/Garden/GardenInfo";
+import GardenScan from "@/screens/home/Garden/GardenScan";
+import GardenDeclareWorker from "../../screens/home/Garden/GardenDeclareWorker";
+import GardenWorker from "@/screens/home/Garden/GardenDetailWorker";
+import GardenInfo1 from "../../screens/home/Garden/GardenInfo1";
+import Worker from "../../screens/home/Worker";
+import WorkerInfo from "../../screens/home/Worker/WorkerInfo";
+import ScheduleDetail from "@/screens/home/WorkSchedule/ScheduleDetail";
+import GardenInfoWorker from "@/screens/home/Garden/GardenInfoWorker";
+import ActiveMachine from "@/screens/home/Garden/ActiveMachine";
+import GardenInfoWorker1 from "@/screens/home/Garden/GardenInfoWorker1";
+import BrowseAddMaterials from "@/screens/home/BrowseAddMaterials";
+import BrowseHarvest from "@/screens/home/BrowseHarvest";
+import SchedulesHarvest from "@/screens/home/ScheduleHarvest/SchedulesHarvest";
+import SchedulesHarvestDetail from "@/screens/home/ScheduleHarvest/SchedulesHarvestDetail";
+import HarvestList from "@/screens/home/Garden/Harvest/HarvestList";
+import HarvestDetail from "@/screens/home/Garden/Harvest/HarvestDetail";
+import HarvestHistory from "@/screens/home/Garden/Harvest/HarvestHistory";
 /**
  * Declare user's screens before signing in
  * For handling route only
@@ -342,5 +342,3 @@ export const AUTHENTICATION_SCREENS: ScreenRegistry[] = [
 ];
 
 Object.freeze(AUTHENTICATION_SCREENS);
-
-

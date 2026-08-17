@@ -1,8 +1,8 @@
-import {create} from 'zustand';
-import axiosClient from '../utils/axiosClient';
-import Snackbar from 'react-native-snackbar';
-import {INews} from '../shared-types/Response/NewsResponse/NewsResponse';
-import ENV from '@/config/ENV';
+import {create} from "zustand";
+import axiosClient from "../utils/axiosClient";
+import Snackbar from "react-native-snackbar";
+import {INews} from "../shared-types/Response/NewsResponse/NewsResponse";
+import ENV from "@/config/ENV";
 
 type NewsItem = INews;
 
@@ -21,14 +21,14 @@ const useNewsStore = create<NewsState>(set => ({
     isLoading: false,
     getFullAvatarUrl: (imagePath?: string): string => {
         if (!imagePath) {
-            return '';
+            return "";
         }
 
-        if (imagePath.startsWith('http')) {
+        if (imagePath.startsWith("http")) {
             return imagePath;
         }
 
-        return `${ENV.BACKEND_URL}${imagePath.replace(/\\/g, '/')}`;
+        return `${ENV.BACKEND_URL}${imagePath.replace(/\\/g, "/")}`;
     },
 
     fetchNews: async () => {
@@ -42,11 +42,11 @@ const useNewsStore = create<NewsState>(set => ({
             console.log(res);
         } catch (error: any) {
             console.log(
-                'FETCH_NEWS_ERROR:',
+                "FETCH_NEWS_ERROR:",
                 error?.response?.data || error.message,
             );
             Snackbar.show({
-                text: 'Không thể tải danh sách tin tức',
+                text: "Không thể tải danh sách tin tức",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
@@ -63,11 +63,11 @@ const useNewsStore = create<NewsState>(set => ({
             set({selectedNews: res.data?.data || null});
         } catch (error: any) {
             console.log(
-                'FETCH_NEWS_DETAIL_ERROR:',
+                "FETCH_NEWS_DETAIL_ERROR:",
                 error?.response?.data || error.message,
             );
             Snackbar.show({
-                text: 'Không thể tải chi tiết tin tức',
+                text: "Không thể tải chi tiết tin tức",
                 duration: Snackbar.LENGTH_SHORT,
             });
         } finally {
