@@ -1,146 +1,36 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {
-    View,
-    Text,
-    StyleSheet,
+    FlatList,
     Image,
-    TouchableOpacity,
     ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import images from "../../../assets/images";
 import "moment/locale/vi";
-import SCREEN_INFO from "../../../config/SCREEN_CONFIG/screenInfo";
-import {useAuthStore} from "../../../stores/authStore";
-import {EOrganization} from "@/shared-types/common/Permissions/Permissions";
-import useNotificationStore from "@/stores/notificationStore";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {Marquee} from "@animatereactnative/marquee";
 import {useIsFocused} from "@react-navigation/native";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import images from "@/assets/images";
+import SCREEN_INFO from "@/config/SCREEN_CONFIG/screenInfo";
+import {useAuthStore} from "@/stores/authStore";
+import useNotificationStore from "@/stores/notificationStore";
+import useNewsStore from "@/stores/newsStore";
 
 export default function Main({navigation}: any) {
     const {userInfo} = useAuthStore();
-    console.log("user-info: ", userInfo);
+    const {notification, fetchActiveNotification} = useNotificationStore();
+    const {news, fetchNews, getFullAvatarUrl} = useNewsStore();
     const [announcement, setAnnouncement] = useState("");
+    const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
     const isFocused = useIsFocused();
 
-    //console.log(userInfo);
-
-    const menuItems = [
-        {
-            function: "GARDEN",
-            key: "gardenForWorker",
-            label: "Khu vườn",
-            buttonImage: images.garden,
-            navigateTo: SCREEN_INFO.GARDENINFOWORKER.key,
-            navigateNext: SCREEN_INFO.GARDENWORKER.key,
-        },
-        {
-            function: "",
-            key: "gardenDeclareForWorker",
-            label: "Báo cáo quy trình",
-            buttonImage: images.gardener,
-            navigateTo: SCREEN_INFO.GARDENINFOWORKER1.key,
-            navigateNext: SCREEN_INFO.GARDENDECLAREWORKER.key,
-        },
-        {
-            function: "GARDEN",
-            key: "gardenInfo",
-            label: "Thông tin khu vườn",
-            buttonImage: images.garden,
-            navigateTo: SCREEN_INFO.GARDENINFO.key,
-        },
-        {
-            function: "EMPLOYEES",
-            key: "unit",
-            label: "Nhân sự",
-            buttonImage: images.workers,
-            navigateTo: SCREEN_INFO.UNIT.key,
-        },
-        {
-            function: "EMPLOYEES",
-            key: "employee",
-            label: "Nhân sự",
-            buttonImage: images.workers,
-            navigateTo: SCREEN_INFO.WORKER.key,
-        },
-        {
-            function: "SCHEDULE",
-            key: "workschedule",
-            label: "Lịch sử quy trình",
-            buttonImage: images.toDoList,
-            navigateTo: SCREEN_INFO.WORKSCHEDULE.key,
-        },
-        {
-            function: "STATISTIC",
-            key: "statistic",
-            label: "Báo cáo thống kê",
-            buttonImage: images.pieChart,
-            navigateTo: SCREEN_INFO.STATISTIC.key,
-        },
-        // {
-        //     function: 'STATISTIC_HARVEST',
-        //     key: 'statisticharvest',
-        //     label: 'Báo cáo thống kê thu hoạch',
-        //     buttonImage: images.harvestChart,
-        //     navigateTo: SCREEN_INFO.STATISTIC_HARVEST.key,
-        // },
-        {
-            function: "",
-            key: "browseaddmaterial",
-            label: "Duyệt đầu tư tăng thêm",
-            buttonImage: images.approve,
-            navigateTo: SCREEN_INFO.BROWSEADDMATERIALS.key,
-        },
-        {
-            function: "",
-            key: "browseharvest",
-            label: "Duyệt thu hoạch",
-            buttonImage: images.approveHarvest,
-            navigateTo: SCREEN_INFO.BROWSE_HARVEST.key,
-        },
-        {
-            function: "",
-            key: "harvest",
-            label: "Thu hoạch",
-            buttonImage: images.approveHarvest,
-            navigateTo: SCREEN_INFO.HARVEST.key,
-        },
-        {
-            function: "",
-            key: "harvestschedule",
-            label: "Quy trình thu hoạch",
-            buttonImage: images.harvestSchedule,
-            navigateTo: SCREEN_INFO.HARVEST_SCHEDULE.key,
-        },
-        {
-            function: "FEEDBACK",
-            key: "feedback",
-            label: "Góp ý",
-            buttonImage: images.feedBack,
-            navigateTo: SCREEN_INFO.FEEDBACK.key,
-        },
-        {
-            function: "DOCUMENT",
-            key: "document",
-            label: "Tài liệu",
-            buttonImage: images.document,
-            navigateTo: SCREEN_INFO.DOCUMENT.key,
-        },
-        {
-            function: "",
-            key: "news",
-            label: "Tin tức",
-            buttonImage: images.megaphone,
-            navigateTo: SCREEN_INFO.NEWS.key,
-        },
-    ];
-
-    const {notification, fetchActiveNotification} = useNotificationStore();
-
     useEffect(() => {
-        // Gọi API lấy thông báo active
         fetchActiveNotification();
+        fetchNews();
     }, []);
 
     useEffect(() => {
@@ -151,289 +41,301 @@ export default function Main({navigation}: any) {
         }
     }, [notification]);
 
-    const getGreeting = () => {
+    useEffect(() => {
+        setAvatarLoadFailed(false);
+    }, [userInfo.avatar]);
+
+    const greetingValue = useMemo(() => {
         const hour = new Date().getHours();
+
         if (hour >= 5 && hour < 13) {
-            const valueGreeting = {
-                greetingText: "Chào buổi sáng",
-                colorGreetingText: "rgba(76, 175, 80, 1)",
-            };
-            return valueGreeting;
+            return "Chào buổi sáng";
         }
-        // } else if (hour >= 11 && hour < 13) {
-        //     return 'Chào buổi trưa';
-        // }
-        else if (hour >= 13 && hour < 18) {
-            const valueGreeting = {
-                greetingText: "Chào buổi chiều",
-                colorGreetingText: "rgba(255, 152, 0, 1)",
-            };
-            return valueGreeting;
-        } else if (hour >= 18 && hour < 22) {
-            const valueGreeting = {
-                greetingText: "Chào buổi tối",
-                colorGreetingText: "rgba(33, 150, 243, 1)",
-            };
-            return valueGreeting;
-        } else {
-            const valueGreeting = {
-                greetingText: "Chúc ngủ ngon!",
-                colorGreetingText: "rgba(66, 31, 25, 1)",
-            };
-            return valueGreeting;
+        if (hour >= 13 && hour < 18) {
+            return "Chào buổi chiều";
         }
-    };
-
-    const filterMenuByRole = (role: string) => {
-        const hasAccessToFunction = (functionKey: string) => {
-            return userInfo.functions.some(
-                func =>
-                    (func._id === functionKey && func.access) ||
-                    (func._id === functionKey.split("_")[0] && func.access),
-            );
-        };
-
-        let filteredMenu: typeof menuItems = [];
-
-        if (role === EOrganization.MANAGEMENT) {
-            filteredMenu = menuItems.filter(
-                item =>
-                    item.key !== "gardenForWorker" &&
-                    item.key !== "gardenDeclareForWorker" &&
-                    item.key !== "unit" &&
-                    item.key !== "browseaddmaterial" &&
-                    item.key !== "browseharvest" &&
-                    item.key !== "harvest",
-            );
-            return filteredMenu.filter(
-                item => !item.function || hasAccessToFunction(item.function),
-            );
+        if (hour >= 18 && hour < 22) {
+            return "Chào buổi tối";
         }
+        return "Chúc ngủ ngon!";
+    }, []);
 
-        if (role === EOrganization.DEPARTMENT) {
-            filteredMenu = menuItems.filter(
-                item =>
-                    item.key !== "gardenForWorker" &&
-                    item.key !== "gardenDeclareForWorker" &&
-                    item.key !== "unit" &&
-                    item.key !== "browseaddmaterial" &&
-                    item.key !== "browseharvest" &&
-                    item.key !== "harvest",
-            );
-            return filteredMenu.filter(
-                item => !item.function || hasAccessToFunction(item.function),
-            );
-        }
+    const avatarSource =
+        userInfo.avatar && !avatarLoadFailed
+            ? {uri: userInfo.avatar}
+            : images.avatar;
 
-        if (role === EOrganization.LEADER) {
-            filteredMenu = menuItems.filter(item => {
-                const excludeKeys =
-                    item.key !== "gardenForWorker" &&
-                    item.key !== "gardenDeclareForWorker" &&
-                    item.key !== "employee" &&
-                    item.key !== "harvest";
-
-                const excludeStatistic =
-                    userInfo.groupId === "" ? item.key !== "statistic" : true;
-
-                return excludeKeys && excludeStatistic;
-            });
-
-            return filteredMenu.filter(
-                item => !item.function || hasAccessToFunction(item.function),
-            );
-        }
-
-        if (role === EOrganization.WORKER) {
-            filteredMenu = menuItems.filter(
-                item =>
-                    item.key !== "unit" &&
-                    item.key !== "employee" &&
-                    item.key !== "gardenInfo" &&
-                    item.key !== "browseaddmaterial" &&
-                    item.key !== "browseharvest" &&
-                    item.key !== "harvestschedule",
-            );
-
-            return filteredMenu.filter(item => {
-                // Chỉ kiểm tra quyền access đối với STATISTIC
-                if (item.function === "STATISTIC") {
-                    return hasAccessToFunction(item.function);
+    const newsPreview = news.slice(0, 2);
+    const renderNewsItem = ({item}: any) => (
+        <TouchableOpacity
+            style={styles.newsCard}
+            activeOpacity={0.88}
+            onPress={() =>
+                navigation.navigate(SCREEN_INFO.NEWS1.key, {id: item._id})
+            }>
+            <Image
+                source={
+                    item.imagePath
+                        ? {uri: getFullAvatarUrl(item.imagePath)}
+                        : images.plant1
                 }
-                return true;
-            });
-        }
-
-        return [];
-    };
-
-    const menuList = filterMenuByRole(userInfo.userType.level);
-
-    const greetingValue = getGreeting();
+                style={styles.newsImage}
+            />
+            <View style={styles.newsContent}>
+                <Text style={styles.newsType}>Loại tin tức</Text>
+                <Text numberOfLines={2} style={styles.newsTitle}>
+                    {item.title}
+                </Text>
+                <Text numberOfLines={2} style={styles.newsExcerpt}>
+                    {item.content}
+                </Text>
+                <Text style={styles.newsAuthor}>Tác giả: CF15 Office</Text>
+            </View>
+        </TouchableOpacity>
+    );
 
     return (
-        <View style={MainStyles.container}>
+        <View style={styles.container}>
             <ScrollView
+                contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}
                 bounces={false}
                 overScrollMode="never">
-                <View style={MainStyles.welcomeUser}>
-                    <View style={MainStyles.helloTime}>
-                        <Text
-                            style={[
-                                MainStyles.helloTimeText,
-                                {color: greetingValue.colorGreetingText},
-                            ]}>
-                            {greetingValue.greetingText}
+                {announcement && isFocused ? (
+                    <View style={styles.announcementContainer}>
+                        <View style={styles.announcementRow}>
+                            <MaterialCommunityIcons
+                                name="lightbulb-on-outline"
+                                size={17}
+                                color="#FFFFFF"
+                            />
+                            <View style={styles.announcementDivider} />
+
+                            <GestureHandlerRootView style={styles.marqueeWrap}>
+                                <Marquee
+                                    frameRate={30}
+                                    spacing={120}
+                                    speed={1.1}
+                                    withGesture={false}>
+                                    <Text style={styles.announcementText}>
+                                        {announcement}
+                                    </Text>
+                                </Marquee>
+                            </GestureHandlerRootView>
+                        </View>
+                    </View>
+                ) : null}
+
+                <View style={styles.welcomeUser}>
+                    <View style={styles.helloTime}>
+                        <Text style={styles.helloTimeText}>
+                            {greetingValue}
                         </Text>
-                        <Text
-                            style={[
-                                MainStyles.helloUserText,
-                                {color: greetingValue.colorGreetingText},
-                            ]}>
+                        <Text style={styles.helloUserText}>
                             {userInfo.fullName}
                         </Text>
                     </View>
 
                     <TouchableOpacity
-                        style={MainStyles.avatarUser}
-                        onPress={() => navigation.navigate("Hồ sơ")}>
+                        style={styles.avatarUser}
+                        onPress={() =>
+                            navigation.navigate(SCREEN_INFO.PROFILE.key)
+                        }>
                         <Image
-                            source={
-                                userInfo.avatar
-                                    ? {
-                                          uri: userInfo.avatar,
-                                      }
-                                    : images.avatar
-                            }
-                            style={MainStyles.avatar}
+                            source={avatarSource}
+                            style={styles.avatar}
+                            onError={() => setAvatarLoadFailed(true)}
                         />
                     </TouchableOpacity>
                 </View>
-                {announcement && isFocused && (
-                    <View style={MainStyles.announcementContainer}>
-                        <GestureHandlerRootView>
-                            <Marquee
-                                frameRate={30}
-                                spacing={150}
-                                speed={1.5}
-                                withGesture={false}>
-                                <Text style={MainStyles.announcementText}>
-                                    {announcement}
-                                </Text>
-                            </Marquee>
-                        </GestureHandlerRootView>
+
+                <View style={styles.heroStack}>
+                    <TouchableOpacity
+                        style={styles.heroCard}
+                        activeOpacity={0.92}
+                        onPress={() =>
+                            navigation.navigate(
+                                SCREEN_INFO.PRODUCTION_PORTAL.key,
+                                {category: "production"},
+                            )
+                        }>
+                        <Image
+                            source={images.cultivationArea}
+                            style={styles.heroIllustration}
+                            resizeMode="contain"
+                        />
+                        <View style={styles.heroContent}>
+                            <Text
+                                style={styles.heroTitle}
+                                numberOfLines={1}
+                                adjustsFontSizeToFit>
+                                Quản trị{" "}
+                                <Text style={styles.heroAccent}>sản xuất</Text>
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.heroCard}
+                        activeOpacity={0.92}
+                        onPress={() =>
+                            navigation.navigate(SCREEN_INFO.OFFICE_PORTAL.key, {
+                                category: "office",
+                            })
+                        }>
+                        <View style={styles.heroContent}>
+                            <Text
+                                style={styles.heroTitle}
+                                numberOfLines={1}
+                                adjustsFontSizeToFit>
+                                Văn phòng{" "}
+                                <Text style={styles.heroAccent}>điện tử</Text>
+                            </Text>
+                        </View>
+                        <Image
+                            source={images.workplaceIcon}
+                            style={styles.heroIllustration}
+                            resizeMode="contain"
+                        />
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.newsSection}>
+                    <View style={styles.sectionHeader}>
+                        <View style={styles.sectionTitleWrap}>
+                            <MaterialCommunityIcons
+                                name="newspaper-variant-outline"
+                                size={20}
+                                color="#1B1B1B"
+                            />
+                            <Text style={styles.sectionTitle}>
+                                Tin tức mới nhất
+                            </Text>
+                        </View>
+                        <TouchableOpacity
+                            onPress={() =>
+                                navigation.navigate(SCREEN_INFO.NEWS.key)
+                            }>
+                            <Text style={styles.sectionLink}>Xem tất cả</Text>
+                        </TouchableOpacity>
                     </View>
-                )}
-                <View style={MainStyles.mainMenu}>
-                    <View style={MainStyles.warpMenuButton}>
-                        {menuList.map(item => (
-                            <TouchableOpacity
-                                key={item.key}
-                                style={MainStyles.menuButton}
-                                onPress={() =>
-                                    navigation.navigate(item.navigateTo, {
-                                        navigateNext: item.navigateNext || null,
-                                    })
-                                }>
-                                <Image
-                                    source={item.buttonImage}
-                                    style={MainStyles.menuButtonImage}
-                                />
-                                <Text style={MainStyles.menuButtonText}>
-                                    {item.label}
+
+                    <FlatList
+                        data={newsPreview}
+                        renderItem={renderNewsItem}
+                        keyExtractor={item => item._id}
+                        scrollEnabled={false}
+                        ListEmptyComponent={
+                            <View style={styles.emptyNewsBox}>
+                                <Text style={styles.emptyNewsText}>
+                                    Chưa có tin tức hiển thị.
                                 </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                            </View>
+                        }
+                    />
                 </View>
             </ScrollView>
         </View>
     );
 }
 
-const MainStyles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#FFFFFF",
+const styles = StyleSheet.create({
+    container: {flex: 1, backgroundColor: "#FFFFFF"},
+    content: {paddingHorizontal: 14, paddingTop: 12, paddingBottom: 24},
+    announcementContainer: {
+        backgroundColor: "#4CAF50",
+        borderRadius: 4,
+        overflow: "hidden",
+        marginHorizontal: -14,
+        marginBottom: 16,
+    },
+    announcementRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 8,
         paddingHorizontal: 10,
     },
+    announcementDivider: {
+        width: 1,
+        height: 15,
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        marginHorizontal: 8,
+    },
+    marqueeWrap: {flex: 1},
+    announcementText: {color: "#FFFFFF", fontWeight: "500", fontSize: 14},
     welcomeUser: {
         flexDirection: "row",
         alignItems: "center",
-        color: "rgba(76, 175, 80, 1)",
         justifyContent: "space-between",
-        marginBottom: 10,
+        marginBottom: 18,
     },
-    helloTime: {
-        width: "75%",
-    },
-    helloTimeText: {
-        fontSize: 13,
-        fontWeight: 400,
-    },
-    helloUserText: {
-        fontWeight: "600",
-        fontSize: 15,
-    },
+    helloTime: {flex: 1},
+    helloTimeText: {fontSize: 14, color: "#7B7B7B", marginBottom: 2},
+    helloUserText: {fontWeight: "700", fontSize: 32, color: "#1B1B1B"},
     avatarUser: {
-        borderRadius: "50%",
-        backgroundColor: "rgba(128, 128, 128, 0.15)",
-        width: 60,
-        height: 60,
+        borderRadius: 28,
+        backgroundColor: "#ECECEC",
+        width: 56,
+        height: 56,
+        padding: 3,
+        overflow: "hidden",
     },
-    avatar: {
-        margin: "auto",
-        width: 50,
-        height: 52,
-        borderRadius: 25,
-    },
-    mainMenu: {
-        marginVertical: 5,
-    },
-    mainMenuTitle: {
-        color: "rgba(128, 128, 128, 1)",
-        fontWeight: "500",
-    },
-    warpMenuButton: {
-        marginTop: 10,
+    avatar: {width: "100%", height: "100%", borderRadius: 40},
+    heroStack: {gap: 18, marginBottom: 18},
+    heroCard: {
+        minHeight: 118,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 18,
+        borderWidth: 1,
+        borderColor: "#D9D9D9",
+        paddingHorizontal: 18,
+        paddingVertical: 18,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        flexWrap: "wrap",
-        gap: 10,
     },
-    menuButton: {
-        width: "48%",
-        gap: 10,
-        paddingVertical: 24,
-        paddingHorizontal: 15,
-        borderRadius: 18,
-        alignItems: "center",
+    heroContent: {
+        flex: 1,
         justifyContent: "center",
-        boxShadow: "0 1 3 0 rgba(0, 0, 0, 0.25)",
+        alignItems: "flex-start",
+        paddingRight: 10,
     },
-    menuButtonImage: {
-        width: 80,
-        height: 80,
-        aspectRatio: 1,
+    heroIllustration: {width: 108, height: 84, marginHorizontal: 8},
+    heroTitle: {color: "#1F1F1F", fontSize: 24, fontWeight: "700"},
+    heroAccent: {color: "#59B75F"},
+    newsSection: {marginBottom: 12},
+    sectionHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 12,
     },
-    menuButtonText: {
-        fontSize: 12,
-        flexShrink: 1,
-        textAlign: "center",
+    sectionTitleWrap: {flexDirection: "row", alignItems: "center", gap: 6},
+    sectionTitle: {fontSize: 22, fontWeight: "700", color: "#1B1B1B"},
+    sectionLink: {fontSize: 13, color: "#4A86FF", fontWeight: "500"},
+    newsCard: {flexDirection: "row", marginBottom: 12},
+    newsImage: {
+        width: 96,
+        height: 74,
+        borderRadius: 10,
+        backgroundColor: "#EFEFEF",
     },
-    announcementContainer: {
-        backgroundColor: "rgba(55, 156, 58, 1)",
-        borderRadius: 8,
-        paddingVertical: 10,
-        overflow: "hidden",
-        marginVertical: 6,
-    },
-    announcementText: {
-        color: "white",
+    newsContent: {flex: 1, marginLeft: 10},
+    newsType: {fontSize: 12, color: "#A0A0A0"},
+    newsTitle: {
+        fontSize: 20,
+        color: "#222",
         fontWeight: "700",
-        fontSize: 22,
-        marginLeft: 10,
+        marginTop: 2,
+        marginBottom: 2,
     },
+    newsExcerpt: {fontSize: 14, color: "#878787", lineHeight: 20},
+    newsAuthor: {
+        marginTop: 4,
+        fontSize: 13,
+        color: "#4A86FF",
+        fontWeight: "500",
+    },
+    emptyNewsBox: {backgroundColor: "#F7F7F7", borderRadius: 10, padding: 12},
+    emptyNewsText: {color: "#767676"},
 });

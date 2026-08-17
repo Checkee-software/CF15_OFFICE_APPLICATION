@@ -196,7 +196,7 @@ const BrowseAddMaterials = () => {
                                                     styles.cancelProgressInput
                                                 }
                                                 placeholder="Nhập lý do từ chối..."
-                                                placeholderTextColor={"#808080"}
+                                                placeholderTextColor="#808080"
                                                 multiline
                                                 numberOfLines={5}
                                                 value={itemComfirm.message}

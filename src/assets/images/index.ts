@@ -20,8 +20,18 @@ import approve from "./approve.png";
 import approveHarvest from "./approve-harvest.png";
 import harvestSchedule from "./harvest-schedule.png";
 import harvestChart from "./harvest-chart.png";
+import cultivationArea from "./cultivation_area.png";
+import workplaceIcon from "./workplace_icon.png";
+import outgoingDocuments from "./outgoing_documents.png";
+import incomingDocuments from "./incoming_documents.png";
+import folderManagement from "./folder_management.png";
+import documentStatistic from "./document_statistic.png";
+import folder from "./folder.png";
+import folder_2 from "./folder_2.png";
 
 const images = {
+    folder: folder,
+    folder_2: folder_2,
     feedBack: feedBack,
     garden: garden,
     toDoList: toDoList,
@@ -44,6 +54,12 @@ const images = {
     approveHarvest: approveHarvest,
     harvestSchedule: harvestSchedule,
     harvestChart: harvestChart,
+    cultivationArea: cultivationArea,
+    workplaceIcon: workplaceIcon,
+    outgoingDocuments: outgoingDocuments,
+    incomingDocuments: incomingDocuments,
+    folderManagement: folderManagement,
+    documentStatistic: documentStatistic,
 
     backgroundLogin: require("./picloginbg.png"),
     avatar: require("./picavt.png"),

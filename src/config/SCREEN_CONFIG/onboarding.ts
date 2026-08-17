@@ -1,10 +1,7 @@
 import {ScreenInformation} from "./types";
 
 const ONBOARDING_SCREENS = {
-    INDEX: {
-        key: "INDEX",
-        isOpenQRCamera: false,
-    } as ScreenInformation,
+    INDEX: {key: "INDEX", isOpenQRCamera: false} as ScreenInformation,
     LOGIN: {
         key: "LOGIN",
         headerTitle: "TRA CỨU THỦ CÔNG",

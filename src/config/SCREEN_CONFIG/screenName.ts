@@ -1,4 +1,4 @@
-export type ScreenName =
+﻿export type ScreenName =
     /* ONBOARDING */
     | "INDEX"
     | "LOGIN"
@@ -6,6 +6,8 @@ export type ScreenName =
     | "DETAIL_TRACKING"
     /* HOME */
     | "MAIN"
+    | "PRODUCTION_PORTAL"
+    | "OFFICE_PORTAL"
     | "BROWSEADDMATERIALS"
     | "BROWSE_HARVEST"
     | "HARVEST_SCHEDULE"
@@ -15,7 +17,13 @@ export type ScreenName =
     | "HARVEST_HISTORY"
     | "LISTNOTIFICATION"
     | "DOCUMENT"
+    | "INCOMING"
+    | "OUTGOING"
+    | "DOCUMENTCATEGORYMANAGER"
     | "DETAILDOCUMENTS"
+    | "DOCUMENT_APPROVAL_HISTORY"
+    | "DOCUMENT_EXECUTION_STEPS"
+    | "DOCUMENT_COMMUNICATION"
     | "GARDENINFO"
     | "GARDENWORKER"
     | "GARDENINFOWORKER"
