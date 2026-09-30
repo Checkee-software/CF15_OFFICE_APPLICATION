@@ -4,17 +4,15 @@ import asyncStorageHelper from "./localStorageHelper/index";
 const axiosClient = axios;
 
 axiosClient.interceptors.request.use(async function (config) {
-    if (!asyncStorageHelper.token) {
-        return config;
+    if (asyncStorageHelper.token) {
+        if (config.headers && typeof config.headers.set === "function") {
+            config.headers.set("Authorization", asyncStorageHelper.token);
+        } else if (config.headers) {
+            (config.headers as any).Authorization = asyncStorageHelper.token;
+        }
     }
 
-    return {
-        ...config,
-        headers: {
-            ...config.headers,
-            Authorization: asyncStorageHelper.token,
-        },
-    };
+    return config;
 });
 
 axiosClient.interceptors.response.use(function (res) {

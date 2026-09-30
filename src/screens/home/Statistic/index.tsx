@@ -354,7 +354,7 @@ const Statistic = () => {
                 );
 
                 setSelectedType("WORK" as EType);
-                setCurrentSelectedType("DISPLAY" as EType);
+                setCurrentSelectedType("WORK" as EType);
 
                 await getListSelection("WORK");
 
@@ -414,9 +414,9 @@ const Statistic = () => {
                         <Text style={styles.statisticTypeText}>
                             {currentSelectedType === "WORK"
                                 ? "Quy trình"
-                                : selectedType === "PRODUCT"
+                                : currentSelectedType === "PRODUCT"
                                 ? "Cây trồng"
-                                : selectedType === "GROUP"
+                                : currentSelectedType === "GROUP"
                                 ? "Đội sản xuất"
                                 : "Tiến độ"}
                         </Text>
@@ -454,10 +454,12 @@ const Statistic = () => {
 
                     <View style={styles.statisticContent}>
                         {userInfo.userType.level !== EOrganization.WORKER ? (
-                            <StatisticResult selectedType={selectedType} />
+                            <StatisticResult
+                                selectedType={currentSelectedType}
+                            />
                         ) : (
                             <StatisticResultWorker
-                                selectedType={selectedType}
+                                selectedType={currentSelectedType}
                             />
                         )}
                     </View>
@@ -856,7 +858,7 @@ const styles = StyleSheet.create({
         margin: "auto",
     },
     listStatistic: {
-        paddingHorizontal: 15,
+        paddingHorizontal: 10,
         flex: 1,
     },
     btnCurrentStatistic: {
@@ -887,8 +889,8 @@ const styles = StyleSheet.create({
         fontSize: 13,
     },
     statisticContent: {
-        alignItems: "center",
-        justifyContent: "center",
+        width: "100%",
+        alignSelf: "stretch",
         flex: 1,
     },
 });

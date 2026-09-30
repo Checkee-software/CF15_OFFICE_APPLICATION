@@ -9,6 +9,26 @@ import moment from "moment";
 import Snackbar from "react-native-snackbar";
 import {create} from "zustand";
 
+export interface IStatisticProgressPieSlice {
+    value: number;
+    color: string;
+    text: string;
+}
+
+export interface IStatisticProgressTask {
+    taskName: string;
+    totalProcessingRate: number;
+    processingRate: number;
+    totalSquare: number;
+    percentage: number;
+    pieChart: IStatisticProgressPieSlice[];
+}
+
+export interface IStatisticProgressProcess {
+    processTitle: string;
+    tasks: IStatisticProgressTask[];
+}
+
 interface IStatisticResponse {
     totalCost: number;
     totalGroup: number;
@@ -18,7 +38,7 @@ interface IStatisticResponse {
     totalProduct?: number;
     list: IWorkList[];
     chart: IChartData[];
-    pieChart: any[];
+    pieChart: IStatisticProgressProcess[];
 }
 
 interface IStatisticHarvestFormData {
@@ -141,14 +161,15 @@ export const useStatisticStore = create<StatisticStore>(set => ({
     }: IStatisticFormData) => {
         const formattedStartDate = moment(startDate).toISOString();
         const formattedEndDate = moment(endDate).toISOString();
+        const targetParam = targetId ? `&targetId=${targetId}` : "";
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
-                `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}&targetId=${targetId}`,
+                `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}${targetParam}`,
             );
             if (response.data.data) {
                 const mainStatisticData = {
-                    list: [...response.data.data.list],
+                    list: [...(response.data.data.list || [])],
                     totalCost: response.data.data.totalCost,
                     totalGarden: response.data.data.totalGarden,
                     totalGroup: response.data.data.totalGroup,
@@ -157,8 +178,6 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     chart: convertToChartData(response.data.data.chart || []),
                     pieChart: [],
                 };
-
-                console.log(mainStatisticData);
 
                 set({statisticData: mainStatisticData});
                 set({isLoading: false});
@@ -195,35 +214,145 @@ export const useStatisticStore = create<StatisticStore>(set => ({
     }: IStatisticFormData) => {
         const formattedStartDate = moment(startDate).toISOString();
         const formattedEndDate = moment(endDate).toISOString();
+        const targetParam = targetId ? `&targetId=${targetId}` : "";
         set({isLoading: true});
         try {
             const response = await axiosClient.get(
-                `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}&targetId=${targetId}`,
+                `${ENV.BACKEND_URL}/resources/statistics/?type=${type}&startDate=${formattedStartDate}&endDate=${formattedEndDate}${targetParam}`,
             );
 
             if (response.data.data) {
-                const chartData = response.data.data.map((item: any) => {
-                    const notComplete = 100 - item.percentage;
+                const rawList = Array.isArray(response.data.data)
+                    ? response.data.data
+                    : [];
 
-                    return {
-                        ...item,
-                        pieChart: [
-                            {
-                                value: item.percentage,
-                                color: "#4CAF50",
-                                text: `${item.percentage}%`,
-                            },
-                            {
-                                value: notComplete,
-                                color: "#FF4E45",
-                                text:
-                                    notComplete > 0
-                                        ? `${notComplete.toFixed(1)}%`
-                                        : "",
-                            },
-                        ],
-                    };
-                });
+                const isGrouped = rawList.some((item: any) =>
+                    Array.isArray(item?.tasks),
+                );
+
+                let processList: IStatisticProgressProcess[] = [];
+
+                if (isGrouped) {
+                    processList = rawList.map((item: any) => {
+                        const tasks: IStatisticProgressTask[] = (
+                            item.tasks || []
+                        ).map((t: any) => {
+                            const rawPercentage = Number(t.percentage) || 0;
+                            const percentage = Math.min(
+                                100,
+                                Math.max(0, Math.round(rawPercentage * 10) / 10),
+                            );
+                            const notComplete =
+                                Math.round((100 - percentage) * 10) / 10;
+                            const totalProcessingRate =
+                                Math.round(
+                                    (Number(
+                                        t.totalProcessingRate ??
+                                            t.processingRate ??
+                                            0,
+                                    ) || 0) * 100,
+                                ) / 100;
+                            const totalSquare =
+                                Math.round(
+                                    (Number(t.totalSquare) || 0) * 100,
+                                ) / 100;
+
+                            return {
+                                ...t,
+                                taskName: t.taskName || "Công việc",
+                                percentage,
+                                totalProcessingRate,
+                                processingRate: totalProcessingRate,
+                                totalSquare,
+                                pieChart: [
+                                    {
+                                        value: percentage,
+                                        color: "#4CAF50",
+                                        text:
+                                            percentage > 0
+                                                ? `${percentage}%`
+                                                : "",
+                                    },
+                                    {
+                                        value: notComplete,
+                                        color: "#FF4E45",
+                                        text:
+                                            notComplete > 0
+                                                ? `${notComplete}%`
+                                                : "",
+                                    },
+                                ],
+                            };
+                        });
+
+                        return {
+                            ...item,
+                            processTitle: item.processTitle || "",
+                            tasks,
+                        };
+                    });
+                } else {
+                    const tasks: IStatisticProgressTask[] = rawList.map(
+                        (t: any) => {
+                            const rawPercentage = Number(t.percentage) || 0;
+                            const percentage = Math.min(
+                                100,
+                                Math.max(0, Math.round(rawPercentage * 10) / 10),
+                            );
+                            const notComplete =
+                                Math.round((100 - percentage) * 10) / 10;
+                            const totalProcessingRate =
+                                Math.round(
+                                    (Number(
+                                        t.totalProcessingRate ??
+                                            t.processingRate ??
+                                            0,
+                                    ) || 0) * 100,
+                                ) / 100;
+                            const totalSquare =
+                                Math.round(
+                                    (Number(t.totalSquare) || 0) * 100,
+                                ) / 100;
+
+                            return {
+                                ...t,
+                                taskName: t.taskName || "Công việc",
+                                percentage,
+                                totalProcessingRate,
+                                processingRate: totalProcessingRate,
+                                totalSquare,
+                                pieChart: [
+                                    {
+                                        value: percentage,
+                                        color: "#4CAF50",
+                                        text:
+                                            percentage > 0
+                                                ? `${percentage}%`
+                                                : "",
+                                    },
+                                    {
+                                        value: notComplete,
+                                        color: "#FF4E45",
+                                        text:
+                                            notComplete > 0
+                                                ? `${notComplete}%`
+                                                : "",
+                                    },
+                                ],
+                            };
+                        },
+                    );
+
+                    processList =
+                        tasks.length > 0
+                            ? [
+                                  {
+                                      processTitle: "",
+                                      tasks,
+                                  },
+                              ]
+                            : [];
+                }
 
                 const mainStatisticData = {
                     list: [],
@@ -233,15 +362,13 @@ export const useStatisticStore = create<StatisticStore>(set => ({
                     totalMember: 0,
                     totalWork: "0",
                     chart: [],
-                    pieChart: chartData,
+                    pieChart: processList,
                 };
                 set({statisticData: mainStatisticData});
                 set({isLoading: false});
             } else {
                 set({isLoading: false});
             }
-
-            set({isLoading: false});
         } catch (error: any) {
             console.log(error);
             set({isLoading: false});

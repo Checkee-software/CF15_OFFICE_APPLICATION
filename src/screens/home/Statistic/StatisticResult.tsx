@@ -2,6 +2,7 @@ import {useStatisticStore} from "@/stores/statisticStore";
 import React from "react";
 import {View, Text, StyleSheet, ScrollView} from "react-native";
 import {BarChart, PieChart} from "react-native-gifted-charts";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 const StatisticResult = (props: any) => {
     const {statisticData, isLoading} = useStatisticStore();
@@ -30,7 +31,7 @@ const StatisticResult = (props: any) => {
 
     // Lấy max _realValue
     const maxRealValue = Math.max(
-        ...(statisticData?.chart ?? []).map(item => item._realValue ?? 0),
+        ...(statisticData?.chart ?? []).map((item: any) => item._realValue ?? 0),
     );
 
     // Chia làm 5 mốc từ 0 đến maxRealValue
@@ -42,85 +43,191 @@ const StatisticResult = (props: any) => {
         formatCurrency(Math.round(i * step)),
     );
 
+    if (isLoading) {
+        return null;
+    }
+
     return (
-        !isLoading && (
-            <View style={styles.container}>
+        <View style={styles.container}>
                 {props.selectedType === "DISPLAY" ? (
-                    statisticData?.pieChart.length !== 0 ? (
-                        <View style={{marginVertical: 20, gap: 30}}>
-                            <View style={{flexDirection: "row", gap: 15}}>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        gap: 5,
-                                    }}>
-                                    <View
-                                        style={{
-                                            width: 12,
-                                            height: 12,
-                                            backgroundColor: "#FF4E45",
-                                            borderRadius: 6,
-                                        }}
-                                    />
+                    (() => {
+                        const progressList = Array.isArray(
+                            statisticData?.pieChart,
+                        )
+                            ? statisticData.pieChart
+                            : [];
+                        const hasProgressData = progressList.some(
+                            (item: any) =>
+                                item.tasks ? item.tasks.length > 0 : true,
+                        );
 
-                                    <Text>Chưa làm</Text>
-                                </View>
+                        if (!hasProgressData || progressList.length === 0) {
+                            return (
+                                <Text style={styles.emptyDataText}>
+                                    Không có dữ liệu thống kê
+                                </Text>
+                            );
+                        }
 
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        gap: 5,
-                                    }}>
-                                    <View
-                                        style={{
-                                            width: 12,
-                                            height: 12,
-                                            backgroundColor: "#4CAF50",
-                                            borderRadius: 6,
-                                        }}
-                                    />
-
-                                    <Text>Đã làm</Text>
-                                </View>
-                            </View>
-
-                            {statisticData?.pieChart.map(
-                                (item: any, index: number) => {
-                                    const labelsPosition =
-                                        item.percentage === 100
-                                            ? "inward"
-                                            : "mid";
-
-                                    return (
+                        return (
+                            <View style={styles.displaySectionContainer}>
+                                <View style={styles.legendContainer}>
+                                    <View style={styles.legendItemBadge}>
                                         <View
-                                            style={styles.pieChartView}
-                                            key={index}>
-                                            <PieChart
-                                                showText
-                                                textColor="white"
-                                                fontWeight="500"
-                                                radius={80}
-                                                innerRadius={30}
-                                                labelsPosition={labelsPosition}
-                                                textSize={14}
-                                                // textBackgroundRadius={26}
-                                                data={item?.pieChart}
-                                            />
-                                            <Text style={{textAlign: "center"}}>
-                                                {`${item.taskName} ${item.totalProcessingRate}/${item.totalSquare} (ha)`}
-                                            </Text>
-                                        </View>
-                                    );
-                                },
-                            )}
-                        </View>
-                    ) : (
-                        <Text style={styles.emptyDataText}>
-                            Không có dữ liệu thống kê
-                        </Text>
-                    )
+                                            style={[
+                                                styles.legendDotIndicator,
+                                                {backgroundColor: "#4CAF50"},
+                                            ]}
+                                        />
+                                        <Text style={styles.legendTextBadge}>
+                                            Đã làm
+                                        </Text>
+                                    </View>
+
+                                    <View style={styles.legendItemBadge}>
+                                        <View
+                                            style={[
+                                                styles.legendDotIndicator,
+                                                {backgroundColor: "#FF4E45"},
+                                            ]}
+                                        />
+                                        <Text style={styles.legendTextBadge}>
+                                            Chưa làm
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                {progressList.map(
+                                    (processItem: any, pIndex: number) => {
+                                        const tasks = Array.isArray(
+                                            processItem.tasks,
+                                        )
+                                            ? processItem.tasks
+                                            : [processItem];
+
+                                        if (tasks.length === 0) return null;
+
+                                        return (
+                                            <View
+                                                style={styles.processGroupCard}
+                                                key={pIndex}>
+                                                {processItem.processTitle ? (
+                                                    <View
+                                                        style={
+                                                            styles.processGroupHeader
+                                                        }>
+                                                        <MaterialIcons
+                                                            name="assignment"
+                                                            size={20}
+                                                            color="#2E7D32"
+                                                        />
+                                                        <Text
+                                                            style={
+                                                                styles.processGroupTitle
+                                                            }>
+                                                            {
+                                                                processItem.processTitle
+                                                            }
+                                                        </Text>
+                                                    </View>
+                                                ) : null}
+
+                                                <View
+                                                    style={
+                                                        styles.processTasksGrid
+                                                    }>
+                                                    {tasks.map(
+                                                        (
+                                                            taskItem: any,
+                                                            tIndex: number,
+                                                        ) => {
+                                                            const labelsPosition =
+                                                                taskItem.percentage ===
+                                                                    100 ||
+                                                                taskItem.percentage ===
+                                                                    0
+                                                                    ? "inward"
+                                                                    : "mid";
+                                                            const rate =
+                                                                taskItem.totalProcessingRate ??
+                                                                taskItem.processingRate ??
+                                                                0;
+                                                            const square =
+                                                                taskItem.totalSquare ??
+                                                                0;
+
+                                                            return (
+                                                                <View
+                                                                    style={
+                                                                        styles.taskCardItem
+                                                                    }
+                                                                    key={
+                                                                        tIndex
+                                                                    }>
+                                                                    <PieChart
+                                                                        showText
+                                                                        textColor="white"
+                                                                        fontWeight="600"
+                                                                        radius={
+                                                                            82
+                                                                        }
+                                                                        innerRadius={
+                                                                            36
+                                                                        }
+                                                                        labelsPosition={
+                                                                            labelsPosition
+                                                                        }
+                                                                        textSize={
+                                                                            14
+                                                                        }
+                                                                        data={
+                                                                            taskItem?.pieChart
+                                                                        }
+                                                                    />
+                                                                    <View
+                                                                        style={
+                                                                            styles.taskMeta
+                                                                        }>
+                                                                        <Text
+                                                                            style={
+                                                                                styles.taskNameLabel
+                                                                            }>
+                                                                            {
+                                                                                taskItem.taskName
+                                                                            }
+                                                                        </Text>
+                                                                        <View
+                                                                            style={
+                                                                                styles.taskProgressBadge
+                                                                            }>
+                                                                            <Text
+                                                                                style={
+                                                                                    styles.taskProgressText
+                                                                                }>
+                                                                                <Text
+                                                                                    style={
+                                                                                        styles.taskProgressHighlight
+                                                                                    }>
+                                                                                    {
+                                                                                        rate
+                                                                                    }
+                                                                                </Text>
+                                                                                /{square} ha ({taskItem.percentage}%)
+                                                                            </Text>
+                                                                        </View>
+                                                                    </View>
+                                                                </View>
+                                                            );
+                                                        },
+                                                    )}
+                                                </View>
+                                            </View>
+                                        );
+                                    },
+                                )}
+                            </View>
+                        );
+                    })()
                 ) : statisticData?.list.length !== 0 &&
                   statisticData?.chart.length !== 0 ? (
                     <View>
@@ -261,7 +368,7 @@ const StatisticResult = (props: any) => {
                         </View>
 
                         <View style={styles.taskListContainer}>
-                            {statisticData?.list.map((task, index) => (
+                            {statisticData?.list.map((task: any, index: number) => (
                                 <View key={index} style={styles.taskItem}>
                                     <Text style={styles.taskTitle}>
                                         {task.title}
@@ -322,12 +429,14 @@ const StatisticResult = (props: any) => {
                     </Text>
                 )}
             </View>
-        )
-    );
+        );
 };
 
 const styles = StyleSheet.create({
-    container: {},
+    container: {
+        width: "100%",
+        alignSelf: "stretch",
+    },
     listCard: {
         marginVertical: 15,
         gap: 10,
@@ -458,6 +567,115 @@ const styles = StyleSheet.create({
     pieChartView: {
         gap: 8,
         alignItems: "center",
+    },
+    displaySectionContainer: {
+        marginVertical: 14,
+        width: "100%",
+        alignSelf: "stretch",
+        gap: 16,
+    },
+    legendContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 24,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        backgroundColor: "#F9F9F9",
+        borderRadius: 24,
+        alignSelf: "center",
+        borderWidth: 1,
+        borderColor: "#EAEAEA",
+    },
+    legendItemBadge: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+    },
+    legendDotIndicator: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+    },
+    legendTextBadge: {
+        fontSize: 13,
+        fontWeight: "600",
+        color: "#424242",
+    },
+    processGroupCard: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 16,
+        padding: 16,
+        width: "100%",
+        alignSelf: "stretch",
+        borderWidth: 1,
+        borderColor: "#E8ECE9",
+        shadowColor: "#000",
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
+        elevation: 2,
+        gap: 16,
+    },
+    processGroupHeader: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+        backgroundColor: "#E8F5E9",
+        paddingVertical: 10,
+        paddingHorizontal: 14,
+        borderRadius: 10,
+    },
+    processGroupTitle: {
+        fontSize: 15,
+        fontWeight: "700",
+        color: "#1B5E20",
+        flex: 1,
+    },
+    processTasksGrid: {
+        gap: 16,
+    },
+    taskCardItem: {
+        alignItems: "center",
+        justifyContent: "center",
+        width: "100%",
+        alignSelf: "stretch",
+        paddingVertical: 16,
+        paddingHorizontal: 12,
+        backgroundColor: "#FAFAFA",
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: "#EEEEEE",
+        gap: 12,
+    },
+    taskMeta: {
+        alignItems: "center",
+        gap: 4,
+        width: "100%",
+        paddingHorizontal: 10,
+    },
+    taskNameLabel: {
+        fontSize: 15,
+        fontWeight: "600",
+        color: "#212121",
+        textAlign: "center",
+    },
+    taskProgressBadge: {
+        backgroundColor: "#F1F8E9",
+        paddingVertical: 4,
+        paddingHorizontal: 12,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: "#C8E6C9",
+    },
+    taskProgressText: {
+        fontSize: 13,
+        color: "#555",
+        fontWeight: "500",
+    },
+    taskProgressHighlight: {
+        color: "#2E7D32",
+        fontWeight: "700",
     },
     emptyDataText: {
         margin: "auto",

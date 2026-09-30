@@ -4,7 +4,7 @@ import {ScreenRegistry} from "./types";
 /* screens */
 import Main from "../../screens/home/Main";
 import FunctionPortal from "../../screens/home/Main/FunctionPortal";
-import Unit from "../../screens/home/Unit";
+import Unit from "../../screens/home/unit";
 import Profile from "../../screens/user/Profile";
 import Document from "../../screens/home/Document";
 import DocumentCategoryManager from "../../screens/home/DocumentCategory/DocumentCategoryManager";

@@ -6,6 +6,16 @@ const HOME_SCREENS = {
         headerTitle: "CF15 OFFICE",
         isOpenQRCamera: false,
     } as ScreenInformation,
+    PRODUCTION_PORTAL: {
+        key: "PRODUCTION_PORTAL",
+        headerTitle: "QUẢN TRỊ SẢN XUẤT",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    OFFICE_PORTAL: {
+        key: "OFFICE_PORTAL",
+        headerTitle: "VĂN PHÒNG ĐIỆN TỬ",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
     BROWSEADDMATERIALS: {
         key: "BROWSEADDMATERIALS",
         headerTitle: "ĐẦU TƯ TĂNG THÊM",
@@ -59,6 +69,36 @@ const HOME_SCREENS = {
     DETAILDOCUMENTS: {
         key: "DETAILDOCUMENTS",
         headerTitle: "CHI TIẾT TÀI LIỆU",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    DOCUMENT_APPROVAL_HISTORY: {
+        key: "DOCUMENT_APPROVAL_HISTORY",
+        headerTitle: "LỊCH SỬ KÝ DUYỆT",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    DOCUMENT_EXECUTION_STEPS: {
+        key: "DOCUMENT_EXECUTION_STEPS",
+        headerTitle: "BƯỚC THỰC HIỆN",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    DOCUMENT_COMMUNICATION: {
+        key: "DOCUMENT_COMMUNICATION",
+        headerTitle: "NỘI DUNG TRAO ĐỔI",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    INCOMING: {
+        key: "INCOMING",
+        headerTitle: "VĂN BẢN ĐẾN",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    OUTGOING: {
+        key: "OUTGOING",
+        headerTitle: "VĂN BẢN ĐI",
+        isOpenQRCamera: false,
+    } as ScreenInformation,
+    DOCUMENTCATEGORYMANAGER: {
+        key: "DOCUMENTCATEGORYMANAGER",
+        headerTitle: "QUẢN LÝ HỒ SƠ",
         isOpenQRCamera: false,
     } as ScreenInformation,
     GARDENINFO: {
