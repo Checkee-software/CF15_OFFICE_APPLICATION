@@ -28,10 +28,14 @@ import folderManagement from "./folder_management.png";
 import documentStatistic from "./document_statistic.png";
 import folder from "./folder.png";
 import folder_2 from "./folder_2.png";
+import planting from "./planting.png";
+import workplace from "./workplace.png";
 
 const images = {
     folder: folder,
     folder_2: folder_2,
+    planting: planting,
+    workplace: workplace,
     feedBack: feedBack,
     garden: garden,
     toDoList: toDoList,
