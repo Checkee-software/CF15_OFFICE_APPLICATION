@@ -282,16 +282,19 @@ export default function Main({navigation}: any) {
                                 <View style={styles.cardImageWrap}>
                                     <Image
                                         source={images.planting}
-                                        style={styles.cardImage}
+                                        style={[
+                                            styles.cardImage,
+                                            styles.cardImageProduction,
+                                        ]}
                                         resizeMode="contain"
                                     />
-                                    <View
-                                        style={[
-                                            styles.cardLine,
-                                            styles.cardLineLeft,
-                                        ]}
-                                    />
                                 </View>
+                                <View
+                                    style={[
+                                        styles.cardLine,
+                                        styles.cardLineLeft,
+                                    ]}
+                                />
                             </PressableCard>
                         </FadeInView>
                     </View>
@@ -313,13 +316,13 @@ export default function Main({navigation}: any) {
                                         style={styles.cardImage}
                                         resizeMode="contain"
                                     />
-                                    <View
-                                        style={[
-                                            styles.cardLine,
-                                            styles.cardLineRight,
-                                        ]}
-                                    />
                                 </View>
+                                <View
+                                    style={[
+                                        styles.cardLine,
+                                        styles.cardLineRight,
+                                    ]}
+                                />
                             </PressableCard>
                         </FadeInView>
 
@@ -415,12 +418,12 @@ export default function Main({navigation}: any) {
 
 const styles = StyleSheet.create({
     container: {flex: 1, backgroundColor: "#FFFFFF"},
-    content: {paddingHorizontal: 16, paddingTop: 14, paddingBottom: 28},
+    content: {paddingHorizontal: 12, paddingTop: 14, paddingBottom: 28},
     announcementContainer: {
         backgroundColor: GREEN,
         borderRadius: 4,
         overflow: "hidden",
-        marginHorizontal: -16,
+        marginHorizontal: -12,
         marginTop: -14,
         marginBottom: 16,
     },
@@ -493,8 +496,8 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 3,
     },
-    productionCard: {minHeight: 225},
-    officeCard: {minHeight: 265},
+    productionCard: {minHeight: 212},
+    officeCard: {minHeight: 247},
     cardTitle: {
         color: "#FFFFFF",
         fontSize: 19,
@@ -507,16 +510,23 @@ const styles = StyleSheet.create({
         lineHeight: 20,
         marginTop: 8,
     },
-    cardImageWrap: {flex: 1, justifyContent: "flex-end", marginTop: 8},
-    cardImage: {width: "100%", height: 96},
+    cardImageWrap: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 14,
+    },
+    cardImage: {width: "100%", height: 100},
+    cardImageProduction: {height: 120},
     cardLine: {
         width: "50%",
         height: 1.5,
         backgroundColor: "rgba(255,255,255,0.85)",
         marginTop: 6,
+        marginBottom: 8,
     },
-    cardLineLeft: {alignSelf: "flex-start", marginLeft: 6},
-    cardLineRight: {alignSelf: "flex-end", marginRight: 6},
+    cardLineLeft: {alignSelf: "flex-start", marginLeft: 4},
+    cardLineRight: {alignSelf: "flex-end", marginRight: 4},
 
     statCard: {
         backgroundColor: DARK_GREEN,
