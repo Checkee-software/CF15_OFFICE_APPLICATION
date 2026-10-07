@@ -15,6 +15,9 @@ import {
     ViewStyle,
 } from "react-native";
 import "moment/locale/vi";
+import {GestureHandlerRootView} from "react-native-gesture-handler";
+import {Marquee} from "@animatereactnative/marquee";
+import {useIsFocused} from "@react-navigation/native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import images from "@/assets/images";
 import SCREEN_INFO from "@/config/SCREEN_CONFIG/screenInfo";
@@ -106,6 +109,7 @@ export default function Main({navigation}: any) {
     const {news, fetchNews, getFullAvatarUrl} = useNewsStore();
     const [announcement, setAnnouncement] = useState("");
     const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         fetchActiveNotification();
@@ -206,6 +210,32 @@ export default function Main({navigation}: any) {
                 showsVerticalScrollIndicator={false}
                 bounces={false}
                 overScrollMode="never">
+                {/* Thanh thông báo chạy chữ */}
+                {announcement && isFocused ? (
+                    <View style={styles.announcementContainer}>
+                        <View style={styles.announcementRow}>
+                            <MaterialCommunityIcons
+                                name="lightbulb-on-outline"
+                                size={20}
+                                color="#FFFFFF"
+                            />
+                            <View style={styles.announcementDivider} />
+
+                            <GestureHandlerRootView style={styles.marqueeWrap}>
+                                <Marquee
+                                    frameRate={30}
+                                    spacing={120}
+                                    speed={1.1}
+                                    withGesture={false}>
+                                    <Text style={styles.announcementText}>
+                                        {announcement}
+                                    </Text>
+                                </Marquee>
+                            </GestureHandlerRootView>
+                        </View>
+                    </View>
+                ) : null}
+
                 {/* Header */}
                 <FadeInView style={styles.welcomeUser}>
                     <View style={styles.helloTime}>
@@ -366,7 +396,7 @@ export default function Main({navigation}: any) {
                     />
                 </FadeInView>
 
-                {/* Thông báo */}
+                {/* Khung thông báo cuối trang */}
                 {announcement ? (
                     <FadeInView delay={320} style={styles.noticeBox}>
                         <MaterialCommunityIcons
@@ -386,6 +416,28 @@ export default function Main({navigation}: any) {
 const styles = StyleSheet.create({
     container: {flex: 1, backgroundColor: "#FFFFFF"},
     content: {paddingHorizontal: 16, paddingTop: 14, paddingBottom: 28},
+    announcementContainer: {
+        backgroundColor: GREEN,
+        borderRadius: 4,
+        overflow: "hidden",
+        marginHorizontal: -16,
+        marginTop: -14,
+        marginBottom: 16,
+    },
+    announcementRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+    },
+    announcementDivider: {
+        width: 1,
+        height: 16,
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        marginHorizontal: 8,
+    },
+    marqueeWrap: {flex: 1},
+    announcementText: {color: "#FFFFFF", fontWeight: "500", fontSize: 16},
     flex1: {flex: 1},
     cardPressable: {flex: 1},
 
